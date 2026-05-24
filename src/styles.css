@@ -205,7 +205,7 @@ kbd { background: var(--bg-tertiary); border: 1px solid var(--border-color); bor
 
 /* Layers panel */
 .layers-panel {
-    position: fixed; top: 60px; right: 0; bottom: 40px; width: 260px;
+    position: fixed; top: 60px; right: 0; bottom: 0; width: 260px;
     background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
     backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%);
     border-left: 1px solid var(--border-color); display: flex; flex-direction: column;
