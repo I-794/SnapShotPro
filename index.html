@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapShot-Pro v4 — Pro Editor</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📸</div>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v4</span></span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="theme-toggle-btn" title="Toggle Theme">🌙</button>
+                <button class="btn btn-secondary" id="shortcuts-btn" title="Keyboard Shortcuts">⌨️</button>
+                <button class="btn btn-secondary" id="undo-btn" disabled>↶ Undo</button>
+                <button class="btn btn-secondary" id="redo-btn" disabled>↷ Redo</button>
+                <button class="btn btn-secondary" id="reset-btn">Reset</button>
+                <button class="btn btn-success" id="export-btn">Export Image</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <h3 class="section-title">Image Upload</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <button class="btn btn-primary" style="flex:1;" id="upload-btn"><span>📁</span> Choose Image</button>
+                <button class="btn btn-secondary" style="flex:1;" id="svg-btn"><span>&lt;/&gt;</span> SVG Code</button>
+            </div>
+            <p class="info-text">Or paste (Ctrl+V) / drag &amp; drop an image</p>
+            <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="add-image-btn">+ Add Another Image</button>
+            <input type="file" id="extra-file-input" accept="image/*" style="display:none;">
+            <div id="extra-images-list"></div>
+            <input type="file" id="file-input" accept="image/*">
+            <div id="svg-input-container" style="display:none;margin-top:16px;">
+                <label class="control-label">Paste SVG Code</label>
+                <textarea class="control-input" id="svg-code-input" placeholder="<svg>...</svg>" style="min-height:120px;font-family:monospace;font-size:12px;"></textarea>
+                <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="render-svg-btn">Render SVG</button>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Auto Layout</h3>
+            <div class="layout-picker-grid">
+                <button class="layout-btn active" data-layout="free" title="Free positioning"><div class="lp" style="flex-direction:column;"><div class="lp-img" style="flex:1;"></div></div></button>
+                <button class="layout-btn" data-layout="col-1" title="Stack vertical"><div class="lp" style="flex-direction:column;"><div class="lp-img" style="flex:1;"></div><div class="lp-img" style="flex:1;"></div></div></button>
+                <button class="layout-btn" data-layout="grid-2x2" title="2×2 Grid"><div class="lp" style="flex-direction:column;"><div class="lp-row-inner"><div class="lp-img"></div><div class="lp-img"></div></div><div class="lp-row-inner"><div class="lp-img"></div><div class="lp-img"></div></div></div></button>
+                <button class="layout-btn" data-layout="row-1" title="Side by side"><div class="lp" style="flex-direction:row;"><div class="lp-img"></div><div class="lp-img"></div></div></button>
+            </div>
+            <div class="divider"></div>
+            <div class="control-group">
+                <label class="control-label">SPACING / GAP</label>
+                <div class="range-group"><input type="range" class="range-input" id="layout-gap" min="0" max="80" value="40"><span class="range-value" id="layout-gap-value">40px</span></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">ALIGNMENT</label>
+                <div class="alignment-buttons">
+                    <button class="align-btn" data-align="start">Start</button>
+                    <button class="align-btn active" data-align="center">Center</button>
+                    <button class="align-btn" data-align="end">End</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Image Editing</h3>
+            <label class="control-label">Transform</label>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;">
+                <button class="btn btn-secondary" id="rotate-left-btn">↶ 90°</button>
+                <button class="btn btn-secondary" id="rotate-right-btn">↷ 90°</button>
+                <button class="btn btn-secondary" id="flip-h-btn">↔ Flip H</button>
+                <button class="btn btn-secondary" id="flip-v-btn">↕ Flip V</button>
+            </div>
+            <label class="control-label">Filters</label>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Brightness</label><div class="range-group"><input type="range" class="range-input" id="brightness" min="0" max="200" value="100"><span class="range-value" id="brightness-value">100%</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Contrast</label><div class="range-group"><input type="range" class="range-input" id="contrast" min="0" max="200" value="100"><span class="range-value" id="contrast-value">100%</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Saturation</label><div class="range-group"><input type="range" class="range-input" id="saturation" min="0" max="200" value="100"><span class="range-value" id="saturation-value">100%</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Blur</label><div class="range-group"><input type="range" class="range-input" id="blur" min="0" max="20" value="0"><span class="range-value" id="blur-value">0px</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Grayscale</label><div class="range-group"><input type="range" class="range-input" id="grayscale" min="0" max="100" value="0"><span class="range-value" id="grayscale-value">0%</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Sepia</label><div class="range-group"><input type="range" class="range-input" id="sepia" min="0" max="100" value="0"><span class="range-value" id="sepia-value">0%</span></div></div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Text &amp; Annotations</h3>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" id="add-text-btn">+ Add Text</button>
+            <div id="text-controls" style="display:none;">
+                <div class="control-group"><label class="control-label">Text Content</label><input type="text" class="control-input" id="text-content" placeholder="Enter text..."></div>
+                <div class="control-group"><label class="control-label">Font Size</label><div class="range-group"><input type="range" class="range-input" id="text-size" min="12" max="120" value="48"><span class="range-value" id="text-size-value">48px</span></div></div>
+                <div class="control-group"><label class="control-label">Font Family</label><select class="control-input" id="text-font"><option>Arial</option><option>Helvetica</option><option>Times New Roman</option><option>Courier New</option><option>Georgia</option><option>Verdana</option><option>Impact</option></select></div>
+                <div class="control-group"><label class="control-label">Text Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-color" value="#ffffff"></div><input type="text" class="control-input" id="text-color-text" value="#ffffff" style="flex:1;"></div></div>
+                <div class="toggle-switch"><span class="toggle-label">Bold</span><label class="switch"><input type="checkbox" id="text-bold"><span class="slider"></span></label></div>
+                <div class="toggle-switch"><span class="toggle-label">Italic</span><label class="switch"><input type="checkbox" id="text-italic"><span class="slider"></span></label></div>
+                <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="remove-text-btn">Remove Text</button>
+                <p class="info-text" style="margin-top:8px;">Tip: Drag text on the canvas to reposition it</p>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Background</h3>
+            <div class="tab-row">
+                <button class="tab-btn active" data-bg="gradient">Gradient</button>
+                <button class="tab-btn" data-bg="mesh">Mesh</button>
+                <button class="tab-btn" data-bg="solid">Solid</button>
+                <button class="tab-btn" data-bg="transparent">Transparent</button>
+            </div>
+            <div id="bg-mesh-panel" style="display:none;">
+                <div class="mesh-pad" id="mesh-pad"></div>
+                <div class="tab-row" style="margin-top:8px;">
+                    <button class="tab-btn" data-mesh-preset="aurora">Aurora</button>
+                    <button class="tab-btn" data-mesh-preset="sunset">Sunset</button>
+                    <button class="tab-btn" data-mesh-preset="cyber">Cyber</button>
+                    <button class="tab-btn" data-mesh-preset="pastel">Pastel</button>
+                </div>
+                <p class="info-text" style="margin-top:8px;">Drag dots to position color blobs. Click a dot to change its color.</p>
+            </div>
+            <div id="bg-gradient-panel">
+                <div class="preset-grid">
+                    <div class="preset-button" data-preset="sunset" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);"><span class="preset-label">Sunset</span></div>
+                    <div class="preset-button" data-preset="ocean" style="background:linear-gradient(135deg,#2E3192 0%,#1BFFFF 100%);"><span class="preset-label">Ocean</span></div>
+                    <div class="preset-button" data-preset="forest" style="background:linear-gradient(135deg,#134E5E 0%,#71B280 100%);"><span class="preset-label">Forest</span></div>
+                    <div class="preset-button" data-preset="fire" style="background:linear-gradient(135deg,#F2994A 0%,#F2C94C 100%);"><span class="preset-label">Fire</span></div>
+                    <div class="preset-button" data-preset="midnight" style="background:linear-gradient(135deg,#0F2027 0%,#203A43 50%,#2C5364 100%);"><span class="preset-label">Midnight</span></div>
+                    <div class="preset-button" data-preset="rose" style="background:linear-gradient(135deg,#ED4264 0%,#FFEDBC 100%);"><span class="preset-label">Rose</span></div>
+                    <div class="preset-button" data-preset="purple" style="background:linear-gradient(135deg,#A8EDEA 0%,#FED6E3 100%);"><span class="preset-label">Purple Dream</span></div>
+                    <div class="preset-button" data-preset="mint" style="background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);"><span class="preset-label">Mint</span></div>
+                </div>
+                <div class="divider"></div>
+                <div class="control-group"><label class="control-label">Gradient Type</label><select class="control-input" id="gradient-type"><option value="linear">Linear</option><option value="radial">Radial</option></select></div>
+                <div class="control-group" id="gradient-angle-group">
+                    <label class="control-label">Angle</label>
+                    <div class="angle-input-group">
+                        <div class="angle-visual"><div class="angle-indicator" id="angle-indicator"></div></div>
+                        <div class="range-group" style="flex:1;"><input type="range" class="range-input" id="gradient-angle" min="0" max="360" value="135"><span class="range-value" id="gradient-angle-value">135°</span></div>
+                    </div>
+                </div>
+                <div class="gradient-stops">
+                    <div class="gradient-stop"><div class="gradient-stop-color"><input type="color" id="gradient-color-1" value="#667eea"></div><div class="gradient-stop-position"><div class="range-group"><input type="range" class="range-input" id="gradient-pos-1" min="0" max="100" value="0"><span class="range-value" id="gradient-pos-1-value">0%</span></div></div></div>
+                    <div class="gradient-stop"><div class="gradient-stop-color"><input type="color" id="gradient-color-2" value="#764ba2"></div><div class="gradient-stop-position"><div class="range-group"><input type="range" class="range-input" id="gradient-pos-2" min="0" max="100" value="100"><span class="range-value" id="gradient-pos-2-value">100%</span></div></div></div>
+                </div>
+                <div class="gradient-preview" id="gradient-preview"></div>
+            </div>
+            <div id="bg-solid-panel" style="display:none;">
+                <div class="control-group"><label class="control-label">Background Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="bg-solid-color" value="#1a1a2e"></div><input type="text" class="control-input" id="bg-solid-color-text" value="#1a1a2e" style="flex:1;"></div></div>
+            </div>
+            <div id="bg-transparent-panel" style="display:none;">
+                <div class="checkerboard-info"></div>
+                <p class="info-text">Canvas will have a transparent background. Export as PNG to preserve transparency.</p>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Image Settings</h3>
+            <div class="control-group"><label class="control-label">Padding</label><div class="range-group"><input type="range" class="range-input" id="padding" min="0" max="200" value="60"><span class="range-value" id="padding-value">60px</span></div></div>
+            <div class="control-group"><label class="control-label">Scale</label><div class="range-group"><input type="range" class="range-input" id="scale" min="50" max="150" value="100"><span class="range-value" id="scale-value">100%</span></div></div>
+            <div class="control-group"><label class="control-label">Border Radius</label><div class="range-group"><input type="range" class="range-input" id="border-radius" min="0" max="50" value="12"><span class="range-value" id="border-radius-value">12px</span></div></div>
+            <div class="toggle-switch"><span class="toggle-label">Show Border</span><label class="switch"><input type="checkbox" id="show-border"><span class="slider"></span></label></div>
+            <div class="control-group" id="border-controls" style="display:none;">
+                <label class="control-label">Border Width</label>
+                <div class="range-group"><input type="range" class="range-input" id="border-width" min="1" max="20" value="2"><span class="range-value" id="border-width-value">2px</span></div>
+                <label class="control-label" style="margin-top:12px;">Border Color</label>
+                <div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="border-color" value="#ffffff"></div><input type="text" class="control-input" id="border-color-text" value="#ffffff" style="flex:1;"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">3D Tilt</h3>
+            <div class="control-group"><label class="control-label">Rotate X</label><div class="range-group"><input type="range" class="range-input" id="tilt-rx" min="-60" max="60" value="0"><span class="range-value" id="tilt-rx-value">0°</span></div></div>
+            <div class="control-group"><label class="control-label">Rotate Y</label><div class="range-group"><input type="range" class="range-input" id="tilt-ry" min="-60" max="60" value="0"><span class="range-value" id="tilt-ry-value">0°</span></div></div>
+            <div class="control-group"><label class="control-label">Rotate Z</label><div class="range-group"><input type="range" class="range-input" id="tilt-rz" min="-180" max="180" value="0"><span class="range-value" id="tilt-rz-value">0°</span></div></div>
+            <div class="control-group"><label class="control-label">Perspective</label><div class="range-group"><input type="range" class="range-input" id="tilt-perspective" min="400" max="2400" value="1200"><span class="range-value" id="tilt-perspective-value">1200px</span></div></div>
+            <button class="btn btn-secondary" style="width:100%;" id="tilt-reset-btn">Reset Tilt</button>
+            <div class="tab-row" style="margin-top:8px;">
+                <button class="tab-btn" data-tilt-preset="iso">Isometric</button>
+                <button class="tab-btn" data-tilt-preset="lean">Lean</button>
+                <button class="tab-btn" data-tilt-preset="card">Card</button>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Mockup Scenes</h3>
+            <div class="scenes-grid" id="scenes-grid">
+                <div class="scene-tile active" data-scene=""><div class="scene-thumb">⊘</div>None</div>
+                <div class="scene-tile" data-scene="laptop"><div class="scene-thumb">💻</div>Laptop</div>
+                <div class="scene-tile" data-scene="phone"><div class="scene-thumb">📱</div>Phone</div>
+                <div class="scene-tile" data-scene="tablet"><div class="scene-thumb">📺</div>Tablet</div>
+                <div class="scene-tile" data-scene="blurred"><div class="scene-thumb">🌫</div>Blurred</div>
+                <div class="scene-tile" data-scene="float"><div class="scene-thumb">🪟</div>Floating</div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Device &amp; Window Frame</h3>
+            <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><option value="macos">macOS Window</option><option value="windows">Windows Window</option><option value="iphone">iPhone 15</option><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></select></div>
+            <div id="device-frame-controls" style="display:none;">
+                <div class="control-group"><label class="control-label">Frame Color</label><select class="control-input" id="device-frame-color"><option value="dark">Dark / Space Black</option><option value="light">Light / Silver</option></select></div>
+                <div class="control-group" id="frame-url-group" style="display:none;"><label class="control-label">URL / Title</label><input type="text" class="control-input" id="frame-url" placeholder="https://example.com" value="https://example.com"></div>
+                <div class="control-group" id="frame-title-group" style="display:none;"><label class="control-label">Window Title</label><input type="text" class="control-input" id="frame-title" placeholder="Screenshot" value="Screenshot"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Shadow Settings</h3>
+            <div class="shadow-preset-grid">
+                <div class="shadow-preset-btn active" data-shadow="soft">Soft</div>
+                <div class="shadow-preset-btn" data-shadow="medium">Medium</div>
+                <div class="shadow-preset-btn" data-shadow="hard">Hard</div>
+                <div class="shadow-preset-btn" data-shadow="none">None</div>
+            </div>
+            <div class="divider"></div>
+            <div class="control-group"><label class="control-label">Shadow Blur</label><div class="range-group"><input type="range" class="range-input" id="shadow-blur" min="0" max="100" value="40"><span class="range-value" id="shadow-blur-value">40px</span></div></div>
+            <div class="control-group"><label class="control-label">Shadow Spread</label><div class="range-group"><input type="range" class="range-input" id="shadow-spread" min="0" max="50" value="10"><span class="range-value" id="shadow-spread-value">10px</span></div></div>
+            <div class="control-group"><label class="control-label">Shadow Opacity</label><div class="range-group"><input type="range" class="range-input" id="shadow-opacity" min="0" max="100" value="30"><span class="range-value" id="shadow-opacity-value">30%</span></div></div>
+            <div class="control-group"><label class="control-label">Offset X</label><div class="range-group"><input type="range" class="range-input" id="shadow-x" min="-50" max="50" value="0"><span class="range-value" id="shadow-x-value">0px</span></div></div>
+            <div class="control-group"><label class="control-label">Offset Y</label><div class="range-group"><input type="range" class="range-input" id="shadow-y" min="-50" max="50" value="10"><span class="range-value" id="shadow-y-value">10px</span></div></div>
+            <div class="control-group"><label class="control-label">Shadow Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="shadow-color" value="#000000"></div><input type="text" class="control-input" id="shadow-color-text" value="#000000" style="flex:1;"></div></div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Privacy Tools</h3>
+            <p class="info-text" style="margin-bottom:12px;">Use the ▓ Redact tool in the toolbar above the canvas to draw boxes.</p>
+            <div class="control-group"><label class="control-label">Redaction Style</label><select class="control-input" id="redact-type"><option value="pixelate">Pixelate</option><option value="blur">Blur</option></select></div>
+            <div class="control-group"><label class="control-label">Intensity</label><div class="range-group"><input type="range" class="range-input" id="redact-intensity" min="4" max="40" value="12"><span class="range-value" id="redact-intensity-value">12</span></div></div>
+            <button class="btn btn-secondary" style="width:100%;" id="clear-redactions-btn">Clear All Redactions</button>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Spotlight Effect</h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Spotlight</span><label class="switch"><input type="checkbox" id="spotlight-enabled"><span class="slider"></span></label></div>
+            <div id="spotlight-controls" style="display:none;margin-top:16px;">
+                <p class="info-text" style="margin-bottom:12px;">Use the ◎ Spotlight tool above the canvas to drag a region.</p>
+                <div class="control-group"><label class="control-label">Dim Opacity</label><div class="range-group"><input type="range" class="range-input" id="spotlight-opacity" min="10" max="95" value="65"><span class="range-value" id="spotlight-opacity-value">65%</span></div></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Canvas Settings</h3>
+            <div class="control-group"><label class="control-label">Canvas Width</label><input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100"></div>
+            <div class="control-group"><label class="control-label">Canvas Height</label><input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100"></div>
+            <div class="export-size-grid">
+                <div class="size-preset-btn" data-size="twitter"><span class="size-preset-label">Twitter</span><span class="size-preset-dims">1200 × 675</span></div>
+                <div class="size-preset-btn" data-size="instagram"><span class="size-preset-label">Instagram</span><span class="size-preset-dims">1080 × 1080</span></div>
+                <div class="size-preset-btn" data-size="facebook"><span class="size-preset-label">Facebook</span><span class="size-preset-dims">1200 × 630</span></div>
+                <div class="size-preset-btn" data-size="linkedin"><span class="size-preset-label">LinkedIn</span><span class="size-preset-dims">1200 × 627</span></div>
+            </div>
+            <p class="info-text">Export quality: PNG (Lossless)</p>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Watermark</h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Watermark</span><label class="switch"><input type="checkbox" id="watermark-enabled"><span class="slider"></span></label></div>
+            <div id="watermark-controls" style="display:none;margin-top:16px;">
+                <div class="control-group"><label class="control-label">Watermark Text</label><input type="text" class="control-input" id="watermark-text" placeholder="Your watermark..." value=""></div>
+                <div class="control-group"><label class="control-label">Position</label><select class="control-input" id="watermark-position"><option value="bottom-right">Bottom Right</option><option value="bottom-left">Bottom Left</option><option value="top-right">Top Right</option><option value="top-left">Top Left</option><option value="center">Center</option></select></div>
+                <div class="control-group"><label class="control-label">Font Size</label><div class="range-group"><input type="range" class="range-input" id="watermark-size" min="10" max="48" value="16"><span class="range-value" id="watermark-size-value">16px</span></div></div>
+                <div class="control-group"><label class="control-label">Opacity</label><div class="range-group"><input type="range" class="range-input" id="watermark-opacity" min="0" max="100" value="50"><span class="range-value" id="watermark-opacity-value">50%</span></div></div>
+                <div class="control-group"><label class="control-label">Color</label><div style="display:flex;gap:8px;"><input type="color" id="watermark-color" value="#ffffff" style="width:60px;height:40px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);cursor:pointer;"><input type="text" class="control-input" id="watermark-color-text" value="#ffffff" placeholder="#ffffff" style="flex:1;"></div></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Export Settings</h3>
+            <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></div>
+            <div id="quality-controls" style="display:none;">
+                <div class="control-group"><label class="control-label">Quality</label><div class="range-group"><input type="range" class="range-input" id="export-quality" min="1" max="100" value="92"><span class="range-value" id="export-quality-value">92%</span></div></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="copy-clipboard-btn">📋 Copy to Clipboard</button>
+            <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="export-html-btn">🌐 Export as HTML Card</button>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Templates</h3>
+            <div class="control-group"><label class="control-label">Template Name</label><input type="text" class="control-input" id="template-name" placeholder="My Template"></div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <button class="btn btn-primary" style="flex:1;" id="save-template-btn">💾 Save</button>
+                <button class="btn btn-secondary" style="flex:1;" id="clear-templates-btn">🗑 Clear All</button>
+            </div>
+            <div class="control-group"><label class="control-label">Load Template</label><select class="control-input" id="template-list"><option value="">-- Select Template --</option></select></div>
+            <button class="btn btn-secondary" style="width:100%;" id="load-template-btn">Load Template</button>
+            <p class="info-text" id="template-info">No templates saved</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="annotation-toolbar" id="annotation-toolbar" style="display:none;">
+            <button class="ann-tool-btn active" data-tool="select">↖ Select</button>
+            <button class="ann-tool-btn" data-tool="arrow">→ Arrow</button>
+            <button class="ann-tool-btn" data-tool="rect">▭ Rect</button>
+            <button class="ann-tool-btn" data-tool="circle">○ Circle</button>
+            <button class="ann-tool-btn" data-tool="number">① Number</button>
+            <button class="ann-tool-btn" data-tool="redact">▓ Redact</button>
+            <button class="ann-tool-btn" data-tool="spotlight">◎ Spotlight</button>
+            <button class="ann-tool-btn" id="sticker-btn" title="Stickers">✨ Stickers</button>
+            <div style="width:1px;background:var(--border-color);margin:0 4px;align-self:stretch;"></div>
+            <input type="color" id="ann-color" value="#ff3b30" title="Annotation Color" style="width:32px;height:32px;border-radius:6px;border:2px solid var(--border-color);cursor:pointer;">
+            <select id="ann-stroke" style="padding:4px 8px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
+                <option value="2">Thin</option><option value="4" selected>Medium</option><option value="6">Thick</option><option value="8">Bold</option>
+            </select>
+            <button id="ann-delete-btn" class="ann-tool-btn" style="margin-left:4px;">🗑 Delete</button>
+            <button id="ann-clear-btn" class="ann-tool-btn">Clear All</button>
+        </div>
+
+        <div class="canvas-container" id="drop-zone">
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">
+                    <h3>Drop your screenshot here</h3>
+                    <p>or click to browse • Supports PNG, JPG, WebP</p>
+                </div>
+            </div>
+            <div class="canvas-viewport" id="canvas-viewport">
+                <div class="zoom-controls" id="zoom-controls" style="display:none;">
+                    <button id="zoom-out" title="Zoom out">−</button>
+                    <span class="zoom-label" id="zoom-label">100%</span>
+                    <button id="zoom-in" title="Zoom in">+</button>
+                    <button id="zoom-fit" title="Fit to screen">Fit</button>
+                </div>
+                <div class="minimap" id="minimap">
+                    <canvas id="minimap-canvas" width="160" height="90"></canvas>
+                    <div class="minimap-viewport" id="minimap-viewport"></div>
+                </div>
+                <div class="canvas-wrapper canvas-wrapper-v4" id="canvas-wrapper" style="display:none;">
+                    <canvas id="preview-canvas" data-tool="select"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="layers-panel" id="layers-panel">
+        <div class="layers-header">
+            <h3>Layers</h3>
+            <button class="layers-toggle-btn" id="layers-toggle-btn" title="Collapse">⇲</button>
+        </div>
+        <div class="layers-list" id="layers-list">
+            <div class="layers-empty">Load an image to see layers</div>
+        </div>
+    </aside>
+
+    <div class="history-timeline" id="history-timeline">
+        <div class="history-controls">
+            <button class="history-btn" id="history-undo-btn" title="Undo (Ctrl+Z)">↶</button>
+            <button class="history-btn" id="history-redo-btn" title="Redo (Ctrl+Y)">↷</button>
+        </div>
+        <span id="history-position">0 / 0</span>
+        <div class="history-track" id="history-track"></div>
+        <span style="opacity:0.7;">⌘K palette</span>
+    </div>
+
+    <div class="status-pill" id="status-pill"></div>
+</div>
+
+<div class="palette-overlay" id="palette-overlay">
+    <div class="palette">
+        <input class="palette-input" id="palette-input" type="text" placeholder="Type a command… (e.g. export png, add arrow, toggle theme)" autocomplete="off" spellcheck="false">
+        <div class="palette-results" id="palette-results"></div>
+    </div>
+</div>
+
+<div class="sticker-drawer" id="sticker-drawer">
+    <div class="sticker-drawer-header">
+        <strong style="font-size:13px;">Stickers</strong>
+        <button class="layers-toggle-btn" id="sticker-close">✕</button>
+    </div>
+    <div class="sticker-cats" id="sticker-cats">
+        <button class="sticker-cat-btn active" data-cat="reactions">Reactions</button>
+        <button class="sticker-cat-btn" data-cat="badges">Badges</button>
+        <button class="sticker-cat-btn" data-cat="arrows">Arrows</button>
+        <button class="sticker-cat-btn" data-cat="callouts">Callouts</button>
+    </div>
+    <div class="sticker-grid" id="sticker-grid"></div>
+</div>
+
+<div class="notification" id="notification">
+    <span class="notification-icon">✓</span>
+    <span class="notification-text" id="notification-text">Image exported successfully!</span>
+</div>
+
+<div class="shortcuts-overlay" id="shortcuts-overlay" style="display:none;">
+    <div class="shortcuts-modal">
+        <div class="shortcuts-header">
+            <h3>Keyboard Shortcuts</h3>
+            <button id="close-shortcuts-btn" class="btn btn-secondary" style="padding:6px 12px;">✕</button>
+        </div>
+        <div class="shortcuts-grid">
+            <div class="shortcut-item"><kbd>Ctrl+S</kbd><span>Export image</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+Z</kbd><span>Undo</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+Y</kbd><span>Redo</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+Shift+C</kbd><span>Copy to clipboard</span></div>
+            <div class="shortcut-item"><kbd>Cmd/Ctrl+K</kbd><span>Command palette</span></div>
+            <div class="shortcut-item"><kbd>Delete / Backspace</kbd><span>Delete selected</span></div>
+            <div class="shortcut-item"><kbd>Escape</kbd><span>Deselect / Select tool</span></div>
+            <div class="shortcut-item"><kbd>?</kbd><span>Toggle this overlay</span></div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

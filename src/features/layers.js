@@ -1,0 +1,204 @@
+import { state } from '../state/state.js';
+import { el } from '../ui/elements.js';
+import { saveStateToHistory } from '../state/history.js';
+import { render } from '../render/render.js';
+import { escapeHTML } from '../utils/dom.js';
+
+function buildLayerList() {
+  const layers = [];
+  if (state.image) layers.push({ id: 'L:image', kind: 'image', name: 'Main image', icon: '🖼', visible: true, locked: false, ref: null });
+  (state.extraImages || []).forEach((ex, i) => {
+    layers.push({ id: 'L:extra:' + ex.id, kind: 'extraImage', name: ex.name || ('Image ' + (i + 2)), icon: '🖼', visible: ex.visible !== false, locked: !!ex.locked, ref: ex });
+  });
+  (state.redactions || []).forEach((r, i) => {
+    layers.push({ id: 'L:redact:' + r.id, kind: 'redaction', name: r.name || ('Redaction ' + (i + 1)), icon: '▓', visible: r.visible !== false, locked: !!r.locked, ref: r });
+  });
+  (state.annotations || []).forEach((a, i) => {
+    const iconMap = { arrow: '→', rect: '▭', circle: '○', number: '①', sticker: '✨' };
+    const nameMap = { arrow: 'Arrow', rect: 'Rectangle', circle: 'Ellipse', number: 'Number', sticker: 'Sticker' };
+    layers.push({
+      id: 'L:ann:' + a.id, kind: 'annotation',
+      name: a.name || (a.type === 'sticker' && a.glyph ? 'Sticker ' + a.glyph : nameMap[a.type] || a.type),
+      icon: iconMap[a.type] || '◆',
+      visible: a.visible !== false, locked: !!a.locked, ref: a
+    });
+  });
+  if (state.spotlight && state.spotlight.enabled) {
+    layers.push({ id: 'L:spotlight', kind: 'spotlight', name: 'Spotlight', icon: '◎', visible: true, locked: false, ref: state.spotlight });
+  }
+  if (state.textOverlay && state.textOverlay.enabled) {
+    layers.push({ id: 'L:text', kind: 'text', name: 'Text: ' + (state.textOverlay.content || 'Untitled').slice(0, 18), icon: 'T', visible: true, locked: false, ref: state.textOverlay });
+  }
+  if (state.watermark && state.watermark.enabled) {
+    layers.push({ id: 'L:watermark', kind: 'watermark', name: 'Watermark', icon: '©', visible: true, locked: false, ref: state.watermark });
+  }
+  return layers;
+}
+
+let _draggedLayerId = null;
+
+export function renderLayersPanel() {
+  const list = el.layersList;
+  if (!list) return;
+  const layers = buildLayerList();
+  if (layers.length === 0) {
+    list.innerHTML = '<div class="layers-empty">Load an image to see layers</div>';
+    return;
+  }
+  const reversed = layers.slice().reverse();
+  list.innerHTML = reversed.map(l => {
+    const isSelected = state.selection.layerIds.includes(l.id);
+    const eye = l.visible ? '👁' : '⊘';
+    const lock = l.locked ? '🔒' : '';
+    return `<div class="layer-row${isSelected ? ' selected' : ''}" data-layer-id="${l.id}" draggable="true">
+      <button class="layer-action-btn${l.visible ? ' active' : ''}" data-act="vis" title="Visibility">${eye}</button>
+      <span class="layer-icon">${l.icon}</span>
+      <span class="layer-name" data-name="${l.id}">${escapeHTML(l.name)}</span>
+      <button class="layer-action-btn${l.locked ? ' locked' : ''}" data-act="lock" title="Lock">${lock || '🔓'}</button>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.layer-row').forEach(row => {
+    const id = row.dataset.layerId;
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.layer-action-btn')) return;
+      if (e.shiftKey) {
+        const i = state.selection.layerIds.indexOf(id);
+        if (i >= 0) state.selection.layerIds.splice(i, 1);
+        else state.selection.layerIds.push(id);
+      } else {
+        state.selection.layerIds = [id];
+      }
+      renderLayersPanel();
+    });
+    row.addEventListener('dblclick', () => beginRenameLayer(id));
+    row.addEventListener('dragstart', () => { _draggedLayerId = id; row.classList.add('dragging'); });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      list.querySelectorAll('.layer-row').forEach(r => r.classList.remove('drop-target'));
+      _draggedLayerId = null;
+    });
+    row.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      list.querySelectorAll('.layer-row').forEach(r => r.classList.remove('drop-target'));
+      row.classList.add('drop-target');
+    });
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.classList.remove('drop-target');
+      if (_draggedLayerId && _draggedLayerId !== id) reorderLayer(_draggedLayerId, id);
+    });
+  });
+  list.querySelectorAll('.layer-action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const row = btn.closest('.layer-row');
+      const id = row.dataset.layerId;
+      const act = btn.dataset.act;
+      if (act === 'vis') toggleLayerVisibility(id);
+      if (act === 'lock') toggleLayerLock(id);
+    });
+  });
+}
+
+function findLayerRef(id) {
+  if (id === 'L:image') return { kind: 'image', ref: state.image };
+  if (id === 'L:spotlight') return { kind: 'spotlight', ref: state.spotlight };
+  if (id === 'L:text') return { kind: 'text', ref: state.textOverlay };
+  if (id === 'L:watermark') return { kind: 'watermark', ref: state.watermark };
+  const m = /^L:(extra|redact|ann):(.+)$/.exec(id);
+  if (!m) return null;
+  const map = { extra: state.extraImages, redact: state.redactions, ann: state.annotations };
+  const arr = map[m[1]] || [];
+  const item = arr.find(x => String(x.id) === m[2]);
+  return item ? { kind: m[1], ref: item, arr } : null;
+}
+
+function toggleLayerVisibility(id) {
+  const f = findLayerRef(id);
+  if (!f || !f.ref) return;
+  if (f.kind === 'spotlight') state.spotlight.enabled = !state.spotlight.enabled;
+  else if (f.kind === 'text') state.textOverlay.enabled = !state.textOverlay.enabled;
+  else if (f.kind === 'watermark') state.watermark.enabled = !state.watermark.enabled;
+  else f.ref.visible = f.ref.visible === false ? true : false;
+  render(); renderLayersPanel();
+}
+
+function toggleLayerLock(id) {
+  const f = findLayerRef(id);
+  if (!f || !f.ref) return;
+  f.ref.locked = !f.ref.locked;
+  renderLayersPanel();
+}
+
+function beginRenameLayer(id) {
+  const f = findLayerRef(id);
+  if (!f || !f.ref || f.kind === 'image' || f.kind === 'spotlight' || f.kind === 'text' || f.kind === 'watermark') return;
+  const span = el.layersList.querySelector(`.layer-name[data-name="${id}"]`);
+  if (!span) return;
+  span.setAttribute('contenteditable', 'true');
+  span.focus();
+  const range = document.createRange(); range.selectNodeContents(span);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  const commit = () => {
+    span.removeAttribute('contenteditable');
+    f.ref.name = span.textContent.trim() || f.ref.name;
+    renderLayersPanel();
+  };
+  span.addEventListener('blur', commit, { once: true });
+  span.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); span.blur(); }
+    if (e.key === 'Escape') { span.textContent = f.ref.name || ''; span.blur(); }
+  });
+}
+
+function reorderLayer(fromId, toId) {
+  const fa = findLayerRef(fromId), ta = findLayerRef(toId);
+  if (!fa || !ta || fa.kind !== ta.kind || !fa.arr) return;
+  saveStateToHistory();
+  const arr = fa.arr;
+  const fi = arr.findIndex(x => x === fa.ref);
+  const ti = arr.findIndex(x => x === ta.ref);
+  if (fi < 0 || ti < 0) return;
+  arr.splice(fi, 1);
+  arr.splice(ti, 0, fa.ref);
+  render(); renderLayersPanel();
+}
+
+export function toggleLayersPanel() {
+  state.ui.layersCollapsed = !state.ui.layersCollapsed;
+  el.layersPanel.classList.toggle('collapsed', state.ui.layersCollapsed);
+  document.querySelector('.main-content').classList.toggle('layers-collapsed', state.ui.layersCollapsed);
+}
+
+export function bindLayersEvents() {
+  if (el.layersToggleBtn) el.layersToggleBtn.addEventListener('click', toggleLayersPanel);
+}
+
+export function altSelectAt(e) {
+  const canvas = el.previewCanvas;
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+  const layers = buildLayerList();
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const L = layers[i];
+    if (!L.visible) continue;
+    if (L.kind === 'annotation' || L.kind === 'redaction') {
+      const r = L.ref;
+      let bx, by, bw, bh;
+      if (L.kind === 'redaction') { bx = r.x; by = r.y; bw = r.w; bh = r.h; }
+      else {
+        bx = Math.min(r.x1, r.x2); by = Math.min(r.y1, r.y2);
+        bw = Math.abs(r.x2 - r.x1); bh = Math.abs(r.y2 - r.y1);
+        if (r.type === 'number') { bx = r.x1 - 24; by = r.y1 - 24; bw = 48; bh = 48; }
+      }
+      if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
+        state.selection.layerIds = [L.id];
+        renderLayersPanel();
+        return true;
+      }
+    }
+  }
+  return false;
+}

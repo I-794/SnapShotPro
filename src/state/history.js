@@ -1,0 +1,70 @@
+import { state } from './state.js';
+
+export const history = { past: [], future: [], maxSize: 50 };
+
+// Subscribers (e.g. layers panel, history timeline) call onChange after every snapshot/undo/redo.
+const listeners = [];
+export function onHistoryChange(fn) { listeners.push(fn); }
+function emit() { listeners.forEach(fn => fn()); }
+
+function snapshot() {
+  return JSON.parse(JSON.stringify({
+    imageTransform: state.imageTransform,
+    imageFilters: state.imageFilters,
+    textOverlay: state.textOverlay,
+    windowOverlay: state.windowOverlay,
+    watermark: state.watermark,
+    gradient: state.gradient,
+    padding: state.padding,
+    scale: state.scale,
+    borderRadius: state.borderRadius,
+    showBorder: state.showBorder,
+    borderWidth: state.borderWidth,
+    borderColor: state.borderColor,
+    shadow: state.shadow,
+    canvas: state.canvas,
+    bgMode: state.bgMode,
+    bgColor: state.bgColor,
+    deviceFrame: state.deviceFrame,
+    annotations: state.annotations,
+    redactions: state.redactions,
+    spotlight: state.spotlight,
+    annotationColor: state.annotationColor,
+    annotationStrokeWidth: state.annotationStrokeWidth,
+    nextNumber: state.nextNumber,
+    redactType: state.redactType,
+    redactIntensity: state.redactIntensity,
+    extraImages: state.extraImages,
+    autoLayout: state.autoLayout,
+    meshGradient: state.meshGradient,
+    tilt3d: state.tilt3d,
+    scene: state.scene
+  }));
+}
+
+function restore(snap) {
+  Object.assign(state, snap);
+}
+
+export function saveStateToHistory() {
+  history.past.push(snapshot());
+  if (history.past.length > history.maxSize) history.past.shift();
+  history.future = [];
+  emit();
+}
+
+export function undo(rerender) {
+  if (history.past.length === 0) return;
+  history.future.push(snapshot());
+  restore(history.past.pop());
+  rerender && rerender();
+  emit();
+}
+
+export function redo(rerender) {
+  if (history.future.length === 0) return;
+  history.past.push(snapshot());
+  restore(history.future.pop());
+  rerender && rerender();
+  emit();
+}
