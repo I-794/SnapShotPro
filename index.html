@@ -446,6 +446,30 @@
     <div class="sticker-grid" id="sticker-grid"></div>
 </div>
 
+<div class="auth-modal-overlay" id="cloud-setup-modal">
+    <div class="auth-modal" style="max-width:520px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>☁ Connect to Supabase</h3>
+            <button class="btn btn-secondary" id="cloud-setup-close" style="padding:4px 10px;">✕</button>
+        </div>
+        <p class="info-text" style="margin:8px 0 12px;">Bring your own free Supabase project to enable accounts + cloud sync. Your URL and anon key are stored only in your browser.</p>
+        <ol style="font-size:12px;color:var(--text-secondary);padding-left:18px;line-height:1.6;margin-bottom:12px;">
+            <li>Create a free project at <a href="https://supabase.com" target="_blank" style="color:var(--accent-primary);">supabase.com</a></li>
+            <li>Project Settings → API → copy your <strong>Project URL</strong> and <strong>anon public</strong> key</li>
+            <li>SQL Editor → New Query → paste the schema (use <button class="btn btn-secondary" id="cloud-setup-copy-sql" style="padding:2px 8px;font-size:11px;">📋 Copy SQL</button>) → Run</li>
+            <li>Authentication → URL Configuration → add your site URL to <strong>Redirect URLs</strong></li>
+        </ol>
+        <label class="control-label">Project URL</label>
+        <input type="text" class="control-input" id="cloud-setup-url" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off">
+        <label class="control-label" style="margin-top:8px;">anon public key</label>
+        <input type="password" class="control-input" id="cloud-setup-key" placeholder="eyJhbGciOi..." autocomplete="off">
+        <div class="auth-modal-actions">
+            <button class="btn btn-primary" id="cloud-setup-save-btn">Save &amp; Sign in</button>
+            <button class="btn btn-secondary" id="cloud-setup-disconnect-btn">Disconnect</button>
+        </div>
+    </div>
+</div>
+
 <div class="auth-modal-overlay" id="auth-modal">
     <div class="auth-modal">
         <div style="display:flex;justify-content:space-between;align-items:center;">
