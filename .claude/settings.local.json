@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\14148\\\\Documents\\\\GitHub\\\\SnapShotPro\" -Recurse -Name)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(git config *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --base main --head v5-feature-pack --title 'v5: AI tools, creator polish, optional cloud accounts, PWA' --body ' *)"
+    ]
+  }
+}
