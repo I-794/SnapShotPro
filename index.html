@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapShot-Pro v4 — Pro Editor</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>SnapShot-Pro v5 — Pro Editor</title>
     <link rel="stylesheet" href="/src/styles.css">
 </head>
 <body>
@@ -12,9 +14,10 @@
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">📸</div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v4</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v5</span></span>
             </div>
             <div class="header-actions">
+                <span id="auth-pill" style="display:inline-flex;gap:6px;align-items:center;margin-right:4px;"></span>
                 <button class="btn btn-secondary" id="theme-toggle-btn" title="Toggle Theme">🌙</button>
                 <button class="btn btn-secondary" id="shortcuts-btn" title="Keyboard Shortcuts">⌨️</button>
                 <button class="btn btn-secondary" id="undo-btn" disabled>↶ Undo</button>
@@ -70,12 +73,13 @@
         <div class="sidebar-section">
             <h3 class="section-title">Image Editing</h3>
             <label class="control-label">Transform</label>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;">
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px;">
                 <button class="btn btn-secondary" id="rotate-left-btn">↶ 90°</button>
                 <button class="btn btn-secondary" id="rotate-right-btn">↷ 90°</button>
                 <button class="btn btn-secondary" id="flip-h-btn">↔ Flip H</button>
                 <button class="btn btn-secondary" id="flip-v-btn">↕ Flip V</button>
             </div>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:16px;" id="crop-btn">✂ Crop &amp; Straighten</button>
             <label class="control-label">Filters</label>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Brightness</label><div class="range-group"><input type="range" class="range-input" id="brightness" min="0" max="200" value="100"><span class="range-value" id="brightness-value">100%</span></div></div>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Contrast</label><div class="range-group"><input type="range" class="range-input" id="contrast" min="0" max="200" value="100"><span class="range-value" id="contrast-value">100%</span></div></div>
@@ -97,6 +101,13 @@
                 <div class="toggle-switch"><span class="toggle-label">Italic</span><label class="switch"><input type="checkbox" id="text-italic"><span class="slider"></span></label></div>
                 <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="remove-text-btn">Remove Text</button>
                 <p class="info-text" style="margin-top:8px;">Tip: Drag text on the canvas to reposition it</p>
+                <div class="divider"></div>
+                <label class="control-label">Custom Fonts</label>
+                <div class="font-upload-row">
+                    <button class="btn btn-secondary" id="custom-font-btn" style="flex:1;">⬆ Upload .ttf / .woff / .woff2</button>
+                    <input type="file" id="custom-font-input" accept=".ttf,.otf,.woff,.woff2,font/*" style="display:none;">
+                </div>
+                <div id="custom-font-list"></div>
             </div>
         </div>
 
@@ -138,9 +149,10 @@
                         <div class="range-group" style="flex:1;"><input type="range" class="range-input" id="gradient-angle" min="0" max="360" value="135"><span class="range-value" id="gradient-angle-value">135°</span></div>
                     </div>
                 </div>
-                <div class="gradient-stops">
-                    <div class="gradient-stop"><div class="gradient-stop-color"><input type="color" id="gradient-color-1" value="#667eea"></div><div class="gradient-stop-position"><div class="range-group"><input type="range" class="range-input" id="gradient-pos-1" min="0" max="100" value="0"><span class="range-value" id="gradient-pos-1-value">0%</span></div></div></div>
-                    <div class="gradient-stop"><div class="gradient-stop-color"><input type="color" id="gradient-color-2" value="#764ba2"></div><div class="gradient-stop-position"><div class="range-group"><input type="range" class="range-input" id="gradient-pos-2" min="0" max="100" value="100"><span class="range-value" id="gradient-pos-2-value">100%</span></div></div></div>
+                <div class="gradient-editor-block">
+                    <label class="control-label">Stops</label>
+                    <div id="gradient-strip" class="grad-strip"></div>
+                    <div id="gradient-stop-controls"></div>
                 </div>
                 <div class="gradient-preview" id="gradient-preview"></div>
             </div>
@@ -151,6 +163,64 @@
                 <div class="checkerboard-info"></div>
                 <p class="info-text">Canvas will have a transparent background. Export as PNG to preserve transparency.</p>
             </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">✨ AI Tools <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v5</span></h3>
+            <label class="control-label">In-browser (free)</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:6px;" id="bg-remove-btn">🪄 Remove Background</button>
+            <div id="bg-remove-progress" class="ai-progress" style="display:none;">
+                <div class="ai-progress-bar"><div class="ai-progress-fill" style="width:0%"></div></div>
+                <span class="ai-progress-label" style="min-width:90px;text-align:right;">0%</span>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;margin-bottom:8px;" id="ocr-btn">🔠 Extract Text (OCR)</button>
+            <p class="info-text" id="ocr-status" style="min-height:14px;"></p>
+            <div id="ocr-result" class="ocr-result" style="display:none;"></div>
+            <button class="btn btn-secondary" style="width:100%;display:none;margin-bottom:8px;" id="ocr-copy-btn">📋 Copy text</button>
+
+            <div class="divider"></div>
+            <label class="control-label">Cloud (bring your own key)</label>
+            <p class="info-text" style="margin-bottom:8px;">Sign in to Claude or OpenAI with your own API key. Keys stay in your browser; calls go straight to the provider.</p>
+            <details style="margin-bottom:8px;" id="api-keys-details" open>
+                <summary style="cursor:pointer;font-size:13px;color:var(--text-primary);font-weight:500;">🔑 API Keys</summary>
+                <div style="margin-top:8px;">
+                    <label class="control-label" style="font-size:11px;">Anthropic (Claude)</label>
+                    <input type="password" class="control-input" id="anthropic-key-input" placeholder="sk-ant-..." autocomplete="off">
+                    <p class="info-text" style="font-size:10px;margin-top:2px;">Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent-primary);">console.anthropic.com</a></p>
+                    <label class="control-label" style="font-size:11px;margin-top:8px;">OpenAI</label>
+                    <input type="password" class="control-input" id="openai-key-input" placeholder="sk-..." autocomplete="off">
+                    <p class="info-text" style="font-size:10px;margin-top:2px;">Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent-primary);">platform.openai.com</a></p>
+                    <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="api-keys-save-btn">Save Keys</button>
+                    <div id="api-key-status" style="margin-top:8px;"></div>
+                </div>
+            </details>
+
+            <div class="ai-action-grid">
+                <button class="btn btn-secondary" id="ai-alt-btn">📝 Alt text</button>
+                <button class="btn btn-secondary" id="ai-caption-btn">💬 Caption</button>
+                <button class="btn btn-secondary" id="ai-s2c-btn">🌐 → HTML</button>
+                <button class="btn btn-secondary" id="ai-copy-btn">📋 Copy result</button>
+            </div>
+            <div class="control-group" style="margin-top:8px;">
+                <label class="control-label">AI Background (DALL-E)</label>
+                <input type="text" class="control-input" id="ai-bg-prompt" placeholder="e.g. soft pastel waves, abstract">
+                <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="ai-bg-btn">🎨 Generate Background</button>
+            </div>
+            <p class="info-text" id="ai-cloud-status" style="min-height:14px;margin-top:4px;"></p>
+            <div id="ai-cloud-result" class="ocr-result" style="display:none;max-height:220px;"></div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Smart Palette</h3>
+            <p class="info-text" style="margin-bottom:8px;">Extract a 5-color palette from your image.</p>
+            <button class="btn btn-primary" style="width:100%;" id="palette-extract-btn">🎨 Extract Palette</button>
+            <div id="palette-swatches" class="palette-swatches"></div>
+            <div class="palette-apply-row">
+                <button class="btn btn-secondary" id="palette-as-gradient" style="flex:1;">→ Gradient</button>
+                <button class="btn btn-secondary" id="palette-as-mesh" style="flex:1;">→ Mesh</button>
+                <button class="btn btn-secondary" id="palette-as-text" style="flex:1;">→ Text</button>
+            </div>
+            <p class="info-text" style="margin-top:8px;">Click a swatch to copy its hex.</p>
         </div>
 
         <div class="sidebar-section">
@@ -273,6 +343,16 @@
         </div>
 
         <div class="sidebar-section">
+            <h3 class="section-title">Cloud Projects</h3>
+            <p class="info-text" style="margin-bottom:8px;">Sign in to save full projects across devices. Templates auto-sync.</p>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <button class="btn btn-primary" style="flex:1;" id="cloud-save-btn">☁ Save Project</button>
+                <button class="btn btn-secondary" style="flex:1;" id="cloud-refresh-btn">↻ Refresh</button>
+            </div>
+            <div id="cloud-project-list"></div>
+        </div>
+
+        <div class="sidebar-section">
             <h3 class="section-title">Templates</h3>
             <div class="control-group"><label class="control-label">Template Name</label><input type="text" class="control-input" id="template-name" placeholder="My Template"></div>
             <div style="display:flex;gap:8px;margin-bottom:12px;">
@@ -291,6 +371,8 @@
             <button class="ann-tool-btn" data-tool="arrow">→ Arrow</button>
             <button class="ann-tool-btn" data-tool="rect">▭ Rect</button>
             <button class="ann-tool-btn" data-tool="circle">○ Circle</button>
+            <button class="ann-tool-btn" data-tool="pen">✎ Pen</button>
+            <button class="ann-tool-btn" data-tool="highlighter">🖍 Highlight</button>
             <button class="ann-tool-btn" data-tool="number">① Number</button>
             <button class="ann-tool-btn" data-tool="redact">▓ Redact</button>
             <button class="ann-tool-btn" data-tool="spotlight">◎ Spotlight</button>
@@ -362,6 +444,50 @@
         <button class="sticker-cat-btn" data-cat="callouts">Callouts</button>
     </div>
     <div class="sticker-grid" id="sticker-grid"></div>
+</div>
+
+<div class="auth-modal-overlay" id="cloud-setup-modal">
+    <div class="auth-modal" style="max-width:520px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>☁ Connect to Supabase</h3>
+            <button class="btn btn-secondary" id="cloud-setup-close" style="padding:4px 10px;">✕</button>
+        </div>
+        <p class="info-text" style="margin:8px 0 12px;">Bring your own free Supabase project to enable accounts + cloud sync. Your URL and anon key are stored only in your browser.</p>
+        <ol style="font-size:12px;color:var(--text-secondary);padding-left:18px;line-height:1.6;margin-bottom:12px;">
+            <li>Create a free project at <a href="https://supabase.com" target="_blank" style="color:var(--accent-primary);">supabase.com</a></li>
+            <li>Project Settings → API → copy your <strong>Project URL</strong> and <strong>anon public</strong> key</li>
+            <li>SQL Editor → New Query → paste the schema (use <button class="btn btn-secondary" id="cloud-setup-copy-sql" style="padding:2px 8px;font-size:11px;">📋 Copy SQL</button>) → Run</li>
+            <li>Authentication → URL Configuration → add your site URL to <strong>Redirect URLs</strong></li>
+        </ol>
+        <label class="control-label">Project URL</label>
+        <input type="text" class="control-input" id="cloud-setup-url" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off">
+        <label class="control-label" style="margin-top:8px;">anon public key</label>
+        <input type="password" class="control-input" id="cloud-setup-key" placeholder="eyJhbGciOi..." autocomplete="off">
+        <div class="auth-modal-actions">
+            <button class="btn btn-primary" id="cloud-setup-save-btn">Save &amp; Sign in</button>
+            <button class="btn btn-secondary" id="cloud-setup-disconnect-btn">Disconnect</button>
+        </div>
+    </div>
+</div>
+
+<div class="auth-modal-overlay" id="auth-modal">
+    <div class="auth-modal">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>Sign in to SnapShot-Pro</h3>
+            <button class="btn btn-secondary" id="auth-modal-close" style="padding:4px 10px;">✕</button>
+        </div>
+        <p class="info-text" style="margin:8px 0 12px;">Optional. Sync your templates, custom fonts, and projects across devices.</p>
+        <input type="email" class="control-input" id="auth-email" placeholder="you@example.com" autocomplete="email">
+        <input type="password" class="control-input" id="auth-password" placeholder="password" autocomplete="current-password">
+        <div class="auth-modal-actions">
+            <button class="btn btn-primary" id="auth-signin-modal-btn">Sign in</button>
+            <button class="btn btn-secondary" id="auth-signup-btn">Sign up</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-secondary" id="auth-google-btn" style="flex:1;">Google</button>
+            <button class="btn btn-secondary" id="auth-github-btn" style="flex:1;">GitHub</button>
+        </div>
+    </div>
 </div>
 
 <div class="notification" id="notification">

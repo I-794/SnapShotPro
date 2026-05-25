@@ -1,4 +1,5 @@
 import { state } from '../state/state.js';
+import { hexToRgba } from '../utils/color.js';
 
 export function drawAnnotations(ctx) {
   if (!state.annotations) return;
@@ -15,6 +16,8 @@ export function drawAnnotations(ctx) {
 
     if (ann.type === 'arrow') {
       drawArrow(ctx, ann.x1, ann.y1, ann.x2, ann.y2, ann.color, ann.strokeWidth);
+    } else if (ann.type === 'pen' || ann.type === 'highlighter') {
+      drawStroke(ctx, ann);
     } else if (ann.type === 'rect') {
       const rx = Math.min(ann.x1, ann.x2), ry = Math.min(ann.y1, ann.y2);
       const rw = Math.abs(ann.x2 - ann.x1), rh = Math.abs(ann.y2 - ann.y1);
@@ -50,16 +53,67 @@ export function drawAnnotations(ctx) {
       ctx.strokeStyle = 'rgba(0, 160, 255, 0.8)';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 3]);
-      const minX = Math.min(ann.x1, ann.x2) - 6;
-      const minY = Math.min(ann.y1, ann.y2) - 6;
-      const maxW = Math.abs(ann.x2 - ann.x1) + 12;
-      const maxH = Math.abs(ann.y2 - ann.y1) + 12;
-      ctx.strokeRect(minX, minY, maxW, maxH);
+      const bbox = annotationBBox(ann);
+      ctx.strokeRect(bbox.x - 6, bbox.y - 6, bbox.w + 12, bbox.h + 12);
       ctx.setLineDash([]);
     }
 
     ctx.restore();
   });
+}
+
+export function drawStroke(ctx, ann) {
+  const pts = ann.points;
+  if (!pts || pts.length < 1) return;
+  ctx.save();
+  if (ann.type === 'highlighter') {
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.strokeStyle = hexToRgba(ann.color, 0.45);
+    ctx.lineWidth = ann.strokeWidth * 3.5;
+  } else {
+    ctx.strokeStyle = ann.color;
+    ctx.lineWidth = ann.strokeWidth;
+  }
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  if (pts.length === 1) {
+    ctx.arc(pts[0].x, pts[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fill();
+  } else {
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length - 1; i++) {
+      const mx = (pts[i].x + pts[i + 1].x) / 2;
+      const my = (pts[i].y + pts[i + 1].y) / 2;
+      ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+    }
+    const last = pts[pts.length - 1];
+    ctx.lineTo(last.x, last.y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+export function annotationBBox(ann) {
+  if (ann.type === 'pen' || ann.type === 'highlighter') {
+    const pts = ann.points || [];
+    if (pts.length === 0) return { x: 0, y: 0, w: 0, h: 0 };
+    let minX = pts[0].x, maxX = pts[0].x, minY = pts[0].y, maxY = pts[0].y;
+    for (const p of pts) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+  }
+  return {
+    x: Math.min(ann.x1, ann.x2),
+    y: Math.min(ann.y1, ann.y2),
+    w: Math.abs(ann.x2 - ann.x1),
+    h: Math.abs(ann.y2 - ann.y1)
+  };
 }
 
 export function drawArrow(ctx, x1, y1, x2, y2, color, strokeWidth) {

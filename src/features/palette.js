@@ -68,6 +68,8 @@ export function registerCommands() {
     { id: 'tool-arrow',       label: 'Tool: Arrow',           icon: '→',  run: () => setTool('arrow') },
     { id: 'tool-rect',        label: 'Tool: Rectangle',       icon: '▭',  run: () => setTool('rect') },
     { id: 'tool-circle',      label: 'Tool: Circle',          icon: '○',  run: () => setTool('circle') },
+    { id: 'tool-pen',         label: 'Tool: Pen (freehand)',  icon: '✎',  run: () => setTool('pen') },
+    { id: 'tool-highlighter', label: 'Tool: Highlighter',     icon: '🖍', run: () => setTool('highlighter') },
     { id: 'tool-number',      label: 'Tool: Number',          icon: '①',  run: () => setTool('number') },
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
     { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },

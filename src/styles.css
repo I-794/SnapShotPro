@@ -318,3 +318,82 @@ kbd { background: var(--bg-tertiary); border: 1px solid var(--border-color); bor
 .align-btn { flex: 1; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .align-btn:hover { border-color: var(--accent-primary); }
 .align-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+/* v5 — multi-stop gradient editor */
+.gradient-editor-block { margin: 12px 0; }
+.grad-strip {
+    position: relative; width: 100%; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border-color); cursor: crosshair;
+    margin: 8px 0 18px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+.grad-stop-marker {
+    position: absolute; top: 100%; transform: translate(-50%, -2px);
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--bg-secondary); box-shadow: 0 0 0 1px var(--border-color), 0 2px 4px rgba(0,0,0,0.4);
+    cursor: grab;
+}
+.grad-stop-marker.selected { box-shadow: 0 0 0 2px var(--accent-primary), 0 2px 6px rgba(0,0,0,0.4); transform: translate(-50%, -2px) scale(1.15); }
+.grad-stop-marker:active { cursor: grabbing; }
+
+/* v5 — font upload */
+.font-upload-row { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.custom-font-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 12px; font-size: 12px; margin: 2px; }
+.custom-font-pill button { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0 2px; font-size: 14px; }
+
+/* v5 — palette extractor */
+.palette-swatches { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.palette-swatch { width: 40px; height: 40px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(0,0,0,0.15); position: relative; transition: transform 0.15s; }
+.palette-swatch:hover { transform: scale(1.08); }
+.palette-swatch-label { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--text-secondary); white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+.palette-swatch:hover .palette-swatch-label { opacity: 1; }
+.palette-apply-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 24px; }
+
+/* v5 — crop overlay */
+.crop-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    z-index: 50;
+}
+.crop-region { position: absolute; pointer-events: auto; cursor: move; box-shadow: 0 0 0 9999px rgba(0,0,0,0.55); border: 1px dashed rgba(255,255,255,0.9); }
+.crop-handle { position: absolute; width: 12px; height: 12px; background: var(--accent-primary); border: 2px solid #fff; border-radius: 2px; pointer-events: auto; }
+.crop-handle.nw { top: -7px; left: -7px; cursor: nwse-resize; }
+.crop-handle.ne { top: -7px; right: -7px; cursor: nesw-resize; }
+.crop-handle.sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+.crop-handle.se { bottom: -7px; right: -7px; cursor: nwse-resize; }
+.crop-toolbar {
+    position: absolute; bottom: -54px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; padding: 8px 12px; background: var(--bg-secondary);
+    border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow-md);
+    pointer-events: auto; align-items: center;
+}
+.crop-toolbar select, .crop-toolbar input[type=range] { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 8px; font-size: 12px; }
+
+/* v5 — AI panel + auth */
+.ai-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0; }
+.ai-action-grid .btn { padding: 8px 6px; font-size: 12px; }
+.ocr-result { max-height: 180px; overflow: auto; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; font-family: monospace; white-space: pre-wrap; margin: 8px 0; }
+.account-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 999px; font-size: 12px; }
+.auth-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; }
+.auth-modal-overlay.visible { display: flex; }
+.auth-modal { background: var(--bg-secondary); border-radius: 12px; padding: 24px; min-width: 320px; max-width: 400px; box-shadow: var(--shadow-lg); }
+.auth-modal h3 { margin-bottom: 12px; }
+.auth-modal .control-input { margin-bottom: 8px; width: 100%; }
+.auth-modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+.auth-modal-actions .btn { flex: 1; }
+
+/* v5 — AI progress */
+.ai-progress { display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-tertiary); border-radius: 6px; font-size: 12px; margin: 8px 0; }
+.ai-progress-bar { flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; }
+.ai-progress-fill { height: 100%; background: var(--accent-primary); transition: width 0.2s; }
+
+
+/* v5.0.1 — indeterminate progress animation for AI tasks */
+.ai-progress.indeterminate .ai-progress-fill {
+    width: 40% !important;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    animation: ai-progress-slide 1.4s ease-in-out infinite;
+}
+@keyframes ai-progress-slide {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(280%); }
+}
+.ai-progress-bar { position: relative; overflow: hidden; }

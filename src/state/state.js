@@ -23,6 +23,7 @@ export const state = {
   theme: 'dark',
   bgMode: 'gradient',
   bgColor: '#1a1a2e',
+  bgImage: null,
   deviceFrame: { type: null, color: 'dark', url: 'https://example.com', title: 'Screenshot' },
   annotations: [],
   redactions: [],
