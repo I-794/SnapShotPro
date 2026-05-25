@@ -1,6 +1,7 @@
 // SnapShot-Pro v4 — app entry.
 // Initialize DOM refs, bind every module, then render.
 
+import { inject } from '@vercel/analytics';
 import { state } from './state/state.js';
 import { onHistoryChange, undo, redo } from './state/history.js';
 import { initElements, el } from './ui/elements.js';
@@ -54,6 +55,7 @@ function setInitialActivePresets() {
 }
 
 function init() {
+  inject();
   initElements();
   loadSavedTheme();
 
