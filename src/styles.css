@@ -385,3 +385,15 @@ kbd { background: var(--bg-tertiary); border: 1px solid var(--border-color); bor
 .ai-progress-bar { flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; }
 .ai-progress-fill { height: 100%; background: var(--accent-primary); transition: width 0.2s; }
 
+
+/* v5.0.1 — indeterminate progress animation for AI tasks */
+.ai-progress.indeterminate .ai-progress-fill {
+    width: 40% !important;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    animation: ai-progress-slide 1.4s ease-in-out infinite;
+}
+@keyframes ai-progress-slide {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(280%); }
+}
+.ai-progress-bar { position: relative; overflow: hidden; }

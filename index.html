@@ -180,14 +180,16 @@
 
             <div class="divider"></div>
             <label class="control-label">Cloud (bring your own key)</label>
-            <p class="info-text" style="margin-bottom:6px;">Keys stay in your browser. Calls go straight to the provider.</p>
-            <details style="margin-bottom:8px;">
-                <summary style="cursor:pointer;font-size:12px;color:var(--text-secondary);">Manage API keys</summary>
+            <p class="info-text" style="margin-bottom:8px;">Sign in to Claude or OpenAI with your own API key. Keys stay in your browser; calls go straight to the provider.</p>
+            <details style="margin-bottom:8px;" id="api-keys-details" open>
+                <summary style="cursor:pointer;font-size:13px;color:var(--text-primary);font-weight:500;">🔑 API Keys</summary>
                 <div style="margin-top:8px;">
-                    <label class="control-label" style="font-size:11px;">OpenAI key</label>
-                    <input type="password" class="control-input" id="openai-key-input" placeholder="sk-..." autocomplete="off">
-                    <label class="control-label" style="font-size:11px;margin-top:6px;">Anthropic key</label>
+                    <label class="control-label" style="font-size:11px;">Anthropic (Claude)</label>
                     <input type="password" class="control-input" id="anthropic-key-input" placeholder="sk-ant-..." autocomplete="off">
+                    <p class="info-text" style="font-size:10px;margin-top:2px;">Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent-primary);">console.anthropic.com</a></p>
+                    <label class="control-label" style="font-size:11px;margin-top:8px;">OpenAI</label>
+                    <input type="password" class="control-input" id="openai-key-input" placeholder="sk-..." autocomplete="off">
+                    <p class="info-text" style="font-size:10px;margin-top:2px;">Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent-primary);">platform.openai.com</a></p>
                     <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="api-keys-save-btn">Save Keys</button>
                     <div id="api-key-status" style="margin-top:8px;"></div>
                 </div>

@@ -31,6 +31,16 @@ function showAiResult(text) {
   out.textContent = text;
 }
 
+function promptForKey() {
+  const details = document.getElementById('api-keys-details');
+  if (details) {
+    details.open = true;
+    details.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const inp = document.getElementById('anthropic-key-input');
+    if (inp) setTimeout(() => inp.focus(), 300);
+  }
+}
+
 async function chooseProvider(needVision) {
   const oai = getKey('openai');
   const ant = getKey('anthropic');
@@ -78,7 +88,11 @@ async function callOpenAIVision(key, prompt, dataUrl) {
 async function runVisionPrompt(prompt) {
   if (!state.image) { showNotification('Load an image first.', 'error'); return null; }
   const choice = await chooseProvider(true);
-  if (!choice) { showNotification('Add an OpenAI or Anthropic API key first.', 'error'); return null; }
+  if (!choice) {
+    showNotification('Paste your Claude or OpenAI key below to use this.', 'error');
+    promptForKey();
+    return null;
+  }
   setAiStatus(`Calling ${choice.provider}…`);
   const dataUrl = imageToDataUrl(state.image);
   try {
@@ -118,7 +132,11 @@ export async function aiScreenshotToCode() {
 
 export async function aiGenerateBackground() {
   const key = getKey('openai');
-  if (!key) { showNotification('OpenAI key required for image generation.', 'error'); return; }
+  if (!key) {
+    showNotification('OpenAI key required for image generation (DALL-E).', 'error');
+    promptForKey();
+    return;
+  }
   const promptInp = document.getElementById('ai-bg-prompt');
   const promptText = promptInp ? promptInp.value.trim() : '';
   if (!promptText) { showNotification('Enter a prompt for the background.', 'error'); return; }

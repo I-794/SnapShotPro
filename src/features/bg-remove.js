@@ -1,24 +1,66 @@
 import { state } from '../state/state.js';
-import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 
+const MAX_EDGE = 2048;
+
 let modelLoaded = false;
 let busy = false;
+let heartbeatId = null;
+let heartbeatStart = 0;
+let lastProgressLabel = '';
 
-function setProgress(pct, label) {
+function setProgress(pct, label, indeterminate = false) {
   const wrap = document.getElementById('bg-remove-progress');
   if (!wrap) return;
-  if (pct === null) { wrap.style.display = 'none'; return; }
+  if (pct === null) { wrap.style.display = 'none'; wrap.classList.remove('indeterminate'); return; }
   wrap.style.display = 'flex';
+  wrap.classList.toggle('indeterminate', indeterminate);
   const fill = wrap.querySelector('.ai-progress-fill');
   const lab = wrap.querySelector('.ai-progress-label');
-  if (fill) fill.style.width = pct + '%';
+  if (fill) fill.style.width = (indeterminate ? 100 : pct) + '%';
   if (lab) lab.textContent = label || `${Math.round(pct)}%`;
+  if (label) lastProgressLabel = label;
+}
+
+function startHeartbeat(initialLabel) {
+  stopHeartbeat();
+  heartbeatStart = Date.now();
+  setProgress(0, initialLabel, true);
+  heartbeatId = setInterval(() => {
+    const secs = Math.round((Date.now() - heartbeatStart) / 1000);
+    const wrap = document.getElementById('bg-remove-progress');
+    if (!wrap) return;
+    const lab = wrap.querySelector('.ai-progress-label');
+    if (lab) lab.textContent = `${lastProgressLabel} (${secs}s)`;
+  }, 500);
+}
+
+function stopHeartbeat() {
+  if (heartbeatId) { clearInterval(heartbeatId); heartbeatId = null; }
+}
+
+function downscaleIfHuge(img) {
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  const longest = Math.max(iw, ih);
+  if (longest <= MAX_EDGE) return null;
+  const scale = MAX_EDGE / longest;
+  const c = document.createElement('canvas');
+  c.width = Math.round(iw * scale);
+  c.height = Math.round(ih * scale);
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, c.width, c.height);
+  return c;
 }
 
 async function imageToBlob(img) {
+  const downscaled = downscaleIfHuge(img);
+  if (downscaled) {
+    return await new Promise(res => downscaled.toBlob(res, 'image/png'));
+  }
   const c = document.createElement('canvas');
   c.width = img.naturalWidth || img.width;
   c.height = img.naturalHeight || img.height;
@@ -26,21 +68,45 @@ async function imageToBlob(img) {
   return await new Promise(res => c.toBlob(res, 'image/png'));
 }
 
+function progressLabel(key, current, total) {
+  // key format examples: 'fetch:/path/to/model.onnx', 'compute:inference'
+  if (key && key.startsWith('fetch')) {
+    const pct = total ? Math.round((current / total) * 100) : 0;
+    const mb = total ? (total / 1024 / 1024).toFixed(1) : '?';
+    return { pct, label: `Downloading model… ${pct}% of ${mb}MB`, indeterminate: false };
+  }
+  if (key && key.startsWith('compute')) {
+    return { pct: Math.max(50, total ? Math.round((current / total) * 100) : 0), label: 'Running AI model on your image…', indeterminate: false };
+  }
+  return { pct: 0, label: `${key || 'Working'}…`, indeterminate: true };
+}
+
 async function removeBackground() {
   if (busy) return;
   if (!state.image) { showNotification('Load an image first.', 'error'); return; }
   busy = true;
   try {
-    setProgress(2, modelLoaded ? 'Processing…' : 'Downloading model (one-time, ~40MB)…');
-    const { removeBackground: imglyRemove } = await import('@imgly/background-removal');
+    startHeartbeat(modelLoaded ? 'Preparing your image…' : 'Loading AI model (first run downloads ~40MB)…');
+    // Let the UI paint before heavy work
+    await new Promise(r => setTimeout(r, 30));
+
+    const mod = await import('@imgly/background-removal');
+    const imglyRemove = mod.removeBackground || mod.default;
+
     const blob = await imageToBlob(state.image);
+
     const resultBlob = await imglyRemove(blob, {
       progress: (key, current, total) => {
-        const pct = total ? Math.round((current / total) * 100) : 0;
-        setProgress(Math.max(2, pct), `${key} ${pct}%`);
-      }
+        const { pct, label, indeterminate } = progressLabel(key, current, total);
+        setProgress(pct, label, indeterminate);
+      },
+      output: { format: 'image/png', quality: 0.95 }
     });
+
     modelLoaded = true;
+    stopHeartbeat();
+    setProgress(95, 'Finalizing…', false);
+
     const url = URL.createObjectURL(resultBlob);
     const img = new Image();
     await new Promise((resolve, reject) => {
@@ -55,9 +121,11 @@ async function removeBackground() {
     setProgress(null);
     showNotification('Background removed.', 'success');
   } catch (e) {
-    console.error(e);
+    console.error('[bg-remove] failed:', e);
+    stopHeartbeat();
     setProgress(null);
-    showNotification('Background removal failed: ' + (e.message || e), 'error');
+    const msg = e?.message || String(e);
+    showNotification('Background removal failed: ' + msg, 'error');
   } finally {
     busy = false;
   }
