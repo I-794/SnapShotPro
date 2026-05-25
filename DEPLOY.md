@@ -65,6 +65,64 @@ After the first deploy, `vercel` alone makes a preview build, `vercel --prod` ma
 
 In the Vercel project dashboard → Settings → Domains → add your domain. Vercel walks you through the DNS records.
 
+## v5 — Optional environment variables
+
+v5 adds two **optional** features that need configuration. If you skip these env vars, the app still works fully (offline editing, in-browser AI, BYOK API keys, PWA install) — only cloud sync/login is disabled.
+
+### Supabase (for accounts + cloud project sync)
+
+Create a free Supabase project at https://supabase.com/, then in the Vercel project → Settings → Environment Variables, add:
+
+| Name | Value |
+|------|-------|
+| `VITE_SUPABASE_URL` | from Supabase project Settings → API |
+| `VITE_SUPABASE_ANON_KEY` | from Supabase project Settings → API (the **anon public** key, safe to ship to browsers) |
+
+Both must start with `VITE_` so Vite exposes them to the client bundle.
+
+Then in your Supabase project, create the schema (SQL Editor → New Query):
+
+```sql
+create table if not exists public.templates (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null,
+  payload jsonb not null,
+  updated_at timestamptz default now(),
+  primary key (user_id, name)
+);
+alter table public.templates enable row level security;
+create policy "users own templates" on public.templates
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create table if not exists public.projects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null,
+  payload jsonb not null,
+  updated_at timestamptz default now(),
+  unique (user_id, name)
+);
+alter table public.projects enable row level security;
+create policy "users own projects" on public.projects
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
+In Supabase → Authentication → Providers, enable Email (default) and optionally Google/GitHub. For Google/GitHub, set the redirect URL to your Vercel domain.
+
+### AI cloud features (BYOK)
+
+Nothing to configure server-side. Each user pastes their own OpenAI / Anthropic key in the **AI Tools → Manage API keys** panel; keys live in their own browser `localStorage` and calls go straight from their browser to the provider. Your Vercel deployment never touches them.
+
+### Bundle size & lazy loading
+
+v5 dependencies (Supabase SDK, OpenAI/Anthropic SDKs, Tesseract.js, @imgly/background-removal) are split into separate chunks via Vite's `manualChunks` and dynamically `import()`-ed only when the related feature is first used. Initial JS payload stays roughly the same as v4 (~30KB gzipped main bundle + small chunks).
+
+The 23 MB `ort.wasm` (background-removal model) in `dist/` is **not loaded by default** — it's only fetched when the user clicks "Remove Background." Vercel serves it as a static asset like any other.
+
+### PWA install
+
+After the first visit, modern browsers show an "Install" button in the address bar. The service worker (`dist/sw.js`) precaches the app shell + small assets and uses a runtime cache for CDN-hosted AI models so they survive offline.
+
 ## Common issues
 
 - **"Build failed — Cannot find module"**: A file imports something that doesn't exist yet. Check the build log for the missing path and either create the file or comment out the import.

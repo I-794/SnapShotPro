@@ -84,4 +84,5 @@ export function bindTemplates() {
   if (el.loadTemplateBtn) el.loadTemplateBtn.addEventListener('click', loadTemplate);
   if (el.clearTemplatesBtn) el.clearTemplatesBtn.addEventListener('click', clearTemplates);
   updateTemplateList();
+  window.__refreshTemplateList = updateTemplateList;
 }

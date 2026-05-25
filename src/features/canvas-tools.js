@@ -2,11 +2,11 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
-import { drawArrow } from '../render/annotations.js';
+import { drawArrow, drawStroke, annotationBBox } from '../render/annotations.js';
 import { hitTestExtraImageAtPoint } from './extra-images.js';
 import { getCanvasCoords } from '../utils/geometry.js';
 
-let drawing = { active: false, startX: 0, startY: 0 };
+let drawing = { active: false, startX: 0, startY: 0, points: [] };
 let dragOffset = { dx: 0, dy: 0 };
 let isDraggingAnnotation = false;
 let isDraggingText = false;
@@ -17,11 +17,10 @@ export function hitTestAnnotations(x, y) {
   if (!state.annotations) return -1;
   for (let i = state.annotations.length - 1; i >= 0; i--) {
     const ann = state.annotations[i];
-    const minX = Math.min(ann.x1, ann.x2) - 10;
-    const maxX = Math.max(ann.x1, ann.x2) + 10;
-    const minY = Math.min(ann.y1, ann.y2) - 10;
-    const maxY = Math.max(ann.y1, ann.y2) + 10;
-    if (x >= minX && x <= maxX && y >= minY && y <= maxY) return i;
+    const bb = annotationBBox(ann);
+    const pad = 10;
+    if (x >= bb.x - pad && x <= bb.x + bb.w + pad &&
+        y >= bb.y - pad && y <= bb.y + bb.h + pad) return i;
   }
   return -1;
 }
@@ -81,6 +80,13 @@ function drawPreviewAnnotation(startX, startY, curX, curY) {
   const tool = state.tool;
   if (tool === 'arrow') {
     drawArrow(ctx, startX, startY, curX, curY, state.annotationColor, state.annotationStrokeWidth);
+  } else if (tool === 'pen' || tool === 'highlighter') {
+    drawStroke(ctx, {
+      type: tool,
+      points: drawing.points,
+      color: state.annotationColor,
+      strokeWidth: state.annotationStrokeWidth
+    });
   } else if (tool === 'rect') {
     const rx = Math.min(startX, curX), ry = Math.min(startY, curY);
     const rw = Math.abs(curX - startX), rh = Math.abs(curY - startY);
@@ -169,6 +175,7 @@ function canvasMouseDown(e) {
   drawing.active = true;
   drawing.startX = x;
   drawing.startY = y;
+  drawing.points = (state.tool === 'pen' || state.tool === 'highlighter') ? [{ x, y }] : [];
 }
 
 function canvasMouseMove(e) {
@@ -196,10 +203,17 @@ function canvasMouseMove(e) {
   if (state.tool === 'select' && isDraggingAnnotation) {
     if (state.selectedAnnotation !== null && state.annotations[state.selectedAnnotation]) {
       const ann = state.annotations[state.selectedAnnotation];
+      const newX1 = x - dragOffset.dx;
+      const newY1 = y - dragOffset.dy;
+      const shiftX = newX1 - ann.x1;
+      const shiftY = newY1 - ann.y1;
+      if ((ann.type === 'pen' || ann.type === 'highlighter') && Array.isArray(ann.points)) {
+        ann.points.forEach(p => { p.x += shiftX; p.y += shiftY; });
+      }
       const dx = ann.x2 - ann.x1;
       const dy = ann.y2 - ann.y1;
-      ann.x1 = x - dragOffset.dx;
-      ann.y1 = y - dragOffset.dy;
+      ann.x1 = newX1;
+      ann.y1 = newY1;
       ann.x2 = ann.x1 + dx;
       ann.y2 = ann.y1 + dy;
       render();
@@ -219,6 +233,12 @@ function canvasMouseMove(e) {
   }
 
   if (!drawing.active) return;
+  if (state.tool === 'pen' || state.tool === 'highlighter') {
+    const last = drawing.points[drawing.points.length - 1];
+    if (!last || Math.hypot(x - last.x, y - last.y) > 1.5) {
+      drawing.points.push({ x, y });
+    }
+  }
   drawPreviewAnnotation(drawing.startX, drawing.startY, x, y);
 }
 
@@ -252,7 +272,28 @@ function canvasMouseUp(e) {
 
   saveStateToHistory();
 
-  if (state.tool === 'arrow' || state.tool === 'rect' || state.tool === 'circle') {
+  if (state.tool === 'pen' || state.tool === 'highlighter') {
+    if (drawing.points.length >= 2) {
+      const bb = (() => {
+        let mnx = drawing.points[0].x, mxx = mnx, mny = drawing.points[0].y, mxy = mny;
+        for (const p of drawing.points) {
+          if (p.x < mnx) mnx = p.x; if (p.x > mxx) mxx = p.x;
+          if (p.y < mny) mny = p.y; if (p.y > mxy) mxy = p.y;
+        }
+        return { x1: mnx, y1: mny, x2: mxx, y2: mxy };
+      })();
+      state.annotations.push({
+        id: Date.now(),
+        type: state.tool,
+        points: drawing.points.slice(),
+        x1: bb.x1, y1: bb.y1, x2: bb.x2, y2: bb.y2,
+        color: state.annotationColor,
+        strokeWidth: state.annotationStrokeWidth,
+        number: null
+      });
+    }
+    drawing.points = [];
+  } else if (state.tool === 'arrow' || state.tool === 'rect' || state.tool === 'circle') {
     state.annotations.push({
       id: Date.now(),
       type: state.tool,

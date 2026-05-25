@@ -5,6 +5,7 @@ import { render } from '../render/render.js';
 import { gradientPresets, shadowPresets, sizePresets } from '../state/presets.js';
 import { isValidHex } from '../utils/color.js';
 import { applyMeshPreset, renderMeshPad } from '../features/mesh-pad.js';
+import { renderGradientEditor, syncFromGradientState } from '../features/gradient-editor.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -56,12 +57,14 @@ function setBgMode(mode) {
 function updateGradientPreview() {
   if (!el.gradientPreview) return;
   const g = state.gradient;
+  const stops = g.colors.map((c, i) => `${c} ${g.positions[i]}%`).join(', ');
   if (g.type === 'linear') {
-    el.gradientPreview.style.background = `linear-gradient(${g.angle}deg, ${g.colors[0]} ${g.positions[0]}%, ${g.colors[1]} ${g.positions[1]}%)`;
+    el.gradientPreview.style.background = `linear-gradient(${g.angle}deg, ${stops})`;
   } else {
-    el.gradientPreview.style.background = `radial-gradient(circle, ${g.colors[0]} ${g.positions[0]}%, ${g.colors[1]} ${g.positions[1]}%)`;
+    el.gradientPreview.style.background = `radial-gradient(circle, ${stops})`;
   }
   if (el.angleIndicator) el.angleIndicator.style.transform = `translate(-50%, -100%) rotate(${g.angle}deg)`;
+  renderGradientEditor();
 }
 
 function updateDeviceFrameSubcontrols() {
@@ -138,15 +141,10 @@ function bindBackground() {
       state.gradient.colors = [...p.colors];
       state.gradient.positions = [...p.positions];
       state.gradient.angle = p.angle;
-      if (el.gradientColor1) el.gradientColor1.value = p.colors[0];
-      if (el.gradientColor2) el.gradientColor2.value = p.colors[1];
-      if (el.gradientPos1) el.gradientPos1.value = p.positions[0];
-      if (el.gradientPos2) el.gradientPos2.value = p.positions[1];
-      if (el.gradientPos1Value) el.gradientPos1Value.textContent = p.positions[0] + '%';
-      if (el.gradientPos2Value) el.gradientPos2Value.textContent = p.positions[1] + '%';
       if (el.gradientAngle) el.gradientAngle.value = p.angle;
       if (el.gradientAngleValue) el.gradientAngleValue.textContent = p.angle + '°';
       document.querySelectorAll('.preset-button').forEach(b => b.classList.toggle('active', b === btn));
+      syncFromGradientState();
       updateGradientPreview();
       render();
     });
@@ -167,18 +165,6 @@ function bindBackground() {
   linkSlider(el.gradientAngle, el.gradientAngleValue, v => v + '°', v => {
     state.gradient.angle = v; updateGradientPreview();
   });
-
-  if (el.gradientColor1) el.gradientColor1.addEventListener('input', (e) => {
-    state.gradient.colors[0] = e.target.value; updateGradientPreview(); render();
-  });
-  if (el.gradientColor1) el.gradientColor1.addEventListener('change', () => saveStateToHistory());
-  if (el.gradientColor2) el.gradientColor2.addEventListener('input', (e) => {
-    state.gradient.colors[1] = e.target.value; updateGradientPreview(); render();
-  });
-  if (el.gradientColor2) el.gradientColor2.addEventListener('change', () => saveStateToHistory());
-
-  linkSlider(el.gradientPos1, el.gradientPos1Value, v => v + '%', v => { state.gradient.positions[0] = v; updateGradientPreview(); });
-  linkSlider(el.gradientPos2, el.gradientPos2Value, v => v + '%', v => { state.gradient.positions[1] = v; updateGradientPreview(); });
 
   linkColor(el.bgSolidColor, el.bgSolidColorText, v => state.bgColor = v);
 }
@@ -400,9 +386,7 @@ export function updateUIFromState() {
 
   set(el.gradientType, state.gradient.type);
   set(el.gradientAngle, state.gradient.angle); txt(el.gradientAngleValue, state.gradient.angle + '°');
-  set(el.gradientColor1, state.gradient.colors[0]); set(el.gradientColor2, state.gradient.colors[1]);
-  set(el.gradientPos1, state.gradient.positions[0]); txt(el.gradientPos1Value, state.gradient.positions[0] + '%');
-  set(el.gradientPos2, state.gradient.positions[1]); txt(el.gradientPos2Value, state.gradient.positions[1] + '%');
+  syncFromGradientState();
   updateGradientPreview();
 
   set(el.bgSolidColor, state.bgColor); set(el.bgSolidColorText, state.bgColor);

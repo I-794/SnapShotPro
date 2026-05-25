@@ -19,6 +19,8 @@ export function drawBackground(ctx, canvas, forExport) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else if (state.bgMode === 'mesh') {
     drawMeshGradient(ctx, canvas);
+  } else if (state.bgMode === 'image' && state.bgImage) {
+    drawImageBackground(ctx, canvas);
   } else {
     drawGradient(ctx, canvas);
   }
@@ -39,10 +41,30 @@ function drawGradient(ctx, canvas) {
     const r = Math.max(canvas.width, canvas.height) / 2;
     g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
   }
-  g.addColorStop(state.gradient.positions[0] / 100, state.gradient.colors[0]);
-  g.addColorStop(state.gradient.positions[1] / 100, state.gradient.colors[1]);
+  const colors = state.gradient.colors || [];
+  const positions = state.gradient.positions || [];
+  const n = Math.min(colors.length, positions.length);
+  if (n < 2) {
+    g.addColorStop(0, colors[0] || '#000');
+    g.addColorStop(1, colors[colors.length - 1] || colors[0] || '#000');
+  } else {
+    for (let i = 0; i < n; i++) {
+      const off = Math.max(0, Math.min(1, positions[i] / 100));
+      g.addColorStop(off, colors[i]);
+    }
+  }
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawImageBackground(ctx, canvas) {
+  const img = state.bgImage;
+  const cw = canvas.width, ch = canvas.height;
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  const r = Math.max(cw / iw, ch / ih);
+  const dw = iw * r, dh = ih * r;
+  ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
 }
 
 export function drawMeshGradient(ctx, canvas) {
