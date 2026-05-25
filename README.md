@@ -1,5 +1,4 @@
-# SnapShot-Pro v4 (Vite)
-
+# SnapShot-Pro 
 Modular rewrite of SnapShot-Pro, set up for Vite and Vercel deployment.
 
 ## Develop
