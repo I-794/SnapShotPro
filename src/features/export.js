@@ -2,9 +2,11 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
+import { exportGif } from './gif-export.js';
 
 export function exportImage() {
   if (!state.image) { showNotification('Please load an image first!', 'error'); return; }
+  if (state.exportSettings.format === 'gif') { exportGif(); return; }
   let mimeType, extension;
   const quality = state.exportSettings.quality / 100;
   switch (state.exportSettings.format) {

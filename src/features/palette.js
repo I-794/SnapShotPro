@@ -74,7 +74,18 @@ export function registerCommands() {
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
     { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },
     { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: () => { saveStateToHistory(); state.redactions = []; render(); showStatus('Redactions cleared'); } },
-    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } }
+    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
+    { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },
+    { id: 'style-watercolor', label: 'Style: Watercolor',    icon: '🎨', run: () => document.querySelector('[data-style-preset="watercolor"]')?.click() },
+    { id: 'style-sketch',     label: 'Style: Sketch',        icon: '✏️', run: () => document.querySelector('[data-style-preset="sketch"]')?.click() },
+    { id: 'style-vintage',    label: 'Style: Vintage',       icon: '📷', run: () => document.querySelector('[data-style-preset="vintage"]')?.click() },
+    { id: 'style-cyber',      label: 'Style: Cyberpunk',     icon: '🌆', run: () => document.querySelector('[data-style-preset="cyber"]')?.click() },
+    { id: 'style-noir',       label: 'Style: Noir',          icon: '🖤', run: () => document.querySelector('[data-style-preset="noir"]')?.click() },
+    { id: 'style-reset',      label: 'Reset Filters',        icon: '⟲',  run: () => document.getElementById('style-reset-btn')?.click() },
+    { id: 'share-image',      label: 'Share Image',          icon: '🔗', run: () => document.getElementById('share-btn')?.click() },
+    { id: 'generate-qr',      label: 'Generate QR Code',     icon: '📱', run: () => document.getElementById('qr-btn')?.click() },
+    { id: 'export-gif',       label: 'Export as GIF',         icon: '🎬', run: () => document.getElementById('gif-export-btn')?.click() },
+    { id: 'anim-play',        label: 'Play/Pause Animation', icon: '▶',  run: () => document.getElementById('animation-play-btn')?.click() }
   ];
 
   // Quick-add stickers as commands

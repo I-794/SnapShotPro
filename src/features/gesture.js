@@ -1,4 +1,4 @@
-// v6 — shared touch-gesture coordination between the canvas (draw/object-drag)
+// v7 — shared touch-gesture coordination between the canvas (draw/object-drag)
 // and the viewport (pan/pinch). Kept in its own module to avoid a circular
 // import between canvas-tools.js and zoom-pan.js.
 

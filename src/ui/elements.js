@@ -80,7 +80,17 @@ const IDS = [
 
   // Extra images / auto layout
   'add-image-btn', 'extra-file-input', 'extra-images-list',
-  'layout-gap', 'layout-gap-value'
+  'layout-gap', 'layout-gap-value',
+
+  // v7 — animation
+  'animation-enabled', 'animation-controls', 'animation-duration', 'animation-duration-value',
+  'animation-play-btn', 'animation-track-list', 'gif-export-btn', 'gif-progress',
+
+  // v7 — AI enhance
+  'ai-enhance-btn', 'style-reset-btn',
+
+  // v7 — share
+  'share-btn', 'embed-container', 'embed-codes', 'qr-btn', 'qr-container'
 ];
 
 export function initElements() {

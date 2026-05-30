@@ -12,6 +12,7 @@ import { renderAutoLayout } from './autolayout.js';
 import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap } from '../features/zoom-pan.js';
+import { getAnimationState } from '../features/animation.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -74,6 +75,20 @@ export function render(forExport) {
 
   if (state.shadow.opacity > 0) drawShadow(ctx, canvas, x, y, imgWidth, imgHeight);
 
+  const animState = getAnimationState();
+  if (animState) {
+    ctx.save();
+    const cx = x + imgWidth / 2;
+    const cy = y + imgHeight / 2;
+    if (animState.opacity !== undefined) ctx.globalAlpha = animState.opacity;
+    if (animState.translateX || animState.translateY || animState.scale !== undefined || animState.rotate) {
+      ctx.translate(cx, cy);
+      if (animState.rotate) ctx.rotate((animState.rotate * Math.PI) / 180);
+      if (animState.scale !== undefined) ctx.scale(animState.scale, animState.scale);
+      ctx.translate(-cx + (animState.translateX || 0), -cy + (animState.translateY || 0));
+    }
+  }
+
   drawImageContent(ctx, x, y, imgWidth, imgHeight);
 
   if (state.showBorder) drawBorder(ctx, x, y, imgWidth, imgHeight);
@@ -86,6 +101,8 @@ export function render(forExport) {
   drawSpotlight(ctx, canvas);
   drawAnnotations(ctx);
   renderExtraImages(ctx, canvas);
+  if (animState) ctx.restore();
+
   drawTextOverlay(ctx, canvas);
   drawWatermark(ctx, canvas);
 

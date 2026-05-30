@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#1a1a2e">
-    <title>SnapShot-Pro v6 — Pro Editor</title>
+    <title>SnapShot-Pro v7 — Pro Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/styles.css">
 </head>
 <body>
@@ -14,7 +17,7 @@
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">📸</div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v6</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v7</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -113,6 +116,36 @@
         </div>
 
         <div class="sidebar-section">
+            <h3 class="section-title">Animation</h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Animation</span><label class="switch"><input type="checkbox" id="animation-enabled"><span class="slider"></span></label></div>
+            <div id="animation-controls" style="display:none;">
+                <div class="control-group">
+                    <label class="control-label">Duration</label>
+                    <div class="range-group"><input type="range" class="range-input" id="animation-duration" min="1" max="10" value="3" step="0.5"><span class="range-value" id="animation-duration-value">3s</span></div>
+                </div>
+                <label class="control-label">Presets</label>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;">
+                    <button class="btn btn-secondary" data-anim-preset="fade-in" style="font-size:11px;padding:7px 4px;">Fade In</button>
+                    <button class="btn btn-secondary" data-anim-preset="slide-up" style="font-size:11px;padding:7px 4px;">Slide Up</button>
+                    <button class="btn btn-secondary" data-anim-preset="bounce" style="font-size:11px;padding:7px 4px;">Bounce</button>
+                    <button class="btn btn-secondary" data-anim-preset="scale-pop" style="font-size:11px;padding:7px 4px;">Scale Pop</button>
+                    <button class="btn btn-secondary" data-anim-preset="rotate-in" style="font-size:11px;padding:7px 4px;">Rotate In</button>
+                    <button class="btn btn-secondary" data-anim-preset="slide-left" style="font-size:11px;padding:7px 4px;">Slide Left</button>
+                </div>
+                <div id="animation-track-list"><p class="info-text">No animation set. Choose a preset above.</p></div>
+                <div class="divider"></div>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-primary" style="flex:1;" id="animation-play-btn">&#9654; Play</button>
+                    <button class="btn btn-success" style="flex:1;" id="gif-export-btn">Export GIF</button>
+                </div>
+                <div id="gif-progress" class="ai-progress" style="display:none;margin-top:8px;">
+                    <div class="ai-progress-bar"><div class="ai-progress-fill" style="width:0%"></div></div>
+                    <span class="ai-progress-label" style="min-width:50px;text-align:right;">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
             <h3 class="section-title">Background</h3>
             <div class="tab-row">
                 <button class="tab-btn active" data-bg="gradient">Gradient</button>
@@ -167,7 +200,7 @@
         </div>
 
         <div class="sidebar-section">
-            <h3 class="section-title">✨ AI Tools <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v5</span></h3>
+            <h3 class="section-title">✨ AI Tools <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v7</span></h3>
             <label class="control-label">In-browser (free)</label>
             <button class="btn btn-primary" style="width:100%;margin-bottom:6px;" id="bg-remove-btn">🪄 Remove Background</button>
             <div id="bg-remove-progress" class="ai-progress" style="display:none;">
@@ -196,6 +229,15 @@
                 </div>
             </details>
 
+            <div class="control-group" style="margin-bottom:8px;">
+                <label class="control-label">Caption Mode</label>
+                <select class="control-input" id="ai-caption-mode">
+                    <option value="social">Social Media</option>
+                    <option value="technical">Technical</option>
+                    <option value="accessibility">Accessibility</option>
+                    <option value="seo">SEO Description</option>
+                </select>
+            </div>
             <div class="ai-action-grid">
                 <button class="btn btn-secondary" id="ai-alt-btn">📝 Alt text</button>
                 <button class="btn btn-secondary" id="ai-caption-btn">💬 Caption</button>
@@ -209,6 +251,22 @@
             </div>
             <p class="info-text" id="ai-cloud-status" style="min-height:14px;margin-top:4px;"></p>
             <div id="ai-cloud-result" class="ocr-result" style="display:none;max-height:220px;"></div>
+
+            <div class="divider"></div>
+            <label class="control-label">AI Enhance</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="ai-enhance-btn">&#10024; Auto-Enhance</button>
+            <p class="info-text" style="margin-bottom:8px;">Uses AI (or local analysis if no key) to optimize brightness, contrast &amp; saturation.</p>
+
+            <label class="control-label">Style Transfer</label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:6px;">
+                <button class="btn btn-secondary" data-style-preset="watercolor" style="font-size:10px;padding:7px 3px;">Watercolor</button>
+                <button class="btn btn-secondary" data-style-preset="sketch" style="font-size:10px;padding:7px 3px;">Sketch</button>
+                <button class="btn btn-secondary" data-style-preset="oil" style="font-size:10px;padding:7px 3px;">Oil Paint</button>
+                <button class="btn btn-secondary" data-style-preset="vintage" style="font-size:10px;padding:7px 3px;">Vintage</button>
+                <button class="btn btn-secondary" data-style-preset="cyber" style="font-size:10px;padding:7px 3px;">Cyberpunk</button>
+                <button class="btn btn-secondary" data-style-preset="noir" style="font-size:10px;padding:7px 3px;">Noir</button>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;" id="style-reset-btn">Reset Filters</button>
         </div>
 
         <div class="sidebar-section">
@@ -313,10 +371,14 @@
             <div class="control-group"><label class="control-label">Canvas Width</label><input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100"></div>
             <div class="control-group"><label class="control-label">Canvas Height</label><input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100"></div>
             <div class="export-size-grid">
-                <div class="size-preset-btn" data-size="twitter"><span class="size-preset-label">Twitter</span><span class="size-preset-dims">1200 × 675</span></div>
+                <div class="size-preset-btn" data-size="twitter"><span class="size-preset-label">Twitter / X</span><span class="size-preset-dims">1200 × 675</span></div>
                 <div class="size-preset-btn" data-size="instagram"><span class="size-preset-label">Instagram</span><span class="size-preset-dims">1080 × 1080</span></div>
                 <div class="size-preset-btn" data-size="facebook"><span class="size-preset-label">Facebook</span><span class="size-preset-dims">1200 × 630</span></div>
                 <div class="size-preset-btn" data-size="linkedin"><span class="size-preset-label">LinkedIn</span><span class="size-preset-dims">1200 × 627</span></div>
+                <div class="size-preset-btn" data-size="ig-story"><span class="size-preset-label">IG Story</span><span class="size-preset-dims">1080 × 1920</span></div>
+                <div class="size-preset-btn" data-size="youtube"><span class="size-preset-label">YouTube</span><span class="size-preset-dims">1280 × 720</span></div>
+                <div class="size-preset-btn" data-size="pinterest"><span class="size-preset-label">Pinterest</span><span class="size-preset-dims">1000 × 1500</span></div>
+                <div class="size-preset-btn" data-size="tiktok"><span class="size-preset-label">TikTok</span><span class="size-preset-dims">1080 × 1920</span></div>
             </div>
             <p class="info-text">Export quality: PNG (Lossless)</p>
         </div>
@@ -335,12 +397,30 @@
 
         <div class="sidebar-section">
             <h3 class="section-title">Export Settings</h3>
-            <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></div>
+            <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="gif">GIF (Animated)</option></select></div>
             <div id="quality-controls" style="display:none;">
                 <div class="control-group"><label class="control-label">Quality</label><div class="range-group"><input type="range" class="range-input" id="export-quality" min="1" max="100" value="92"><span class="range-value" id="export-quality-value">92%</span></div></div>
             </div>
             <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="copy-clipboard-btn">📋 Copy to Clipboard</button>
             <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="export-html-btn">🌐 Export as HTML Card</button>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Share</h3>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="share-btn">&#128279; Share Image</button>
+            <p class="info-text" style="margin-bottom:8px;">Upload to Supabase Storage and get a shareable link. Requires cloud setup.</p>
+            <div id="embed-container" style="display:none;">
+                <label class="control-label">Embed Codes</label>
+                <div id="embed-codes"></div>
+                <div style="display:flex;gap:5px;margin-top:6px;">
+                    <button class="btn btn-secondary" data-copy-embed="html" style="flex:1;font-size:11px;padding:6px;">Copy HTML</button>
+                    <button class="btn btn-secondary" data-copy-embed="markdown" style="flex:1;font-size:11px;padding:6px;">Copy MD</button>
+                    <button class="btn btn-secondary" data-copy-embed="iframe" style="flex:1;font-size:11px;padding:6px;">Copy Iframe</button>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <button class="btn btn-secondary" style="width:100%;" id="qr-btn">QR Code</button>
+            <div id="qr-container" style="display:none;margin-top:8px;text-align:center;"></div>
         </div>
 
         <div class="sidebar-section">

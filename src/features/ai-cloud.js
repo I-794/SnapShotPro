@@ -116,10 +116,18 @@ export async function aiAltText() {
   if (out) showAiResult(out);
 }
 
+const CAPTION_MODES = {
+  social: 'Write a short, punchy social-media caption for this image (under 25 words, no hashtags, no preamble).',
+  technical: 'Write a technical description of this image suitable for documentation. Focus on UI elements, layout, and technical details. Be precise and concise (2-3 sentences, no preamble).',
+  accessibility: 'Write a detailed, accessible alt text for this image following WCAG guidelines. Describe all meaningful visual content, layout, and relationships. Be thorough but concise (2-4 sentences, no preamble).',
+  seo: 'Write an SEO-optimized description for this image suitable for a website meta description or image caption. Include relevant keywords naturally. (1-2 sentences, under 160 characters, no preamble).'
+};
+
 export async function aiCaption() {
-  const out = await runVisionPrompt(
-    'Write a short, punchy social-media caption for this image (under 25 words, no hashtags, no preamble).'
-  );
+  const modeSelect = document.getElementById('ai-caption-mode');
+  const mode = modeSelect ? modeSelect.value : 'social';
+  const prompt = CAPTION_MODES[mode] || CAPTION_MODES.social;
+  const out = await runVisionPrompt(prompt);
   if (out) showAiResult(out);
 }
 

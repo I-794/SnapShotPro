@@ -1,4 +1,4 @@
-// SnapShot-Pro v6 — app entry.
+// SnapShot-Pro v7 — app entry.
 // Initialize DOM refs, bind every module, then render.
 
 import { inject } from '@vercel/analytics';
@@ -33,6 +33,10 @@ import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindCrop } from './features/crop.js';
 import { bindResetButton } from './features/reset.js';
+import { bindShare } from './features/share.js';
+import { bindAiEnhance } from './features/ai-enhance.js';
+import { bindAnimation } from './features/animation.js';
+import { bindGifExport } from './features/gif-export.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
@@ -87,6 +91,10 @@ function init() {
   bindCloudSync();
   bindCrop();
   bindResetButton();
+  bindShare();
+  bindAiEnhance();
+  bindAnimation();
+  bindGifExport();
   registerCommands();
   bindPalette();
   bindAllControls();

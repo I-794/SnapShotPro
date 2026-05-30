@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapShotPro - Professional Screenshot Sharing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #242424;
+            --border-color: #333;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --success: #10b981;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 360px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+
+        .sidebar-section {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 60px;
+            padding: 32px;
+            overflow: auto;
+            background: var(--bg-primary);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            max-width: 100%;
+            max-height: calc(100vh - 140px);
+            transition: all 0.3s ease;
+        }
+
+        #preview-canvas {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 140px);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            width: 600px;
+            height: 400px;
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone.drag-over {
+            border-color: var(--accent-primary);
+            background: var(--accent-light);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--text-secondary);
+        }
+
+        .upload-text {
+            text-align: center;
+        }
+
+        .upload-text h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-text p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Form Controls */
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            outline: none;
+            padding: 0;
+            border: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .range-input {
+            flex: 1;
+        }
+
+        .range-value {
+            min-width: 40px;
+            text-align: right;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Color Picker */
+        .color-picker-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-preview:hover {
+            border-color: var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .color-preview input[type="color"] {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Gradient Picker */
+        .gradient-stops {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .gradient-stop {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .gradient-stop-color {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-stop-color input[type="color"] {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            border: none;
+            cursor: pointer;
+        }
+
+        .gradient-stop-position {
+            flex: 1;
+        }
+
+        /* Preset Buttons */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .preset-button {
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-button:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .preset-button.active {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .preset-label {
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            padding: 4px;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #2a2a2a;
+            border-color: #404040;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
+        /* Select Dropdown */
+        select.control-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* Number Input */
+        input[type="number"].control-input {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Angle Input */
+        .angle-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .angle-visual {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .angle-indicator {
+            width: 2px;
+            height: 16px;
+            background: var(--accent-primary);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center bottom;
+            border-radius: 2px;
+        }
+
+        /* Export Panel */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .export-size-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .size-preset-btn {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .size-preset-btn:hover {
+            background: #2a2a2a;
+            border-color: var(--accent-primary);
+        }
+
+        .size-preset-btn.active {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .size-preset-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .size-preset-dims {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Hidden file input */
+        #file-input {
+            display: none;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            border-color: var(--success);
+        }
+
+        .notification.error {
+            border-color: #ef4444;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        .notification-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Loading State */
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 320px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+
+        /* Gradient Preview */
+        .gradient-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 2px solid var(--border-color);
+        }
+
+        /* Shadow Preset Grid */
+        .shadow-preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .shadow-preset-btn {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .shadow-preset-btn:hover {
+            background: #2a2a2a;
+            border-color: var(--accent-primary);
+        }
+
+        .shadow-preset-btn.active {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Info Text */
+        .info-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 16px 0;
+        }
+
+        /* Collapsible Section */
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 12px 0;
+            user-select: none;
+        }
+
+        .collapsible-header:hover .section-title {
+            color: var(--accent-primary);
+        }
+
+        .collapsible-icon {
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+        }
+
+        .collapsible-icon.open {
+            transform: rotate(180deg);
+        }
+
+        /* Text Elements */
+        .text-elements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .text-element-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .text-element-item:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .text-element-item.active {
+            border-color: var(--accent-primary);
+            background: var(--accent-light);
+        }
+
+        .text-element-preview {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+
+        .text-element-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icon-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .icon-btn.delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .text-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📸</div>
+                    <span>SnapShotPro</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="undo-btn" disabled>↶ Undo</button>
+                    <button class="btn btn-secondary" id="redo-btn" disabled>↷ Redo</button>
+                    <button class="btn btn-secondary" id="reset-btn">Reset</button>
+                    <button class="btn btn-success" id="export-btn">Export Image</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Image Upload Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Image Upload</h3>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-primary" style="flex: 1;" id="upload-btn">
+                        <span>📁</span>
+                        Choose Image
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1;" id="svg-btn">
+                        <span>&lt;/&gt;</span>
+                        SVG Code
+                    </button>
+                </div>
+                <p class="info-text">Or paste (Ctrl+V) / drag & drop an image</p>
+                <input type="file" id="file-input" accept="image/*">
+
+                <!-- SVG Code Input -->
+                <div id="svg-input-container" style="display: none; margin-top: 16px;">
+                    <label class="control-label">Paste SVG Code</label>
+                    <textarea class="control-input" id="svg-code-input" placeholder="<svg>...</svg>" style="min-height: 120px; font-family: monospace; font-size: 12px;"></textarea>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" id="render-svg-btn">Render SVG</button>
+                </div>
+            </div>
+
+            <!-- Image Editing Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Image Editing</h3>
+
+                <!-- Transform Controls -->
+                <label class="control-label">Transform</label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                    <button class="btn btn-secondary" id="rotate-left-btn">↶ 90°</button>
+                    <button class="btn btn-secondary" id="rotate-right-btn">↷ 90°</button>
+                    <button class="btn btn-secondary" id="flip-h-btn">↔ Flip H</button>
+                    <button class="btn btn-secondary" id="flip-v-btn">↕ Flip V</button>
+                </div>
+
+                <!-- Filters -->
+                <label class="control-label">Filters</label>
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Brightness</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="brightness" min="0" max="200" value="100">
+                        <span class="range-value" id="brightness-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Contrast</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="contrast" min="0" max="200" value="100">
+                        <span class="range-value" id="contrast-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Saturation</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="saturation" min="0" max="200" value="100">
+                        <span class="range-value" id="saturation-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Blur</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="blur" min="0" max="20" value="0">
+                        <span class="range-value" id="blur-value">0px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Grayscale</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="grayscale" min="0" max="100" value="0">
+                        <span class="range-value" id="grayscale-value">0%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" style="font-size: 12px; margin-bottom: 4px;">Sepia</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="sepia" min="0" max="100" value="0">
+                        <span class="range-value" id="sepia-value">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Gradient Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Background Gradient</h3>
+
+                <div class="preset-grid">
+                    <div class="preset-button" data-preset="sunset" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="preset-label">Sunset</span>
+                    </div>
+                    <div class="preset-button" data-preset="ocean" style="background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);">
+                        <span class="preset-label">Ocean</span>
+                    </div>
+                    <div class="preset-button" data-preset="forest" style="background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);">
+                        <span class="preset-label">Forest</span>
+                    </div>
+                    <div class="preset-button" data-preset="fire" style="background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%);">
+                        <span class="preset-label">Fire</span>
+                    </div>
+                    <div class="preset-button" data-preset="midnight" style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);">
+                        <span class="preset-label">Midnight</span>
+                    </div>
+                    <div class="preset-button" data-preset="rose" style="background: linear-gradient(135deg, #ED4264 0%, #FFEDBC 100%);">
+                        <span class="preset-label">Rose</span>
+                    </div>
+                    <div class="preset-button" data-preset="purple" style="background: linear-gradient(135deg, #A8EDEA 0%, #FED6E3 100%);">
+                        <span class="preset-label">Purple Dream</span>
+                    </div>
+                    <div class="preset-button" data-preset="mint" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                        <span class="preset-label">Mint</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="control-group">
+                    <label class="control-label">Gradient Type</label>
+                    <select class="control-input" id="gradient-type">
+                        <option value="linear">Linear</option>
+                        <option value="radial">Radial</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="gradient-angle-group">
+                    <label class="control-label">Angle</label>
+                    <div class="angle-input-group">
+                        <div class="angle-visual">
+                            <div class="angle-indicator" id="angle-indicator"></div>
+                        </div>
+                        <div class="range-group" style="flex: 1;">
+                            <input type="range" class="range-input" id="gradient-angle" min="0" max="360" value="135">
+                            <span class="range-value" id="gradient-angle-value">135°</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gradient-stops">
+                    <div class="gradient-stop">
+                        <div class="gradient-stop-color">
+                            <input type="color" id="gradient-color-1" value="#667eea">
+                        </div>
+                        <div class="gradient-stop-position">
+                            <div class="range-group">
+                                <input type="range" class="range-input" id="gradient-pos-1" min="0" max="100" value="0">
+                                <span class="range-value" id="gradient-pos-1-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gradient-stop">
+                        <div class="gradient-stop-color">
+                            <input type="color" id="gradient-color-2" value="#764ba2">
+                        </div>
+                        <div class="gradient-stop-position">
+                            <div class="range-group">
+                                <input type="range" class="range-input" id="gradient-pos-2" min="0" max="100" value="100">
+                                <span class="range-value" id="gradient-pos-2-value">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gradient-preview" id="gradient-preview"></div>
+            </div>
+
+            <!-- Image Settings Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Image Settings</h3>
+
+                <div class="control-group">
+                    <label class="control-label">Padding</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="padding" min="0" max="200" value="60">
+                        <span class="range-value" id="padding-value">60px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Scale</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="scale" min="50" max="150" value="100">
+                        <span class="range-value" id="scale-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Border Radius</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="border-radius" min="0" max="50" value="12">
+                        <span class="range-value" id="border-radius-value">12px</span>
+                    </div>
+                </div>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">Show Border</span>
+                    <label class="switch">
+                        <input type="checkbox" id="show-border">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="control-group" id="border-controls" style="display: none;">
+                    <label class="control-label">Border Width</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="border-width" min="1" max="20" value="2">
+                        <span class="range-value" id="border-width-value">2px</span>
+                    </div>
+
+                    <label class="control-label" style="margin-top: 12px;">Border Color</label>
+                    <div class="color-picker-wrapper">
+                        <div class="color-preview">
+                            <input type="color" id="border-color" value="#ffffff">
+                        </div>
+                        <input type="text" class="control-input" id="border-color-text" value="#ffffff" style="flex: 1;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shadow Settings Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Shadow Settings</h3>
+
+                <div class="shadow-preset-grid">
+                    <div class="shadow-preset-btn active" data-shadow="soft">Soft</div>
+                    <div class="shadow-preset-btn" data-shadow="medium">Medium</div>
+                    <div class="shadow-preset-btn" data-shadow="hard">Hard</div>
+                    <div class="shadow-preset-btn" data-shadow="none">None</div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="control-group">
+                    <label class="control-label">Shadow Blur</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="shadow-blur" min="0" max="100" value="40">
+                        <span class="range-value" id="shadow-blur-value">40px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Shadow Spread</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="shadow-spread" min="0" max="50" value="10">
+                        <span class="range-value" id="shadow-spread-value">10px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Shadow Opacity</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="shadow-opacity" min="0" max="100" value="30">
+                        <span class="range-value" id="shadow-opacity-value">30%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Offset X</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="shadow-x" min="-50" max="50" value="0">
+                        <span class="range-value" id="shadow-x-value">0px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Offset Y</label>
+                    <div class="range-group">
+                        <input type="range" class="range-input" id="shadow-y" min="-50" max="50" value="10">
+                        <span class="range-value" id="shadow-y-value">10px</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Shadow Color</label>
+                    <div class="color-picker-wrapper">
+                        <div class="color-preview">
+                            <input type="color" id="shadow-color" value="#000000">
+                        </div>
+                        <input type="text" class="control-input" id="shadow-color-text" value="#000000" style="flex: 1;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Settings Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Canvas Settings</h3>
+
+                <div class="control-group">
+                    <label class="control-label">Canvas Width</label>
+                    <input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Canvas Height</label>
+                    <input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100">
+                </div>
+
+                <div class="export-size-grid">
+                    <div class="size-preset-btn" data-size="twitter">
+                        <span class="size-preset-label">Twitter</span>
+                        <span class="size-preset-dims">1200 × 675</span>
+                    </div>
+                    <div class="size-preset-btn" data-size="instagram">
+                        <span class="size-preset-label">Instagram</span>
+                        <span class="size-preset-dims">1080 × 1080</span>
+                    </div>
+                    <div class="size-preset-btn" data-size="facebook">
+                        <span class="size-preset-label">Facebook</span>
+                        <span class="size-preset-dims">1200 × 630</span>
+                    </div>
+                    <div class="size-preset-btn" data-size="linkedin">
+                        <span class="size-preset-label">LinkedIn</span>
+                        <span class="size-preset-dims">1200 × 627</span>
+                    </div>
+                </div>
+
+                <p class="info-text">Export quality: PNG (Lossless)</p>
+            </div>
+
+            <!-- Text Overlay Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Text Overlay</h3>
+
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="add-text-btn">
+                    <span>+</span>
+                    Add Text
+                </button>
+
+                <div id="text-elements-list" class="text-elements-list"></div>
+
+                <div id="text-controls" class="text-controls" style="display: none;">
+                    <div class="control-group">
+                        <label class="control-label">Text Content</label>
+                        <textarea class="control-input" id="text-content" placeholder="Enter your text..." rows="3"></textarea>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Font Family</label>
+                        <select class="control-input" id="text-font">
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Font Size</label>
+                        <div class="range-group">
+                            <input type="range" class="range-input" id="text-size" min="12" max="200" value="48">
+                            <span class="range-value" id="text-size-value">48px</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Font Weight</label>
+                        <select class="control-input" id="text-weight">
+                            <option value="normal">Normal</option>
+                            <option value="bold">Bold</option>
+                            <option value="lighter">Lighter</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Text Color</label>
+                        <div class="color-picker-wrapper">
+                            <div class="color-preview">
+                                <input type="color" id="text-color" value="#ffffff">
+                            </div>
+                            <input type="text" class="control-input" id="text-color-text" value="#ffffff" style="flex: 1;">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Text Align</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                            <button class="btn btn-secondary text-align-btn active" data-align="left">Left</button>
+                            <button class="btn btn-secondary text-align-btn" data-align="center">Center</button>
+                            <button class="btn btn-secondary text-align-btn" data-align="right">Right</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Position X</label>
+                        <div class="range-group">
+                            <input type="range" class="range-input" id="text-x" min="0" max="100" value="50">
+                            <span class="range-value" id="text-x-value">50%</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Position Y</label>
+                        <div class="range-group">
+                            <input type="range" class="range-input" id="text-y" min="0" max="100" value="50">
+                            <span class="range-value" id="text-y-value">50%</span>
+                        </div>
+                    </div>
+
+                    <div class="toggle-switch">
+                        <span class="toggle-label">Text Shadow</span>
+                        <label class="switch">
+                            <input type="checkbox" id="text-shadow-enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="text-shadow-controls" style="display: none;">
+                        <div class="control-group">
+                            <label class="control-label">Shadow Blur</label>
+                            <div class="range-group">
+                                <input type="range" class="range-input" id="text-shadow-blur" min="0" max="20" value="4">
+                                <span class="range-value" id="text-shadow-blur-value">4px</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Shadow Color</label>
+                            <div class="color-picker-wrapper">
+                                <div class="color-preview">
+                                    <input type="color" id="text-shadow-color" value="#000000">
+                                </div>
+                                <input type="text" class="control-input" id="text-shadow-color-text" value="#000000" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="info-text">Click on a text element to edit or delete it</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="canvas-container" id="drop-zone">
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">
+                        <h3>Drop your screenshot here</h3>
+                        <p>or click to browse • Supports PNG, JPG, WebP</p>
+                    </div>
+                </div>
+                <div class="canvas-wrapper" id="canvas-wrapper" style="display: none;">
+                    <canvas id="preview-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span class="notification-icon">✓</span>
+        <span class="notification-text" id="notification-text">Image exported successfully!</span>
+    </div>
+
+    <script>
+        // History Management
+        const history = {
+            past: [],
+            future: [],
+            maxSize: 50
+        };
+
+        // Application State
+        const state = {
+            image: null,
+            svgCode: null,
+            imageTransform: {
+                rotation: 0, // 0, 90, 180, 270
+                flipH: false,
+                flipV: false
+            },
+            imageFilters: {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100,
+                blur: 0,
+                grayscale: 0,
+                sepia: 0
+            },
+            gradient: {
+                type: 'linear',
+                angle: 135,
+                colors: ['#667eea', '#764ba2'],
+                positions: [0, 100]
+            },
+            padding: 60,
+            scale: 100,
+            borderRadius: 12,
+            showBorder: false,
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            shadow: {
+                blur: 40,
+                spread: 10,
+                opacity: 30,
+                x: 0,
+                y: 10,
+                color: '#000000'
+            },
+            canvas: {
+                width: 1200,
+                height: 675
+            },
+            textElements: [],
+            currentTextId: null
+        };
+
+        // Save state to history
+        function saveStateToHistory() {
+            const stateCopy = JSON.parse(JSON.stringify({
+                imageTransform: state.imageTransform,
+                imageFilters: state.imageFilters,
+                gradient: state.gradient,
+                padding: state.padding,
+                scale: state.scale,
+                borderRadius: state.borderRadius,
+                showBorder: state.showBorder,
+                borderWidth: state.borderWidth,
+                borderColor: state.borderColor,
+                shadow: state.shadow,
+                canvas: state.canvas,
+                textElements: state.textElements
+            }));
+
+            history.past.push(stateCopy);
+            if (history.past.length > history.maxSize) {
+                history.past.shift();
+            }
+            history.future = [];
+            updateHistoryButtons();
+        }
+
+        // Undo action
+        function undo() {
+            if (history.past.length === 0) return;
+
+            const currentState = JSON.parse(JSON.stringify({
+                imageTransform: state.imageTransform,
+                imageFilters: state.imageFilters,
+                gradient: state.gradient,
+                padding: state.padding,
+                scale: state.scale,
+                borderRadius: state.borderRadius,
+                showBorder: state.showBorder,
+                borderWidth: state.borderWidth,
+                borderColor: state.borderColor,
+                shadow: state.shadow,
+                canvas: state.canvas,
+                textElements: state.textElements
+            }));
+
+            history.future.push(currentState);
+            const previousState = history.past.pop();
+
+            Object.assign(state, previousState);
+            updateUIFromState();
+            updateTextElementsList();
+            render();
+            updateHistoryButtons();
+        }
+
+        // Redo action
+        function redo() {
+            if (history.future.length === 0) return;
+
+            const currentState = JSON.parse(JSON.stringify({
+                imageTransform: state.imageTransform,
+                imageFilters: state.imageFilters,
+                gradient: state.gradient,
+                padding: state.padding,
+                scale: state.scale,
+                borderRadius: state.borderRadius,
+                showBorder: state.showBorder,
+                borderWidth: state.borderWidth,
+                borderColor: state.borderColor,
+                shadow: state.shadow,
+                canvas: state.canvas,
+                textElements: state.textElements
+            }));
+
+            history.past.push(currentState);
+            const nextState = history.future.pop();
+
+            Object.assign(state, nextState);
+            updateUIFromState();
+            updateTextElementsList();
+            render();
+            updateHistoryButtons();
+        }
+
+        // Update history buttons state
+        function updateHistoryButtons() {
+            const undoBtn = document.getElementById('undo-btn');
+            const redoBtn = document.getElementById('redo-btn');
+            undoBtn.disabled = history.past.length === 0;
+            redoBtn.disabled = history.future.length === 0;
+        }
+
+        // Update UI from state
+        function updateUIFromState() {
+            // Image filters
+            elements.brightness.value = state.imageFilters.brightness;
+            elements.brightnessValue.textContent = `${state.imageFilters.brightness}%`;
+            elements.contrast.value = state.imageFilters.contrast;
+            elements.contrastValue.textContent = `${state.imageFilters.contrast}%`;
+            elements.saturation.value = state.imageFilters.saturation;
+            elements.saturationValue.textContent = `${state.imageFilters.saturation}%`;
+            elements.blur.value = state.imageFilters.blur;
+            elements.blurValue.textContent = `${state.imageFilters.blur}px`;
+            elements.grayscale.value = state.imageFilters.grayscale;
+            elements.grayscaleValue.textContent = `${state.imageFilters.grayscale}%`;
+            elements.sepia.value = state.imageFilters.sepia;
+            elements.sepiaValue.textContent = `${state.imageFilters.sepia}%`;
+
+            elements.gradientType.value = state.gradient.type;
+            elements.gradientAngle.value = state.gradient.angle;
+            elements.gradientAngleValue.textContent = `${state.gradient.angle}°`;
+            elements.gradientColor1.value = state.gradient.colors[0];
+            elements.gradientColor2.value = state.gradient.colors[1];
+            elements.gradientPos1.value = state.gradient.positions[0];
+            elements.gradientPos2.value = state.gradient.positions[1];
+            elements.gradientPos1Value.textContent = `${state.gradient.positions[0]}%`;
+            elements.gradientPos2Value.textContent = `${state.gradient.positions[1]}%`;
+
+            elements.padding.value = state.padding;
+            elements.paddingValue.textContent = `${state.padding}px`;
+            elements.scale.value = state.scale;
+            elements.scaleValue.textContent = `${state.scale}%`;
+            elements.borderRadius.value = state.borderRadius;
+            elements.borderRadiusValue.textContent = `${state.borderRadius}px`;
+            elements.showBorder.checked = state.showBorder;
+            elements.borderControls.style.display = state.showBorder ? 'block' : 'none';
+            elements.borderWidth.value = state.borderWidth;
+            elements.borderWidthValue.textContent = `${state.borderWidth}px`;
+            elements.borderColor.value = state.borderColor;
+            elements.borderColorText.value = state.borderColor;
+
+            elements.shadowBlur.value = state.shadow.blur;
+            elements.shadowBlurValue.textContent = `${state.shadow.blur}px`;
+            elements.shadowSpread.value = state.shadow.spread;
+            elements.shadowSpreadValue.textContent = `${state.shadow.spread}px`;
+            elements.shadowOpacity.value = state.shadow.opacity;
+            elements.shadowOpacityValue.textContent = `${state.shadow.opacity}%`;
+            elements.shadowX.value = state.shadow.x;
+            elements.shadowXValue.textContent = `${state.shadow.x}px`;
+            elements.shadowY.value = state.shadow.y;
+            elements.shadowYValue.textContent = `${state.shadow.y}px`;
+            elements.shadowColor.value = state.shadow.color;
+            elements.shadowColorText.value = state.shadow.color;
+
+            elements.canvasWidth.value = state.canvas.width;
+            elements.canvasHeight.value = state.canvas.height;
+
+            updateAngleIndicator();
+            updateGradientPreview();
+        }
+
+        // Gradient Presets
+        const gradientPresets = {
+            sunset: {
+                colors: ['#667eea', '#764ba2'],
+                positions: [0, 100],
+                angle: 135
+            },
+            ocean: {
+                colors: ['#2E3192', '#1BFFFF'],
+                positions: [0, 100],
+                angle: 135
+            },
+            forest: {
+                colors: ['#134E5E', '#71B280'],
+                positions: [0, 100],
+                angle: 135
+            },
+            fire: {
+                colors: ['#F2994A', '#F2C94C'],
+                positions: [0, 100],
+                angle: 135
+            },
+            midnight: {
+                colors: ['#0F2027', '#2C5364'],
+                positions: [0, 100],
+                angle: 135
+            },
+            rose: {
+                colors: ['#ED4264', '#FFEDBC'],
+                positions: [0, 100],
+                angle: 135
+            },
+            purple: {
+                colors: ['#A8EDEA', '#FED6E3'],
+                positions: [0, 100],
+                angle: 135
+            },
+            mint: {
+                colors: ['#84fab0', '#8fd3f4'],
+                positions: [0, 100],
+                angle: 135
+            }
+        };
+
+        // Shadow Presets
+        const shadowPresets = {
+            soft: { blur: 40, spread: 10, opacity: 30, x: 0, y: 10 },
+            medium: { blur: 60, spread: 20, opacity: 40, x: 0, y: 20 },
+            hard: { blur: 80, spread: 30, opacity: 50, x: 0, y: 30 },
+            none: { blur: 0, spread: 0, opacity: 0, x: 0, y: 0 }
+        };
+
+        // Canvas Size Presets
+        const sizePresets = {
+            twitter: { width: 1200, height: 675 },
+            instagram: { width: 1080, height: 1080 },
+            facebook: { width: 1200, height: 630 },
+            linkedin: { width: 1200, height: 627 }
+        };
+
+        // DOM Elements
+        const elements = {
+            uploadZone: document.getElementById('upload-zone'),
+            canvasWrapper: document.getElementById('canvas-wrapper'),
+            canvas: document.getElementById('preview-canvas'),
+            fileInput: document.getElementById('file-input'),
+            uploadBtn: document.getElementById('upload-btn'),
+            svgBtn: document.getElementById('svg-btn'),
+            renderSvgBtn: document.getElementById('render-svg-btn'),
+            svgInputContainer: document.getElementById('svg-input-container'),
+            svgCodeInput: document.getElementById('svg-code-input'),
+            exportBtn: document.getElementById('export-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            undoBtn: document.getElementById('undo-btn'),
+            redoBtn: document.getElementById('redo-btn'),
+            dropZone: document.getElementById('drop-zone'),
+            notification: document.getElementById('notification'),
+            notificationText: document.getElementById('notification-text'),
+
+            // Image editing controls
+            rotateLeftBtn: document.getElementById('rotate-left-btn'),
+            rotateRightBtn: document.getElementById('rotate-right-btn'),
+            flipHBtn: document.getElementById('flip-h-btn'),
+            flipVBtn: document.getElementById('flip-v-btn'),
+            brightness: document.getElementById('brightness'),
+            brightnessValue: document.getElementById('brightness-value'),
+            contrast: document.getElementById('contrast'),
+            contrastValue: document.getElementById('contrast-value'),
+            saturation: document.getElementById('saturation'),
+            saturationValue: document.getElementById('saturation-value'),
+            blur: document.getElementById('blur'),
+            blurValue: document.getElementById('blur-value'),
+            grayscale: document.getElementById('grayscale'),
+            grayscaleValue: document.getElementById('grayscale-value'),
+            sepia: document.getElementById('sepia'),
+            sepiaValue: document.getElementById('sepia-value'),
+
+            // Gradient controls
+            gradientType: document.getElementById('gradient-type'),
+            gradientAngle: document.getElementById('gradient-angle'),
+            gradientAngleValue: document.getElementById('gradient-angle-value'),
+            gradientAngleGroup: document.getElementById('gradient-angle-group'),
+            angleIndicator: document.getElementById('angle-indicator'),
+            gradientColor1: document.getElementById('gradient-color-1'),
+            gradientColor2: document.getElementById('gradient-color-2'),
+            gradientPos1: document.getElementById('gradient-pos-1'),
+            gradientPos2: document.getElementById('gradient-pos-2'),
+            gradientPos1Value: document.getElementById('gradient-pos-1-value'),
+            gradientPos2Value: document.getElementById('gradient-pos-2-value'),
+            gradientPreview: document.getElementById('gradient-preview'),
+
+            // Image settings
+            padding: document.getElementById('padding'),
+            paddingValue: document.getElementById('padding-value'),
+            scale: document.getElementById('scale'),
+            scaleValue: document.getElementById('scale-value'),
+            borderRadius: document.getElementById('border-radius'),
+            borderRadiusValue: document.getElementById('border-radius-value'),
+            showBorder: document.getElementById('show-border'),
+            borderControls: document.getElementById('border-controls'),
+            borderWidth: document.getElementById('border-width'),
+            borderWidthValue: document.getElementById('border-width-value'),
+            borderColor: document.getElementById('border-color'),
+            borderColorText: document.getElementById('border-color-text'),
+
+            // Shadow settings
+            shadowBlur: document.getElementById('shadow-blur'),
+            shadowBlurValue: document.getElementById('shadow-blur-value'),
+            shadowSpread: document.getElementById('shadow-spread'),
+            shadowSpreadValue: document.getElementById('shadow-spread-value'),
+            shadowOpacity: document.getElementById('shadow-opacity'),
+            shadowOpacityValue: document.getElementById('shadow-opacity-value'),
+            shadowX: document.getElementById('shadow-x'),
+            shadowXValue: document.getElementById('shadow-x-value'),
+            shadowY: document.getElementById('shadow-y'),
+            shadowYValue: document.getElementById('shadow-y-value'),
+            shadowColor: document.getElementById('shadow-color'),
+            shadowColorText: document.getElementById('shadow-color-text'),
+
+            // Canvas settings
+            canvasWidth: document.getElementById('canvas-width'),
+            canvasHeight: document.getElementById('canvas-height'),
+
+            // Text controls
+            addTextBtn: document.getElementById('add-text-btn'),
+            textElementsList: document.getElementById('text-elements-list'),
+            textControls: document.getElementById('text-controls'),
+            textContent: document.getElementById('text-content'),
+            textFont: document.getElementById('text-font'),
+            textSize: document.getElementById('text-size'),
+            textSizeValue: document.getElementById('text-size-value'),
+            textWeight: document.getElementById('text-weight'),
+            textColor: document.getElementById('text-color'),
+            textColorText: document.getElementById('text-color-text'),
+            textX: document.getElementById('text-x'),
+            textXValue: document.getElementById('text-x-value'),
+            textY: document.getElementById('text-y'),
+            textYValue: document.getElementById('text-y-value'),
+            textShadowEnabled: document.getElementById('text-shadow-enabled'),
+            textShadowControls: document.getElementById('text-shadow-controls'),
+            textShadowBlur: document.getElementById('text-shadow-blur'),
+            textShadowBlurValue: document.getElementById('text-shadow-blur-value'),
+            textShadowColor: document.getElementById('text-shadow-color'),
+            textShadowColorText: document.getElementById('text-shadow-color-text')
+        };
+
+        // Initialize Canvas Context
+        const ctx = elements.canvas.getContext('2d');
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            // Upload button
+            elements.uploadBtn.addEventListener('click', () => elements.fileInput.click());
+            elements.uploadZone.addEventListener('click', () => elements.fileInput.click());
+            elements.fileInput.addEventListener('change', handleFileSelect);
+
+            // SVG button
+            elements.svgBtn.addEventListener('click', toggleSvgInput);
+            elements.renderSvgBtn.addEventListener('click', renderSvgCode);
+
+            // Export and Reset
+            elements.exportBtn.addEventListener('click', exportImage);
+            elements.resetBtn.addEventListener('click', resetToDefaults);
+
+            // Undo/Redo
+            elements.undoBtn.addEventListener('click', undo);
+            elements.redoBtn.addEventListener('click', redo);
+
+            // Image editing - Transform
+            elements.rotateLeftBtn.addEventListener('click', () => {
+                saveStateToHistory();
+                state.imageTransform.rotation = (state.imageTransform.rotation - 90 + 360) % 360;
+                render();
+            });
+
+            elements.rotateRightBtn.addEventListener('click', () => {
+                saveStateToHistory();
+                state.imageTransform.rotation = (state.imageTransform.rotation + 90) % 360;
+                render();
+            });
+
+            elements.flipHBtn.addEventListener('click', () => {
+                saveStateToHistory();
+                state.imageTransform.flipH = !state.imageTransform.flipH;
+                render();
+            });
+
+            elements.flipVBtn.addEventListener('click', () => {
+                saveStateToHistory();
+                state.imageTransform.flipV = !state.imageTransform.flipV;
+                render();
+            });
+
+            // Image editing - Filters
+            elements.brightness.addEventListener('input', (e) => {
+                state.imageFilters.brightness = parseInt(e.target.value);
+                elements.brightnessValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.contrast.addEventListener('input', (e) => {
+                state.imageFilters.contrast = parseInt(e.target.value);
+                elements.contrastValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.saturation.addEventListener('input', (e) => {
+                state.imageFilters.saturation = parseInt(e.target.value);
+                elements.saturationValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.blur.addEventListener('input', (e) => {
+                state.imageFilters.blur = parseInt(e.target.value);
+                elements.blurValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.grayscale.addEventListener('input', (e) => {
+                state.imageFilters.grayscale = parseInt(e.target.value);
+                elements.grayscaleValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.sepia.addEventListener('input', (e) => {
+                state.imageFilters.sepia = parseInt(e.target.value);
+                elements.sepiaValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            // Drag and Drop
+            elements.dropZone.addEventListener('dragover', handleDragOver);
+            elements.dropZone.addEventListener('dragleave', handleDragLeave);
+            elements.dropZone.addEventListener('drop', handleDrop);
+
+            // Paste
+            document.addEventListener('paste', handlePaste);
+
+            // Gradient controls
+            elements.gradientType.addEventListener('change', (e) => {
+                state.gradient.type = e.target.value;
+                elements.gradientAngleGroup.style.display =
+                    e.target.value === 'linear' ? 'block' : 'none';
+                updateGradientPreview();
+                render();
+            });
+
+            elements.gradientAngle.addEventListener('input', (e) => {
+                state.gradient.angle = parseInt(e.target.value);
+                elements.gradientAngleValue.textContent = `${e.target.value}°`;
+                updateAngleIndicator();
+                updateGradientPreview();
+                render();
+            });
+
+            elements.gradientColor1.addEventListener('input', (e) => {
+                state.gradient.colors[0] = e.target.value;
+                updateGradientPreview();
+                render();
+            });
+
+            elements.gradientColor2.addEventListener('input', (e) => {
+                state.gradient.colors[1] = e.target.value;
+                updateGradientPreview();
+                render();
+            });
+
+            elements.gradientPos1.addEventListener('input', (e) => {
+                state.gradient.positions[0] = parseInt(e.target.value);
+                elements.gradientPos1Value.textContent = `${e.target.value}%`;
+                updateGradientPreview();
+                render();
+            });
+
+            elements.gradientPos2.addEventListener('input', (e) => {
+                state.gradient.positions[1] = parseInt(e.target.value);
+                elements.gradientPos2Value.textContent = `${e.target.value}%`;
+                updateGradientPreview();
+                render();
+            });
+
+            // Image settings
+            elements.padding.addEventListener('input', (e) => {
+                state.padding = parseInt(e.target.value);
+                elements.paddingValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.scale.addEventListener('input', (e) => {
+                state.scale = parseInt(e.target.value);
+                elements.scaleValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.borderRadius.addEventListener('input', (e) => {
+                state.borderRadius = parseInt(e.target.value);
+                elements.borderRadiusValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.showBorder.addEventListener('change', (e) => {
+                state.showBorder = e.target.checked;
+                elements.borderControls.style.display = e.target.checked ? 'block' : 'none';
+                render();
+            });
+
+            elements.borderWidth.addEventListener('input', (e) => {
+                state.borderWidth = parseInt(e.target.value);
+                elements.borderWidthValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.borderColor.addEventListener('input', (e) => {
+                state.borderColor = e.target.value;
+                elements.borderColorText.value = e.target.value;
+                render();
+            });
+
+            elements.borderColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                    state.borderColor = e.target.value;
+                    elements.borderColor.value = e.target.value;
+                    render();
+                }
+            });
+
+            // Shadow settings
+            elements.shadowBlur.addEventListener('input', (e) => {
+                state.shadow.blur = parseInt(e.target.value);
+                elements.shadowBlurValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.shadowSpread.addEventListener('input', (e) => {
+                state.shadow.spread = parseInt(e.target.value);
+                elements.shadowSpreadValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.shadowOpacity.addEventListener('input', (e) => {
+                state.shadow.opacity = parseInt(e.target.value);
+                elements.shadowOpacityValue.textContent = `${e.target.value}%`;
+                render();
+            });
+
+            elements.shadowX.addEventListener('input', (e) => {
+                state.shadow.x = parseInt(e.target.value);
+                elements.shadowXValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.shadowY.addEventListener('input', (e) => {
+                state.shadow.y = parseInt(e.target.value);
+                elements.shadowYValue.textContent = `${e.target.value}px`;
+                render();
+            });
+
+            elements.shadowColor.addEventListener('input', (e) => {
+                state.shadow.color = e.target.value;
+                elements.shadowColorText.value = e.target.value;
+                render();
+            });
+
+            elements.shadowColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                    state.shadow.color = e.target.value;
+                    elements.shadowColor.value = e.target.value;
+                    render();
+                }
+            });
+
+            // Canvas settings
+            elements.canvasWidth.addEventListener('input', (e) => {
+                state.canvas.width = parseInt(e.target.value);
+                render();
+            });
+
+            elements.canvasHeight.addEventListener('input', (e) => {
+                state.canvas.height = parseInt(e.target.value);
+                render();
+            });
+
+            // Preset buttons
+            document.querySelectorAll('.preset-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const preset = btn.dataset.preset;
+                    applyGradientPreset(preset);
+
+                    document.querySelectorAll('.preset-button').forEach(b =>
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Shadow preset buttons
+            document.querySelectorAll('.shadow-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const preset = btn.dataset.shadow;
+                    applyShadowPreset(preset);
+
+                    document.querySelectorAll('.shadow-preset-btn').forEach(b =>
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Size preset buttons
+            document.querySelectorAll('.size-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const size = btn.dataset.size;
+                    applySizePreset(size);
+
+                    document.querySelectorAll('.size-preset-btn').forEach(b =>
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Text controls
+            elements.addTextBtn.addEventListener('click', addTextElement);
+
+            elements.textContent.addEventListener('input', (e) => {
+                updateCurrentTextElement('content', e.target.value);
+            });
+
+            elements.textFont.addEventListener('change', (e) => {
+                updateCurrentTextElement('font', e.target.value);
+            });
+
+            elements.textSize.addEventListener('input', (e) => {
+                updateCurrentTextElement('size', parseInt(e.target.value));
+                elements.textSizeValue.textContent = `${e.target.value}px`;
+            });
+
+            elements.textWeight.addEventListener('change', (e) => {
+                updateCurrentTextElement('weight', e.target.value);
+            });
+
+            elements.textColor.addEventListener('input', (e) => {
+                updateCurrentTextElement('color', e.target.value);
+                elements.textColorText.value = e.target.value;
+            });
+
+            elements.textColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                    updateCurrentTextElement('color', e.target.value);
+                    elements.textColor.value = e.target.value;
+                }
+            });
+
+            elements.textX.addEventListener('input', (e) => {
+                updateCurrentTextElement('x', parseInt(e.target.value));
+                elements.textXValue.textContent = `${e.target.value}%`;
+            });
+
+            elements.textY.addEventListener('input', (e) => {
+                updateCurrentTextElement('y', parseInt(e.target.value));
+                elements.textYValue.textContent = `${e.target.value}%`;
+            });
+
+            elements.textShadowEnabled.addEventListener('change', (e) => {
+                updateCurrentTextElement('shadowEnabled', e.target.checked);
+                elements.textShadowControls.style.display = e.target.checked ? 'block' : 'none';
+            });
+
+            elements.textShadowBlur.addEventListener('input', (e) => {
+                updateCurrentTextElement('shadowBlur', parseInt(e.target.value));
+                elements.textShadowBlurValue.textContent = `${e.target.value}px`;
+            });
+
+            elements.textShadowColor.addEventListener('input', (e) => {
+                updateCurrentTextElement('shadowColor', e.target.value);
+                elements.textShadowColorText.value = e.target.value;
+            });
+
+            elements.textShadowColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                    updateCurrentTextElement('shadowColor', e.target.value);
+                    elements.textShadowColor.value = e.target.value;
+                }
+            });
+
+            // Text align buttons
+            document.querySelectorAll('.text-align-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateCurrentTextElement('align', btn.dataset.align);
+
+                    document.querySelectorAll('.text-align-btn').forEach(b =>
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        }
+
+        // File Handling
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.uploadZone.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.uploadZone.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.uploadZone.classList.remove('drag-over');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        }
+
+        function handlePaste(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    loadImage(file);
+                    break;
+                }
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    state.image = img;
+                    state.svgCode = null;
+                    elements.uploadZone.style.display = 'none';
+                    elements.canvasWrapper.style.display = 'block';
+                    saveStateToHistory();
+                    render();
+                    showNotification('Image loaded successfully!', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // SVG Code Handling
+        function toggleSvgInput() {
+            const isVisible = elements.svgInputContainer.style.display !== 'none';
+            elements.svgInputContainer.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function renderSvgCode() {
+            const svgCode = elements.svgCodeInput.value.trim();
+            if (!svgCode) {
+                showNotification('Please enter SVG code', 'error');
+                return;
+            }
+
+            try {
+                // Create a blob from the SVG code
+                const blob = new Blob([svgCode], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+
+                const img = new Image();
+                img.onload = () => {
+                    state.image = img;
+                    state.svgCode = svgCode;
+                    elements.uploadZone.style.display = 'none';
+                    elements.canvasWrapper.style.display = 'block';
+                    elements.svgInputContainer.style.display = 'none';
+                    saveStateToHistory();
+                    render();
+                    showNotification('SVG rendered successfully!', 'success');
+                    URL.revokeObjectURL(url);
+                };
+                img.onerror = () => {
+                    showNotification('Invalid SVG code', 'error');
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            } catch (error) {
+                showNotification('Error rendering SVG: ' + error.message, 'error');
+            }
+        }
+
+        // Gradient Functions
+        function applyGradientPreset(presetName) {
+            const preset = gradientPresets[presetName];
+            if (preset) {
+                saveStateToHistory();
+                state.gradient.colors = [...preset.colors];
+                state.gradient.positions = [...preset.positions];
+                state.gradient.angle = preset.angle;
+
+                // Update UI
+                elements.gradientColor1.value = preset.colors[0];
+                elements.gradientColor2.value = preset.colors[1];
+                elements.gradientPos1.value = preset.positions[0];
+                elements.gradientPos2.value = preset.positions[1];
+                elements.gradientAngle.value = preset.angle;
+
+                elements.gradientPos1Value.textContent = `${preset.positions[0]}%`;
+                elements.gradientPos2Value.textContent = `${preset.positions[1]}%`;
+                elements.gradientAngleValue.textContent = `${preset.angle}°`;
+
+                updateAngleIndicator();
+                updateGradientPreview();
+                render();
+            }
+        }
+
+        function updateGradientPreview() {
+            const preview = elements.gradientPreview;
+            const gradient = createGradientString();
+            preview.style.background = gradient;
+        }
+
+        function createGradientString() {
+            const { type, angle, colors, positions } = state.gradient;
+
+            if (type === 'linear') {
+                return `linear-gradient(${angle}deg, ${colors[0]} ${positions[0]}%, ${colors[1]} ${positions[1]}%)`;
+            } else {
+                return `radial-gradient(circle, ${colors[0]} ${positions[0]}%, ${colors[1]} ${positions[1]}%)`;
+            }
+        }
+
+        function updateAngleIndicator() {
+            const angle = state.gradient.angle;
+            elements.angleIndicator.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+        }
+
+        // Shadow Functions
+        function applyShadowPreset(presetName) {
+            const preset = shadowPresets[presetName];
+            if (preset) {
+                saveStateToHistory();
+                state.shadow = { ...state.shadow, ...preset };
+
+                // Update UI
+                elements.shadowBlur.value = preset.blur;
+                elements.shadowSpread.value = preset.spread;
+                elements.shadowOpacity.value = preset.opacity;
+                elements.shadowX.value = preset.x;
+                elements.shadowY.value = preset.y;
+
+                elements.shadowBlurValue.textContent = `${preset.blur}px`;
+                elements.shadowSpreadValue.textContent = `${preset.spread}px`;
+                elements.shadowOpacityValue.textContent = `${preset.opacity}%`;
+                elements.shadowXValue.textContent = `${preset.x}px`;
+                elements.shadowYValue.textContent = `${preset.y}px`;
+
+                render();
+            }
+        }
+
+        // Size Preset Functions
+        function applySizePreset(presetName) {
+            const preset = sizePresets[presetName];
+            if (preset) {
+                saveStateToHistory();
+                state.canvas.width = preset.width;
+                state.canvas.height = preset.height;
+
+                // Update UI
+                elements.canvasWidth.value = preset.width;
+                elements.canvasHeight.value = preset.height;
+
+                render();
+            }
+        }
+
+        // Text Element Functions
+        function addTextElement() {
+            saveStateToHistory();
+
+            const newText = {
+                id: Date.now(),
+                content: 'Sample Text',
+                font: 'Arial',
+                size: 48,
+                weight: 'normal',
+                color: '#ffffff',
+                align: 'left',
+                x: 50,
+                y: 50,
+                shadowEnabled: false,
+                shadowBlur: 4,
+                shadowColor: '#000000'
+            };
+
+            state.textElements.push(newText);
+            state.currentTextId = newText.id;
+
+            updateTextElementsList();
+            loadTextIntoControls(newText);
+            render();
+        }
+
+        function deleteTextElement(id) {
+            saveStateToHistory();
+            state.textElements = state.textElements.filter(t => t.id !== id);
+
+            if (state.currentTextId === id) {
+                state.currentTextId = null;
+                elements.textControls.style.display = 'none';
+            }
+
+            updateTextElementsList();
+            render();
+        }
+
+        function selectTextElement(id) {
+            state.currentTextId = id;
+            const textElement = state.textElements.find(t => t.id === id);
+
+            if (textElement) {
+                loadTextIntoControls(textElement);
+            }
+
+            updateTextElementsList();
+        }
+
+        function loadTextIntoControls(textElement) {
+            elements.textControls.style.display = 'flex';
+            elements.textContent.value = textElement.content;
+            elements.textFont.value = textElement.font;
+            elements.textSize.value = textElement.size;
+            elements.textSizeValue.textContent = `${textElement.size}px`;
+            elements.textWeight.value = textElement.weight;
+            elements.textColor.value = textElement.color;
+            elements.textColorText.value = textElement.color;
+            elements.textX.value = textElement.x;
+            elements.textXValue.textContent = `${textElement.x}%`;
+            elements.textY.value = textElement.y;
+            elements.textYValue.textContent = `${textElement.y}%`;
+            elements.textShadowEnabled.checked = textElement.shadowEnabled;
+            elements.textShadowControls.style.display = textElement.shadowEnabled ? 'block' : 'none';
+            elements.textShadowBlur.value = textElement.shadowBlur;
+            elements.textShadowBlurValue.textContent = `${textElement.shadowBlur}px`;
+            elements.textShadowColor.value = textElement.shadowColor;
+            elements.textShadowColorText.value = textElement.shadowColor;
+
+            // Update text align buttons
+            document.querySelectorAll('.text-align-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.align === textElement.align);
+            });
+        }
+
+        function updateCurrentTextElement(property, value) {
+            if (state.currentTextId === null) return;
+
+            const textElement = state.textElements.find(t => t.id === state.currentTextId);
+            if (textElement) {
+                textElement[property] = value;
+                updateTextElementsList();
+                render();
+            }
+        }
+
+        function updateTextElementsList() {
+            const listContainer = elements.textElementsList;
+            listContainer.innerHTML = '';
+
+            state.textElements.forEach(textElement => {
+                const item = document.createElement('div');
+                item.className = 'text-element-item';
+                if (textElement.id === state.currentTextId) {
+                    item.classList.add('active');
+                }
+
+                const preview = document.createElement('div');
+                preview.className = 'text-element-preview';
+                preview.textContent = textElement.content || 'Empty text';
+
+                const actions = document.createElement('div');
+                actions.className = 'text-element-actions';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'icon-btn delete';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.title = 'Delete';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteTextElement(textElement.id);
+                };
+
+                actions.appendChild(deleteBtn);
+
+                item.appendChild(preview);
+                item.appendChild(actions);
+
+                item.onclick = () => selectTextElement(textElement.id);
+
+                listContainer.appendChild(item);
+            });
+        }
+
+        function drawTextElements() {
+            state.textElements.forEach(textElement => {
+                if (!textElement.content) return;
+
+                ctx.save();
+
+                // Set text properties
+                ctx.font = `${textElement.weight} ${textElement.size}px ${textElement.font}`;
+                ctx.fillStyle = textElement.color;
+                ctx.textAlign = textElement.align;
+                ctx.textBaseline = 'middle';
+
+                // Apply shadow if enabled
+                if (textElement.shadowEnabled) {
+                    ctx.shadowColor = textElement.shadowColor;
+                    ctx.shadowBlur = textElement.shadowBlur;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                }
+
+                // Calculate position
+                const x = (textElement.x / 100) * elements.canvas.width;
+                const y = (textElement.y / 100) * elements.canvas.height;
+
+                // Draw text (handle multi-line)
+                const lines = textElement.content.split('\n');
+                const lineHeight = textElement.size * 1.2;
+
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, x, y + (index * lineHeight));
+                });
+
+                ctx.restore();
+            });
+        }
+
+        // Render Function
+        function render() {
+            if (!state.image) return;
+
+            const canvas = elements.canvas;
+            canvas.width = state.canvas.width;
+            canvas.height = state.canvas.height;
+
+            // Draw gradient background
+            drawGradient();
+
+            // Calculate image dimensions with padding and scale
+            const scaleFactor = state.scale / 100;
+            const padding = state.padding * 2;
+
+            const availableWidth = canvas.width - padding;
+            const availableHeight = canvas.height - padding;
+
+            let imgWidth = state.image.width * scaleFactor;
+            let imgHeight = state.image.height * scaleFactor;
+
+            // Fit image within available space
+            const imgRatio = imgWidth / imgHeight;
+            const availableRatio = availableWidth / availableHeight;
+
+            if (imgRatio > availableRatio) {
+                // Image is wider
+                if (imgWidth > availableWidth) {
+                    imgWidth = availableWidth;
+                    imgHeight = imgWidth / imgRatio;
+                }
+            } else {
+                // Image is taller
+                if (imgHeight > availableHeight) {
+                    imgHeight = availableHeight;
+                    imgWidth = imgHeight * imgRatio;
+                }
+            }
+
+            const x = (canvas.width - imgWidth) / 2;
+            const y = (canvas.height - imgHeight) / 2;
+
+            // Draw shadow
+            if (state.shadow.opacity > 0) {
+                drawShadow(x, y, imgWidth, imgHeight);
+            }
+
+            // Draw image with border radius, transforms, and filters
+            ctx.save();
+
+            // Create rounded rectangle path
+            const radius = state.borderRadius;
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + imgWidth - radius, y);
+            ctx.quadraticCurveTo(x + imgWidth, y, x + imgWidth, y + radius);
+            ctx.lineTo(x + imgWidth, y + imgHeight - radius);
+            ctx.quadraticCurveTo(x + imgWidth, y + imgHeight, x + imgWidth - radius, y + imgHeight);
+            ctx.lineTo(x + radius, y + imgHeight);
+            ctx.quadraticCurveTo(x, y + imgHeight, x, y + imgHeight - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.clip();
+
+            // Apply transforms and filters
+            const centerX = x + imgWidth / 2;
+            const centerY = y + imgHeight / 2;
+
+            ctx.translate(centerX, centerY);
+
+            // Apply rotation
+            if (state.imageTransform.rotation !== 0) {
+                ctx.rotate((state.imageTransform.rotation * Math.PI) / 180);
+            }
+
+            // Apply flip
+            const scaleX = state.imageTransform.flipH ? -1 : 1;
+            const scaleY = state.imageTransform.flipV ? -1 : 1;
+            ctx.scale(scaleX, scaleY);
+
+            // Apply CSS filters
+            const filters = [];
+            if (state.imageFilters.brightness !== 100) {
+                filters.push(`brightness(${state.imageFilters.brightness}%)`);
+            }
+            if (state.imageFilters.contrast !== 100) {
+                filters.push(`contrast(${state.imageFilters.contrast}%)`);
+            }
+            if (state.imageFilters.saturation !== 100) {
+                filters.push(`saturate(${state.imageFilters.saturation}%)`);
+            }
+            if (state.imageFilters.blur > 0) {
+                filters.push(`blur(${state.imageFilters.blur}px)`);
+            }
+            if (state.imageFilters.grayscale > 0) {
+                filters.push(`grayscale(${state.imageFilters.grayscale}%)`);
+            }
+            if (state.imageFilters.sepia > 0) {
+                filters.push(`sepia(${state.imageFilters.sepia}%)`);
+            }
+            if (filters.length > 0) {
+                ctx.filter = filters.join(' ');
+            }
+
+            // Adjust drawing position for rotation
+            let drawWidth = imgWidth;
+            let drawHeight = imgHeight;
+            if (state.imageTransform.rotation === 90 || state.imageTransform.rotation === 270) {
+                drawWidth = imgHeight;
+                drawHeight = imgWidth;
+            }
+
+            // Draw image centered
+            ctx.drawImage(state.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+            ctx.restore();
+
+            // Draw border if enabled
+            if (state.showBorder) {
+                drawBorder(x, y, imgWidth, imgHeight);
+            }
+
+            // Draw text elements
+            drawTextElements();
+        }
+
+        function drawGradient() {
+            let gradient;
+
+            if (state.gradient.type === 'linear') {
+                const angle = state.gradient.angle * Math.PI / 180;
+                const x1 = elements.canvas.width / 2 + Math.cos(angle) * elements.canvas.width;
+                const y1 = elements.canvas.height / 2 + Math.sin(angle) * elements.canvas.height;
+                const x2 = elements.canvas.width / 2 - Math.cos(angle) * elements.canvas.width;
+                const y2 = elements.canvas.height / 2 - Math.sin(angle) * elements.canvas.height;
+
+                gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+            } else {
+                const centerX = elements.canvas.width / 2;
+                const centerY = elements.canvas.height / 2;
+                const radius = Math.max(elements.canvas.width, elements.canvas.height) / 2;
+
+                gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            }
+
+            gradient.addColorStop(state.gradient.positions[0] / 100, state.gradient.colors[0]);
+            gradient.addColorStop(state.gradient.positions[1] / 100, state.gradient.colors[1]);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, elements.canvas.width, elements.canvas.height);
+        }
+
+        function drawShadow(x, y, width, height) {
+            const shadowCanvas = document.createElement('canvas');
+            shadowCanvas.width = elements.canvas.width;
+            shadowCanvas.height = elements.canvas.height;
+            const shadowCtx = shadowCanvas.getContext('2d');
+
+            // Convert hex color to rgba
+            const shadowColor = state.shadow.color;
+            const opacity = state.shadow.opacity / 100;
+            const r = parseInt(shadowColor.slice(1, 3), 16);
+            const g = parseInt(shadowColor.slice(3, 5), 16);
+            const b = parseInt(shadowColor.slice(5, 7), 16);
+
+            shadowCtx.shadowColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+            shadowCtx.shadowBlur = state.shadow.blur;
+            shadowCtx.shadowOffsetX = state.shadow.x;
+            shadowCtx.shadowOffsetY = state.shadow.y;
+
+            // Draw shadow shape
+            const radius = state.borderRadius;
+            const spread = state.shadow.spread;
+            const shadowX = x - spread;
+            const shadowY = y - spread;
+            const shadowWidth = width + spread * 2;
+            const shadowHeight = height + spread * 2;
+
+            shadowCtx.fillStyle = 'black';
+            shadowCtx.beginPath();
+            shadowCtx.moveTo(shadowX + radius, shadowY);
+            shadowCtx.lineTo(shadowX + shadowWidth - radius, shadowY);
+            shadowCtx.quadraticCurveTo(shadowX + shadowWidth, shadowY, shadowX + shadowWidth, shadowY + radius);
+            shadowCtx.lineTo(shadowX + shadowWidth, shadowY + shadowHeight - radius);
+            shadowCtx.quadraticCurveTo(shadowX + shadowWidth, shadowY + shadowHeight,
+                shadowX + shadowWidth - radius, shadowY + shadowHeight);
+            shadowCtx.lineTo(shadowX + radius, shadowY + shadowHeight);
+            shadowCtx.quadraticCurveTo(shadowX, shadowY + shadowHeight, shadowX, shadowY + shadowHeight - radius);
+            shadowCtx.lineTo(shadowX, shadowY + radius);
+            shadowCtx.quadraticCurveTo(shadowX, shadowY, shadowX + radius, shadowY);
+            shadowCtx.closePath();
+            shadowCtx.fill();
+
+            ctx.drawImage(shadowCanvas, 0, 0);
+        }
+
+        function drawBorder(x, y, width, height) {
+            ctx.strokeStyle = state.borderColor;
+            ctx.lineWidth = state.borderWidth;
+
+            const radius = state.borderRadius;
+            const offset = state.borderWidth / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y + offset);
+            ctx.lineTo(x + width - radius, y + offset);
+            ctx.quadraticCurveTo(x + width - offset, y + offset, x + width - offset, y + radius);
+            ctx.lineTo(x + width - offset, y + height - radius);
+            ctx.quadraticCurveTo(x + width - offset, y + height - offset,
+                x + width - radius, y + height - offset);
+            ctx.lineTo(x + radius, y + height - offset);
+            ctx.quadraticCurveTo(x + offset, y + height - offset, x + offset, y + height - radius);
+            ctx.lineTo(x + offset, y + radius);
+            ctx.quadraticCurveTo(x + offset, y + offset, x + radius, y + offset);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // Export Function
+        function exportImage() {
+            if (!state.image) {
+                showNotification('Please load an image first!', 'error');
+                return;
+            }
+
+            elements.canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `screenshot-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showNotification('Image exported successfully!', 'success');
+            }, 'image/png');
+        }
+
+        // Reset Function
+        function resetToDefaults() {
+            // Reset state
+            state.imageTransform = {
+                rotation: 0,
+                flipH: false,
+                flipV: false
+            };
+            state.imageFilters = {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100,
+                blur: 0,
+                grayscale: 0,
+                sepia: 0
+            };
+            state.gradient = {
+                type: 'linear',
+                angle: 135,
+                colors: ['#667eea', '#764ba2'],
+                positions: [0, 100]
+            };
+            state.padding = 60;
+            state.scale = 100;
+            state.borderRadius = 12;
+            state.showBorder = false;
+            state.borderWidth = 2;
+            state.borderColor = '#ffffff';
+            state.shadow = {
+                blur: 40,
+                spread: 10,
+                opacity: 30,
+                x: 0,
+                y: 10,
+                color: '#000000'
+            };
+            state.canvas = {
+                width: 1200,
+                height: 675
+            };
+            state.textElements = [];
+            state.currentTextId = null;
+
+            // Update all UI elements
+            elements.brightness.value = 100;
+            elements.brightnessValue.textContent = '100%';
+            elements.contrast.value = 100;
+            elements.contrastValue.textContent = '100%';
+            elements.saturation.value = 100;
+            elements.saturationValue.textContent = '100%';
+            elements.blur.value = 0;
+            elements.blurValue.textContent = '0px';
+            elements.grayscale.value = 0;
+            elements.grayscaleValue.textContent = '0%';
+            elements.sepia.value = 0;
+            elements.sepiaValue.textContent = '0%';
+
+            elements.gradientType.value = 'linear';
+            elements.gradientAngle.value = 135;
+            elements.gradientAngleValue.textContent = '135°';
+            elements.gradientColor1.value = '#667eea';
+            elements.gradientColor2.value = '#764ba2';
+            elements.gradientPos1.value = 0;
+            elements.gradientPos2.value = 100;
+            elements.gradientPos1Value.textContent = '0%';
+            elements.gradientPos2Value.textContent = '100%';
+
+            elements.padding.value = 60;
+            elements.paddingValue.textContent = '60px';
+            elements.scale.value = 100;
+            elements.scaleValue.textContent = '100%';
+            elements.borderRadius.value = 12;
+            elements.borderRadiusValue.textContent = '12px';
+            elements.showBorder.checked = false;
+            elements.borderControls.style.display = 'none';
+            elements.borderWidth.value = 2;
+            elements.borderWidthValue.textContent = '2px';
+            elements.borderColor.value = '#ffffff';
+            elements.borderColorText.value = '#ffffff';
+
+            elements.shadowBlur.value = 40;
+            elements.shadowBlurValue.textContent = '40px';
+            elements.shadowSpread.value = 10;
+            elements.shadowSpreadValue.textContent = '10px';
+            elements.shadowOpacity.value = 30;
+            elements.shadowOpacityValue.textContent = '30%';
+            elements.shadowX.value = 0;
+            elements.shadowXValue.textContent = '0px';
+            elements.shadowY.value = 10;
+            elements.shadowYValue.textContent = '10px';
+            elements.shadowColor.value = '#000000';
+            elements.shadowColorText.value = '#000000';
+
+            elements.canvasWidth.value = 1200;
+            elements.canvasHeight.value = 675;
+
+            // Reset active buttons
+            document.querySelectorAll('.preset-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.shadow-preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.size-preset-btn').forEach(b => b.classList.remove('active'));
+
+            document.querySelector('.preset-button[data-preset="sunset"]').classList.add('active');
+            document.querySelector('.shadow-preset-btn[data-shadow="soft"]').classList.add('active');
+
+            // Reset text elements
+            updateTextElementsList();
+            elements.textControls.style.display = 'none';
+
+            updateAngleIndicator();
+            updateGradientPreview();
+            render();
+
+            showNotification('Settings reset to defaults!', 'success');
+        }
+
+        // Notification Function
+        function showNotification(message, type = 'success') {
+            elements.notificationText.textContent = message;
+            elements.notification.className = `notification ${type}`;
+            elements.notification.classList.add('show');
+
+            setTimeout(() => {
+                elements.notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize Application
+        function init() {
+            setupEventListeners();
+            updateAngleIndicator();
+            updateGradientPreview();
+
+            // Set active defaults
+            document.querySelector('.preset-button[data-preset="sunset"]').classList.add('active');
+            document.querySelector('.shadow-preset-btn[data-shadow="soft"]').classList.add('active');
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>

@@ -50,6 +50,20 @@ export const state = {
     ]
   },
   scene: { id: '' },
+  animation: {
+    enabled: false,
+    duration: 3000,
+    playing: false,
+    currentTime: 0,
+    tracks: []
+  },
+  aiEnhance: {
+    stylePreset: null,
+    lastSuggestion: null
+  },
+  share: {
+    lastUrl: null
+  },
   ui: { layersCollapsed: false, paletteOpen: false, stickerDrawerOpen: false },
   selection: { layerIds: [] },
   lastImageRect: null

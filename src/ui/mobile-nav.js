@@ -1,4 +1,4 @@
-// v6 — mobile off-canvas sidebar drawer.
+// v7 — mobile off-canvas sidebar drawer.
 // Hamburger (#sidebar-toggle-btn, phone-only via CSS) slides the sidebar in
 // over a backdrop. Closes on backdrop tap and on any control/tool selection
 // inside the sidebar, so the canvas isn't left obstructed on small screens.
