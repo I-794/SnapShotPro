@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.32.1",
     "@imgly/background-removal": "^1.6.0",
     "@supabase/supabase-js": "^2.45.4",
+    "@vercel/analytics": "^2.0.1",
     "openai": "^4.73.0",
     "tesseract.js": "^5.1.1"
   },
