@@ -1,4 +1,4 @@
-// SnapShot-Pro v4 — app entry.
+// SnapShot-Pro v6 — app entry.
 // Initialize DOM refs, bind every module, then render.
 
 import { state } from './state/state.js';
@@ -35,6 +35,7 @@ import { bindResetButton } from './features/reset.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
+import { bindMobileNav } from './ui/mobile-nav.js';
 
 function bindHeader() {
   el.themeToggleBtn.addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
@@ -88,6 +89,7 @@ function init() {
   bindPalette();
   bindAllControls();
   bindKeyboard();
+  bindMobileNav();
 
   setInitialActivePresets();
   renderMeshPad();

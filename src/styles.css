@@ -397,3 +397,106 @@ kbd { background: var(--bg-tertiary); border: 1px solid var(--border-color); bor
     100% { transform: translateX(280%); }
 }
 .ai-progress-bar { position: relative; overflow: hidden; }
+
+
+/* ============================================================
+   v6 — Responsive / mobile + touch support
+   Additive over the desktop base above. Desktop (>1024px) is
+   unchanged; tablet and phone rules layer on below.
+   ============================================================ */
+
+/* --- Touch gestures: let JS receive pointer events instead of
+   native scroll/zoom. Critical for one-finger draw + pinch. --- */
+#preview-canvas { touch-action: none; }
+.canvas-viewport { touch-action: none; }
+.mesh-handle { touch-action: none; }
+.grad-strip, .grad-stop-marker, .crop-region, .crop-handle { touch-action: none; }
+/* Kill double-tap-to-zoom + long-press callout on chrome, NOT on inputs */
+.annotation-toolbar, .canvas-viewport, .zoom-controls, .header-actions {
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+.canvas-viewport { touch-action: none; } /* re-assert: full gesture control over canvas */
+
+/* Hamburger is desktop-hidden; shown only on phones (see <768 block) */
+#sidebar-toggle-btn { display: none; }
+.sidebar-backdrop {
+    position: fixed; inset: 60px 0 0 0; background: rgba(0,0,0,0.5);
+    z-index: 1050; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+
+/* Safe-area insets (needs viewport-fit=cover on the meta tag) */
+.header { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+.history-timeline { padding-bottom: env(safe-area-inset-bottom); }
+
+/* --- Tablet: 768–1024px --- */
+@media (max-width: 1024px) {
+    .sidebar { width: 320px; }
+    .main-content { padding-left: 20px; padding-right: 20px; }
+    /* Auto-collapse the layers panel to reclaim canvas width */
+    .layers-panel { transform: translateX(calc(100% - 36px)); }
+    .main-content { margin-right: 36px; }
+}
+
+/* --- Phone: <768px --- */
+@media (max-width: 767px) {
+    /* Sidebar becomes an off-canvas drawer; .main-content (flex:1) fills width */
+    .sidebar {
+        position: fixed; top: 60px; left: 0; bottom: 0;
+        width: min(85vw, 360px); z-index: 1100;
+        transform: translateX(-100%); transition: transform 0.25s ease;
+        margin-top: 0; padding-bottom: env(safe-area-inset-bottom);
+    }
+    .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+
+    /* Main content takes the full width; clear sticky toolbar + history bar */
+    .main-content { margin-right: 0; padding: 8px 12px 56px; }
+
+    /* Hide fixed overlays that would obstruct the small canvas
+       (still reachable via the command palette) */
+    .layers-panel { display: none; }
+
+    /* Canvas fits the smaller viewport */
+    #preview-canvas { max-height: calc(100vh - 200px); }
+
+    /* Header declutters: hamburger appears, undo/redo/reset become icon-ish.
+       (Actions stay reachable via command palette + keyboard.) */
+    #sidebar-toggle-btn { display: inline-flex; }
+    .header { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+    .logo { font-size: 17px; gap: 8px; }
+
+    /* Annotation toolbar → single horizontally-scrolling sticky strip */
+    .annotation-toolbar {
+        flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+        position: sticky; top: 0; z-index: 80;
+        -webkit-overflow-scrolling: touch;
+    }
+    .annotation-toolbar > * { flex-shrink: 0; }
+
+    /* Upload zone fills available space instead of fixed 600×400 */
+    .upload-zone { min-height: 50vh; }
+}
+
+/* Fluid upload zone (all sizes ≤ desktop): replaces fixed 600×400 */
+@media (max-width: 1024px) {
+    .upload-zone {
+        width: 100%; max-width: 600px; height: auto;
+        aspect-ratio: 3 / 2; min-height: 240px;
+    }
+}
+
+/* --- Touch devices: enlarge tap targets (coarse pointer only, so
+   desktop mouse density is untouched) --- */
+@media (pointer: coarse) {
+    .btn { min-height: 44px; }
+    .ann-tool-btn, .tab-btn { min-height: 40px; }
+    .zoom-controls button { min-width: 40px; min-height: 40px; }
+    input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; }
+    input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; }
+    .switch { width: 52px; height: 30px; }
+    .slider:before { height: 22px; width: 22px; }
+    input:checked + .slider:before { transform: translateX(22px); }
+    .mesh-handle { width: 28px; height: 28px; }
+    .layer-action-btn { width: 30px; height: 30px; }
+}
