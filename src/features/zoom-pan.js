@@ -1,6 +1,7 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { isTypingTarget } from '../utils/dom.js';
+import { activePointers, gesture } from './gesture.js';
 
 function clampZoom(z) { return Math.max(0.1, Math.min(4, z)); }
 
@@ -74,6 +75,77 @@ export function bindZoomPan() {
   if (el.zoomIn) el.zoomIn.addEventListener('click', () => setZoom(state.view.zoom * 1.2));
   if (el.zoomOut) el.zoomOut.addEventListener('click', () => setZoom(state.view.zoom / 1.2));
   if (el.zoomFit) el.zoomFit.addEventListener('click', fitZoom);
+
+  bindTouchPanZoom(vp);
+}
+
+// ---- Touch: one-finger pan (Select tool) + two-finger pinch-zoom/pan ----
+// Mouse is excluded here — desktop keeps the Space+drag path above. Coexists
+// with the Ctrl/Cmd+wheel zoom. Pointer-events for touch are implicitly
+// captured to the canvas target, so the moves still bubble up to window.
+let _pinch = null;     // { startDist, startZoom }
+let _pinchMid = null;  // last midpoint, for two-finger pan delta
+let _tpan = null;      // { startX, startY, origX, origY }
+
+const _dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const _mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+function bindTouchPanZoom(vp) {
+  vp.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.size >= 2) {
+      const [p, q] = [...activePointers.values()];
+      _pinch = { startDist: _dist(p, q) || 1, startZoom: state.view.zoom };
+      _pinchMid = _mid(p, q);
+      _tpan = null;
+    } else if (activePointers.size === 1) {
+      // One finger on empty canvas with Select tool → pan the viewport.
+      if (state.tool === 'select' && !gesture.canvasBusy) {
+        _tpan = { startX: e.clientX, startY: e.clientY, origX: state.view.panX, origY: state.view.panY };
+      }
+    }
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size >= 2 && _pinch) {
+      const [p, q] = [...activePointers.values()];
+      const d = _dist(p, q);
+      const m = _mid(p, q);
+      const rect = vp.getBoundingClientRect();
+      // Anchor the zoom at the pinch midpoint (keeps the world point under the
+      // fingers fixed), then add the midpoint travel as a two-finger pan.
+      setZoom(_pinch.startZoom * (d / _pinch.startDist), (m.x - rect.left) / rect.width, (m.y - rect.top) / rect.height);
+      if (_pinchMid) { state.view.panX += m.x - _pinchMid.x; state.view.panY += m.y - _pinchMid.y; }
+      _pinchMid = m;
+      applyTransform(); renderMinimap();
+    } else if (_tpan) {
+      state.view.panX = _tpan.origX + (e.clientX - _tpan.startX);
+      state.view.panY = _tpan.origY + (e.clientY - _tpan.startY);
+      applyTransform(); renderMinimap();
+    }
+  });
+
+  const onUp = (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.delete(e.pointerId);
+    if (activePointers.size < 2) { _pinch = null; _pinchMid = null; }
+    if (activePointers.size === 0) {
+      _tpan = null;
+    } else if (activePointers.size === 1) {
+      // Dropped from two fingers to one — rebase the pan on the survivor so it
+      // doesn't jump.
+      const [p] = [...activePointers.values()];
+      _tpan = (state.tool === 'select' && !gesture.canvasBusy)
+        ? { startX: p.x, startY: p.y, origX: state.view.panX, origY: state.view.panY }
+        : null;
+    }
+  };
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
 }
 
 export function renderMinimap() {

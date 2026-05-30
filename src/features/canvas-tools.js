@@ -5,6 +5,7 @@ import { render } from '../render/render.js';
 import { drawArrow, drawStroke, annotationBBox } from '../render/annotations.js';
 import { hitTestExtraImageAtPoint } from './extra-images.js';
 import { getCanvasCoords } from '../utils/geometry.js';
+import { activePointers, gesture } from './gesture.js';
 
 let drawing = { active: false, startX: 0, startY: 0, points: [] };
 let dragOffset = { dx: 0, dy: 0 };
@@ -12,6 +13,23 @@ let isDraggingAnnotation = false;
 let isDraggingText = false;
 let textDragOffset = { dx: 0, dy: 0 };
 let isDraggingExtraImage = false;
+let capturedPointerId = null;
+
+// Abandon any in-progress one-finger interaction (used when a 2nd finger lands,
+// so the viewport can take over for pinch/two-finger pan).
+function cancelInteraction() {
+  drawing.active = false;
+  drawing.points = [];
+  isDraggingText = false;
+  isDraggingAnnotation = false;
+  isDraggingExtraImage = false;
+  gesture.canvasBusy = false;
+  if (capturedPointerId !== null) {
+    try { el.previewCanvas.releasePointerCapture(capturedPointerId); } catch (_) {}
+    capturedPointerId = null;
+  }
+  render();
+}
 
 export function hitTestAnnotations(x, y) {
   if (!state.annotations) return -1;
@@ -122,6 +140,22 @@ function drawPreviewAnnotation(startX, startY, curX, curY) {
 
 function canvasMouseDown(e) {
   if (!state.image) return;
+  // A second touch/pen pointer landed → abandon the one-finger interaction and
+  // let the viewport handle pinch-zoom / two-finger pan instead.
+  if (e.pointerType !== 'mouse' && activePointers.size >= 1) {
+    cancelInteraction();
+    return;
+  }
+  canvasDownLogic(e);
+  // Claim the pointer only when we actually started drawing or dragging, so an
+  // empty-canvas tap with the Select tool falls through to the viewport (pan).
+  gesture.canvasBusy = drawing.active || isDraggingText || isDraggingAnnotation || isDraggingExtraImage;
+  if (gesture.canvasBusy && e.pointerId != null) {
+    try { el.previewCanvas.setPointerCapture(e.pointerId); capturedPointerId = e.pointerId; } catch (_) {}
+  }
+}
+
+function canvasDownLogic(e) {
   const canvas = el.previewCanvas;
   const { x, y } = getCanvasCoords(e, canvas);
 
@@ -243,6 +277,15 @@ function canvasMouseMove(e) {
 }
 
 function canvasMouseUp(e) {
+  canvasUpLogic(e);
+  gesture.canvasBusy = false;
+  if (capturedPointerId !== null) {
+    try { el.previewCanvas.releasePointerCapture(capturedPointerId); } catch (_) {}
+    capturedPointerId = null;
+  }
+}
+
+function canvasUpLogic(e) {
   if (!state.image) return;
   const canvas = el.previewCanvas;
 
@@ -350,10 +393,11 @@ export function setTool(t) {
 }
 
 export function bindCanvasTools() {
-  el.previewCanvas.addEventListener('mousedown', canvasMouseDown);
-  el.previewCanvas.addEventListener('mousemove', canvasMouseMove);
-  el.previewCanvas.addEventListener('mouseup', canvasMouseUp);
-  el.previewCanvas.addEventListener('mouseleave', canvasMouseUp);
+  // Pointer events give a single code path for mouse + touch + pen.
+  el.previewCanvas.addEventListener('pointerdown', canvasMouseDown);
+  el.previewCanvas.addEventListener('pointermove', canvasMouseMove);
+  el.previewCanvas.addEventListener('pointerup', canvasMouseUp);
+  el.previewCanvas.addEventListener('pointercancel', canvasMouseUp);
 
   document.querySelectorAll('.ann-tool-btn[data-tool]').forEach(btn => {
     btn.addEventListener('click', () => {

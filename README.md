@@ -1,5 +1,10 @@
-# SnapShot-Pro 
-Modular rewrite of SnapShot-Pro, set up for Vite and Vercel deployment.
+# SnapShot-Pro v6 (Vite)
+
+Modular SnapShot-Pro, set up for Vite and Vercel deployment. The Pro Editor is
+the single app — `index.html` is the entry, served at `/` (Vercel auto-detects
+Vite and serves the `dist/` build). v6 adds a fully responsive layout and full
+touch support (one-finger draw, one-finger pan, two-finger pinch-zoom) so it
+works on phones and tablets as well as desktop.
 
 ## Develop
 
