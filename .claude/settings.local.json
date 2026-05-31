@@ -17,7 +17,9 @@
       "Bash(OG_BASE_URL=\"https://snapshotpro.vercel.app\" npm run build)",
       "Bash(awk '{print $5, $9}')",
       "Bash(cd *)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "Bash(git reset *)",
+      "Bash(git commit *)"
     ]
   }
 }
