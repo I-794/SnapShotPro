@@ -15,7 +15,9 @@
       "Bash(node scripts/make-og.mjs)",
       "Bash(node -e \"const s=require\\('fs'\\).statSync\\('public/og.png'\\);console.log\\('og.png bytes:',s.size\\)\")",
       "Bash(OG_BASE_URL=\"https://snapshotpro.vercel.app\" npm run build)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "Bash(cd *)",
+      "PowerShell(git *)"
     ]
   }
 }
