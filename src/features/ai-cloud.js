@@ -41,6 +41,23 @@ function promptForKey() {
   }
 }
 
+async function tryHostedJson(path, body) {
+  try {
+    const r = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (r.status === 404 || r.status === 501) return { fellThrough: true };
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `Backend error ${r.status}`);
+    return data;
+  } catch (e) {
+    if (e.message && /Backend error/.test(e.message)) throw e;
+    return { fellThrough: true };
+  }
+}
+
 async function chooseProvider(needVision) {
   const oai = getKey('openai');
   const ant = getKey('anthropic');
@@ -85,16 +102,43 @@ async function callOpenAIVision(key, prompt, dataUrl) {
   return res.choices?.[0]?.message?.content || '';
 }
 
+async function callHostedVision(prompt, dataUrl) {
+  const out = await tryHostedJson('/api/ai-vision', {
+    prompt,
+    image: dataUrlToBase64(dataUrl),
+    mimeType: 'image/png'
+  });
+  if (out.fellThrough) return null;
+  return out;
+}
+
+async function callHostedImageGenerate(prompt, size) {
+  const out = await tryHostedJson('/api/image-generate', { prompt, size });
+  if (out.fellThrough) return null;
+  return out.b64;
+}
+
 async function runVisionPrompt(prompt) {
   if (!state.image) { showNotification('Load an image first.', 'error'); return null; }
+  const dataUrl = imageToDataUrl(state.image);
+  setAiStatus('Checking hosted AI...');
+  try {
+    const hosted = await callHostedVision(prompt, dataUrl);
+    if (hosted?.text) {
+      setAiStatus(`Done via hosted ${hosted.provider || 'AI'}.`);
+      return hosted.text;
+    }
+  } catch (e) {
+    console.warn('Hosted vision failed; falling back to browser key.', e);
+  }
+
   const choice = await chooseProvider(true);
   if (!choice) {
-    showNotification('Paste your Claude or OpenAI key below to use this.', 'error');
+    showNotification('Hosted AI is not configured yet. Paste your Claude or OpenAI key below to use this locally.', 'error');
     promptForKey();
     return null;
   }
   setAiStatus(`Calling ${choice.provider}…`);
-  const dataUrl = imageToDataUrl(state.image);
   try {
     const out = choice.provider === 'anthropic'
       ? await callAnthropicVision(choice.key, prompt, dataUrl)
@@ -139,28 +183,31 @@ export async function aiScreenshotToCode() {
 }
 
 export async function aiGenerateBackground() {
-  const key = getKey('openai');
-  if (!key) {
-    showNotification('OpenAI key required for image generation (DALL-E).', 'error');
-    promptForKey();
-    return;
-  }
   const promptInp = document.getElementById('ai-bg-prompt');
   const promptText = promptInp ? promptInp.value.trim() : '';
   if (!promptText) { showNotification('Enter a prompt for the background.', 'error'); return; }
   setAiStatus('Generating background image…');
   try {
-    const OpenAI = (await import('openai')).default;
-    const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
-    const res = await client.images.generate({
-      model: 'dall-e-3',
-      prompt: promptText,
-      size: '1792x1024',
-      response_format: 'b64_json',
-      n: 1
-    });
-    const b64 = res.data?.[0]?.b64_json;
-    if (!b64) throw new Error('No image returned');
+    let b64 = await callHostedImageGenerate(promptText, '1536x1024');
+    if (!b64) {
+      const key = getKey('openai');
+      if (!key) {
+        showNotification('Hosted AI is not configured yet. Add an OpenAI key locally or set OPENAI_API_KEY on Vercel.', 'error');
+        promptForKey();
+        return;
+      }
+      const OpenAI = (await import('openai')).default;
+      const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+      const res = await client.images.generate({
+        model: 'dall-e-3',
+        prompt: promptText,
+        size: '1792x1024',
+        response_format: 'b64_json',
+        n: 1
+      });
+      b64 = res.data?.[0]?.b64_json;
+      if (!b64) throw new Error('No image returned');
+    }
     const dataUrl = 'data:image/png;base64,' + b64;
     const img = new Image();
     await new Promise((resolve, reject) => {

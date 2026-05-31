@@ -65,9 +65,25 @@ After the first deploy, `vercel` alone makes a preview build, `vercel --prod` ma
 
 In the Vercel project dashboard → Settings → Domains → add your domain. Vercel walks you through the DNS records.
 
-## v5 — Optional environment variables
+## Optional environment variables
 
-v5 adds two **optional** features that need configuration. If you skip these env vars, the app still works fully (offline editing, in-browser AI, BYOK API keys, PWA install) — only cloud sync/login is disabled.
+The app still works without these values for offline editing, local analysis,
+PWA install, and bring-your-own-key AI. Add them when you want hosted AI,
+accounts, cloud sync, or share links.
+
+### Hosted AI backend
+
+In Vercel → Project → Settings → Environment Variables, add:
+
+| Name | Value |
+|------|-------|
+| `OPENAI_API_KEY` | your server-side OpenAI API key |
+| `OPENAI_VISION_MODEL` | optional override for alt text/captions/screenshot-to-HTML |
+| `OPENAI_ENHANCE_MODEL` | optional override for auto-enhance |
+
+This enables the serverless routes in `api/` so visitors can use AI features
+without pasting their own key. If `OPENAI_API_KEY` is missing, those routes
+return `501` and the editor falls back to the existing browser-key flow.
 
 ### Supabase (for accounts + cloud project sync)
 
@@ -109,9 +125,15 @@ create policy "users own projects" on public.projects
 
 In Supabase → Authentication → Providers, enable Email (default) and optionally Google/GitHub. For Google/GitHub, set the redirect URL to your Vercel domain.
 
-### AI cloud features (BYOK)
+### AI cloud features
 
-Nothing to configure server-side. Each user pastes their own OpenAI / Anthropic key in the **AI Tools → Manage API keys** panel; keys live in their own browser `localStorage` and calls go straight from their browser to the provider. Your Vercel deployment never touches them.
+Hosted AI uses `OPENAI_API_KEY` server-side for alt text, captions,
+screenshot-to-HTML, auto-enhance, image generation, and image edits. Local/dev
+users can still paste their own OpenAI or Anthropic key in the **AI Tools → API
+Keys** panel; those keys live in their own browser `localStorage` and calls go
+straight from their browser to the provider.
+
+See `docs/BACKEND.md` for the route list and what the backend adds.
 
 ### Bundle size & lazy loading
 

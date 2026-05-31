@@ -7,6 +7,14 @@ micro-animations), element animation with GIF export, advanced AI features
 (auto-enhance, smart crop, style transfer), and sharing/collaboration tools
 (share links, embed codes, QR codes, expanded social presets).
 
+## Backend
+
+Hosted AI routes live in `api/` as Vercel serverless functions. With
+`OPENAI_API_KEY` configured, visitors can use AI captions, alt text,
+screenshot-to-HTML, auto-enhance, image generation, and image edits without
+bringing their own key. Without it, the editor falls back to local/browser-key
+features. See `docs/BACKEND.md` for details.
+
 ## Develop
 
 ```bash

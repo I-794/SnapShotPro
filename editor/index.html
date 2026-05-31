@@ -247,8 +247,8 @@
             <button class="btn btn-secondary" style="width:100%;display:none;margin-bottom:8px;" id="ocr-copy-btn">📋 Copy text</button>
 
             <div class="divider"></div>
-            <label class="control-label">Cloud (bring your own key)</label>
-            <p class="info-text" style="margin-bottom:8px;">Sign in to Claude or OpenAI with your own API key. Keys stay in your browser; calls go straight to the provider.</p>
+            <label class="control-label">Cloud (hosted or your own key)</label>
+            <p class="info-text" style="margin-bottom:8px;">On the hosted site, AI text and image tools can run through the backend key. Local or private use can still use your own Claude/OpenAI key; keys stay in your browser.</p>
             <details style="margin-bottom:8px;" id="api-keys-details" open>
                 <summary style="cursor:pointer;font-size:13px;color:var(--text-primary);font-weight:500;">🔑 API Keys</summary>
                 <div style="margin-top:8px;">
@@ -279,7 +279,7 @@
                 <button class="btn btn-secondary" id="ai-copy-btn">📋 Copy result</button>
             </div>
             <div class="control-group" style="margin-top:8px;">
-                <label class="control-label">AI Background (DALL-E)</label>
+                <label class="control-label">AI Background</label>
                 <input type="text" class="control-input" id="ai-bg-prompt" placeholder="e.g. soft pastel waves, abstract">
                 <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="ai-bg-btn">🎨 Generate Background</button>
             </div>
@@ -308,7 +308,7 @@
             </div>
             <button class="btn btn-secondary" style="width:100%;" id="ai-edit-eraser-btn">🧽 Magic Eraser</button>
             <p class="info-text" id="ai-edit-status" style="min-height:14px;margin-top:4px;"></p>
-            <p class="info-text" style="font-size:10px;">Runs on the hosted key when deployed, or your own OpenAI key locally.</p>
+            <p class="info-text" style="font-size:10px;">Uses the backend key when deployed, or your own OpenAI key locally.</p>
 
             <div class="divider"></div>
             <label class="control-label">AI Enhance</label>

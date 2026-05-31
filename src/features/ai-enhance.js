@@ -47,8 +47,54 @@ function updateFilterUI() {
   }
 }
 
+function dataUrlToBase64(url) {
+  const i = url.indexOf(',');
+  return i >= 0 ? url.slice(i + 1) : url;
+}
+
+async function tryHostedEnhance(dataUrl) {
+  try {
+    const r = await fetch('/api/ai-enhance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: dataUrlToBase64(dataUrl),
+        mimeType: 'image/jpeg'
+      })
+    });
+    if (r.status === 404 || r.status === 501) return null;
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `Backend error ${r.status}`);
+    return data.filters || null;
+  } catch (e) {
+    if (e.message && /Backend error/.test(e.message)) throw e;
+    return null;
+  }
+}
+
+function applyEnhanceFilters(vals, message) {
+  saveStateToHistory();
+  state.imageFilters.brightness = Math.round(vals.brightness);
+  state.imageFilters.contrast = Math.round(vals.contrast);
+  state.imageFilters.saturation = Math.round(vals.saturation);
+  updateFilterUI();
+  render();
+  showNotification(message, 'success');
+}
+
 async function autoEnhance() {
   if (!state.image) { showNotification('Upload an image first.', 'error'); return; }
+
+  const dataUrl = el.previewCanvas.toDataURL('image/jpeg', 0.6);
+  try {
+    const hosted = await tryHostedEnhance(dataUrl);
+    if (hosted) {
+      applyEnhanceFilters(hosted, 'Enhanced with hosted AI.');
+      return;
+    }
+  } catch (e) {
+    console.warn('Hosted enhance failed; falling back to browser/local enhance.', e);
+  }
 
   const anthropicKey = localStorage.getItem('snapshotpro_anthropic_key');
   const openaiKey = localStorage.getItem('snapshotpro_openai_key');
