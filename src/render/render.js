@@ -11,9 +11,10 @@ import { drawTextOverlay, drawWatermark } from './overlays.js';
 import { renderAutoLayout } from './autolayout.js';
 import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
-import { renderMinimap } from '../features/zoom-pan.js';
+import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
+import { bakePerspective } from './perspective.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -27,6 +28,10 @@ export function render(forExport) {
   const ctx = canvas.getContext('2d');
   canvas.width = state.canvas.width;
   canvas.height = state.canvas.height;
+
+  // Keep the wrapper's CSS transform in sync (it suppresses CSS tilt while a
+  // device mockup is active, since tilt is baked into the canvas for those).
+  if (!forExport) applyTransform();
 
   drawBackground(ctx, canvas, forExport);
 
@@ -42,16 +47,31 @@ export function render(forExport) {
   // v8 — realistic device mockups: draw the device behind, composite the
   // screenshot into its screen, then paint on-top accents (notch/glare). This
   // path replaces the legacy frames.js overlay for these types.
+  // v8.1 — compose flat onto an offscreen canvas, then (if tilted) bake the 3D
+  // perspective into the main canvas so the tilt exports. Text/watermark stay on
+  // the main canvas (unwarped) so captions and branding remain crisp.
   if (isDeviceMockup(state.deviceFrame.type)) {
-    const out = drawDeviceMockup(ctx, canvas, state.deviceFrame.type);
+    const off = mockCanvas(canvas.width, canvas.height);
+    const octx = off.getContext('2d');
+    octx.setTransform(1, 0, 0, 1, 0, 0);
+    octx.clearRect(0, 0, off.width, off.height);
+    const out = drawDeviceMockup(octx, canvas, state.deviceFrame.type);
     if (out && out.rect) {
       state.lastImageRect = out.rect;
-      drawScreenImage(ctx, out.rect, out.radius);
-      if (out.overlay) out.overlay(ctx);
-      drawRedactions(ctx, canvas);
-      drawSpotlight(ctx, canvas);
-      drawAnnotations(ctx);
-      renderExtraImages(ctx, canvas);
+      drawScreenImage(octx, out.rect, out.radius);
+      if (out.overlay) out.overlay(octx);
+      drawRedactions(octx, off);   // blur samples `off` (the composited mockup), not the bare bg
+      drawSpotlight(octx, off);
+      drawAnnotations(octx);
+      renderExtraImages(octx, off);
+
+      const t = state.tilt3d;
+      if (t && (t.rx || t.ry || t.rz)) {
+        bakePerspective(ctx, off, t, { fit: true, margin: Math.max(20, state.padding) });
+      } else {
+        ctx.drawImage(off, 0, 0);
+      }
+
       drawTextOverlay(ctx, canvas);
       drawWatermark(ctx, canvas);
       if (!forExport) renderMinimap();
@@ -128,6 +148,15 @@ export function render(forExport) {
   drawWatermark(ctx, canvas);
 
   if (!forExport) renderMinimap();
+}
+
+// Reusable offscreen canvas for compositing a device mockup before warping.
+let _mockOff = null;
+function mockCanvas(w, h) {
+  if (!_mockOff) _mockOff = document.createElement('canvas');
+  if (_mockOff.width !== w) _mockOff.width = w;
+  if (_mockOff.height !== h) _mockOff.height = h;
+  return _mockOff;
 }
 
 function drawImageContent(ctx, x, y, imgWidth, imgHeight) {

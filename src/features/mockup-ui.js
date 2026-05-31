@@ -25,6 +25,7 @@ const PRESETS = {
     bgMode: 'solid', bgColor: '#13141a',
     padding: 90,
     shadow: { blur: 90, spread: 30, opacity: 40, x: 0, y: 40, color: '#000000' },
+    tilt: { rx: -12, ry: 16, rz: 0, perspective: 1400 },
     canvas: { width: 1280, height: 960 }
   },
   twitter: {
@@ -33,6 +34,7 @@ const PRESETS = {
     gradient: { type: 'linear', angle: 120, colors: ['#2348ff', '#5470ff'], positions: [0, 100] },
     padding: 80,
     shadow: { blur: 70, spread: 20, opacity: 35, x: 0, y: 30, color: '#000000' },
+    tilt: { rx: -7, ry: 12, rz: 0, perspective: 1600 },
     canvas: { width: 1200, height: 675 }
   },
   dribbble: {
@@ -40,6 +42,7 @@ const PRESETS = {
     bgMode: 'mesh',
     padding: 110,
     shadow: { blur: 80, spread: 25, opacity: 35, x: 0, y: 30, color: '#000000' },
+    tilt: { rx: -14, ry: 18, rz: 0, perspective: 1300 },
     canvas: { width: 1600, height: 1200 }
   }
 };
@@ -58,9 +61,25 @@ export function applyMockupPreset(name) {
   if (p.padding != null) state.padding = p.padding;
   if (p.shadow) state.shadow = { ...state.shadow, ...p.shadow };
   if (p.canvas) state.canvas = { ...p.canvas };
+  // Bake-in tilt for the hero look (flat if the preset doesn't specify one).
+  state.tilt3d = { rx: 0, ry: 0, rz: 0, perspective: 1200, ...(p.tilt || {}) };
+  syncTiltInputs();
   render();
   if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
   showStatus('Mockup: ' + name);
+}
+
+// Reflect tilt state into the 3D-tilt sliders + value labels.
+function syncTiltInputs() {
+  const t = state.tilt3d;
+  if (el.tiltRx) el.tiltRx.value = t.rx;
+  if (el.tiltRy) el.tiltRy.value = t.ry;
+  if (el.tiltRz) el.tiltRz.value = t.rz;
+  if (el.tiltPerspective) el.tiltPerspective.value = t.perspective;
+  if (el.tiltRxValue) el.tiltRxValue.textContent = t.rx + '°';
+  if (el.tiltRyValue) el.tiltRyValue.textContent = t.ry + '°';
+  if (el.tiltRzValue) el.tiltRzValue.textContent = t.rz + '°';
+  if (el.tiltPerspectiveValue) el.tiltPerspectiveValue.textContent = t.perspective + 'px';
 }
 
 export function bindMockupUi() {

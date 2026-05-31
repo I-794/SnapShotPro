@@ -3,7 +3,16 @@ import { el } from '../ui/elements.js';
 import { tiltPresets } from '../state/presets.js';
 import { saveStateToHistory } from '../state/history.js';
 import { applyTransform } from './zoom-pan.js';
+import { render } from '../render/render.js';
+import { isDeviceMockup } from '../render/mockups.js';
 import { showStatus } from '../ui/notification.js';
+
+// While a device mockup is active, tilt is baked into the canvas, so a tilt
+// change needs a re-render (not just the CSS-transform update).
+function applyTilt() {
+  applyTransform();
+  if (isDeviceMockup(state.deviceFrame.type)) render();
+}
 
 export function resetTilt() {
   state.tilt3d = { rx: 0, ry: 0, rz: 0, perspective: 1200 };
@@ -15,7 +24,7 @@ export function resetTilt() {
   if (el.tiltRyValue) el.tiltRyValue.textContent = '0°';
   if (el.tiltRzValue) el.tiltRzValue.textContent = '0°';
   if (el.tiltPerspectiveValue) el.tiltPerspectiveValue.textContent = '1200px';
-  applyTransform();
+  applyTilt();
 }
 
 export function applyTiltPreset(name) {
@@ -31,7 +40,7 @@ export function applyTiltPreset(name) {
   if (el.tiltRyValue) el.tiltRyValue.textContent = p.ry + '°';
   if (el.tiltRzValue) el.tiltRzValue.textContent = p.rz + '°';
   if (el.tiltPerspectiveValue) el.tiltPerspectiveValue.textContent = p.perspective + 'px';
-  applyTransform();
+  applyTilt();
   showStatus('Tilt: ' + name);
 }
 
@@ -45,7 +54,7 @@ export function bindTiltEvents() {
     el.tiltRyValue.textContent = state.tilt3d.ry + '°';
     el.tiltRzValue.textContent = state.tilt3d.rz + '°';
     el.tiltPerspectiveValue.textContent = state.tilt3d.perspective + 'px';
-    applyTransform();
+    applyTilt();
   };
   if (el.tiltRx) el.tiltRx.addEventListener('input', update);
   if (el.tiltRy) el.tiltRy.addEventListener('input', update);

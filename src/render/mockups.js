@@ -15,7 +15,8 @@
 import { state } from '../state/state.js';
 
 export const DEVICE_TYPES = new Set([
-  'iphone', 'iphone16pro', 'ipadpro', 'macbookpro', 'watch', 'studiodisplay'
+  'iphone', 'iphone16pro', 'ipadpro', 'macbookpro', 'watch', 'studiodisplay',
+  'pixel', 'winlaptop'
 ]);
 
 export function isDeviceMockup(type) {
@@ -340,6 +341,95 @@ function studioDisplay(ctx, canvas) {
   return { rect, radius: screenR, overlay };
 }
 
+function pixel(ctx, canvas) {
+  const pal = palette(state.deviceFrame.color);
+  const b = fitDevice(canvas, 0.48);
+  const bodyR = b.w * 0.13; // Android corners are squarer than iPhone
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.40)';
+  ctx.shadowBlur = b.w * 0.16;
+  ctx.shadowOffsetY = b.w * 0.06;
+  const g = ctx.createLinearGradient(b.x, b.y, b.x + b.w, b.y + b.h);
+  g.addColorStop(0, pal.a); g.addColorStop(0.5, pal.b); g.addColorStop(1, pal.edge);
+  ctx.fillStyle = g;
+  rr(ctx, b.x, b.y, b.w, b.h, bodyR);
+  ctx.fill();
+  ctx.restore();
+
+  const bz = b.w * 0.03;
+  const rect = { x: b.x + bz, y: b.y + bz, w: b.w - bz * 2, h: b.h - bz * 2 };
+  const screenR = bodyR - bz;
+  ctx.save(); ctx.fillStyle = '#000'; rr(ctx, rect.x, rect.y, rect.w, rect.h, screenR); ctx.fill(); ctx.restore();
+
+  const overlay = (c) => {
+    // centered punch-hole camera
+    c.save();
+    c.fillStyle = '#11131c';
+    c.beginPath();
+    c.arc(rect.x + rect.w / 2, rect.y + rect.h * 0.035, Math.max(3, rect.w * 0.022), 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    drawGlare(c, rect, screenR);
+    screenEdge(c, rect, screenR);
+  };
+  return { rect, radius: screenR, overlay };
+}
+
+function winlaptop(ctx, canvas) {
+  const pal = palette(state.deviceFrame.color);
+  const fit = fitDevice(canvas, 1.52);
+  const lidH = fit.h * 0.91;
+  const baseH = fit.h - lidH;
+  const lidW = fit.w * 0.88;
+  const lidX = fit.x + (fit.w - lidW) / 2;
+  const lidY = fit.y;
+  const lidR = Math.max(5, lidW * 0.012);
+
+  // lid housing
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.40)';
+  ctx.shadowBlur = fit.w * 0.05;
+  ctx.shadowOffsetY = fit.w * 0.025;
+  const lg = ctx.createLinearGradient(lidX, lidY, lidX, lidY + lidH);
+  lg.addColorStop(0, pal.a); lg.addColorStop(1, pal.b);
+  ctx.fillStyle = lg;
+  rr(ctx, lidX, lidY, lidW, lidH, lidR);
+  ctx.fill();
+  ctx.restore();
+
+  const bz = lidW * 0.024; // thicker, uniform bezels (no notch)
+  const rect = { x: lidX + bz, y: lidY + bz * 1.4, w: lidW - bz * 2, h: lidH - bz * 2.4 };
+  const screenR = lidR * 0.5;
+  ctx.save(); ctx.fillStyle = '#000'; rr(ctx, rect.x, rect.y, rect.w, rect.h, screenR); ctx.fill(); ctx.restore();
+
+  // base deck
+  const baseY = lidY + lidH;
+  ctx.save();
+  const bg = ctx.createLinearGradient(fit.x, baseY, fit.x, baseY + baseH);
+  bg.addColorStop(0, pal.side); bg.addColorStop(1, pal.b);
+  ctx.fillStyle = bg;
+  rr(ctx, fit.x, baseY, fit.w, baseH, baseH * 0.4);
+  ctx.fill();
+  // trackpad lip hint
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillRect(fit.x + fit.w * 0.42, baseY, fit.w * 0.16, baseH * 0.28);
+  ctx.restore();
+
+  const overlay = (c) => {
+    // webcam dot centered in top bezel
+    c.save();
+    c.fillStyle = '#11131c';
+    c.beginPath();
+    c.arc(rect.x + rect.w / 2, lidY + bz * 0.7, Math.max(2, bz * 0.14), 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    drawGlare(c, rect, screenR);
+    screenEdge(c, rect, screenR);
+  };
+  return { rect, radius: screenR, overlay };
+}
+
 // ---- dispatch --------------------------------------------------------------
 
 export function drawDeviceMockup(ctx, canvas, type) {
@@ -350,6 +440,8 @@ export function drawDeviceMockup(ctx, canvas, type) {
     case 'macbookpro':    return macbook(ctx, canvas);
     case 'watch':         return watch(ctx, canvas);
     case 'studiodisplay': return studioDisplay(ctx, canvas);
+    case 'pixel':         return pixel(ctx, canvas);
+    case 'winlaptop':     return winlaptop(ctx, canvas);
     default:              return null;
   }
 }

@@ -2,6 +2,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { activePointers, gesture } from './gesture.js';
+import { isDeviceMockup } from '../render/mockups.js';
 
 function clampZoom(z) { return Math.max(0.1, Math.min(4, z)); }
 
@@ -10,7 +11,11 @@ export function applyTransform() {
   if (!w) return;
   const { rx, ry, rz, perspective } = state.tilt3d;
   const base = `translate(${state.view.panX}px, ${state.view.panY}px) scale(${state.view.zoom})`;
-  const tilt = (rx || ry || rz) ? ` perspective(${perspective}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)` : '';
+  // Device mockups bake tilt into the canvas itself (so it exports), so don't
+  // also tilt the wrapper in CSS — that would double-apply the perspective.
+  const tilt = (rx || ry || rz) && !isDeviceMockup(state.deviceFrame.type)
+    ? ` perspective(${perspective}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`
+    : '';
   w.style.transform = base + tilt;
   if (el.zoomLabel) el.zoomLabel.textContent = Math.round(state.view.zoom * 100) + '%';
 }
