@@ -7,6 +7,9 @@ import { state } from '../state/state.js';
 import { renderInto } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { getVideoContext } from './video.js';
+// Vite serves the gif.js worker as a real URL; without this gif.render() can
+// never spawn its worker and silently never finishes.
+import gifWorkerUrl from 'gif.js/dist/gif.worker.js?url';
 
 const MAX_DURATION = 30;
 
@@ -139,7 +142,7 @@ export async function exportVideoGif() {
   setProgress('Building GIF…');
   try {
     const GIF = (await import('gif.js')).default;
-    const gif = new GIF({ workers: 2, quality: 10, width, height, workerScript: undefined });
+    const gif = new GIF({ workers: 2, quality: 10, width, height, workerScript: gifWorkerUrl });
     for (let i = 0; i < count; i++) {
       await seekTo(state.video.in + i / fps);
       renderInto(exportCanvas, true);

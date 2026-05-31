@@ -2,6 +2,9 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
+// Serve the gif.js worker as a bundled URL — gif.render() needs a real worker
+// script or it never finishes (passing undefined silently hangs in Vite).
+import gifWorkerUrl from 'gif.js/dist/gif.worker.js?url';
 
 export async function exportGif() {
   if (!state.image) { showNotification('Upload an image first.', 'error'); return; }
@@ -25,7 +28,7 @@ export async function exportGif() {
       quality: 10,
       width: canvas.width,
       height: canvas.height,
-      workerScript: undefined
+      workerScript: gifWorkerUrl
     });
 
     const originalTime = state.animation.currentTime;

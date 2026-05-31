@@ -42,9 +42,16 @@ export function drawFrame() {
 export function seekTo(t) {
   return new Promise((resolve) => {
     if (!videoEl) { resolve(); return; }
-    const onSeeked = () => { videoEl.removeEventListener('seeked', onSeeked); drawFrame(); resolve(); };
+    let done = false;
+    const finish = () => { if (done) return; done = true; videoEl.removeEventListener('seeked', onSeeked); drawFrame(); resolve(); };
+    const onSeeked = () => finish();
     videoEl.addEventListener('seeked', onSeeked);
-    videoEl.currentTime = Math.max(0, Math.min(videoEl.duration || 0, t));
+    const target = Math.max(0, Math.min(videoEl.duration || 0, t));
+    // If the time doesn't actually change, 'seeked' may not fire — guard with a
+    // short fallback so frame export never hangs on a real clip.
+    if (Math.abs(videoEl.currentTime - target) < 1e-3) { setTimeout(finish, 0); return; }
+    videoEl.currentTime = target;
+    setTimeout(finish, 1500);
   });
 }
 
