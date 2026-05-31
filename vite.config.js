@@ -28,7 +28,10 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        editor: resolve(__dirname, 'editor/index.html')
+        editor: resolve(__dirname, 'editor/index.html'),
+        changelog: resolve(__dirname, 'changelog/index.html'),
+        privacy: resolve(__dirname, 'privacy/index.html'),
+        appStoreScreenshots: resolve(__dirname, 'app-store-screenshots/index.html')
       },
       output: {
         manualChunks: {

@@ -29,7 +29,11 @@
       "Bash(powershell -Command 'Get-NetTCPConnection -LocalPort 5174 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
       "Bash(grep -c '\"node_modules/playwright\"' package-lock.json)",
       "Bash(curl -s -o /dev/null -w \"editor %{http_code}\\\\n\" http://localhost:5174/editor/)",
-      "Bash(node smoke-mp4.mjs)"
+      "Bash(node smoke-mp4.mjs)",
+      "Bash(curl -s -o /dev/null -w \"privacy %{http_code}\\\\n\" http://localhost:5174/privacy/)",
+      "Bash(node smoke-taste.mjs)",
+      "Bash(rm -f smoke-taste.mjs)",
+      "Bash(rm -rf taste-shots)"
     ]
   }
 }

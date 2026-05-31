@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Make App Store and Play Store screenshots in your browser. Drop in a screen, add a device frame and caption, and export the whole set at every required size as a ZIP. Free, no account.">
+    <title>App Store Screenshot Generator · SnapShot-Pro</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="App Store Screenshot Generator · SnapShot-Pro">
+    <meta property="og:description" content="Captioned, device-framed store screenshots at every size, exported as a ZIP. In your browser, free.">
+    <meta property="og:image" content="__OG_BASE__/og.png">
+    <meta name="theme-color" content="#2348ff">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <style>
+        .hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 64px); align-items: center; padding-bottom: clamp(48px, 7vw, 80px); }
+        .hero-copy h1 { font-size: clamp(38px, 5.4vw, 64px); font-weight: 700; line-height: 1.0; letter-spacing: -0.035em; margin-bottom: 22px; }
+        .hero-copy h1 .accent { color: var(--accent); }
+        .hero-copy .lede { font-size: clamp(16.5px, 1.5vw, 19px); color: var(--ink-2); max-width: 34ch; line-height: 1.55; margin-bottom: 32px; }
+        .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; }
+
+        .set-board { background: linear-gradient(150deg, #4f7cff 0%, #2348ff 45%, #6a3cff 110%); border-radius: 26px; padding: clamp(20px, 3vw, 34px); box-shadow: var(--shadow-product); position: relative; overflow: hidden; }
+        .set-board::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 80% at 80% 0%, rgba(255,255,255,0.26), transparent 55%); pointer-events: none; }
+        .panel-row { display: flex; gap: 14px; position: relative; z-index: 1; }
+        .store-panel { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .store-panel .cap { color: #fff; font-weight: 700; font-size: 12.5px; line-height: 1.2; text-align: center; margin-bottom: 12px; min-height: 30px; letter-spacing: -0.01em; }
+        .phone { width: 100%; aspect-ratio: 9 / 19; background: #0b0b0d; border-radius: 17px; padding: 4px; box-shadow: 0 16px 34px -10px rgba(8, 12, 40, 0.55); }
+        .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 13px; display: block; }
+
+        .sizes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .size-card { background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 16px 18px; transition: border-color 0.2s, transform 0.2s var(--ease); }
+        .size-card:hover { border-color: var(--accent-line); transform: translateY(-2px); }
+        .size-card .name { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+        .size-card .dims { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-3); }
+        .size-group { font-size: 13px; font-weight: 600; color: var(--accent); margin: 26px 0 12px; }
+        .size-group:first-child { margin-top: 0; }
+
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .step { padding-top: 24px; border-top: 2px solid var(--ink); }
+        .step .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
+        .step h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+        .step p { font-size: 15px; color: var(--ink-2); line-height: 1.55; }
+
+        .points { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .point { background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--r-card); padding: 26px; }
+        .point h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+        .point p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+
+        .closing-card { position: relative; overflow: hidden; border-radius: 30px; background: linear-gradient(155deg, #2348ff 0%, #1a37d6 55%, #15161a 130%); padding: clamp(44px, 7vw, 84px) clamp(28px, 6vw, 72px); text-align: center; color: #fff; }
+        .closing-card::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 50% 0%, rgba(255,255,255,0.18), transparent 60%); }
+        .closing-card > * { position: relative; z-index: 1; }
+        .closing-card h2 { font-size: clamp(28px, 4.4vw, 48px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.04; margin-bottom: 16px; }
+        .closing-card p { font-size: 17px; color: rgba(255,255,255,0.84); max-width: 44ch; margin: 0 auto 30px; }
+        .closing-card .btn-primary { background: #fff; color: var(--accent); }
+        .closing-card .btn-primary:hover { background: #f0f0ee; }
+
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+            .hero-copy .lede { max-width: 46ch; }
+            .set-board { max-width: 520px; }
+            .steps { grid-template-columns: 1fr; }
+            .points { grid-template-columns: 1fr; }
+            .sizes-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) { .sizes-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="mark" viewBox="0 0 64 64">
+        <defs><linearGradient id="snap-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs>
+        <rect width="64" height="64" rx="14" fill="url(#snap-g)"/>
+        <rect x="10" y="20" width="44" height="32" rx="5" fill="#1a1a2e"/>
+        <rect x="22" y="14" width="20" height="10" rx="2" fill="#1a1a2e"/>
+        <circle cx="32" cy="36" r="10" fill="none" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="32" cy="36" r="5" fill="#fff"/>
+        <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
+    </symbol>
+</svg>
+
+<nav id="nav">
+    <div class="wrap nav-inner">
+        <a href="/" class="brand"><svg class="brand-mark"><use href="#mark"/></svg>SnapShot-Pro</a>
+        <div class="nav-right">
+            <a href="/#features" class="nav-link">Features</a>
+            <a href="/changelog/" class="nav-link">Changelog</a>
+            <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+            <a href="/editor/" class="btn btn-primary">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="wrap hero-inner">
+        <div class="hero-copy">
+            <p class="mono-label" style="margin-bottom:18px;">App Store screenshots</p>
+            <h1>Store screenshots,<br>built in your <span class="accent">browser</span>.</h1>
+            <p class="lede">Frame your screens, add a caption, and export the whole set at every required size. No account, no upload.</p>
+            <div class="hero-actions">
+                <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+                <a href="#sizes" class="btn btn-ghost btn-lg">See the sizes</a>
+            </div>
+        </div>
+        <div class="hero-visual reveal">
+            <div class="set-board">
+                <div class="panel-row">
+                    <div class="store-panel">
+                        <div class="cap">Capture anything</div>
+                        <div class="phone"><img src="https://picsum.photos/seed/snapstore-a/360/760" alt="App screen framed in an iPhone" loading="eager"></div>
+                    </div>
+                    <div class="store-panel">
+                        <div class="cap">One tap to share</div>
+                        <div class="phone"><img src="https://picsum.photos/seed/snapstore-b/360/760" alt="App screen framed in an iPhone" loading="eager"></div>
+                    </div>
+                    <div class="store-panel">
+                        <div class="cap">Yours, everywhere</div>
+                        <div class="phone"><img src="https://picsum.photos/seed/snapstore-c/360/760" alt="App screen framed in an iPhone" loading="eager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="section-pad" id="how" style="background:var(--bg-sunken);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+        <div class="head-block reveal">
+            <h2>From one screen to a full set.</h2>
+            <p>Design the look once. SnapShot-Pro renders every panel for you at the exact sizes the stores ask for.</p>
+        </div>
+        <div class="steps">
+            <div class="step reveal">
+                <div class="num">01</div>
+                <h3>Drop in your screens</h3>
+                <p>Paste, drag, or upload each app screen. Give every panel its own image and caption.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num">02</div>
+                <h3>Frame and caption</h3>
+                <p>Pick a device frame and background, then add a headline above or below each screen.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num">03</div>
+                <h3>Export the set</h3>
+                <p>Choose a store size and download every panel at once as a ZIP, ready to upload.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" id="sizes">
+    <div class="wrap">
+        <div class="head-block reveal">
+            <h2>Every store size, ready to go.</h2>
+            <p>Pick a target and SnapShot-Pro renders your design at that exact resolution.</p>
+        </div>
+        <div class="reveal">
+            <p class="size-group">iOS · App Store</p>
+            <div class="sizes-grid">
+                <div class="size-card"><div class="name">iPhone 6.9″</div><div class="dims">1320 × 2868</div></div>
+                <div class="size-card"><div class="name">iPhone 6.7″</div><div class="dims">1290 × 2796</div></div>
+                <div class="size-card"><div class="name">iPhone 6.5″</div><div class="dims">1242 × 2688</div></div>
+                <div class="size-card"><div class="name">iPhone 5.5″</div><div class="dims">1242 × 2208</div></div>
+                <div class="size-card"><div class="name">iPad 13″</div><div class="dims">2064 × 2752</div></div>
+                <div class="size-card"><div class="name">iPad 12.9″</div><div class="dims">2048 × 2732</div></div>
+            </div>
+            <p class="size-group">Android · Play Store</p>
+            <div class="sizes-grid">
+                <div class="size-card"><div class="name">Play phone</div><div class="dims">1080 × 1920</div></div>
+                <div class="size-card"><div class="name">Play tablet</div><div class="dims">1600 × 2560</div></div>
+            </div>
+            <p class="size-group">Desktop</p>
+            <div class="sizes-grid">
+                <div class="size-card"><div class="name">Mac</div><div class="dims">2880 × 1800</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" style="padding-top:0;">
+    <div class="wrap">
+        <div class="points">
+            <div class="point reveal">
+                <h3>Captions that line up</h3>
+                <p>A headline band sits above or below the device and never overlaps it, on any panel size.</p>
+            </div>
+            <div class="point reveal">
+                <h3>Batch a whole template</h3>
+                <p>Apply one design across many screenshots at once and download them together as a ZIP.</p>
+            </div>
+            <div class="point reveal">
+                <h3>Real device frames</h3>
+                <p>iPhone, iPad, Pixel, MacBook, and more, drawn on canvas with accurate corners and finishes.</p>
+            </div>
+            <div class="point reveal">
+                <h3>Free, in your browser</h3>
+                <p>No account, no install, nothing uploaded. The whole thing runs on your machine.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" style="padding-top:0;">
+    <div class="wrap">
+        <div class="closing-card reveal">
+            <h2>Ship a polished listing today.</h2>
+            <p>Open the studio, switch to Set mode, and export your first store-ready set in minutes.</p>
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap foot-inner">
+        <div class="foot-brand"><svg class="brand-mark"><use href="#mark"/></svg>SnapShot-Pro</div>
+        <div class="foot-links">
+            <a href="/#features">Features</a>
+            <a href="/app-store-screenshots/">App Store screenshots</a>
+            <a href="/changelog/">Changelog</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/editor/">Open studio</a>
+            <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="foot-note">Free &amp; open source · v9</div>
+    </div>
+</footer>
+
+<script src="/site.js"></script>
+</body>
+</html>

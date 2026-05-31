@@ -1,0 +1,112 @@
+/* Shared design system for SnapShot-Pro content pages (changelog, privacy,
+   app-store-screenshots). Mirrors the landing page tokens so sub-pages stay
+   visually consistent. The landing (index.html) keeps its own inline styles. */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #f7f7f4;
+    --bg-raise: #ffffff;
+    --bg-sunken: #efefe9;
+    --ink: #15161a;
+    --ink-2: #55565e;
+    --ink-3: #8a8b92;
+    --line: rgba(21, 22, 26, 0.09);
+    --line-strong: rgba(21, 22, 26, 0.16);
+    --accent: #2348ff;
+    --accent-press: #1a37d6;
+    --accent-soft: rgba(35, 72, 255, 0.08);
+    --accent-line: rgba(35, 72, 255, 0.22);
+    --on-accent: #ffffff;
+
+    --r-card: 22px;
+    --r-sm: 12px;
+    --r-pill: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(22, 25, 50, 0.04), 0 6px 18px rgba(22, 25, 50, 0.05);
+    --shadow-lift: 0 2px 4px rgba(22, 25, 50, 0.05), 0 22px 50px rgba(22, 25, 50, 0.10);
+    --shadow-product: 0 2px 6px rgba(20, 28, 70, 0.06), 0 50px 100px -30px rgba(20, 28, 70, 0.34);
+
+    --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+    font-family: var(--font); background: var(--bg); color: var(--ink);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden; line-height: 1.5;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent); color: var(--on-accent); }
+
+.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
+.wrap-narrow { max-width: 760px; }
+.mono-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+
+/* Nav */
+nav {
+    position: sticky; top: 0; z-index: 100; height: 66px; display: flex; align-items: center;
+    background: rgba(247, 247, 244, 0.72); backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
+}
+nav.scrolled { border-bottom-color: var(--line); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; }
+.brand-mark { width: 30px; height: 30px; flex-shrink: 0; }
+.nav-right { display: flex; align-items: center; gap: clamp(16px, 3vw, 34px); }
+.nav-link { font-size: 14.5px; font-weight: 500; color: var(--ink-2); transition: color 0.18s; }
+.nav-link:hover { color: var(--ink); }
+
+/* Buttons */
+.btn {
+    font-family: var(--font); cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600; letter-spacing: -0.01em; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
+}
+.btn:active { transform: translateY(0) scale(0.985); }
+.btn-primary { background: var(--accent); color: var(--on-accent); border-radius: var(--r-pill); padding: 11px 22px; font-size: 14.5px; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--accent-press); transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.btn-ghost { background: var(--bg-raise); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 10px 21px; font-size: 14.5px; }
+.btn-ghost:hover { border-color: var(--ink); transform: translateY(-1px); }
+.btn-lg { padding: 15px 30px; font-size: 15.5px; }
+.btn .ar { transition: transform 0.2s var(--ease); }
+.btn:hover .ar { transform: translateX(3px); }
+
+/* Page header band */
+.page-head { padding: clamp(56px, 9vw, 110px) 0 clamp(36px, 5vw, 56px); position: relative; overflow: hidden; }
+.page-head .glow { position: absolute; top: -30%; right: -8%; width: 60vw; height: 70vh; background: radial-gradient(closest-side, var(--accent-soft), transparent 72%); pointer-events: none; z-index: 0; }
+.page-head .wrap { position: relative; z-index: 1; }
+.page-head h1 { font-size: clamp(36px, 5.5vw, 62px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; margin-bottom: 18px; }
+.page-head h1 .accent { color: var(--accent); }
+.page-head .lede { font-size: clamp(16px, 1.5vw, 19px); color: var(--ink-2); max-width: 58ch; line-height: 1.6; }
+
+/* Section scaffolding */
+section { position: relative; }
+.section-pad { padding: clamp(56px, 8vw, 100px) 0; }
+.head-block { max-width: 40ch; margin-bottom: clamp(32px, 5vw, 52px); }
+.head-block h2 { font-size: clamp(26px, 3.6vw, 42px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 14px; }
+.head-block p { font-size: 16.5px; color: var(--ink-2); line-height: 1.6; }
+
+/* Footer */
+footer { border-top: 1px solid var(--line); padding: 40px 0; margin-top: 20px; }
+.foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.foot-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.foot-brand .brand-mark { width: 26px; height: 26px; }
+.foot-links { display: flex; gap: 26px; font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
+.foot-links a:hover { color: var(--accent); }
+.foot-note { font-size: 13px; color: var(--ink-3); }
+
+/* Reveal motion */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 560px) {
+    .nav-link { display: none; }
+    .foot-inner { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+}
