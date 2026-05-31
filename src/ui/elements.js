@@ -32,7 +32,7 @@ const IDS = [
   'border-width', 'border-width-value', 'border-color', 'border-color-text',
 
   // Device frame
-  'device-frame-type', 'device-frame-controls', 'device-frame-color',
+  'device-frame-type', 'device-frame-controls', 'device-frame-color', 'device-frame-glare',
   'frame-url-group', 'frame-title-group', 'frame-url', 'frame-title',
 
   // Shadow

@@ -24,7 +24,7 @@ export const state = {
   bgMode: 'gradient',
   bgColor: '#1a1a2e',
   bgImage: null,
-  deviceFrame: { type: null, color: 'dark', url: 'https://example.com', title: 'Screenshot' },
+  deviceFrame: { type: null, color: 'dark', glare: true, url: 'https://example.com', title: 'Screenshot' },
   annotations: [],
   redactions: [],
   spotlight: { enabled: false, x: 0.2, y: 0.2, w: 0.6, h: 0.6, opacity: 0.65 },

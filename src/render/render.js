@@ -13,6 +13,7 @@ import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
+import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -36,6 +37,26 @@ export function render(forExport) {
     drawWatermark(ctx, canvas);
     if (!forExport) renderMinimap();
     return;
+  }
+
+  // v8 — realistic device mockups: draw the device behind, composite the
+  // screenshot into its screen, then paint on-top accents (notch/glare). This
+  // path replaces the legacy frames.js overlay for these types.
+  if (isDeviceMockup(state.deviceFrame.type)) {
+    const out = drawDeviceMockup(ctx, canvas, state.deviceFrame.type);
+    if (out && out.rect) {
+      state.lastImageRect = out.rect;
+      drawScreenImage(ctx, out.rect, out.radius);
+      if (out.overlay) out.overlay(ctx);
+      drawRedactions(ctx, canvas);
+      drawSpotlight(ctx, canvas);
+      drawAnnotations(ctx);
+      renderExtraImages(ctx, canvas);
+      drawTextOverlay(ctx, canvas);
+      drawWatermark(ctx, canvas);
+      if (!forExport) renderMinimap();
+      return;
+    }
   }
 
   const scaleFactor = state.scale / 100;

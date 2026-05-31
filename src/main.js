@@ -20,6 +20,7 @@ import { renderMeshPad } from './features/mesh-pad.js';
 import { bindTiltEvents } from './features/tilt.js';
 import { bindStickerEvents } from './features/stickers.js';
 import { bindSceneEvents } from './features/scene-select.js';
+import { bindMockupUi } from './features/mockup-ui.js';
 import { bindSvgInput } from './features/svg-input.js';
 import { bindTemplates } from './features/templates.js';
 import { bindGradientEditor } from './features/gradient-editor.js';
@@ -78,6 +79,7 @@ function init() {
   bindTiltEvents();
   bindStickerEvents();
   bindSceneEvents();
+  bindMockupUi();
   bindSvgInput();
   bindTemplates();
   bindGradientEditor();

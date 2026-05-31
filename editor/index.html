@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v7 · Pro Editor</title>
+    <title>SnapShot-Pro v8 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v7</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v8</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -336,11 +336,22 @@
 
         <div class="sidebar-section">
             <h3 class="section-title">Device &amp; Window Frame</h3>
-            <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><option value="macos">macOS Window</option><option value="windows">Windows Window</option><option value="iphone">iPhone 15</option><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></select></div>
+            <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><optgroup label="Devices"><option value="iphone16pro">iPhone 16 Pro</option><option value="ipadpro">iPad Pro</option><option value="macbookpro">MacBook Pro</option><option value="watch">Apple Watch</option><option value="studiodisplay">Studio Display</option></optgroup><optgroup label="Windows"><option value="macos">macOS Window</option><option value="windows">Windows Window</option></optgroup><optgroup label="Browsers"><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></optgroup></select></div>
             <div id="device-frame-controls" style="display:none;">
-                <div class="control-group"><label class="control-label">Frame Color</label><select class="control-input" id="device-frame-color"><option value="dark">Dark / Space Black</option><option value="light">Light / Silver</option></select></div>
+                <div class="control-group"><label class="control-label">Frame Color</label><select class="control-input" id="device-frame-color"><option value="dark">Space Black</option><option value="graphite">Graphite</option><option value="silver">Silver</option><option value="titanium">Natural Titanium</option><option value="gold">Gold</option><option value="light">Light Silver</option></select></div>
+                <div class="control-group"><label class="control-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="device-frame-glare" checked style="width:auto;"> Screen glare</label></div>
                 <div class="control-group" id="frame-url-group" style="display:none;"><label class="control-label">URL / Title</label><input type="text" class="control-input" id="frame-url" placeholder="https://example.com" value="https://example.com"></div>
                 <div class="control-group" id="frame-title-group" style="display:none;"><label class="control-label">Window Title</label><input type="text" class="control-input" id="frame-title" placeholder="Screenshot" value="Screenshot"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">✨ Mockup Presets</h3>
+            <div class="scenes-grid">
+                <div class="scene-tile" data-mockup-preset="appstore"><div class="scene-thumb">📱</div>App Store</div>
+                <div class="scene-tile" data-mockup-preset="producthunt"><div class="scene-thumb">🚀</div>Product Hunt</div>
+                <div class="scene-tile" data-mockup-preset="twitter"><div class="scene-thumb">🐦</div>Social Card</div>
+                <div class="scene-tile" data-mockup-preset="dribbble"><div class="scene-thumb">🎨</div>Dribbble</div>
             </div>
         </div>
 
