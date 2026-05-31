@@ -116,20 +116,20 @@ export const STORE_PRESETS = {
 Extend the existing BYOK AI stack from "generate a backdrop from a prompt" (already shipped) to **prompt-based background replacement that matches the subject, outpainting (extend the canvas), and a magic eraser (remove objects)**.
 
 ### Backend decision (per your choice: hosted image API)
-- **Provider: OpenAI Images `gpt-image-1`** — it supports the **edits** endpoint with an image + mask (DALL-E 3, currently used, does *not* support edits/masks; DALL-E 2 does but is lower quality). `gpt-image-1` is the right primitive for both outpainting and eraser.
+- **Provider: OpenAI Images `gpt-image-2`** — it supports the **edits** endpoint with an image + mask (DALL-E 3, currently used, does *not* support edits/masks; DALL-E 2 does but is lower quality). `gpt-image-2` is the right primitive for both outpainting and eraser.
 - **Keys: keep BYOK client-side** (existing `api-keys.js`), consistent with current `aiGenerateBackground`. 
 - **Recommended hardening (optional, flagged):** add a thin **Vercel serverless proxy** (`/api/image-edit`) so the key can optionally live server-side (Vercel env var) for the hosted/shared deployment, while still allowing BYOK locally. This is the "small proxy" path; gate behind a build flag so local dev stays keyless-BYOK. Decide at implementation time whether to ship the proxy in v9.1 or defer.
 
 ### Features
 1. **AI background (replace, subject-aware).** Today's `aiGenerateBackground` swaps `state.bgImage` blindly. v9.1: generate a backdrop, then composite the *existing subject* on top (we already have the screenshot as `state.image` and, post-bg-removal, a cutout via `@imgly/background-removal` which is already a dependency). Pipeline: remove bg from subject → generate scene → place subject. 
-2. **Outpainting / canvas extend.** User expands the canvas (e.g. 1:1 → 16:9); the new margin is sent to `gpt-image-1` edits with a transparent mask over the new area; result fills the extension to match. New UI: "Extend canvas" with target ratio + a generate button.
-3. **Magic eraser.** User brushes a mask over an object (new mask-brush tool in `canvas-tools.js`, reuse the redaction-box interaction model but freehand). Send image + mask to `gpt-image-1` edits with prompt "remove and fill naturally." Replace `state.image` with the result (push to history first).
+2. **Outpainting / canvas extend.** User expands the canvas (e.g. 1:1 → 16:9); the new margin is sent to `gpt-image-2` edits with a transparent mask over the new area; result fills the extension to match. New UI: "Extend canvas" with target ratio + a generate button.
+3. **Magic eraser.** User brushes a mask over an object (new mask-brush tool in `canvas-tools.js`, reuse the redaction-box interaction model but freehand). Send image + mask to `gpt-image-2` edits with prompt "remove and fill naturally." Replace `state.image` with the result (push to history first).
 
 ### New modules / changes
 - `src/features/ai-image-edit.js` — `extendCanvas()`, `magicErase(maskCanvas)`, `replaceBackground(prompt)`. Shares helpers (`imageToDataUrl`, `dataUrlToBase64`, key selection) with `ai-cloud.js` — extract those into `src/features/ai-shared.js`.
 - `canvas-tools.js` — new `'mask'` tool producing a 1-bit mask canvas.
 - State: `state.aiEdit = { maskActive: false, lastPrompt: '' }`.
-- `ai-cloud.js` `aiGenerateBackground` — migrate from `dall-e-3` to `gpt-image-1` for consistency, keep behavior.
+- `ai-cloud.js` `aiGenerateBackground` — migrate from `dall-e-3` to `gpt-image-2` for consistency, keep behavior.
 
 ### Acceptance criteria
 - [ ] Brush over an object, magic-erase → object removed, area plausibly filled, undoable.
@@ -139,7 +139,7 @@ Extend the existing BYOK AI stack from "generate a backdrop from a prompt" (alre
 
 ### Risks
 - Cost/latency per edit (seconds, real $). Show spinner + cost-aware copy.
-- `gpt-image-1` access/availability per key — feature-detect and fall back with a clear message.
+- `gpt-image-2` access/availability per key — feature-detect and fall back with a clear message.
 - Browser CORS / `dangerouslyAllowBrowser` already accepted in current code; proxy removes the key-exposure concern for the hosted build.
 
 ---

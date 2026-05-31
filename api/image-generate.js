@@ -1,4 +1,4 @@
-// v9.1 — Vercel serverless proxy: text→image generation via OpenAI gpt-image-1.
+// v9.1 — Vercel serverless proxy: text→image generation via OpenAI gpt-image-2.
 //
 // Keeps the OpenAI key server-side (OPENAI_API_KEY env var) so hosted users
 // don't need their own key. Returns HTTP 501 when no server key is configured,
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const r = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gpt-image-1', prompt, size: size || '1024x1024', n: 1 })
+      body: JSON.stringify({ model: 'gpt-image-2', prompt, size: size || '1024x1024', n: 1 })
     });
     const data = await r.json();
     if (!r.ok) { res.status(r.status).json({ error: data.error?.message || 'OpenAI error' }); return; }

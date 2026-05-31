@@ -1,5 +1,5 @@
 // v9.1 — Vercel serverless proxy: image edit (inpaint / outpaint) via OpenAI
-// gpt-image-1. Used for the magic eraser and canvas-extend (outpainting).
+// gpt-image-2. Used for the magic eraser and canvas-extend (outpainting).
 //
 // Mask semantics (OpenAI): transparent areas of the mask mark where the image
 // should be regenerated; opaque areas are kept. The client builds both PNGs.
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const { image, mask, prompt, size } = req.body || {};
     if (!image || !prompt) { res.status(400).json({ error: 'Missing image or prompt' }); return; }
     const form = new FormData();
-    form.append('model', 'gpt-image-1');
+    form.append('model', 'gpt-image-2');
     form.append('prompt', prompt);
     form.append('size', size || 'auto');
     form.append('image', b64ToBlob(image), 'image.png');

@@ -35,7 +35,7 @@ export function blobToBase64(blob) {
   });
 }
 
-// gpt-image-1 accepts a fixed set of sizes; pick the closest to a target aspect.
+// gpt-image-2 accepts a fixed set of sizes; pick the closest to a target aspect.
 export function nearestGptImageSize(w, h) {
   const ar = w / h;
   if (ar > 1.25) return '1536x1024';

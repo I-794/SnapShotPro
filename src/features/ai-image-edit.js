@@ -3,7 +3,7 @@
 // Backend: prefers the Vercel serverless proxy (/api/image-*, key server-side);
 // falls back to bring-your-own-key via the OpenAI SDK when the proxy is absent
 // (e.g. local `vite dev`) or returns 501 (no server key configured). All edits
-// use gpt-image-1, which supports mask-based inpaint/outpaint.
+// use gpt-image-2, which supports mask-based inpaint/outpaint.
 
 import { state } from '../state/state.js';
 import { saveStateToHistory } from '../state/history.js';
@@ -54,7 +54,7 @@ async function generate(prompt, size) {
   if (!viaProxy.fell_through) return viaProxy.b64;
   const client = await openaiClient();
   if (!client) { needKeyHint(); throw new Error('Add an OpenAI key (or deploy the server proxy) to generate images.'); }
-  const res = await client.images.generate({ model: 'gpt-image-1', prompt, size: size || '1024x1024', n: 1 });
+  const res = await client.images.generate({ model: 'gpt-image-2', prompt, size: size || '1024x1024', n: 1 });
   const b64 = res.data?.[0]?.b64_json;
   if (!b64) throw new Error('No image returned.');
   return b64;
@@ -69,7 +69,7 @@ async function edit(imageBlob, maskBlob, prompt, size) {
   if (!client) { needKeyHint(); throw new Error('Add an OpenAI key (or deploy the server proxy) to edit images.'); }
   const { toFile } = await import('openai');
   const params = {
-    model: 'gpt-image-1',
+    model: 'gpt-image-2',
     prompt,
     size: size || '1024x1024',
     image: await toFile(imageBlob, 'image.png', { type: 'image/png' })
