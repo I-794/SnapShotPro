@@ -2,6 +2,24 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Replaces __OG_BASE__ in HTML with the absolute site URL so social embeds
+// (Discord, X, Slack) resolve og:image/og:url. On Vercel this comes from the
+// build environment automatically; override locally with OG_BASE_URL.
+function ogBase() {
+  const raw =
+    process.env.OG_BASE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
+    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+    '';
+  const base = raw.replace(/\/+$/, '');
+  return {
+    name: 'og-base',
+    transformIndexHtml(html) {
+      return html.split('__OG_BASE__').join(base);
+    }
+  };
+}
+
 export default defineConfig({
   root: '.',
   build: {
@@ -26,6 +44,7 @@ export default defineConfig({
     open: true,
   },
   plugins: [
+    ogBase(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],

@@ -10,7 +10,12 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(gh pr create --base main --head v5-feature-pack --title 'v5: AI tools, creator polish, optional cloud accounts, PWA' --body ' *)",
-      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap\")"
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap\")",
+      "Bash(node -e \"for\\(const p of ['sharp','canvas','@resvg/resvg-js','puppeteer']\\){try{require.resolve\\(p\\);console.log\\(p+': yes'\\)}catch{console.log\\(p+': no'\\)}}\")",
+      "Bash(node scripts/make-og.mjs)",
+      "Bash(node -e \"const s=require\\('fs'\\).statSync\\('public/og.png'\\);console.log\\('og.png bytes:',s.size\\)\")",
+      "Bash(OG_BASE_URL=\"https://snapshotpro.vercel.app\" npm run build)",
+      "Bash(awk '{print $5, $9}')"
     ]
   }
 }
