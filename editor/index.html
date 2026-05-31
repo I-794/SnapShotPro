@@ -158,6 +158,28 @@
         </div>
 
         <div class="sidebar-section">
+            <h3 class="section-title">🎬 Video / Clip <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v9</span></h3>
+            <p class="info-text" id="video-empty-hint" style="margin-bottom:8px;">Drop a video on the canvas, or add one — then frame it in any device mockup and export MP4/GIF.</p>
+            <button class="btn btn-primary" style="width:100%;" id="video-add-btn">🎬 Add video clip</button>
+            <input type="file" id="video-file-input" accept="video/*" style="display:none;">
+            <div id="video-controls" style="display:none;margin-top:12px;">
+                <div style="display:flex;gap:6px;margin-bottom:10px;">
+                    <button class="btn btn-secondary" style="flex:2;" id="video-play-btn">▶ Play</button>
+                    <button class="btn btn-secondary" style="flex:1;" id="video-remove-btn">Remove</button>
+                </div>
+                <div class="control-group"><label class="control-label">Trim start <span class="range-value" id="video-in-label">0.00s</span></label><input type="range" class="range-input" id="video-in" min="0" max="10" step="0.05" value="0"></div>
+                <div class="control-group"><label class="control-label">Trim end <span class="range-value" id="video-out-label">0.00s</span></label><input type="range" class="range-input" id="video-out" min="0" max="10" step="0.05" value="10"></div>
+                <p class="info-text" id="video-duration-label" style="margin-bottom:10px;">Clip: 0.00s</p>
+                <div class="control-group"><label class="control-label">Frame rate</label><select class="control-input" id="video-fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-primary" style="flex:1;" id="video-mp4-btn">⬇ MP4</button>
+                    <button class="btn btn-secondary" style="flex:1;" id="video-gif-btn">⬇ GIF</button>
+                </div>
+                <p class="info-text" id="video-export-progress" style="margin-top:8px;"></p>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
             <h3 class="section-title">Background</h3>
             <div class="tab-row">
                 <button class="tab-btn active" data-bg="gradient">Gradient</button>
@@ -265,6 +287,30 @@
             <div id="ai-cloud-result" class="ocr-result" style="display:none;max-height:220px;"></div>
 
             <div class="divider"></div>
+            <label class="control-label">Generative AI <span style="font-size:10px;color:var(--text-secondary);">v9 · gpt-image-1</span></label>
+            <div class="control-group" style="margin-bottom:8px;">
+                <label class="control-label" style="font-size:11px;">Replace background</label>
+                <input type="text" class="control-input" id="ai-edit-bg-prompt" placeholder="e.g. sunlit minimalist desk, soft bokeh">
+                <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="ai-edit-bg-btn">🪄 Replace background</button>
+            </div>
+            <div class="control-group" style="margin-bottom:8px;">
+                <label class="control-label" style="font-size:11px;">Extend canvas (outpaint)</label>
+                <div style="display:flex;gap:6px;">
+                    <select class="control-input" id="ai-edit-extend-ratio" style="flex:1;">
+                        <option value="16:9">16:9</option>
+                        <option value="4:3">4:3</option>
+                        <option value="1:1">1:1</option>
+                        <option value="3:4">3:4</option>
+                        <option value="9:16">9:16</option>
+                    </select>
+                    <button class="btn btn-secondary" id="ai-edit-extend-btn" style="flex:1;">↔ Extend</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;" id="ai-edit-eraser-btn">🧽 Magic Eraser</button>
+            <p class="info-text" id="ai-edit-status" style="min-height:14px;margin-top:4px;"></p>
+            <p class="info-text" style="font-size:10px;">Runs on the hosted key when deployed, or your own OpenAI key locally.</p>
+
+            <div class="divider"></div>
             <label class="control-label">AI Enhance</label>
             <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="ai-enhance-btn">&#10024; Auto-Enhance</button>
             <p class="info-text" style="margin-bottom:8px;">Uses AI (or local analysis if no key) to optimize brightness, contrast &amp; saturation.</p>
@@ -352,6 +398,46 @@
                 <div class="scene-tile" data-mockup-preset="producthunt"><div class="scene-thumb">🚀</div>Product Hunt</div>
                 <div class="scene-tile" data-mockup-preset="twitter"><div class="scene-thumb">🐦</div>Social Card</div>
                 <div class="scene-tile" data-mockup-preset="dribbble"><div class="scene-thumb">🎨</div>Dribbble</div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">📱 App Store Sets <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v9</span></h3>
+            <div class="app-mode-toggle">
+                <button class="app-mode-btn active" data-app-mode="single">Single</button>
+                <button class="app-mode-btn" data-app-mode="set">Set</button>
+                <button class="app-mode-btn" data-app-mode="batch">Batch</button>
+            </div>
+
+            <div id="set-controls" style="display:none;margin-top:14px;">
+                <p class="info-text" style="margin-bottom:10px;">Design once (background + device frame on the left), then render a captioned panel per app screen at store-ready sizes.</p>
+                <div class="control-group"><label class="control-label">Store size</label><select class="control-input" id="set-preset"></select></div>
+                <div class="control-group">
+                    <label class="control-label">Caption colors</label>
+                    <div style="display:flex;gap:8px;">
+                        <div style="flex:1;display:flex;align-items:center;gap:6px;"><input type="color" id="set-headline-color" value="#0b0b0d" style="width:38px;height:34px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);cursor:pointer;"><span class="info-text">Headline</span></div>
+                        <div style="flex:1;display:flex;align-items:center;gap:6px;"><input type="color" id="set-subhead-color" value="#4a4a52" style="width:38px;height:34px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);cursor:pointer;"><span class="info-text">Subhead</span></div>
+                    </div>
+                </div>
+                <label class="control-label">Panels</label>
+                <div id="set-filmstrip" class="set-filmstrip"></div>
+                <button class="btn btn-secondary" style="width:100%;margin-bottom:12px;" id="set-add-panel-btn">+ Add panel</button>
+                <div class="divider"></div>
+                <div id="set-panel-editor"></div>
+                <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="set-export-btn">📦 Export set (ZIP)</button>
+                <p class="info-text" id="set-progress" style="margin-top:8px;"></p>
+            </div>
+
+            <div id="batch-controls" style="display:none;margin-top:14px;">
+                <p class="info-text" style="margin-bottom:10px;">Apply the current design to many screenshots at once and download them as a ZIP.</p>
+                <div id="batch-drop" class="batch-drop">Drop images here or click to select</div>
+                <input type="file" id="batch-file-input" accept="image/*" multiple style="display:none;">
+                <div id="batch-list" style="margin:12px 0;"></div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-primary" style="flex:2;" id="batch-export-btn">📦 Export all (ZIP)</button>
+                    <button class="btn btn-secondary" style="flex:1;" id="batch-clear-btn">Clear</button>
+                </div>
+                <p class="info-text" id="batch-progress" style="margin-top:8px;"></p>
             </div>
         </div>
 

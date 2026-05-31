@@ -15,6 +15,7 @@ import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { bakePerspective } from './perspective.js';
+import { renderSetPreview } from '../features/screenshot-set.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -23,8 +24,22 @@ function getFrameInsets() {
 }
 
 export function render(forExport) {
+  // v9 — Set mode owns the preview: it draws a captioned store panel instead of
+  // the standard composition. Routed before the no-image guard so the layout
+  // (background + caption band) previews even before a screenshot is loaded.
+  if (!forExport && state.mode === 'set' && state.screenshotSet && state.screenshotSet.panels.length) {
+    renderSetPreview();
+    return;
+  }
+  renderInto(el.previewCanvas, forExport);
+}
+
+// Render the current global state into an arbitrary canvas. `render()` targets
+// the on-screen preview canvas; v9 batch/set export call this with offscreen
+// canvases (forExport=true suppresses the minimap + CSS-transform sync, which
+// are live-UI only).
+export function renderInto(canvas, forExport) {
   if (!state.image) return;
-  const canvas = el.previewCanvas;
   const ctx = canvas.getContext('2d');
   canvas.width = state.canvas.width;
   canvas.height = state.canvas.height;

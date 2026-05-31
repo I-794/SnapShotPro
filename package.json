@@ -1,7 +1,7 @@
 {
   "name": "snapshot-pro",
   "private": true,
-  "version": "8.1.0",
+  "version": "9.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,9 @@
     "@imgly/background-removal": "^1.6.0",
     "@supabase/supabase-js": "^2.45.4",
     "@vercel/analytics": "^2.0.1",
+    "fflate": "^0.8.3",
     "gif.js": "^0.2.0",
+    "mp4-muxer": "^5.2.2",
     "openai": "^4.73.0",
     "qrcode": "^1.5.4",
     "tesseract.js": "^5.1.1"

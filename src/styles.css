@@ -988,3 +988,102 @@ kbd {
     .mesh-handle { width: 28px; height: 28px; }
     .layer-action-btn { width: 30px; height: 30px; }
 }
+
+/* ─── v9 — App Store Sets + Batch ─── */
+.app-mode-toggle {
+    display: flex; gap: 4px; padding: 4px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+.app-mode-btn {
+    flex: 1; padding: 7px 10px; border: none; cursor: pointer;
+    background: transparent; color: var(--text-secondary);
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    border-radius: var(--radius-sm); transition: all 0.15s ease;
+}
+.app-mode-btn:hover { color: var(--text-primary); }
+.app-mode-btn.active {
+    background: var(--accent-primary); color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+.set-filmstrip {
+    display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px;
+    margin-bottom: 8px;
+}
+.set-panel-chip {
+    flex: 0 0 auto; cursor: pointer; position: relative;
+    border-radius: var(--radius-sm); transition: transform 0.12s ease;
+}
+.set-panel-chip:hover { transform: translateY(-2px); }
+.set-panel-thumb {
+    width: 46px; height: 72px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border-color); overflow: hidden;
+    background: var(--bg-tertiary);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-tertiary); font-size: 20px;
+}
+.set-panel-chip.active .set-panel-thumb {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.set-panel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.set-panel-num {
+    position: absolute; top: -6px; right: -6px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent-primary); color: #fff;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.batch-drop {
+    border: 2px dashed var(--border-color); border-radius: var(--radius-md);
+    padding: 22px 12px; text-align: center; cursor: pointer;
+    color: var(--text-secondary); font-size: 13px; transition: all 0.15s ease;
+}
+.batch-drop:hover, .batch-drop.dragover {
+    border-color: var(--accent-primary); color: var(--text-primary);
+    background: var(--accent-light);
+}
+.batch-row {
+    display: flex; align-items: center; gap: 10px; padding: 6px;
+    border-radius: var(--radius-sm); background: var(--bg-tertiary);
+    margin-bottom: 6px;
+}
+.batch-thumb {
+    width: 36px; height: 36px; border-radius: var(--radius-sm); overflow: hidden;
+    background: var(--bg-primary); flex: 0 0 auto;
+}
+.batch-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.batch-name {
+    flex: 1; font-size: 12px; color: var(--text-primary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.batch-del {
+    border: none; background: transparent; cursor: pointer;
+    color: var(--text-tertiary); font-size: 14px; padding: 4px 6px;
+    border-radius: var(--radius-sm);
+}
+.batch-del:hover { color: var(--error); background: var(--bg-primary); }
+
+/* ─── v9.1 — Magic Eraser modal ─── */
+.eraser-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.eraser-modal {
+    background: var(--bg-elevated); border: 1px solid var(--border-color);
+    border-radius: var(--radius-md); padding: 18px; box-shadow: var(--shadow-lg);
+    max-width: 92vw;
+}
+.eraser-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+.eraser-head strong { font-size: 15px; color: var(--text-primary); }
+.eraser-canvas-wrap {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-tertiary); border-radius: var(--radius-sm); padding: 8px;
+}
+.eraser-canvas-wrap canvas { max-width: 100%; cursor: crosshair; border-radius: 4px; touch-action: none; }
+.eraser-controls { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.eraser-controls .btn { padding: 7px 12px; }

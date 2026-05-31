@@ -19,7 +19,15 @@
       "Bash(cd *)",
       "PowerShell(git *)",
       "Bash(git reset *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npm version *)",
+      "Bash(npm ls *)",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(BROWSER=none npx vite --port 5174 --strictPort)",
+      "Bash(curl -s -o /dev/null -w \"editor route HTTP %{http_code}\\\\n\" http://localhost:5174/editor/)",
+      "Bash(node smoke-v9.mjs)",
+      "Bash(powershell -Command 'Get-NetTCPConnection -LocalPort 5174 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
+      "Bash(grep -c '\"node_modules/playwright\"' package-lock.json)"
     ]
   }
 }

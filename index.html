@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro is a browser-based screenshot studio. Beautiful backgrounds, device frames, annotations, animation, and AI polish. Free, no account, no upload.">
+    <meta name="description" content="SnapShot-Pro is a browser-based screenshot studio. Backgrounds, device frames, App Store screenshot sets, generative AI edits, annotations, and video to MP4. Free, no account.">
     <title>SnapShot-Pro · Screenshot Studio</title>
 
     <!-- Social link embeds (Discord / X / Slack / iMessage). __OG_BASE__ is replaced
@@ -13,7 +13,7 @@
     <meta property="og:site_name" content="SnapShot-Pro">
     <meta property="og:url" content="__OG_BASE__/">
     <meta property="og:title" content="SnapShot-Pro · Screenshot Studio">
-    <meta property="og:description" content="Screenshots that carry weight. Backgrounds, device frames, annotations, and AI polish, all in your browser.">
+    <meta property="og:description" content="Screenshots that carry weight. Backgrounds, device frames, App Store sets, generative AI edits, and video, all in your browser.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta property="og:image:secure_url" content="__OG_BASE__/og.png">
     <meta property="og:image:type" content="image/png">
@@ -22,7 +22,7 @@
     <meta property="og:image:alt" content="SnapShot-Pro, the browser-based screenshot studio">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SnapShot-Pro · Screenshot Studio">
-    <meta name="twitter:description" content="Screenshots that carry weight. Backgrounds, device frames, annotations, and AI polish, all in your browser.">
+    <meta name="twitter:description" content="Screenshots that carry weight. Backgrounds, device frames, App Store sets, generative AI edits, and video, all in your browser.">
     <meta name="twitter:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -257,14 +257,41 @@
         .cell p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
         .cell-foot { margin-top: auto; }
 
-        /* span layout — exact cell count = 7 features, varied rhythm */
+        /* span layout — exact cell count = 10 features, varied rhythm
+           rows: 3+3 · 4+2 · 3+3 · 2+2+2 · 6 */
         .c-ai     { grid-column: span 3; }
         .c-bg     { grid-column: span 3; }
+        .c-sets   { grid-column: span 4; }
         .c-frames { grid-column: span 2; }
+        .c-genai  { grid-column: span 3; }
+        .c-video  { grid-column: span 3; }
         .c-anim   { grid-column: span 2; }
         .c-annot  { grid-column: span 2; }
-        .c-share  { grid-column: span 3; }
-        .c-offline{ grid-column: span 3; }
+        .c-share  { grid-column: span 2; }
+        .c-offline{ grid-column: span 6; }
+
+        /* Generative-AI cell: on-brand cobalt mesh, not generic AI-purple */
+        .cell.tinted-mesh { background: radial-gradient(125% 125% at 0% 0%, #4f7cff, #2348ff 46%, #1a37d6 100%); border-color: transparent; color: #fff; }
+        .cell.tinted-mesh h3 { color: #fff; }
+        .cell.tinted-mesh p { color: rgba(255,255,255,0.84); }
+        .cell.tinted-mesh .cell-ico { background: rgba(255,255,255,0.18); color: #fff; }
+
+        /* Wide closing cell laid out as a row */
+        .cell.wide-row { flex-direction: row; align-items: center; gap: 24px; }
+        .cell.wide-row .cell-ico { margin-bottom: 0; }
+        .cell.wide-row p { max-width: 62ch; }
+
+        /* mini visuals (match the existing .mini-frames / .swatch-row idiom) */
+        .mini-panels { display: flex; gap: 11px; margin-top: 22px; }
+        .mini-panels i { width: 50px; aspect-ratio: 9 / 16; border-radius: 9px; background: var(--bg-sunken); border: 1px solid var(--line); position: relative; overflow: hidden; }
+        .mini-panels i::before { content: ''; position: absolute; left: 10%; right: 10%; top: 9%; height: 16%; border-radius: 4px; background: var(--accent-line); }
+        .mini-panels i::after { content: ''; position: absolute; left: 16%; right: 16%; top: 34%; bottom: 9%; border-radius: 6px; background: var(--line-strong); }
+        .mini-timeline { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+        .mini-timeline .play { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .mini-timeline .play svg { width: 13px; height: 13px; color: #fff; }
+        .mini-timeline .bar { flex: 1; height: 5px; border-radius: var(--r-pill); background: var(--bg-sunken); position: relative; }
+        .mini-timeline .bar::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 46%; background: var(--accent); border-radius: var(--r-pill); }
+        .mini-timeline .bar::after { content: ''; position: absolute; left: 46%; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: var(--shadow-sm); }
 
         /* feature cells with real visual variation (not all white-on-white) */
         .cell.tinted-ink { background: #15161a; border-color: #26272d; color: #fff; }
@@ -326,7 +353,9 @@
             .showpiece { aspect-ratio: 4 / 3; max-width: 540px; }
             .gallery { grid-template-columns: 1fr 1fr; }
             .bento { grid-template-columns: repeat(2, 1fr); }
-            .c-ai, .c-bg, .c-frames, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 2; }
+            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 2; }
+            .cell.wide-row { flex-direction: column; align-items: flex-start; }
+            .cell.wide-row .cell-ico { margin-bottom: 18px; }
             .steps { grid-template-columns: 1fr; }
         }
         @media (max-width: 560px) {
@@ -334,7 +363,7 @@
             .hero h1 { font-size: clamp(40px, 12vw, 56px); }
             .gallery { grid-template-columns: 1fr; }
             .bento { grid-template-columns: 1fr; }
-            .c-ai, .c-bg, .c-frames, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 1; }
+            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 1; }
             .float-chip.one { left: 2%; } .float-chip.two { right: 2%; }
             .foot-inner { flex-direction: column; align-items: flex-start; }
         }
@@ -380,7 +409,7 @@
         <div class="hero-copy">
             <div class="hero-eyebrow"><span class="dot"></span><span>Free screenshot studio, runs in your browser</span></div>
             <h1>Screenshots that<br>carry <span class="accent">weight</span>.</h1>
-            <p class="hero-sub">Beautiful backgrounds, device frames, annotations, and AI polish, all in your browser. No account, no limits.</p>
+            <p class="hero-sub">Backgrounds, device frames, App Store sets, generative AI edits, even video. All in your browser, no account.</p>
             <div class="hero-actions">
                 <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
                 <a href="#showcase" class="btn btn-ghost btn-lg">See it in action</a>
@@ -397,11 +426,11 @@
                 </div>
                 <div class="float-chip one">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-                    AI auto-enhance
+                    Generative AI edits
                 </div>
                 <div class="float-chip two">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
-                    Device frames
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>
+                    App Store sets
                 </div>
             </div>
         </div>
@@ -417,6 +446,9 @@
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Animation &amp; GIF export</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19 7 14l9-9 5 5z"/><path d="M5 21h6"/></svg>Annotate &amp; redact</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6m0 9.6L8.2 13.2"/></svg>Share links &amp; embeds</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>App Store sets &amp; batch</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg>Generative AI &amp; magic eraser</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Video to MP4 &amp; GIF</span>
         <!-- duplicated for seamless loop -->
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>AI background removal</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/></svg>Device &amp; window frames</span>
@@ -424,6 +456,9 @@
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Animation &amp; GIF export</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19 7 14l9-9 5 5z"/><path d="M5 21h6"/></svg>Annotate &amp; redact</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6m0 9.6L8.2 13.2"/></svg>Share links &amp; embeds</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>App Store sets &amp; batch</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg>Generative AI &amp; magic eraser</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Video to MP4 &amp; GIF</span>
     </div>
 </div>
 
@@ -473,11 +508,28 @@
                     <i style="background:#ff8a5c"></i><i style="background:#ff5e7e"></i><i style="background:#a05cff"></i><i style="background:#2348ff"></i><i style="background:#2bd4c4"></i>
                 </div>
             </div>
+            <div class="cell c-sets reveal">
+                <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg></div>
+                <h3>App Store sets &amp; batch</h3>
+                <p>Design one mockup, then export a full set of captioned screenshots at every store size. Or run a template across many images and download the ZIP.</p>
+                <div class="mini-panels cell-foot"><i></i><i></i><i></i></div>
+            </div>
             <div class="cell c-frames reveal">
                 <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
                 <h3>Device &amp; window frames</h3>
                 <p>macOS, Windows, iPhone, and browser chrome, plus laptop and phone mockup scenes.</p>
                 <div class="mini-frames cell-foot"><i></i><i></i><i></i></div>
+            </div>
+            <div class="cell c-genai tinted-mesh reveal">
+                <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <h3>Generative AI edits</h3>
+                <p>Replace a background from a prompt, extend the canvas past its edges, or brush away anything you don't want.</p>
+            </div>
+            <div class="cell c-video reveal">
+                <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="m16 9 6-3v12l-6-3"/></svg></div>
+                <h3>Video, framed</h3>
+                <p>Drop in a clip, trim it, set it inside any device, and export an MP4 or GIF.</p>
+                <div class="mini-timeline cell-foot"><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="bar"></span></div>
             </div>
             <div class="cell c-anim reveal">
                 <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></svg></div>
@@ -494,10 +546,12 @@
                 <h3>Share &amp; export anywhere</h3>
                 <p>One-click links, embed codes, and QR. Export presets sized for X, Instagram, YouTube, LinkedIn, and TikTok, in PNG, JPEG, or WebP.</p>
             </div>
-            <div class="cell c-offline reveal">
+            <div class="cell c-offline wide-row reveal">
                 <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
-                <h3>Installable &amp; offline</h3>
-                <p>Add it to your dock as a PWA. Full functionality with no connection, and nothing uploaded unless you ask.</p>
+                <div>
+                    <h3>Installable &amp; offline</h3>
+                    <p>Add it to your dock as a PWA. The editor runs offline; only cloud AI and sharing need a connection, and nothing uploads unless you ask.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -523,7 +577,7 @@
             <div class="step reveal">
                 <div class="num">03</div>
                 <h3>Export anywhere</h3>
-                <p>Copy to clipboard, download at the right size, or share a link in a click.</p>
+                <p>Copy, download at any store size, export an MP4, or share a link in a click.</p>
             </div>
         </div>
     </div>
@@ -549,7 +603,7 @@
             <a href="/editor/">Open studio</a>
             <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a>
         </div>
-        <div class="foot-note">Free &amp; open source · v7</div>
+        <div class="foot-note">Free &amp; open source · v9</div>
     </div>
 </footer>
 

@@ -15,6 +15,11 @@ import { stickers } from '../state/presets.js';
 import { addSticker } from './stickers.js';
 import { saveStateToHistory } from '../state/history.js';
 import { showStatus } from '../ui/notification.js';
+import { setMode } from './set-ui.js';
+import { exportSet, exportBatch } from './batch-export.js';
+import { replaceBackground, extendCanvas, openEraser } from './ai-image-edit.js';
+import { togglePlay } from './video.js';
+import { exportVideoMp4, exportVideoGif } from './video-export.js';
 
 let commands = [];
 
@@ -85,7 +90,18 @@ export function registerCommands() {
     { id: 'share-image',      label: 'Share Image',          icon: '🔗', run: () => document.getElementById('share-btn')?.click() },
     { id: 'generate-qr',      label: 'Generate QR Code',     icon: '📱', run: () => document.getElementById('qr-btn')?.click() },
     { id: 'export-gif',       label: 'Export as GIF',         icon: '🎬', run: () => document.getElementById('gif-export-btn')?.click() },
-    { id: 'anim-play',        label: 'Play/Pause Animation', icon: '▶',  run: () => document.getElementById('animation-play-btn')?.click() }
+    { id: 'anim-play',        label: 'Play/Pause Animation', icon: '▶',  run: () => document.getElementById('animation-play-btn')?.click() },
+    { id: 'mode-single',      label: 'Mode: Single',         icon: '🖼', run: () => setMode('single') },
+    { id: 'mode-set',         label: 'Mode: App Store Set',  icon: '📱', run: () => setMode('set') },
+    { id: 'mode-batch',       label: 'Mode: Batch',          icon: '🗂', run: () => setMode('batch') },
+    { id: 'export-set',       label: 'Export App Store set (ZIP)', icon: '📦', run: exportSet },
+    { id: 'export-batch',     label: 'Batch export (ZIP)',   icon: '📦', run: exportBatch },
+    { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
+    { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },
+    { id: 'ai-eraser',        label: 'AI: Magic Eraser',     icon: '🧽', run: openEraser },
+    { id: 'video-play',       label: 'Video: Play/Pause clip', icon: '🎬', run: togglePlay },
+    { id: 'video-mp4',        label: 'Video: Export MP4',    icon: '⬇', run: exportVideoMp4 },
+    { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif }
   ];
 
   // Quick-add stickers as commands

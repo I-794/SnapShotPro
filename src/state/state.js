@@ -66,7 +66,30 @@ export const state = {
   },
   ui: { layersCollapsed: false, paletteOpen: false, stickerDrawerOpen: false },
   selection: { layerIds: [] },
-  lastImageRect: null
+  lastImageRect: null,
+
+  // v9 — App Store screenshot sets + batch.
+  // mode: 'single' (normal editor) | 'set' (one design → N captioned store
+  // panels) | 'batch' (one template → N uploaded images → ZIP).
+  mode: 'single',
+  screenshotSet: {
+    preset: 'ios-6.7',
+    active: 0,
+    // Each panel: { imageId, headline, subhead, position: 'top'|'bottom' }.
+    // imageId is null to reuse the globally-loaded screenshot, else a key into
+    // imageRegistry (panels can each show a different app screen).
+    panels: [
+      { imageId: null, headline: 'Capture anything', subhead: 'One tap and done.', position: 'top' }
+    ],
+    // Caption styling shared across panels. headlineSize/subheadSize are
+    // fractions of canvas width so they scale across preset sizes.
+    shared: { font: 'Geist', headlineColor: '#0b0b0d', subheadColor: '#4a4a52', headlineSize: 0.05, subheadSize: 0.028 }
+  },
+  batch: { images: [] },   // [{ id, name }] — Image objects live in imageRegistry
+
+  // v9.2 — video/clip support. The <video> element + frame canvas live in
+  // video.js (not JSON-serializable); this just holds trim + playback params.
+  video: { loaded: false, duration: 0, in: 0, out: 0, fps: 30, playing: false, w: 0, h: 0 }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).
