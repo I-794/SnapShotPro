@@ -131,21 +131,21 @@
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v11.1 · June 2026</div>
-                <h2>Screen recording + auto-zoom</h2>
-                <p class="spot-lede">Record your screen right in the browser, auto-zoom toward every click for a polished demo, then frame it in any device and export MP4 or GIF.</p>
+                <div class="spot-ver">v11.2 · June 2026</div>
+                <h2>AI Art Director + localized sets</h2>
+                <p class="spot-lede">Describe the look you want and get a full composition in one shot — then export your App Store set in every language with AI-translated captions.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></span>
-                        <div><strong>Record in the browser</strong><span>One click captures your screen — no extension, no upload. The clip lands straight in the editor.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+                        <div><strong>One prompt, full design</strong><span>"A calm fintech look, navy gradient, iPhone" → background, frame, headline, and shadow, applied and fully undoable.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></span>
-                        <div><strong>Auto-zoom toward clicks</strong><span>SnapShot-Pro eases in on each click, holds, and releases — a Screen-Studio-style polish, baked into the export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+                        <div><strong>Localized App Store sets</strong><span>List your languages and export one ZIP subfolder per locale, each with translated captions — built on the existing set pipeline.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="14" height="10" rx="2"/><path d="m16 10 6-3v10l-6-3z"/></svg></span>
-                        <div><strong>Frame &amp; export</strong><span>Trim it, drop it in a device mockup, and export MP4 or GIF — the whole existing video pipeline, for free.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+                        <div><strong>Your keys, your call</strong><span>Bring your own OpenAI or Claude key — the model only ever picks from SnapShot-Pro's existing presets, so output always renders.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -156,7 +156,7 @@
             <div class="spot-visual">
                 <div class="spot-browser">
                     <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-screen-record/1280/800" alt="A screen recording with auto-zoom, framed in a device in SnapShot-Pro" loading="eager" width="1280" height="800">
+                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-art-director/1280/800" alt="An AI-generated design composition in SnapShot-Pro" loading="eager" width="1280" height="800">
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -169,6 +169,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v11.2</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>AI Art Director + localized sets</h2>
+                    <ul class="changes">
+                        <li><b>AI Art Director.</b> Describe a vibe and the model returns a full design spec — background, gradient/mesh, device frame, headline, shadow — validated against existing presets, applied via the normal undoable path.</li>
+                        <li><b>Localized App Store sets.</b> Enter a list of languages and export one ZIP subfolder per locale, with captions batch-translated through your own AI key. English stays a flat export.</li>
+                        <li><b>Reuses the BYOK AI stack.</b> A new JSON-mode text helper rides on the existing OpenAI/Claude key handling — no new dependencies, no server required.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v11.1</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Screen recording + auto-zoom</h2>

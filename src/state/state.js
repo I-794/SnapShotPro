@@ -83,7 +83,10 @@ export const state = {
     ],
     // Caption styling shared across panels. headlineSize/subheadSize are
     // fractions of canvas width so they scale across preset sizes.
-    shared: { font: 'Geist', headlineColor: '#0b0b0d', subheadColor: '#4a4a52', headlineSize: 0.05, subheadSize: 0.028 }
+    shared: { font: 'Geist', headlineColor: '#0b0b0d', subheadColor: '#4a4a52', headlineSize: 0.05, subheadSize: 0.028 },
+    // v11.2 — locales to export. 'en' uses the original captions; each other
+    // locale gets AI-translated captions in its own ZIP subfolder.
+    locales: ['en']
   },
   batch: { images: [] },   // [{ id, name }] — Image objects live in imageRegistry
 

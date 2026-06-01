@@ -33,6 +33,7 @@ import { bindBgRemove } from './features/bg-remove.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
+import { bindAiArtDirector } from './features/ai-art-director.js';
 import { bindAiImageEdit } from './features/ai-image-edit.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
@@ -99,6 +100,7 @@ function init() {
   bindOcr();
   bindApiKeysPanel();
   bindAiCloud();
+  bindAiArtDirector();
   bindAiImageEdit();
   bindAuth();
   bindCloudSync();

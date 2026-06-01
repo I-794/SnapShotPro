@@ -98,6 +98,7 @@ export function registerCommands() {
     { id: 'mode-batch',       label: 'Mode: Batch',          icon: '🗂', run: () => setMode('batch') },
     { id: 'export-set',       label: 'Export App Store set (ZIP)', icon: '📦', run: exportSet },
     { id: 'export-batch',     label: 'Batch export (ZIP)',   icon: '📦', run: exportBatch },
+    { id: 'ai-art-director',  label: 'AI: Art Director (full design)', icon: '🎬', run: () => document.getElementById('art-director-btn')?.click() },
     { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
     { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },
     { id: 'ai-eraser',        label: 'AI: Magic Eraser',     icon: '🧽', run: openEraser },

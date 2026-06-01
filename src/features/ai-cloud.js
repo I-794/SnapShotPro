@@ -153,6 +153,69 @@ async function runVisionPrompt(prompt) {
   }
 }
 
+async function callAnthropicText(key, prompt, json) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+  const system = json ? 'Respond with ONLY valid minified JSON — no markdown fences, no commentary.' : undefined;
+  const res = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    ...(system ? { system } : {}),
+    messages: [{ role: 'user', content: prompt }]
+  });
+  return res.content?.[0]?.text || '';
+}
+
+async function callOpenAIText(key, prompt, json) {
+  const OpenAI = (await import('openai')).default;
+  const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+  const res = await client.chat.completions.create({
+    model: 'gpt-4o-mini',
+    max_tokens: 1024,
+    ...(json ? { response_format: { type: 'json_object' } } : {}),
+    messages: [{ role: 'user', content: prompt }]
+  });
+  return res.choices?.[0]?.message?.content || '';
+}
+
+// Text-only sibling of runVisionPrompt: BYOK chat call with optional JSON mode.
+// (OpenAI's json_object format requires the word "JSON" to appear in the prompt;
+// callers building JSON prompts should include it.) Returns the raw string or
+// null (after prompting for a key) when no provider is configured.
+export async function runTextPrompt(prompt, { json = false } = {}) {
+  const choice = await chooseProvider(false);
+  if (!choice) {
+    showNotification('Add a Claude or OpenAI key below to use AI features.', 'error');
+    promptForKey();
+    return null;
+  }
+  setAiStatus(`Calling ${choice.provider}…`);
+  try {
+    const out = choice.provider === 'anthropic'
+      ? await callAnthropicText(choice.key, prompt, json)
+      : await callOpenAIText(choice.key, prompt, json);
+    setAiStatus(`Done via ${choice.provider}.`);
+    return out;
+  } catch (e) {
+    console.error(e);
+    setAiStatus('Failed.');
+    showNotification(`AI call failed: ${e.message || e}`, 'error');
+    return null;
+  }
+}
+
+// Parse a JSON value from a model response, tolerating markdown fences and
+// surrounding prose. Returns null on failure.
+export function parseJsonLoose(text) {
+  if (!text) return null;
+  let t = String(text).trim();
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) t = fence[1].trim();
+  const span = t.match(/[{[][\s\S]*[}\]]/);
+  if (span) t = span[0];
+  try { return JSON.parse(t); } catch (_) { return null; }
+}
+
 export async function aiAltText() {
   const out = await runVisionPrompt(
     'Write concise, accessible alt text for this image (1-2 sentences, no preamble). Describe the most important visible content.'

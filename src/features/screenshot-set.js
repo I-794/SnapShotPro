@@ -188,7 +188,11 @@ export function renderSetPreview() {
 // Render every panel to an offscreen canvas and return [{ name, blob }].
 // Sequential + yields to the event loop between panels so large canvases
 // (e.g. 2868px tall) don't spike memory or freeze the UI.
-export async function renderSetPanels(onProgress) {
+//
+// `overrides` (optional) is an array aligned to panels; when present, each
+// panel's headline/subhead are replaced by overrides[i] — used by localized
+// export (v11.2) to render translated captions without mutating the set.
+export async function renderSetPanels(onProgress, overrides) {
   const ss = state.screenshotSet;
   const preset = getStorePreset(ss.preset);
   const shared = sharedFrom(preset);
@@ -197,7 +201,9 @@ export async function renderSetPanels(onProgress) {
   const savedCanvas = state.canvas;
   const out = [];
   for (let i = 0; i < ss.panels.length; i++) {
-    const panel = ss.panels[i];
+    const base = ss.panels[i];
+    const ov = overrides && overrides[i];
+    const panel = ov ? { ...base, headline: ov.headline ?? base.headline, subhead: ov.subhead ?? base.subhead } : base;
     const img = panelImage(panel);
     if (img) state.image = img;
     state.canvas = { width: preset.w, height: preset.h };

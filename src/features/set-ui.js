@@ -238,6 +238,17 @@ export function bindSetUi() {
   const subColor = document.getElementById('set-subhead-color');
   if (subColor) subColor.addEventListener('input', () => { state.screenshotSet.shared.subheadColor = subColor.value; render(); });
 
+  // Locales (v11.2): parse "en, es, de" into state.screenshotSet.locales.
+  const localesInput = document.getElementById('set-locales');
+  if (localesInput) {
+    localesInput.value = (state.screenshotSet.locales || ['en']).join(', ');
+    const sync = () => {
+      const list = localesInput.value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+      state.screenshotSet.locales = list.length ? Array.from(new Set(list)) : ['en'];
+    };
+    localesInput.addEventListener('input', sync);
+  }
+
   const addBtn = document.getElementById('set-add-panel-btn');
   if (addBtn) addBtn.addEventListener('click', addPanel);
 

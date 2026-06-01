@@ -291,6 +291,11 @@
                 <button class="btn btn-secondary" id="ai-copy-btn">📋 Copy result</button>
             </div>
             <div class="control-group" style="margin-top:8px;">
+                <label class="control-label">AI Art Director</label>
+                <input type="text" class="control-input" id="art-director-prompt" placeholder="e.g. calm fintech look, navy gradient, iPhone">
+                <button class="btn btn-primary" style="width:100%;margin-top:6px;" id="art-director-btn">🎬 Generate full design</button>
+            </div>
+            <div class="control-group" style="margin-top:8px;">
                 <label class="control-label">AI Background</label>
                 <input type="text" class="control-input" id="ai-bg-prompt" placeholder="e.g. soft pastel waves, abstract">
                 <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="ai-bg-btn">🎨 Generate Background</button>
@@ -474,6 +479,11 @@
                 <button class="btn btn-secondary" style="width:100%;margin-bottom:12px;" id="set-add-panel-btn">+ Add panel</button>
                 <div class="divider"></div>
                 <div id="set-panel-editor"></div>
+                <div class="control-group" style="margin-top:8px;">
+                    <label class="control-label">Languages <span style="font-weight:400;color:var(--text-secondary);">(AI-translated captions)</span></label>
+                    <input type="text" class="control-input" id="set-locales" value="en" placeholder="en, es, de, fr, ja">
+                    <p class="info-text" style="margin-top:4px;">Comma-separated. More than one exports a ZIP subfolder per language.</p>
+                </div>
                 <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="set-export-btn">📦 Export set (ZIP)</button>
                 <p class="info-text" id="set-progress" style="margin-top:8px;"></p>
             </div>
