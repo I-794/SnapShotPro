@@ -10,6 +10,7 @@ import { showNotification } from './ui/notification.js';
 import { render } from './render/render.js';
 
 import { bindUploadEvents } from './features/upload.js';
+import { bindUrlLoad } from './features/url-load.js';
 import { bindExtraImagesEvents } from './features/extra-images.js';
 import { exportImage, copyToClipboard, exportAsHTML } from './features/export.js';
 import { bindCanvasTools, setTool } from './features/canvas-tools.js';
@@ -76,6 +77,7 @@ function init() {
 
   bindHeader();
   bindUploadEvents();
+  bindUrlLoad();
   bindExtraImagesEvents();
   bindCanvasTools();
   bindLayersEvents();

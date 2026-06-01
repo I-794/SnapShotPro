@@ -19,6 +19,7 @@ import { setMode } from './set-ui.js';
 import { exportSet, exportBatch } from './batch-export.js';
 import { replaceBackground, extendCanvas, openEraser } from './ai-image-edit.js';
 import { togglePlay } from './video.js';
+import { focusUrlLoad } from './url-load.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 
 let commands = [];
@@ -42,6 +43,7 @@ export function registerCommands() {
     { id: 'export-webp',      label: 'Export as WebP',        icon: '📥', run: () => { state.exportSettings.format = 'webp'; exportImage(); } },
     { id: 'export-html',      label: 'Export as HTML Card',   icon: '🌐', run: exportAsHTML },
     { id: 'copy-clipboard',   label: 'Copy to Clipboard',     icon: '📋', run: copyToClipboard },
+    { id: 'load-url',         label: 'Load from URL',         icon: '🔗', run: focusUrlLoad },
     { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
     { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
