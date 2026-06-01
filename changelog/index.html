@@ -131,21 +131,21 @@
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v11.3 · June 2026</div>
-                <h2>Community gallery</h2>
-                <p class="spot-lede">Publish a design or Brand Kit for everyone, and browse what others made — one click to load any submission straight into your studio.</p>
+                <div class="spot-ver">v11.4 · June 2026</div>
+                <h2>Live collaboration</h2>
+                <p class="spot-lede">Start a session, share the link, and design together in real time — live cursors and synced edits, right in the browser.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
-                        <div><strong>Publish in a click</strong><span>Share your current design or Brand Kit with a rendered thumbnail — no setup, just name it and post.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15.5 18.5c0-2 1.2-3.5 3-3.5s3 1.3 3 3"/></svg></span>
+                        <div><strong>Live cursors &amp; presence</strong><span>See everyone in the room move in real time — cursors float above the canvas and never end up in your export.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-                        <div><strong>Browse &amp; search</strong><span>A live grid of community templates and kits, searchable by name — see thumbnails before you load.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v4h-4"/></svg></span>
+                        <div><strong>Synced edits</strong><span>Every committed change broadcasts to the room and applies instantly for everyone, without polluting anyone's undo history.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></span>
-                        <div><strong>Apply instantly</strong><span>Tap any card to load it onto your canvas — fully undoable. Browsing is open to all; publishing needs sign-in.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+                        <div><strong>One editable link</strong><span>Share a link and anyone — even signed-out guests — joins the same editable session. Built on Supabase Realtime.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -156,7 +156,7 @@
             <div class="spot-visual">
                 <div class="spot-browser">
                     <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-gallery/1280/800" alt="The SnapShot-Pro community gallery grid of templates" loading="eager" width="1280" height="800">
+                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-collab/1280/800" alt="Two collaborators editing one design with live cursors in SnapShot-Pro" loading="eager" width="1280" height="800">
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -169,6 +169,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v11.4</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Live collaboration</h2>
+                    <ul class="changes">
+                        <li><b>Real-time sessions.</b> Start a live session and share a <code>?collab=</code> link; collaborators join a Supabase Realtime channel and edit the same design together.</li>
+                        <li><b>Live cursors.</b> Each participant's cursor renders as an overlay above the canvas (never in exports), with presence join/leave handling.</li>
+                        <li><b>Synced, history-safe edits.</b> Local commits broadcast a serialized snapshot (last-write-wins); remote updates apply without touching local undo history.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v11.3</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Community gallery</h2>

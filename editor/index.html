@@ -590,6 +590,17 @@
             <div class="divider"></div>
             <button class="btn btn-secondary" style="width:100%;" id="qr-btn">QR Code</button>
             <div id="qr-container" style="display:none;margin-top:8px;text-align:center;"></div>
+            <div class="divider"></div>
+            <label class="control-label">👥 Live collaboration <span style="font-weight:400;color:var(--text-secondary);">v11.4</span></label>
+            <p class="info-text" style="margin:4px 0 8px;">Start a session and share the link — edits and cursors sync live. Requires cloud setup.</p>
+            <button class="btn btn-primary" style="width:100%;" id="collab-start-btn">👥 Start live session</button>
+            <div id="collab-link-box" style="display:none;margin-top:8px;">
+                <div style="display:flex;gap:8px;">
+                    <input type="text" class="control-input" id="collab-link" readonly style="flex:1;font-size:11px;">
+                    <button class="btn btn-secondary" id="collab-copy-btn">Copy</button>
+                </div>
+            </div>
+            <p class="info-text" id="collab-status" style="min-height:14px;margin-top:6px;"></p>
         </div>
 
         <div class="sidebar-section">
