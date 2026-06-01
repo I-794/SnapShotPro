@@ -131,21 +131,21 @@
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v11.4 · June 2026</div>
-                <h2>Live collaboration</h2>
-                <p class="spot-lede">Start a session, share the link, and design together in real time. Live cursors and synced edits, right in the browser.</p>
+                <div class="spot-ver">v11 · June 2026</div>
+                <h2>Record, generate, collaborate</h2>
+                <p class="spot-lede">The biggest release yet. Record your screen with auto-zoom, generate a whole design from one prompt, and edit together in real time.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></span>
+                        <div><strong>Screen recording + auto-zoom</strong><span>Record your screen in the browser and SnapShot-Pro eases in on every click, then frame the clip in any device and export MP4 or GIF.</span></div>
+                    </div>
+                    <div class="spot-feat">
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+                        <div><strong>AI Art Director</strong><span>Describe a vibe ("calm fintech, navy gradient, iPhone") and get a complete, on-brand composition applied in one shot, fully undoable.</span></div>
+                    </div>
+                    <div class="spot-feat">
                         <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15.5 18.5c0-2 1.2-3.5 3-3.5s3 1.3 3 3"/></svg></span>
-                        <div><strong>Live cursors &amp; presence</strong><span>See everyone in the room move in real time; cursors float above the canvas and never end up in your export.</span></div>
-                    </div>
-                    <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v4h-4"/></svg></span>
-                        <div><strong>Synced edits</strong><span>Every committed change broadcasts to the room and applies instantly for everyone, without polluting anyone's undo history.</span></div>
-                    </div>
-                    <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
-                        <div><strong>One editable link</strong><span>Share a link and anyone, even signed-out guests, joins the same editable session. Built on Supabase Realtime.</span></div>
+                        <div><strong>Live collaboration</strong><span>Share a link and design together in real time, with live cursors and synced edits. Built on Supabase Realtime.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -156,7 +156,7 @@
             <div class="spot-visual">
                 <div class="spot-browser">
                     <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-collab/1280/800" alt="Two collaborators editing one design with live cursors in SnapShot-Pro" loading="eager" width="1280" height="800">
+                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-v11/1280/800" alt="SnapShot-Pro v11: screen recording, AI design, and live collaboration" loading="eager" width="1280" height="800">
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -169,57 +169,14 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
-                <div class="entry-meta"><span class="ver">v11.4</span><span class="entry-date">June 2026</span></div>
+                <div class="entry-meta"><span class="ver">v11</span><span class="entry-date">June 2026</span></div>
                 <div>
-                    <h2>Live collaboration</h2>
+                    <h2>Record, generate, collaborate</h2>
                     <ul class="changes">
-                        <li><b>Real-time sessions.</b> Start a live session and share a <code>?collab=</code> link; collaborators join a Supabase Realtime channel and edit the same design together.</li>
-                        <li><b>Live cursors.</b> Each participant's cursor renders as an overlay above the canvas (never in exports), with presence join/leave handling.</li>
-                        <li><b>Synced, history-safe edits.</b> Local commits broadcast a serialized snapshot (last-write-wins); remote updates apply without touching local undo history.</li>
-                    </ul>
-                </div>
-            </li>
-            <li class="entry reveal">
-                <div class="entry-meta"><span class="ver">v11.3</span><span class="entry-date">June 2026</span></div>
-                <div>
-                    <h2>Community gallery</h2>
-                    <ul class="changes">
-                        <li><b>Publish &amp; browse.</b> Share a design or Brand Kit to a public gallery with a rendered thumbnail, and browse/search everyone else's, all backed by a new Supabase <code>gallery</code> table with public-read RLS.</li>
-                        <li><b>One-click apply.</b> Tap any card to load it onto your canvas (undoable); templates restore via the project path, Brand Kits route through the Brand Kit apply.</li>
-                        <li><b>Shared serializer.</b> Project serialization moved into <code>src/state/serialize.js</code> so cloud sync, the gallery, and collaboration all save designs identically.</li>
-                    </ul>
-                </div>
-            </li>
-            <li class="entry reveal">
-                <div class="entry-meta"><span class="ver">v11.2</span><span class="entry-date">June 2026</span></div>
-                <div>
-                    <h2>AI Art Director + localized sets</h2>
-                    <ul class="changes">
-                        <li><b>AI Art Director.</b> Describe a vibe and the model returns a full design spec (background, gradient/mesh, device frame, headline, shadow), validated against existing presets, applied via the normal undoable path.</li>
-                        <li><b>Localized App Store sets.</b> Enter a list of languages and export one ZIP subfolder per locale, with captions batch-translated through your own AI key. English stays a flat export.</li>
-                        <li><b>Reuses the BYOK AI stack.</b> A new JSON-mode text helper rides on the existing OpenAI/Claude key handling, with no new dependencies and no server required.</li>
-                    </ul>
-                </div>
-            </li>
-            <li class="entry reveal">
-                <div class="entry-meta"><span class="ver">v11.1</span><span class="entry-date">June 2026</span></div>
-                <div>
-                    <h2>Screen recording + auto-zoom</h2>
-                    <ul class="changes">
-                        <li><b>Record your screen in the browser.</b> Capture with <code>getDisplayMedia</code> + <code>MediaRecorder</code> and the clip drops straight into the editor, trimmable, framable, and exportable as MP4/GIF.</li>
-                        <li><b>Auto-zoom toward clicks.</b> While recording, SnapShot-Pro tracks the cursor and turns each click into an eased zoom-in / hold / zoom-out, baked identically into preview and export.</li>
-                        <li><b>Reuses the whole video pipeline.</b> The recording is just a clip: frame it in a device mockup and export like any other video, with an intensity slider to tune the effect.</li>
-                    </ul>
-                </div>
-            </li>
-            <li class="entry reveal">
-                <div class="entry-meta"><span class="ver">v11.0</span><span class="entry-date">June 2026</span></div>
-                <div>
-                    <h2>Load from URL</h2>
-                    <ul class="changes">
-                        <li><b>Paste a link, not a file.</b> Drop a direct image or video URL into the upload panel (or the <code>Load from URL</code> command) and it loads straight into the editor.</li>
-                        <li><b>YouTube support.</b> Paste a YouTube link and SnapShot-Pro resolves it to the video's poster thumbnail as a still image, ToS-clean, with no embed required.</li>
-                        <li><b>Untainted &amp; exportable.</b> Remote media is fetched through a server-side CORS proxy, so the canvas never taints and every export keeps working.</li>
+                        <li><b>Screen recording + auto-zoom.</b> Record your screen in the browser (<code>getDisplayMedia</code> + <code>MediaRecorder</code>); SnapShot-Pro eases in on every click, then you frame the clip in any device and export MP4 or GIF.</li>
+                        <li><b>AI Art Director.</b> Describe a vibe and the model returns a full design spec (background, gradient/mesh, device frame, headline, shadow), validated against existing presets and applied via the normal undoable path.</li>
+                        <li><b>Live collaboration.</b> Share a <code>?collab=</code> link and design together in real time over Supabase Realtime, with live cursors and synced, history-safe edits.</li>
+                        <li><b>Also in v11.</b> Load media straight from a URL or YouTube link, export App Store sets localized into multiple languages, and publish or browse designs in a new community gallery.</li>
                     </ul>
                 </div>
             </li>
