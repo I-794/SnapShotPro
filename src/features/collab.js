@@ -170,7 +170,7 @@ function updateCollabUI(active) {
   if (start) start.textContent = active ? '⏹ Leave session' : '👥 Start live session';
   if (linkBox) linkBox.style.display = active ? 'block' : 'none';
   if (active && linkInput) linkInput.value = shareLink();
-  if (status) status.textContent = active ? 'Live — others can join via the link.' : '';
+  if (status) status.textContent = active ? 'Live. Others can join via the link.' : '';
 }
 
 // ---- bind -----------------------------------------------------------------

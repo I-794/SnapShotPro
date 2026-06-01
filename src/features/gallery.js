@@ -100,7 +100,7 @@ async function browse() {
 
   lastItems = data || [];
   setGalleryStatus('');
-  if (!lastItems.length) { listEl.innerHTML = '<p class="info-text">Nothing published yet — be the first!</p>'; return; }
+  if (!lastItems.length) { listEl.innerHTML = '<p class="info-text">Nothing published yet. Be the first!</p>'; return; }
 
   listEl.innerHTML = lastItems.map((it) => `
     <div class="gallery-card" data-id="${it.id}" style="cursor:pointer;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px;">

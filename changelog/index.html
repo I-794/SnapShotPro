@@ -133,11 +133,11 @@
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
                 <div class="spot-ver">v11.4 · June 2026</div>
                 <h2>Live collaboration</h2>
-                <p class="spot-lede">Start a session, share the link, and design together in real time — live cursors and synced edits, right in the browser.</p>
+                <p class="spot-lede">Start a session, share the link, and design together in real time. Live cursors and synced edits, right in the browser.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
                         <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15.5 18.5c0-2 1.2-3.5 3-3.5s3 1.3 3 3"/></svg></span>
-                        <div><strong>Live cursors &amp; presence</strong><span>See everyone in the room move in real time — cursors float above the canvas and never end up in your export.</span></div>
+                        <div><strong>Live cursors &amp; presence</strong><span>See everyone in the room move in real time; cursors float above the canvas and never end up in your export.</span></div>
                     </div>
                     <div class="spot-feat">
                         <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v4h-4"/></svg></span>
@@ -145,7 +145,7 @@
                     </div>
                     <div class="spot-feat">
                         <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
-                        <div><strong>One editable link</strong><span>Share a link and anyone — even signed-out guests — joins the same editable session. Built on Supabase Realtime.</span></div>
+                        <div><strong>One editable link</strong><span>Share a link and anyone, even signed-out guests, joins the same editable session. Built on Supabase Realtime.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -184,7 +184,7 @@
                 <div>
                     <h2>Community gallery</h2>
                     <ul class="changes">
-                        <li><b>Publish &amp; browse.</b> Share a design or Brand Kit to a public gallery with a rendered thumbnail, and browse/search everyone else's — backed by a new Supabase <code>gallery</code> table with public-read RLS.</li>
+                        <li><b>Publish &amp; browse.</b> Share a design or Brand Kit to a public gallery with a rendered thumbnail, and browse/search everyone else's, all backed by a new Supabase <code>gallery</code> table with public-read RLS.</li>
                         <li><b>One-click apply.</b> Tap any card to load it onto your canvas (undoable); templates restore via the project path, Brand Kits route through the Brand Kit apply.</li>
                         <li><b>Shared serializer.</b> Project serialization moved into <code>src/state/serialize.js</code> so cloud sync, the gallery, and collaboration all save designs identically.</li>
                     </ul>
@@ -195,9 +195,9 @@
                 <div>
                     <h2>AI Art Director + localized sets</h2>
                     <ul class="changes">
-                        <li><b>AI Art Director.</b> Describe a vibe and the model returns a full design spec — background, gradient/mesh, device frame, headline, shadow — validated against existing presets, applied via the normal undoable path.</li>
+                        <li><b>AI Art Director.</b> Describe a vibe and the model returns a full design spec (background, gradient/mesh, device frame, headline, shadow), validated against existing presets, applied via the normal undoable path.</li>
                         <li><b>Localized App Store sets.</b> Enter a list of languages and export one ZIP subfolder per locale, with captions batch-translated through your own AI key. English stays a flat export.</li>
-                        <li><b>Reuses the BYOK AI stack.</b> A new JSON-mode text helper rides on the existing OpenAI/Claude key handling — no new dependencies, no server required.</li>
+                        <li><b>Reuses the BYOK AI stack.</b> A new JSON-mode text helper rides on the existing OpenAI/Claude key handling, with no new dependencies and no server required.</li>
                     </ul>
                 </div>
             </li>
@@ -206,9 +206,9 @@
                 <div>
                     <h2>Screen recording + auto-zoom</h2>
                     <ul class="changes">
-                        <li><b>Record your screen in the browser.</b> Capture with <code>getDisplayMedia</code> + <code>MediaRecorder</code> and the clip drops straight into the editor — trimmable, framable, exportable as MP4/GIF.</li>
+                        <li><b>Record your screen in the browser.</b> Capture with <code>getDisplayMedia</code> + <code>MediaRecorder</code> and the clip drops straight into the editor, trimmable, framable, and exportable as MP4/GIF.</li>
                         <li><b>Auto-zoom toward clicks.</b> While recording, SnapShot-Pro tracks the cursor and turns each click into an eased zoom-in / hold / zoom-out, baked identically into preview and export.</li>
-                        <li><b>Reuses the whole video pipeline.</b> The recording is just a clip — frame it in a device mockup and export like any other video, with an intensity slider to tune the effect.</li>
+                        <li><b>Reuses the whole video pipeline.</b> The recording is just a clip: frame it in a device mockup and export like any other video, with an intensity slider to tune the effect.</li>
                     </ul>
                 </div>
             </li>
@@ -218,7 +218,7 @@
                     <h2>Load from URL</h2>
                     <ul class="changes">
                         <li><b>Paste a link, not a file.</b> Drop a direct image or video URL into the upload panel (or the <code>Load from URL</code> command) and it loads straight into the editor.</li>
-                        <li><b>YouTube support.</b> Paste a YouTube link and SnapShot-Pro resolves it to the video's poster thumbnail as a still image — ToS-clean, no embed required.</li>
+                        <li><b>YouTube support.</b> Paste a YouTube link and SnapShot-Pro resolves it to the video's poster thumbnail as a still image, ToS-clean, with no embed required.</li>
                         <li><b>Untainted &amp; exportable.</b> Remote media is fetched through a server-side CORS proxy, so the canvas never taints and every export keeps working.</li>
                     </ul>
                 </div>
