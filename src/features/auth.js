@@ -218,7 +218,26 @@ create table if not exists public.projects (
 );
 alter table public.projects enable row level security;
 create policy "users own projects" on public.projects
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);`;
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- v11.3 — public community gallery (templates + brand kits)
+create table if not exists public.gallery (
+  id uuid primary key default gen_random_uuid(),
+  author_id uuid not null references auth.users(id) on delete cascade,
+  kind text not null check (kind in ('template','brandkit')),
+  name text not null,
+  payload jsonb not null,
+  preview_url text,
+  likes int default 0,
+  created_at timestamptz default now()
+);
+alter table public.gallery enable row level security;
+create policy "gallery is publicly readable" on public.gallery
+  for select using (true);
+create policy "authors insert their gallery items" on public.gallery
+  for insert with check (auth.uid() = author_id);
+create policy "authors delete their gallery items" on public.gallery
+  for delete using (auth.uid() = author_id);`;
     try {
       await navigator.clipboard.writeText(sql);
       showNotification('SQL copied — paste into Supabase SQL Editor.', 'success');

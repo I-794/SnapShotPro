@@ -2,6 +2,7 @@ import { showNotification } from '../ui/notification.js';
 import { getClient, getUser, onAuthChange } from './auth.js';
 import { state } from '../state/state.js';
 import { render } from '../render/render.js';
+import { snapshotProject } from '../state/serialize.js';
 
 const TEMPLATES_KEY = 'snapshotpro_templates';
 
@@ -12,34 +13,6 @@ function loadLocalTemplates() {
 function saveLocalTemplates(obj) {
   try { localStorage.setItem(TEMPLATES_KEY, JSON.stringify(obj)); }
   catch (e) {}
-}
-
-function snapshotProject() {
-  return JSON.parse(JSON.stringify({
-    imageTransform: state.imageTransform,
-    imageFilters: state.imageFilters,
-    textOverlay: state.textOverlay,
-    watermark: state.watermark,
-    gradient: state.gradient,
-    padding: state.padding,
-    scale: state.scale,
-    borderRadius: state.borderRadius,
-    showBorder: state.showBorder,
-    borderWidth: state.borderWidth,
-    borderColor: state.borderColor,
-    shadow: state.shadow,
-    canvas: state.canvas,
-    bgMode: state.bgMode,
-    bgColor: state.bgColor,
-    deviceFrame: state.deviceFrame,
-    annotations: state.annotations,
-    redactions: state.redactions,
-    spotlight: state.spotlight,
-    meshGradient: state.meshGradient,
-    tilt3d: state.tilt3d,
-    scene: state.scene,
-    autoLayout: state.autoLayout
-  }));
 }
 
 export async function pushTemplates() {

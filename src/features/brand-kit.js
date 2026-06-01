@@ -126,6 +126,14 @@ function selectedKit() {
 function applyToDesign() {
   const kit = selectedKit();
   if (!kit) { showNotification('Select a brand kit first.', 'error'); return; }
+  applyKitObject(kit);
+  showNotification('Brand kit applied to design.', 'success');
+}
+
+// Apply an arbitrary kit object (not just the selected one) to the design.
+// Used by the community gallery (v11.3) to apply a brand-kit it loaded.
+export function applyKitObject(kit) {
+  if (!kit) return;
   saveStateToHistory();
   applyVisuals(kit);
   if (kit.font) state.textOverlay.font = kit.font;
@@ -133,7 +141,12 @@ function applyToDesign() {
   syncFromGradientState();
   render();
   if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
-  showNotification('Brand kit applied to design.', 'success');
+}
+
+// Serialize the current design's identity as a brand-kit payload (for the
+// gallery's "publish brand kit"). Mirrors the internal captureKit().
+export function captureKitObject() {
+  return captureKit();
 }
 
 function applyToSet() {

@@ -68,3 +68,19 @@ npm run build
 ```
 
 Should produce a `dist/` folder with `index.html` plus hashed JS and CSS bundles. That's what Vercel deploys.
+
+## Supabase schema (cloud features)
+
+The copyable SQL lives in `src/features/auth.js` (the setup modal's "Copy SQL"
+button) — paste it into the Supabase SQL Editor. Tables and their RLS:
+
+- `templates` — per-user named template payloads. PK `(user_id, name)`. RLS:
+  owner-only (`auth.uid() = user_id`).
+- `projects` — per-user named full-project snapshots. RLS: owner-only.
+- `gallery` (v11.3) — public community gallery of templates + brand kits.
+  Columns: `id, author_id, kind('template'|'brandkit'), name, payload jsonb,
+  preview_url, likes, created_at`. RLS: **public read** (`select using (true)`),
+  insert/delete restricted to the author (`auth.uid() = author_id`).
+
+Storage buckets (created on demand by the client, public):
+- `shares` (share links), `gallery` (v11.3 thumbnails).

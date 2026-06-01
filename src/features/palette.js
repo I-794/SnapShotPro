@@ -20,6 +20,7 @@ import { exportSet, exportBatch } from './batch-export.js';
 import { replaceBackground, extendCanvas, openEraser } from './ai-image-edit.js';
 import { togglePlay } from './video.js';
 import { focusUrlLoad } from './url-load.js';
+import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 
 let commands = [];
@@ -106,7 +107,9 @@ export function registerCommands() {
     { id: 'auto-zoom-toggle', label: 'Toggle auto-zoom',     icon: '🔎', run: () => { const t = document.getElementById('auto-zoom-enabled'); if (t) { t.checked = !t.checked; t.dispatchEvent(new Event('change')); } } },
     { id: 'video-play',       label: 'Video: Play/Pause clip', icon: '🎬', run: togglePlay },
     { id: 'video-mp4',        label: 'Video: Export MP4',    icon: '⬇', run: exportVideoMp4 },
-    { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif }
+    { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif },
+    { id: 'gallery-browse',   label: 'Browse community gallery', icon: '🌐', run: openGalleryBrowse },
+    { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() }
   ];
 
   // Quick-add stickers as commands
