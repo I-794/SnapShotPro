@@ -14,6 +14,7 @@ import { el } from '../ui/elements.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { fitZoom } from './zoom-pan.js';
+import { sampleZoom } from './auto-zoom.js';
 
 let videoEl = null;
 let frameCanvas = null;
@@ -34,9 +35,25 @@ function ensureFrameCanvas(w, h) {
 }
 
 // Copy the video's current frame into the frame canvas (which is state.image).
+// When auto-zoom is enabled, draw a cropped source sub-rectangle scaled to fill
+// the frame canvas — a zoom toward the interpolated focal point for this
+// timestamp. Both live playback (tick) and export (seekTo) call drawFrame, so
+// the effect appears identically in preview, MP4, and GIF with no render change.
 export function drawFrame() {
   if (!videoEl || !frameCtx) return;
-  frameCtx.drawImage(videoEl, 0, 0, frameCanvas.width, frameCanvas.height);
+  const W = frameCanvas.width, H = frameCanvas.height;
+  if (state.autoZoom.enabled && state.autoZoom.keyframes.length) {
+    const { cx, cy, scale } = sampleZoom(state.autoZoom.keyframes, videoEl.currentTime || 0);
+    const s = Math.max(1, scale);
+    const sw = W / s, sh = H / s;
+    // Clamp the crop window so it stays inside the source frame.
+    let sx = cx * W - sw / 2, sy = cy * H - sh / 2;
+    sx = Math.max(0, Math.min(W - sw, sx));
+    sy = Math.max(0, Math.min(H - sh, sy));
+    frameCtx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, W, H);
+  } else {
+    frameCtx.drawImage(videoEl, 0, 0, W, H);
+  }
 }
 
 export function seekTo(t) {

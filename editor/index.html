@@ -166,6 +166,14 @@
             <p class="info-text" id="video-empty-hint" style="margin-bottom:8px;">Drop a video on the canvas, or add one — then frame it in any device mockup and export MP4/GIF.</p>
             <button class="btn btn-primary" style="width:100%;" id="video-add-btn">🎬 Add video clip</button>
             <input type="file" id="video-file-input" accept="video/*" style="display:none;">
+            <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="screen-record-btn">⏺ Record screen</button>
+            <p class="info-text" id="screen-record-hint" style="margin-top:6px;">Record your screen, then auto-zoom toward your clicks. Only this tab's cursor is tracked.</p>
+            <div class="control-group" style="margin-top:8px;">
+                <label class="control-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="auto-zoom-enabled" style="width:auto;"> Auto-zoom toward clicks
+                </label>
+            </div>
+            <div class="control-group"><label class="control-label">Zoom intensity <span class="range-value" id="auto-zoom-intensity-value">1.6×</span></label><input type="range" class="range-input" id="auto-zoom-intensity" min="1" max="2.5" step="0.1" value="1.6"></div>
             <div id="video-controls" style="display:none;margin-top:12px;">
                 <div style="display:flex;gap:6px;margin-bottom:10px;">
                     <button class="btn btn-secondary" style="flex:2;" id="video-play-btn">▶ Play</button>

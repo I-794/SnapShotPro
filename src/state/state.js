@@ -91,6 +91,12 @@ export const state = {
   // video.js (not JSON-serializable); this just holds trim + playback params.
   video: { loaded: false, duration: 0, in: 0, out: 0, fps: 30, playing: false, w: 0, h: 0 },
 
+  // v11.1 — screen recording cursor/click track (normalized coords, t in ms
+  // from record start) used to build auto-zoom keyframes; and the auto-zoom
+  // toggle/intensity. `keyframes` is derived from events when a recording loads.
+  recording: { events: [] },
+  autoZoom: { enabled: false, intensity: 1.6, keyframes: [] },
+
   // v10 — Brand Kit logo watermark. `src` is a dataUrl (JSON-serializable so it
   // travels with brand kits/templates); the decoded Image lives in `brandAssets`
   // below. `scale`/`opacity` are fractions/percent; position mirrors watermark.

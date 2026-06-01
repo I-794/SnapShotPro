@@ -101,6 +101,8 @@ export function registerCommands() {
     { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
     { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },
     { id: 'ai-eraser',        label: 'AI: Magic Eraser',     icon: '🧽', run: openEraser },
+    { id: 'screen-record',    label: 'Record screen',        icon: '⏺', run: () => document.getElementById('screen-record-btn')?.click() },
+    { id: 'auto-zoom-toggle', label: 'Toggle auto-zoom',     icon: '🔎', run: () => { const t = document.getElementById('auto-zoom-enabled'); if (t) { t.checked = !t.checked; t.dispatchEvent(new Event('change')); } } },
     { id: 'video-play',       label: 'Video: Play/Pause clip', icon: '🎬', run: togglePlay },
     { id: 'video-mp4',        label: 'Video: Export MP4',    icon: '⬇', run: exportVideoMp4 },
     { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif }

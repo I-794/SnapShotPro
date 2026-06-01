@@ -44,6 +44,7 @@ import { bindAnimation } from './features/animation.js';
 import { bindGifExport } from './features/gif-export.js';
 import { bindVideo } from './features/video.js';
 import { bindVideoExport } from './features/video-export.js';
+import { bindScreenRecord } from './features/screen-record.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
@@ -109,6 +110,7 @@ function init() {
   bindGifExport();
   bindVideo();
   bindVideoExport();
+  bindScreenRecord();
   registerCommands();
   bindPalette();
   bindAllControls();
