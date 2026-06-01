@@ -268,4 +268,7 @@ export function bindSetUi() {
   if (batchExportBtn) batchExportBtn.addEventListener('click', exportBatch);
 
   renderBatchList();
+
+  // Let other modules (e.g. Brand Kit) refresh the set preview + filmstrip.
+  window.__refreshSetUi = () => { renderFilmstrip(); renderPanelEditor(); };
 }

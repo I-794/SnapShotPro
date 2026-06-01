@@ -89,8 +89,17 @@ export const state = {
 
   // v9.2 — video/clip support. The <video> element + frame canvas live in
   // video.js (not JSON-serializable); this just holds trim + playback params.
-  video: { loaded: false, duration: 0, in: 0, out: 0, fps: 30, playing: false, w: 0, h: 0 }
+  video: { loaded: false, duration: 0, in: 0, out: 0, fps: 30, playing: false, w: 0, h: 0 },
+
+  // v10 — Brand Kit logo watermark. `src` is a dataUrl (JSON-serializable so it
+  // travels with brand kits/templates); the decoded Image lives in `brandAssets`
+  // below. `scale`/`opacity` are fractions/percent; position mirrors watermark.
+  logo: { enabled: false, src: null, position: 'bottom-right', scale: 0.12, opacity: 90 }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).
 export const imageRegistry = {};
+
+// v10 — decoded brand-logo Image lives here (not in state, like imageRegistry).
+// brand-kit.js loads state.logo.src into this; overlays.js draws it.
+export const brandAssets = { logoImage: null };

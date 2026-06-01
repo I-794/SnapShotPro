@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro is a browser-based screenshot studio. Backgrounds, device frames, App Store screenshot sets, generative AI edits, annotations, and video to MP4. Free, no account.">
+    <meta name="description" content="SnapShot-Pro is a browser-based screenshot studio. Backgrounds, device frames, App Store screenshot sets, brand kits, generative AI edits, annotations, and video to MP4. Free, no account.">
     <title>SnapShot-Pro · Screenshot Studio</title>
 
     <!-- Social link embeds (Discord / X / Slack / iMessage). __OG_BASE__ is replaced
@@ -269,6 +269,10 @@
         .c-annot  { grid-column: span 2; }
         .c-share  { grid-column: span 2; }
         .c-offline{ grid-column: span 6; }
+        .c-brand  { grid-column: span 6; }
+        .new-tag { display: inline-block; font: 600 11px/1 var(--mono, monospace); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.18); color: #fff; margin-bottom: 12px; }
+        .brand-swatches-foot { display: flex; gap: 8px; margin-top: 16px; }
+        .brand-swatches-foot i { width: 26px; height: 26px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
 
         /* Generative-AI cell: on-brand cobalt mesh, not generic AI-purple */
         .cell.tinted-mesh { background: radial-gradient(125% 125% at 0% 0%, #4f7cff, #2348ff 46%, #1a37d6 100%); border-color: transparent; color: #fff; }
@@ -353,7 +357,7 @@
             .showpiece { aspect-ratio: 4 / 3; max-width: 540px; }
             .gallery { grid-template-columns: 1fr 1fr; }
             .bento { grid-template-columns: repeat(2, 1fr); }
-            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 2; }
+            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline, .c-brand { grid-column: span 2; }
             .cell.wide-row { flex-direction: column; align-items: flex-start; }
             .cell.wide-row .cell-ico { margin-bottom: 18px; }
             .steps { grid-template-columns: 1fr; }
@@ -363,7 +367,7 @@
             .hero h1 { font-size: clamp(40px, 12vw, 56px); }
             .gallery { grid-template-columns: 1fr; }
             .bento { grid-template-columns: 1fr; }
-            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline { grid-column: span 1; }
+            .c-ai, .c-bg, .c-sets, .c-frames, .c-genai, .c-video, .c-anim, .c-annot, .c-share, .c-offline, .c-brand { grid-column: span 1; }
             .float-chip.one { left: 2%; } .float-chip.two { right: 2%; }
             .foot-inner { flex-direction: column; align-items: flex-start; }
         }
@@ -449,6 +453,7 @@
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>App Store sets &amp; batch</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg>Generative AI &amp; magic eraser</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Video to MP4 &amp; GIF</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><circle cx="12" cy="11" r="2.5"/></svg>Brand kits</span>
         <!-- duplicated for seamless loop -->
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>AI background removal</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/></svg>Device &amp; window frames</span>
@@ -459,6 +464,7 @@
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>App Store sets &amp; batch</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg>Generative AI &amp; magic eraser</span>
         <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/></svg>Video to MP4 &amp; GIF</span>
+        <span class="strip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><circle cx="12" cy="11" r="2.5"/></svg>Brand kits</span>
     </div>
 </div>
 
@@ -495,6 +501,15 @@
             <p>Thirty-plus tools for framing, styling, annotating, and shipping screenshots, running entirely on your machine.</p>
         </div>
         <div class="bento">
+            <div class="cell c-brand wide-row tinted-accent reveal">
+                <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><circle cx="12" cy="11" r="2.5"/></svg></div>
+                <div>
+                    <span class="new-tag">New in v10</span>
+                    <h3>Brand Kit</h3>
+                    <p>Save your brand once, colors, heading font, signature gradient, logo watermark, and device colorway, then apply the whole identity to any design or a full App Store set in a single click. Your logo rides along on every exported panel.</p>
+                    <div class="brand-swatches-foot"><i style="background:#2348ff"></i><i style="background:#5470ff"></i><i style="background:#0b0b0d"></i><i style="background:#f7f7f4"></i></div>
+                </div>
+            </div>
             <div class="cell c-ai tinted-ink reveal">
                 <div class="cell-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg></div>
                 <h3>AI tools, on your terms</h3>
@@ -605,7 +620,7 @@
             <a href="/editor/">Open studio</a>
             <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a>
         </div>
-        <div class="foot-note">Free &amp; open source · v9</div>
+        <div class="foot-note">Free &amp; open source · v10</div>
     </div>
 </footer>
 

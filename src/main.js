@@ -27,6 +27,7 @@ import { bindTemplates } from './features/templates.js';
 import { bindGradientEditor } from './features/gradient-editor.js';
 import { bindCustomFont } from './features/custom-font.js';
 import { bindPaletteExtractor } from './features/palette-extract.js';
+import { bindBrandKit } from './features/brand-kit.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
@@ -90,6 +91,7 @@ function init() {
   bindGradientEditor();
   bindCustomFont();
   bindPaletteExtractor();
+  bindBrandKit();
   bindBgRemove();
   bindOcr();
   bindApiKeysPanel();

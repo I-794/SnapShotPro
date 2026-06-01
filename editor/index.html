@@ -341,6 +341,44 @@
         </div>
 
         <div class="sidebar-section">
+            <h3 class="section-title">Brand Kit</h3>
+            <p class="info-text" style="margin-bottom:8px;">Save your brand's colors, font, gradient, logo &amp; watermark, then apply it to any design or App Store set in one click.</p>
+            <div class="control-group"><label class="control-label">Brand Kit Name</label><input type="text" class="control-input" id="brand-name" placeholder="My Brand"></div>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" id="brand-save-btn">💾 Save Current Design as Brand Kit</button>
+
+            <label class="control-label">Brand Logo</label>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <button class="btn btn-secondary" id="brand-logo-btn" style="flex:1;">⬆ Upload Logo</button>
+                <button class="btn btn-secondary" id="brand-logo-clear" style="flex:0 0 auto;" title="Remove logo">✕</button>
+            </div>
+            <input type="file" id="brand-logo-input" accept="image/*" style="display:none;">
+            <div class="toggle-switch"><span class="toggle-label">Show Logo Watermark</span><label class="switch"><input type="checkbox" id="brand-logo-enabled"><span class="slider"></span></label></div>
+            <div id="brand-logo-controls" style="display:none;">
+                <div class="control-group"><label class="control-label">Position</label>
+                    <select class="control-input" id="brand-logo-position">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="center">Center</option>
+                    </select>
+                </div>
+                <div class="control-group"><label class="control-label">Logo Size</label><div class="range-group"><input type="range" class="range-input" id="brand-logo-scale" min="4" max="40" value="12"><span class="range-value" id="brand-logo-scale-value">12%</span></div></div>
+                <div class="control-group"><label class="control-label">Logo Opacity</label><div class="range-group"><input type="range" class="range-input" id="brand-logo-opacity" min="10" max="100" value="90"><span class="range-value" id="brand-logo-opacity-value">90%</span></div></div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="control-group"><label class="control-label">Saved Brand Kits</label><select class="control-input" id="brand-list"><option value="">-- Select Brand Kit --</option></select></div>
+            <div id="brand-swatches" class="palette-swatches"></div>
+            <div style="display:flex;gap:8px;margin:8px 0;">
+                <button class="btn btn-primary" id="brand-apply-design" style="flex:1;">Apply to Design</button>
+                <button class="btn btn-primary" id="brand-apply-set" style="flex:1;">Apply to Set</button>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;" id="brand-delete-btn">🗑 Delete Brand Kit</button>
+            <p class="info-text" id="brand-info" style="margin-top:8px;">No brand kits saved</p>
+        </div>
+
+        <div class="sidebar-section">
             <h3 class="section-title">Image Settings</h3>
             <div class="control-group"><label class="control-label">Padding</label><div class="range-group"><input type="range" class="range-input" id="padding" min="0" max="200" value="60"><span class="range-value" id="padding-value">60px</span></div></div>
             <div class="control-group"><label class="control-label">Scale</label><div class="range-group"><input type="range" class="range-input" id="scale" min="50" max="150" value="100"><span class="range-value" id="scale-value">100%</span></div></div>

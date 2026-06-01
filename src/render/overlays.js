@@ -1,4 +1,4 @@
-import { state } from '../state/state.js';
+import { state, brandAssets } from '../state/state.js';
 
 export function drawTextOverlay(ctx, canvas) {
   if (!state.textOverlay.enabled || !state.textOverlay.content) return;
@@ -32,5 +32,31 @@ export function drawWatermark(ctx, canvas) {
     case 'center':       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; wx = canvas.width / 2; wy = canvas.height / 2; break;
   }
   ctx.fillText(state.watermark.text, wx, wy);
+  ctx.restore();
+}
+
+// v10 — brand logo watermark. Draws the decoded logo (brandAssets.logoImage,
+// loaded by brand-kit.js) scaled to a fraction of canvas width, in a corner or
+// centered. No-op until the image has decoded; brand-kit.js re-renders on load.
+export function drawLogo(ctx, canvas) {
+  const lg = state.logo;
+  const img = brandAssets.logoImage;
+  if (!lg || !lg.enabled || !lg.src) return;
+  if (!img || !img.complete || !img.naturalWidth) return;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, Math.min(1, lg.opacity / 100));
+  const w = canvas.width * lg.scale;
+  const h = w * (img.naturalHeight / img.naturalWidth);
+  const pad = Math.round(canvas.width * 0.025);
+  let x, y;
+  switch (lg.position) {
+    case 'bottom-left':  x = pad;                       y = canvas.height - h - pad; break;
+    case 'top-right':    x = canvas.width - w - pad;    y = pad;                     break;
+    case 'top-left':     x = pad;                       y = pad;                     break;
+    case 'center':       x = (canvas.width - w) / 2;    y = (canvas.height - h) / 2; break;
+    case 'bottom-right':
+    default:             x = canvas.width - w - pad;    y = canvas.height - h - pad; break;
+  }
+  ctx.drawImage(img, x, y, w, h);
   ctx.restore();
 }

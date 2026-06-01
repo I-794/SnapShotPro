@@ -7,7 +7,7 @@ import { drawDeviceFrame } from './frames.js';
 import { drawAnnotations } from './annotations.js';
 import { drawRedactions } from './redactions.js';
 import { drawSpotlight } from './spotlight.js';
-import { drawTextOverlay, drawWatermark } from './overlays.js';
+import { drawTextOverlay, drawWatermark, drawLogo } from './overlays.js';
 import { renderAutoLayout } from './autolayout.js';
 import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
@@ -55,6 +55,7 @@ export function renderInto(canvas, forExport) {
     renderAutoLayout(ctx, canvas);
     drawTextOverlay(ctx, canvas);
     drawWatermark(ctx, canvas);
+    drawLogo(ctx, canvas);
     if (!forExport) renderMinimap();
     return;
   }
@@ -89,6 +90,7 @@ export function renderInto(canvas, forExport) {
 
       drawTextOverlay(ctx, canvas);
       drawWatermark(ctx, canvas);
+      drawLogo(ctx, canvas);
       if (!forExport) renderMinimap();
       return;
     }
@@ -161,6 +163,7 @@ export function renderInto(canvas, forExport) {
 
   drawTextOverlay(ctx, canvas);
   drawWatermark(ctx, canvas);
+  drawLogo(ctx, canvas);
 
   if (!forExport) renderMinimap();
 }

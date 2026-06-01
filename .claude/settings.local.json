@@ -33,7 +33,10 @@
       "Bash(curl -s -o /dev/null -w \"privacy %{http_code}\\\\n\" http://localhost:5174/privacy/)",
       "Bash(node smoke-taste.mjs)",
       "Bash(rm -f smoke-taste.mjs)",
-      "Bash(rm -rf taste-shots)"
+      "Bash(rm -rf taste-shots)",
+      "Bash(ls editor *)",
+      "Bash(ls *.html editor/*.html)",
+      "Bash(grep -c 'id=\"__TRACKED_VAR__\"' editor/index.html)"
     ]
   }
 }

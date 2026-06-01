@@ -15,6 +15,7 @@ import { state, imageRegistry } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { drawBackground } from '../render/background.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from '../render/mockups.js';
+import { drawLogo } from '../render/overlays.js';
 import { getStorePreset } from '../state/store-presets.js';
 
 // Resolve the device used to frame set panels: prefer the globally-selected
@@ -147,6 +148,9 @@ export function composePanel(canvas, panel, shared) {
   ctx.restore();
 
   if (hasCaption) drawCaption(ctx, W, captionTop, bandH, panel, shared);
+
+  // v10 — brand logo watermark on each store panel (reads state.logo).
+  drawLogo(ctx, canvas);
 }
 
 function sharedFrom(preset) {
