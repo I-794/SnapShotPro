@@ -16,6 +16,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/site.css">
     <style>
+        /* ── Featured major-release spotlight ───────────────────────────────
+           Always showcases the latest SHIPPED major release. When a new major
+           version lands, swap the content inside the marked slot below. ── */
+        .spotlight {
+            position: relative; overflow: hidden; border-radius: 30px;
+            background: linear-gradient(150deg, #4f7cff 0%, #2348ff 44%, #1a37d6 100%);
+            color: #fff; padding: clamp(28px, 4vw, 54px);
+            display: grid; grid-template-columns: 1.04fr 0.96fr; gap: clamp(28px, 4vw, 56px);
+            align-items: center; box-shadow: var(--shadow-product);
+        }
+        .spotlight::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(95% 75% at 86% 0%, rgba(255,255,255,0.22), transparent 56%);
+        }
+        .spotlight > * { position: relative; z-index: 1; }
+        .spot-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 11.5px; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            padding: 6px 13px 6px 11px; border-radius: var(--r-pill);
+            background: rgba(255,255,255,0.16); color: #fff; margin-bottom: 22px;
+        }
+        .spot-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.28); }
+        .spot-ver { font-family: var(--font-mono); font-size: 13px; opacity: 0.82; margin-bottom: 12px; }
+        .spotlight h2 { font-size: clamp(30px, 4vw, 46px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.03; margin-bottom: 16px; }
+        .spot-lede { font-size: clamp(15.5px, 1.4vw, 18px); color: rgba(255,255,255,0.86); line-height: 1.55; max-width: 44ch; margin-bottom: 30px; }
+        .spot-feats { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+        .spot-feat { display: flex; gap: 13px; align-items: flex-start; }
+        .spot-feat-ico { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; }
+        .spot-feat-ico svg { width: 18px; height: 18px; color: #fff; }
+        .spot-feat strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+        .spot-feat span { font-size: 13.5px; color: rgba(255,255,255,0.78); line-height: 1.5; }
+        .spot-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .spotlight .btn-primary { background: #fff; color: var(--accent); }
+        .spotlight .btn-primary:hover { background: #f0f0ee; transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+        .spotlight .btn-ghost { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.42); }
+        .spotlight .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+
+        /* Spotlight product visual: a browser frame, matching the landing idiom */
+        .spot-visual { display: flex; align-items: center; justify-content: center; }
+        .spot-browser { width: 100%; border-radius: 13px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -18px rgba(10, 16, 50, 0.5); transform: rotate(-1.4deg); }
+        .spot-bar { height: 36px; background: #f3f3f1; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .spot-bar i { width: 11px; height: 11px; border-radius: 50%; }
+        .spot-bar i:nth-child(1){ background:#ff5f57; } .spot-bar i:nth-child(2){ background:#febc2e; } .spot-bar i:nth-child(3){ background:#28c840; }
+        .spot-bar .url { margin-left: 10px; height: 21px; flex: 1; border-radius: 6px; background: #e7e7e3; display: flex; align-items: center; padding: 0 11px; font-family: var(--font-mono); font-size: 10px; color: #9b9b95; }
+        .spot-shot { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: #e7e7e3; }
+
+        /* ── Timeline (full release history) ── */
         .log { list-style: none; }
         .entry { display: grid; grid-template-columns: 150px 1fr; gap: clamp(16px, 4vw, 48px); padding: clamp(28px, 4vw, 44px) 0; border-top: 1px solid var(--line); }
         .entry:first-child { border-top: none; }
@@ -28,6 +76,13 @@
         .changes li { position: relative; padding-left: 22px; color: var(--ink-2); font-size: 15.5px; line-height: 1.55; }
         .changes li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
         .changes b { color: var(--ink); font-weight: 600; }
+        .log-head { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: clamp(20px, 3vw, 32px); }
+
+        @media (max-width: 860px) {
+            .spotlight { grid-template-columns: 1fr; gap: 32px; }
+            .spot-visual { order: -1; }
+            .spot-browser { transform: none; max-width: 520px; margin: 0 auto; }
+        }
         @media (max-width: 640px) { .entry { grid-template-columns: 1fr; gap: 14px; } }
     </style>
 </head>
@@ -60,14 +115,58 @@
 <header class="page-head">
     <div class="glow"></div>
     <div class="wrap">
-        <p class="mono-label" style="margin-bottom:16px;">Changelog</p>
-        <h1>What's new, <span class="accent">version by version</span>.</h1>
-        <p class="lede">SnapShot-Pro started as a single HTML file and grew into a full browser studio. Here is the trail.</p>
+        <p class="mono-label" style="margin-bottom:16px;">Updates</p>
+        <h1>Major updates, and <span class="accent">every release</span>.</h1>
+        <p class="lede">The big leaps get a spotlight. Below that, the full trail, from a single HTML file to a full browser studio.</p>
     </div>
 </header>
 
-<section class="section-pad" style="padding-top:0;">
+<!-- Featured major-release spotlight ──────────────────────────────────────────
+     SWAP SLOT: when the next major version ships, replace the content of this
+     <section> with the new release. Keep the v10 details below as a timeline
+     entry. Everything between the two SWAP markers is what changes. -->
+<section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
+        <div class="spotlight reveal">
+            <!-- SWAP-START -->
+            <div class="spot-copy">
+                <span class="spot-tag"><span class="dot"></span>Latest release</span>
+                <div class="spot-ver">v10.0 · May 2026</div>
+                <h2>Brand Kit</h2>
+                <p class="spot-lede">Save your identity once, then stamp it onto any design or a whole App Store set in a single click.</p>
+                <div class="spot-feats">
+                    <div class="spot-feat">
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><circle cx="12" cy="11" r="2.5"/></svg></span>
+                        <div><strong>Save your brand once</strong><span>Colors, heading font, signature gradient, device colorway, and watermark, bundled and stored in your browser.</span></div>
+                    </div>
+                    <div class="spot-feat">
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></span>
+                        <div><strong>Apply in one click</strong><span>Push the whole identity onto a single design, or onto an entire store set so every panel matches.</span></div>
+                    </div>
+                    <div class="spot-feat">
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/></svg></span>
+                        <div><strong>Logo watermark</strong><span>Drop in a logo, place it in any corner, and it rides along on every exported screenshot.</span></div>
+                    </div>
+                </div>
+                <div class="spot-actions">
+                    <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+                    <a href="#history" class="btn btn-ghost btn-lg">See the full history</a>
+                </div>
+            </div>
+            <div class="spot-visual">
+                <div class="spot-browser">
+                    <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
+                    <img class="spot-shot" src="https://picsum.photos/seed/snapshot-brandkit-set/1280/800" alt="A branded App Store screenshot set composed in SnapShot-Pro" loading="eager" width="1280" height="800">
+                </div>
+            </div>
+            <!-- SWAP-END -->
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" id="history" style="padding-top:0;">
+    <div class="wrap">
+        <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
                 <div class="entry-meta"><span class="ver">v10.0</span><span class="entry-date">May 2026</span></div>
