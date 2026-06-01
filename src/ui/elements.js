@@ -6,6 +6,7 @@ const IDS = [
   // Core
   'upload-zone', 'canvas-wrapper', 'preview-canvas', 'file-input', 'upload-btn',
   'svg-btn', 'render-svg-btn', 'svg-input-container', 'svg-code-input',
+  'url-load-input', 'url-load-btn',
   'export-btn', 'reset-btn', 'undo-btn', 'redo-btn', 'drop-zone',
   'notification', 'notification-text', 'theme-toggle-btn',
   'shortcuts-btn', 'shortcuts-overlay', 'close-shortcuts-btn', 'annotation-toolbar',
