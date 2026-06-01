@@ -31,7 +31,8 @@ export default defineConfig({
         editor: resolve(__dirname, 'editor/index.html'),
         changelog: resolve(__dirname, 'changelog/index.html'),
         privacy: resolve(__dirname, 'privacy/index.html'),
-        appStoreScreenshots: resolve(__dirname, 'app-store-screenshots/index.html')
+        appStoreScreenshots: resolve(__dirname, 'app-store-screenshots/index.html'),
+        guide: resolve(__dirname, 'guide/index.html')
       },
       output: {
         manualChunks: {
