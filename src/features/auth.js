@@ -213,11 +213,28 @@ create table if not exists public.projects (
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
   payload jsonb not null,
-  updated_at timestamptz default now(),
-  unique (user_id, name)
+  updated_at timestamptz default now()
 );
+-- v12 — projects are keyed by id (not name); carry a thumbnail + created_at.
+alter table public.projects add column if not exists thumbnail text;
+alter table public.projects add column if not exists created_at timestamptz default now();
+alter table public.projects drop constraint if exists projects_user_id_name_key;
 alter table public.projects enable row level security;
 create policy "users own projects" on public.projects
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- v12 — version history snapshots for each project.
+create table if not exists public.project_versions (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references public.projects(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  label text,
+  payload jsonb not null,
+  thumbnail text,
+  created_at timestamptz default now()
+);
+alter table public.project_versions enable row level security;
+create policy "users own project versions" on public.project_versions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- v11.3 — public community gallery (templates + brand kits)

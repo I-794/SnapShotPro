@@ -36,7 +36,10 @@
       "Bash(rm -rf taste-shots)",
       "Bash(ls editor *)",
       "Bash(ls *.html editor/*.html)",
-      "Bash(grep -c 'id=\"__TRACKED_VAR__\"' editor/index.html)"
+      "Bash(grep -c 'id=\"__TRACKED_VAR__\"' editor/index.html)",
+      "Bash(curl -s http://localhost:4173/editor/)",
+      "Bash(curl -s http://localhost:4173/changelog/)",
+      "Bash(kill %1)"
     ]
   }
 }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v11 · Pro Editor</title>
+    <title>SnapShot-Pro v12 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v11</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v12</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -604,13 +604,18 @@
         </div>
 
         <div class="sidebar-section">
-            <h3 class="section-title">Cloud Projects</h3>
-            <p class="info-text" style="margin-bottom:8px;">Sign in to save full projects across devices. Templates auto-sync.</p>
-            <div style="display:flex;gap:8px;margin-bottom:8px;">
-                <button class="btn btn-primary" style="flex:1;" id="cloud-save-btn">☁ Save Project</button>
-                <button class="btn btn-secondary" style="flex:1;" id="cloud-refresh-btn">↻ Refresh</button>
+            <h3 class="section-title">📁 Projects <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v12</span></h3>
+            <p class="info-text" style="margin-bottom:8px;">Your work autosaves to a project and is versioned automatically. Sign in to sync across devices.</p>
+            <div class="project-current">
+                <span class="project-current-name" id="projects-current-name">No project yet</span>
+                <span class="project-current-status" id="projects-status"></span>
             </div>
-            <div id="cloud-project-list"></div>
+            <div style="display:flex;gap:8px;margin:8px 0;">
+                <button class="btn btn-secondary" style="flex:1;" id="projects-new-btn">＋ New</button>
+                <button class="btn btn-primary" style="flex:1;" id="projects-save-version-btn">💾 Save version</button>
+                <button class="btn btn-secondary" style="flex:1;" id="projects-history-btn">🕘 History</button>
+            </div>
+            <div id="projects-list"></div>
         </div>
 
         <div class="sidebar-section" id="gallery-panel">
@@ -762,6 +767,17 @@
             <button class="btn btn-secondary" id="auth-google-btn" style="flex:1;">Google</button>
             <button class="btn btn-secondary" id="auth-github-btn" style="flex:1;">GitHub</button>
         </div>
+    </div>
+</div>
+
+<div class="auth-modal-overlay" id="versions-modal">
+    <div class="auth-modal" style="max-width:560px;width:90vw;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 id="versions-modal-title" style="margin-bottom:0;">Version history</h3>
+            <button class="btn btn-secondary" id="versions-modal-close" style="padding:4px 10px;">✕</button>
+        </div>
+        <p class="info-text" style="margin:8px 0 12px;">Restore any point in time, or fork it into a new project. Versions are captured automatically as you work.</p>
+        <div id="versions-modal-body" class="versions-list"></div>
     </div>
 </div>
 
