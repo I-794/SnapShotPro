@@ -6,7 +6,20 @@ export const gradientPresets = {
   midnight: { colors: ['#0F2027', '#2C5364'], positions: [0, 100], angle: 135 },
   rose:     { colors: ['#ED4264', '#FFEDBC'], positions: [0, 100], angle: 135 },
   purple:   { colors: ['#A8EDEA', '#FED6E3'], positions: [0, 100], angle: 135 },
-  mint:     { colors: ['#84fab0', '#8fd3f4'], positions: [0, 100], angle: 135 }
+  mint:     { colors: ['#84fab0', '#8fd3f4'], positions: [0, 100], angle: 135 },
+  // v13.6 — twelve more gradients (warm, cool, fresh, soft, and two moody darks)
+  coral:    { colors: ['#ff9966', '#ff5e62'], positions: [0, 100], angle: 135 },
+  lagoon:   { colors: ['#43cea2', '#185a9d'], positions: [0, 100], angle: 135 },
+  flamingo: { colors: ['#f857a6', '#ff5858'], positions: [0, 100], angle: 135 },
+  tide:     { colors: ['#00dbde', '#20e3b2'], positions: [0, 100], angle: 135 },
+  grape:    { colors: ['#6a3093', '#a044ff'], positions: [0, 100], angle: 135 },
+  emerald:  { colors: ['#11998e', '#38ef7d'], positions: [0, 100], angle: 135 },
+  peach:    { colors: ['#fceabb', '#f8b88b'], positions: [0, 100], angle: 135 },
+  cosmos:   { colors: ['#1f1c2c', '#3a1c71'], positions: [0, 100], angle: 135 },
+  slate:    { colors: ['#1a2332', '#2d3e50'], positions: [0, 100], angle: 135 },
+  blush:    { colors: ['#ffafbd', '#ffc3a0'], positions: [0, 100], angle: 135 },
+  lime:     { colors: ['#a8ff78', '#78ffd6'], positions: [0, 100], angle: 135 },
+  ember:    { colors: ['#ff512f', '#f09819'], positions: [0, 100], angle: 135 }
 };
 
 export const shadowPresets = {
