@@ -38,6 +38,7 @@ import { bindAiImageEdit } from './features/ai-image-edit.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
+import { bindPages } from './features/pages.js';
 import { bindGallery } from './features/gallery.js';
 import { bindCrop } from './features/crop.js';
 import { bindResetButton } from './features/reset.js';
@@ -107,6 +108,7 @@ function init() {
   bindAiImageEdit();
   bindAuth();
   bindCloudSync();
+  bindPages();
   bindProjects();
   bindGallery();
   bindCrop();

@@ -7,16 +7,16 @@
 //  • Version snapshots — automatic (time-spaced) + named — with a timeline
 //    modal to restore or fork a version into a new project.
 //
-// Source of truth for serialization is src/state/serialize.js (serializeFull /
-// normalizeProject). This module owns persistence, the dashboard, and the UI.
+// v13: a project's `payload` is now a *document* (multiple pages). Serialization
+// is delegated to pages.js (serializeDocument / applyDocument); this module owns
+// persistence, the dashboard, version history, and cloud sync.
 
 import { state } from '../state/state.js';
-import { el } from '../ui/elements.js';
-import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { escapeHTML } from '../utils/dom.js';
 import { onHistoryChange } from '../state/history.js';
-import { serializeFull, normalizeProject } from '../state/serialize.js';
+import { makeThumb, uid } from './document.js';
+import { serializeDocument, applyDocument, onDocumentChange, pageCount } from './pages.js';
 import { getClient, getUser, onAuthChange } from './auth.js';
 
 const STORE_KEY = 'snapshotpro_projects_v12';
@@ -52,30 +52,9 @@ function pruneAutoVersions(store) {
   });
 }
 
-function uid() {
-  try { return crypto.randomUUID(); }
-  catch (e) { return 'p-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
-}
-
 function getActive() {
   if (!activeId) return null;
   return loadStore()[activeId] || null;
-}
-
-// ── Thumbnails ───────────────────────────────────────────────────────────────
-// Downscale whatever is on the live preview canvas — avoids a re-render.
-function makeThumb() {
-  const src = el.previewCanvas;
-  if (!src || !src.width) return null;
-  try {
-    const W = 320;
-    const scale = W / src.width;
-    const H = Math.max(1, Math.round(src.height * scale));
-    const c = document.createElement('canvas');
-    c.width = W; c.height = H;
-    c.getContext('2d').drawImage(src, 0, 0, W, H);
-    return c.toDataURL('image/jpeg', 0.6);
-  } catch (e) { return null; }
 }
 
 // ── Saving ───────────────────────────────────────────────────────────────────
@@ -86,7 +65,7 @@ function newProject(name) {
   store[id] = {
     id,
     name: name || untitledName(store),
-    payload: serializeFull(),
+    payload: serializeDocument(),
     thumbnail: makeThumb(),
     createdAt: now,
     updatedAt: now,
@@ -111,7 +90,7 @@ function saveActive({ versionLabel } = {}) {
   let p = store[activeId];
   if (!p) return null;
 
-  p.payload = serializeFull();
+  p.payload = serializeDocument();
   p.thumbnail = makeThumb();
   p.updatedAt = Date.now();
 
@@ -157,39 +136,27 @@ function scheduleAutosave() {
   }, AUTOSAVE_DELAY);
 }
 
-// ── Applying a project / version to the editor ───────────────────────────────
-function showCanvasUI() {
-  if (el.uploadZone) el.uploadZone.style.display = 'none';
-  if (el.canvasWrapper) el.canvasWrapper.style.display = 'block';
-  if (el.annotationToolbar) el.annotationToolbar.style.display = 'flex';
-  if (el.zoomControls) el.zoomControls.style.display = 'flex';
-}
-
-function applyPayload(payload) {
-  const norm = normalizeProject(payload);
-  Object.assign(state, norm.design);
-  state.svgCode = norm.svgCode || null;
-  const finish = () => {
-    showCanvasUI();
-    render();
-    if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
-  };
-  if (norm.image) {
-    const img = new Image();
-    img.onload = () => { state.image = img; finish(); };
-    img.onerror = finish;
-    img.src = norm.image;
+// Immediate save triggered by document-level changes (page add / switch /
+// delete / reorder) which don't go through the history stack. Creates a project
+// on demand so multi-page work is never lost.
+export function saveDocumentNow() {
+  if (!state.image && pageCount() <= 1) return;
+  if (!activeId) {
+    if (creating) return;
+    creating = true; newProject(); creating = false;
   } else {
-    finish();
+    saveActive();
   }
+  renderPanel();
 }
 
+// ── Applying a project / version to the editor ───────────────────────────────
 function openProject(id) {
   const p = loadStore()[id];
   if (!p) return;
   activeId = id;
   localStorage.setItem(ACTIVE_KEY, id);
-  applyPayload(p.payload);
+  applyDocument(p.payload);
   setSavedStatus(p.updatedAt);
   renderPanel();
   showNotification(`Opened "${p.name}".`, 'success');
@@ -203,14 +170,14 @@ function restoreVersion(versionId) {
   if (!v) return;
   // Snapshot the pre-restore state first so the restore itself is recoverable.
   p.versions.unshift({
-    id: uid(), label: 'Before restore', payload: serializeFull(),
+    id: uid(), label: 'Before restore', payload: serializeDocument(),
     thumbnail: makeThumb(), createdAt: Date.now(), auto: false
   });
   p.payload = v.payload;
   p.updatedAt = Date.now();
   writeStore(store);
   pushProjectToCloud(p);
-  applyPayload(v.payload);
+  applyDocument(v.payload);
   closeVersionsModal();
   renderPanel();
   showNotification('Version restored.', 'success');
@@ -232,7 +199,7 @@ function forkVersion(versionId) {
   localStorage.setItem(ACTIVE_KEY, id);
   writeStore(store);
   pushProjectToCloud(store[id]);
-  applyPayload(v.payload);
+  applyDocument(v.payload);
   closeVersionsModal();
   renderPanel();
   showNotification(`Forked into "${store[id].name}".`, 'success');
@@ -422,8 +389,9 @@ function closeVersionsModal() {
 export function bindProjects() {
   activeId = localStorage.getItem(ACTIVE_KEY) || null;
 
-  // Autosave after every committed edit.
+  // Autosave after every committed edit, and after page-level document changes.
   onHistoryChange(scheduleAutosave);
+  onDocumentChange(saveDocumentNow);
 
   const newBtn = document.getElementById('projects-new-btn');
   const saveVerBtn = document.getElementById('projects-save-version-btn');

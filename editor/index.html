@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v12 · Pro Editor</title>
+    <title>SnapShot-Pro v13 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v12</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v13</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -618,6 +618,21 @@
             <div id="projects-list"></div>
         </div>
 
+        <div class="sidebar-section">
+            <h3 class="section-title">🗂 Pages &amp; Deck <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v13</span></h3>
+            <p class="info-text" style="margin-bottom:8px;">Build a multi-page document. Each page keeps its own size and design. Switch pages from the filmstrip under the canvas.</p>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <button class="btn btn-secondary" style="flex:1;" id="deck-add-btn">＋ Add page</button>
+                <button class="btn btn-secondary" style="flex:1;" id="deck-duplicate-btn">⧉ Duplicate</button>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <button class="btn btn-primary" style="flex:1;" id="deck-pdf-btn">⬇ Export PDF</button>
+                <button class="btn btn-secondary" style="flex:1;" id="deck-zip-btn">⬇ ZIP</button>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;" id="deck-present-btn">▶ Present deck</button>
+            <p class="info-text" id="deck-status" style="min-height:14px;margin-top:6px;"></p>
+        </div>
+
         <div class="sidebar-section" id="gallery-panel">
             <h3 class="section-title">🌐 Community Gallery <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v11</span></h3>
             <p class="info-text" style="margin-bottom:8px;">Publish a design or Brand Kit for everyone, or browse and apply others'. Sign in to publish; anyone can browse.</p>
@@ -689,6 +704,7 @@
                     <canvas id="preview-canvas" data-tool="select"></canvas>
                 </div>
             </div>
+            <div class="page-filmstrip" id="page-filmstrip" style="display:none;"></div>
         </div>
     </div>
 
@@ -779,6 +795,14 @@
         <p class="info-text" style="margin:8px 0 12px;">Restore any point in time, or fork it into a new project. Versions are captured automatically as you work.</p>
         <div id="versions-modal-body" class="versions-list"></div>
     </div>
+</div>
+
+<div class="present-overlay" id="present-overlay">
+    <button class="present-close" id="present-close" title="Exit (Esc)">✕</button>
+    <button class="present-nav present-prev" id="present-prev" title="Previous (←)">‹</button>
+    <img class="present-image" id="present-image" alt="Deck page">
+    <button class="present-nav present-next" id="present-next" title="Next (→)">›</button>
+    <div class="present-counter" id="present-counter">1 / 1</div>
 </div>
 
 <div class="notification" id="notification">
