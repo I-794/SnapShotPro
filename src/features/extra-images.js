@@ -4,6 +4,42 @@ import { showNotification } from '../ui/notification.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 
+const ACCENT = '#5470ff';
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// Clean, modern selection: a thin accent outline + small square corner handles,
+// sized relative to the canvas so they stay visible when the canvas is scaled
+// down to fit. Replaces the old bright cyan dashed box.
+function drawSelectionChrome(ctx, x, y, w, h, radius, cw) {
+  const lw = Math.max(2, cw * 0.0018);
+  const hs = Math.max(10, cw * 0.011);
+  ctx.save();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = lw;
+  roundRectPath(ctx, x, y, w, h, radius);
+  ctx.stroke();
+  [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([px, py]) => {
+    ctx.beginPath();
+    ctx.rect(px - hs / 2, py - hs / 2, hs, hs);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = ACCENT;
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+
 export function renderExtraImages(ctx, canvas) {
   state.extraImages.forEach(ei => {
     if (ei.visible === false) return;
@@ -15,15 +51,27 @@ export function renderExtraImages(ctx, canvas) {
     const ih = img.height * ei.scaleFrac;
     const tx = cw * ei.xFrac - iw / 2;
     const ty = ch * ei.yFrac - ih / 2;
+    const radius = Math.max(4, Math.min(iw, ih) * 0.05);
+
+    // Soft drop shadow so the image sits on the stage instead of looking pasted.
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.38)';
+    ctx.shadowBlur = Math.max(12, iw * 0.045);
+    ctx.shadowOffsetY = Math.max(4, ih * 0.025);
+    roundRectPath(ctx, tx, ty, iw, ih, radius);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.restore();
+
+    // Rounded-corner image (matches the main screenshot's framing).
+    ctx.save();
+    roundRectPath(ctx, tx, ty, iw, ih, radius);
+    ctx.clip();
     ctx.drawImage(img, tx, ty, iw, ih);
+    ctx.restore();
+
     if (state.selectedExtraImage === ei.id) {
-      ctx.save();
-      ctx.strokeStyle = 'rgba(0,160,255,0.8)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 3]);
-      ctx.strokeRect(tx - 4, ty - 4, iw + 8, ih + 8);
-      ctx.setLineDash([]);
-      ctx.restore();
+      drawSelectionChrome(ctx, tx, ty, iw, ih, radius, cw);
     }
   });
 }

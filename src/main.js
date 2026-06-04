@@ -54,6 +54,8 @@ import { registerCommands, bindPalette } from './features/palette.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
 import { bindMobileNav } from './ui/mobile-nav.js';
+import { bindStudioNav } from './features/studio-nav.js';
+import { bindWelcome } from './features/welcome.js';
 
 function bindHeader() {
   el.themeToggleBtn.addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
@@ -126,6 +128,8 @@ function init() {
   bindAllControls();
   bindKeyboard();
   bindMobileNav();
+  bindStudioNav();
+  bindWelcome();
 
   setInitialActivePresets();
   renderMeshPad();

@@ -6,6 +6,19 @@ import { isDeviceMockup } from '../render/mockups.js';
 
 function clampZoom(z) { return Math.max(0.1, Math.min(4, z)); }
 
+// User preference: show the minimap at all. When off, it never appears (even
+// zoomed in). When on (default), it appears only when the canvas overflows.
+let minimapEnabled = (() => {
+  try { return localStorage.getItem('snapshotpro_minimap') !== 'off'; } catch (e) { return true; }
+})();
+function setMinimapEnabled(on) {
+  minimapEnabled = on;
+  try { localStorage.setItem('snapshotpro_minimap', on ? 'on' : 'off'); } catch (e) {}
+  const btn = document.getElementById('minimap-toggle');
+  if (btn) btn.classList.toggle('active', on);
+  renderMinimap();
+}
+
 export function applyTransform() {
   const w = el.canvasWrapper;
   if (!w) return;
@@ -81,6 +94,14 @@ export function bindZoomPan() {
   if (el.zoomOut) el.zoomOut.addEventListener('click', () => setZoom(state.view.zoom / 1.2));
   if (el.zoomFit) el.zoomFit.addEventListener('click', fitZoom);
 
+  const mt = document.getElementById('minimap-toggle');
+  if (mt) {
+    mt.classList.toggle('active', minimapEnabled);
+    mt.addEventListener('click', () => setMinimapEnabled(!minimapEnabled));
+  }
+  const mh = document.getElementById('minimap-hide');
+  if (mh) mh.addEventListener('click', () => setMinimapEnabled(false));
+
   bindTouchPanZoom(vp);
 }
 
@@ -154,20 +175,27 @@ function bindTouchPanZoom(vp) {
 }
 
 export function renderMinimap() {
-  if (!state.image) { if (el.minimap) el.minimap.classList.remove('visible'); return; }
   if (!el.minimap || !el.minimapCanvas) return;
+  if (!state.image || !minimapEnabled) { el.minimap.classList.remove('visible'); return; }
+
+  const cw = el.previewCanvas.width, ch = el.previewCanvas.height;
+  const vp = el.canvasViewport.getBoundingClientRect();
+  const z = state.view.zoom;
+  const visW = vp.width / z, visH = vp.height / z;
+
+  // The minimap only earns its place when part of the canvas is off-screen
+  // (i.e. you're zoomed in). At Fit/100% the whole canvas is visible, so the
+  // minimap is just clutter floating over the artwork — hide it.
+  if (visW >= cw - 1 && visH >= ch - 1) { el.minimap.classList.remove('visible'); return; }
   el.minimap.classList.add('visible');
+
   const mctx = el.minimapCanvas.getContext('2d');
   const mw = el.minimapCanvas.width, mh = el.minimapCanvas.height;
   mctx.fillStyle = '#000';
   mctx.fillRect(0, 0, mw, mh);
-  const cw = el.previewCanvas.width, ch = el.previewCanvas.height;
   const r = Math.min(mw / cw, mh / ch);
   const dw = cw * r, dh = ch * r;
   mctx.drawImage(el.previewCanvas, (mw - dw) / 2, (mh - dh) / 2, dw, dh);
-  const vp = el.canvasViewport.getBoundingClientRect();
-  const z = state.view.zoom;
-  const visW = vp.width / z, visH = vp.height / z;
   const offsetX = -state.view.panX / z, offsetY = -state.view.panY / z;
   const vx = (offsetX / cw) * dw + (mw - dw) / 2;
   const vy = (offsetY / ch) * dh + (mh - dh) / 2;
