@@ -934,7 +934,7 @@ kbd {
     background: var(--bg-secondary); border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg); padding: 22px;
     box-shadow: var(--shadow-lg), 0 0 100px rgba(0, 0, 0, 0.4);
-    animation: modalIn 0.3s var(--transition-smooth);
+    animation: modalIn 0.3s var(--transition-smooth) backwards;
 }
 .welcome-close {
     position: absolute; top: 14px; right: 14px; z-index: 2;
@@ -942,7 +942,7 @@ kbd {
     background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 14px;
 }
 .welcome-slide { display: none; }
-.welcome-slide.active { display: block; animation: sectionReveal 0.35s var(--transition-smooth); }
+.welcome-slide.active { display: block; animation: sectionReveal 0.35s var(--transition-smooth) backwards; }
 .welcome-visual {
     height: 180px; border-radius: var(--radius-md); margin-bottom: 18px;
     display: flex; align-items: center; justify-content: center;
