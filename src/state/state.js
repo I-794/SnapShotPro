@@ -7,7 +7,15 @@ export const state = {
   svgCode: null,
   imageTransform: { rotation: 0, flipH: false, flipV: false },
   imageFilters: { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0 },
-  textOverlay: { enabled: false, content: '', size: 48, font: 'Arial', color: '#ffffff', bold: false, italic: false, x: 0.5, y: 0.5 },
+  textOverlay: {
+    enabled: false, content: '', size: 48, font: 'Arial', color: '#ffffff', bold: false, italic: false, x: 0.5, y: 0.5,
+    // v14 — richer text effects. All default off; pre-v14 saves lack these and
+    // render fine (drawTextOverlay + updateUIFromState default-merge them).
+    stroke: { enabled: false, width: 2, color: '#000000' },
+    gradient: { enabled: false, color1: '#ffffff', color2: '#2348ff', angle: 0 },
+    highlight: { enabled: false, color: '#ffff00', padding: 8, radius: 6 },
+    shadow: { enabled: false, blur: 6, x: 2, y: 2, color: '#000000' }
+  },
   windowOverlay: { enabled: false, style: 'macos', title: 'Screenshot', height: 40, showControls: true },
   watermark: { enabled: false, text: '', position: 'bottom-right', size: 16, opacity: 50, color: '#ffffff' },
   exportSettings: { format: 'png', quality: 92 },
@@ -19,6 +27,9 @@ export const state = {
   borderWidth: 2,
   borderColor: '#ffffff',
   shadow: { blur: 40, spread: 10, opacity: 30, x: 0, y: 10, color: '#000000' },
+  // v14 — mirrored reflection beneath the device/subject. length = fraction of
+  // subject height that is mirrored; gap = px between subject and reflection.
+  reflection: { enabled: false, opacity: 0.35, length: 0.5, gap: 8 },
   canvas: { width: 1200, height: 675 },
   theme: 'dark',
   bgMode: 'gradient',

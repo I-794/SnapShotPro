@@ -1,18 +1,79 @@
 import { state, brandAssets } from '../state/state.js';
+import { roundRectPath } from '../utils/geometry.js';
 
 export function drawTextOverlay(ctx, canvas) {
-  if (!state.textOverlay.enabled || !state.textOverlay.content) return;
+  const t = state.textOverlay;
+  if (!t.enabled || !t.content) return;
+
+  // v14 — effect sub-objects. `|| {}` keeps pre-v14 saves (which lack these)
+  // rendering: an absent group reads as disabled.
+  const hl = t.highlight || {};
+  const sh = t.shadow || {};
+  const st = t.stroke || {};
+  const gr = t.gradient || {};
+
   ctx.save();
   let fontStyle = '';
-  if (state.textOverlay.italic) fontStyle += 'italic ';
-  if (state.textOverlay.bold) fontStyle += 'bold ';
-  ctx.font = `${fontStyle}${state.textOverlay.size}px ${state.textOverlay.font}`;
-  ctx.fillStyle = state.textOverlay.color;
+  if (t.italic) fontStyle += 'italic ';
+  if (t.bold) fontStyle += 'bold ';
+  ctx.font = `${fontStyle}${t.size}px ${t.font}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const tx = canvas.width * state.textOverlay.x;
-  const ty = canvas.height * state.textOverlay.y;
-  ctx.fillText(state.textOverlay.content, tx, ty);
+
+  const tx = canvas.width * t.x;
+  const ty = canvas.height * t.y;
+  const w = ctx.measureText(t.content).width;
+  const h = t.size;
+
+  // 1) Highlight box behind the text — drawn before the shadow is set so the box
+  //    itself casts none.
+  if (hl.enabled) {
+    const pad = hl.padding ?? 8;
+    ctx.save();
+    ctx.fillStyle = hl.color || '#ffff00';
+    roundRectPath(ctx, tx - w / 2 - pad, ty - h / 2 - pad, w + pad * 2, h + pad * 2, hl.radius ?? 6);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 2) Drop shadow — cast by the outermost text paint (the stroke if present,
+  //    otherwise the fill).
+  if (sh.enabled) {
+    ctx.shadowColor = sh.color || '#000000';
+    ctx.shadowBlur = sh.blur ?? 6;
+    ctx.shadowOffsetX = sh.x ?? 2;
+    ctx.shadowOffsetY = sh.y ?? 2;
+  }
+
+  // 3) Outline.
+  if (st.enabled) {
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = st.width ?? 2;
+    ctx.strokeStyle = st.color || '#000000';
+    ctx.strokeText(t.content, tx, ty);
+    // The stroke already cast the shadow; clear it so the fill doesn't double it.
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // 4) Fill — gradient across the text box, or a solid color.
+  if (gr.enabled) {
+    const a = (gr.angle ?? 0) * Math.PI / 180;
+    const hw = w / 2, hh = h / 2;
+    const g = ctx.createLinearGradient(
+      tx - Math.cos(a) * hw, ty - Math.sin(a) * hh,
+      tx + Math.cos(a) * hw, ty + Math.sin(a) * hh
+    );
+    g.addColorStop(0, gr.color1 || '#ffffff');
+    g.addColorStop(1, gr.color2 || '#2348ff');
+    ctx.fillStyle = g;
+  } else {
+    ctx.fillStyle = t.color;
+  }
+  ctx.fillText(t.content, tx, ty);
+
   ctx.restore();
 }
 

@@ -5,7 +5,7 @@ import { render } from '../render/render.js';
 import { exportImage, copyToClipboard } from './export.js';
 import { openPalette, closePalette } from './palette.js';
 import { closeStickerDrawer } from './stickers.js';
-import { setTool, deleteSelected } from './canvas-tools.js';
+import { setTool, deleteSelected, nudgeSelected } from './canvas-tools.js';
 import { isTypingTarget } from '../utils/dom.js';
 
 function showShortcuts(show) {
@@ -44,6 +44,15 @@ export function bindKeyboard() {
     } else {
       if (e.key === '?') { e.preventDefault(); showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return; }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); return; }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        // Nudge the selected element: 1px, or 10px with Shift. One history entry
+        // per key press (e.repeat skips the save while a key is held).
+        const step = e.shiftKey ? 10 : 1;
+        const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+        const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+        if (nudgeSelected(dx, dy, !e.repeat)) e.preventDefault();
+        return;
+      }
     }
   });
 

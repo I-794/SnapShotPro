@@ -47,12 +47,27 @@ const IDS = [
   // Spotlight
   'spotlight-enabled', 'spotlight-controls', 'spotlight-opacity', 'spotlight-opacity-value',
 
+  // Reflection (v14)
+  'reflection-enabled', 'reflection-controls', 'reflection-opacity', 'reflection-opacity-value',
+  'reflection-length', 'reflection-length-value', 'reflection-gap', 'reflection-gap-value',
+
   // Canvas
   'canvas-width', 'canvas-height',
 
   // Text overlay
   'add-text-btn', 'text-controls', 'text-content', 'text-size', 'text-size-value',
   'text-font', 'text-color', 'text-color-text', 'text-bold', 'text-italic', 'remove-text-btn',
+
+  // Text effects (v14)
+  'text-stroke-enabled', 'text-stroke-controls', 'text-stroke-width', 'text-stroke-width-value',
+  'text-stroke-color', 'text-stroke-color-text',
+  'text-gradient-enabled', 'text-gradient-controls', 'text-gradient-color1', 'text-gradient-color1-text',
+  'text-gradient-color2', 'text-gradient-color2-text', 'text-gradient-angle', 'text-gradient-angle-value',
+  'text-highlight-enabled', 'text-highlight-controls', 'text-highlight-color', 'text-highlight-color-text',
+  'text-highlight-padding', 'text-highlight-padding-value', 'text-highlight-radius', 'text-highlight-radius-value',
+  'text-shadow-enabled', 'text-shadow-controls', 'text-shadow-blur', 'text-shadow-blur-value',
+  'text-shadow-x', 'text-shadow-x-value', 'text-shadow-y', 'text-shadow-y-value',
+  'text-shadow-color', 'text-shadow-color-text',
 
   // Watermark
   'watermark-enabled', 'watermark-controls', 'watermark-text', 'watermark-position',

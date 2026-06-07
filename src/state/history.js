@@ -22,6 +22,7 @@ function snapshot() {
     borderWidth: state.borderWidth,
     borderColor: state.borderColor,
     shadow: state.shadow,
+    reflection: state.reflection,
     canvas: state.canvas,
     bgMode: state.bgMode,
     bgColor: state.bgColor,

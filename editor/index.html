@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v13.6 · Pro Editor</title>
+    <title>SnapShot-Pro v14 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v13.6</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v14</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -130,6 +130,38 @@
                 <div class="control-group"><label class="control-label">Text Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-color" value="#ffffff"></div><input type="text" class="control-input" id="text-color-text" value="#ffffff" style="flex:1;"></div></div>
                 <div class="toggle-switch"><span class="toggle-label">Bold</span><label class="switch"><input type="checkbox" id="text-bold"><span class="slider"></span></label></div>
                 <div class="toggle-switch"><span class="toggle-label">Italic</span><label class="switch"><input type="checkbox" id="text-italic"><span class="slider"></span></label></div>
+
+                <div class="divider"></div>
+                <label class="control-label">Text Effects <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v14</span></label>
+
+                <div class="toggle-switch"><span class="toggle-label">Outline</span><label class="switch"><input type="checkbox" id="text-stroke-enabled"><span class="slider"></span></label></div>
+                <div id="text-stroke-controls" style="display:none;">
+                    <div class="control-group"><label class="control-label">Outline Width</label><div class="range-group"><input type="range" class="range-input" id="text-stroke-width" min="1" max="20" value="2"><span class="range-value" id="text-stroke-width-value">2px</span></div></div>
+                    <div class="control-group"><label class="control-label">Outline Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-stroke-color" value="#000000"></div><input type="text" class="control-input" id="text-stroke-color-text" value="#000000" style="flex:1;"></div></div>
+                </div>
+
+                <div class="toggle-switch"><span class="toggle-label">Gradient Fill</span><label class="switch"><input type="checkbox" id="text-gradient-enabled"><span class="slider"></span></label></div>
+                <div id="text-gradient-controls" style="display:none;">
+                    <div class="control-group"><label class="control-label">Color 1</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-gradient-color1" value="#ffffff"></div><input type="text" class="control-input" id="text-gradient-color1-text" value="#ffffff" style="flex:1;"></div></div>
+                    <div class="control-group"><label class="control-label">Color 2</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-gradient-color2" value="#2348ff"></div><input type="text" class="control-input" id="text-gradient-color2-text" value="#2348ff" style="flex:1;"></div></div>
+                    <div class="control-group"><label class="control-label">Angle</label><div class="range-group"><input type="range" class="range-input" id="text-gradient-angle" min="0" max="360" value="0"><span class="range-value" id="text-gradient-angle-value">0°</span></div></div>
+                </div>
+
+                <div class="toggle-switch"><span class="toggle-label">Highlight</span><label class="switch"><input type="checkbox" id="text-highlight-enabled"><span class="slider"></span></label></div>
+                <div id="text-highlight-controls" style="display:none;">
+                    <div class="control-group"><label class="control-label">Highlight Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-highlight-color" value="#ffff00"></div><input type="text" class="control-input" id="text-highlight-color-text" value="#ffff00" style="flex:1;"></div></div>
+                    <div class="control-group"><label class="control-label">Padding</label><div class="range-group"><input type="range" class="range-input" id="text-highlight-padding" min="0" max="40" value="8"><span class="range-value" id="text-highlight-padding-value">8px</span></div></div>
+                    <div class="control-group"><label class="control-label">Corner Radius</label><div class="range-group"><input type="range" class="range-input" id="text-highlight-radius" min="0" max="40" value="6"><span class="range-value" id="text-highlight-radius-value">6px</span></div></div>
+                </div>
+
+                <div class="toggle-switch"><span class="toggle-label">Drop Shadow</span><label class="switch"><input type="checkbox" id="text-shadow-enabled"><span class="slider"></span></label></div>
+                <div id="text-shadow-controls" style="display:none;">
+                    <div class="control-group"><label class="control-label">Blur</label><div class="range-group"><input type="range" class="range-input" id="text-shadow-blur" min="0" max="40" value="6"><span class="range-value" id="text-shadow-blur-value">6px</span></div></div>
+                    <div class="control-group"><label class="control-label">Offset X</label><div class="range-group"><input type="range" class="range-input" id="text-shadow-x" min="-30" max="30" value="2"><span class="range-value" id="text-shadow-x-value">2px</span></div></div>
+                    <div class="control-group"><label class="control-label">Offset Y</label><div class="range-group"><input type="range" class="range-input" id="text-shadow-y" min="-30" max="30" value="2"><span class="range-value" id="text-shadow-y-value">2px</span></div></div>
+                    <div class="control-group"><label class="control-label">Shadow Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="text-shadow-color" value="#000000"></div><input type="text" class="control-input" id="text-shadow-color-text" value="#000000" style="flex:1;"></div></div>
+                </div>
+
                 <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="remove-text-btn">Remove Text</button>
                 <p class="info-text" style="margin-top:8px;">Tip: Drag text on the canvas to reposition it</p>
                 <div class="divider"></div>
@@ -140,6 +172,17 @@
                 </div>
                 <div id="custom-font-list"></div>
             </div>
+            <div class="divider"></div>
+            <label class="control-label">Align selected to canvas</label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="left" title="Align left" style="font-size:14px;padding:7px 4px;">⬅</button>
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="hcenter" title="Center horizontally" style="font-size:14px;padding:7px 4px;">⇔</button>
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="right" title="Align right" style="font-size:14px;padding:7px 4px;">➡</button>
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="top" title="Align top" style="font-size:14px;padding:7px 4px;">⬆</button>
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="vcenter" title="Center vertically" style="font-size:14px;padding:7px 4px;">⇕</button>
+                <button class="btn btn-secondary align-canvas-btn" data-align-canvas="bottom" title="Align bottom" style="font-size:14px;padding:7px 4px;">⬇</button>
+            </div>
+            <p class="info-text" style="margin-top:8px;">Aligns the selected element. Tip: nudge with arrow keys (Shift = 10px).</p>
         </div>
 
         <div class="sidebar-section">
@@ -539,6 +582,17 @@
             <div class="control-group"><label class="control-label">Offset X</label><div class="range-group"><input type="range" class="range-input" id="shadow-x" min="-50" max="50" value="0"><span class="range-value" id="shadow-x-value">0px</span></div></div>
             <div class="control-group"><label class="control-label">Offset Y</label><div class="range-group"><input type="range" class="range-input" id="shadow-y" min="-50" max="50" value="10"><span class="range-value" id="shadow-y-value">10px</span></div></div>
             <div class="control-group"><label class="control-label">Shadow Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="shadow-color" value="#000000"></div><input type="text" class="control-input" id="shadow-color-text" value="#000000" style="flex:1;"></div></div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Reflection <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v14</span></h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Reflection</span><label class="switch"><input type="checkbox" id="reflection-enabled"><span class="slider"></span></label></div>
+            <div id="reflection-controls" style="display:none;margin-top:16px;">
+                <p class="info-text" style="margin-bottom:12px;">A faded mirror of the device or framed subject, for a glossy product-shot look. Included in exports.</p>
+                <div class="control-group"><label class="control-label">Opacity</label><div class="range-group"><input type="range" class="range-input" id="reflection-opacity" min="5" max="80" value="35"><span class="range-value" id="reflection-opacity-value">35%</span></div></div>
+                <div class="control-group"><label class="control-label">Length</label><div class="range-group"><input type="range" class="range-input" id="reflection-length" min="10" max="100" value="50"><span class="range-value" id="reflection-length-value">50%</span></div></div>
+                <div class="control-group"><label class="control-label">Gap</label><div class="range-group"><input type="range" class="range-input" id="reflection-gap" min="0" max="60" value="8"><span class="range-value" id="reflection-gap-value">8px</span></div></div>
+            </div>
         </div>
 
         <div class="sidebar-section">

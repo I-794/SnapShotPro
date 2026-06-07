@@ -162,7 +162,7 @@ function iphone(ctx, canvas) {
     drawGlare(c, rect, screenR);
     screenEdge(c, rect, screenR);
   };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: b };
 }
 
 function ipad(ctx, canvas) {
@@ -196,7 +196,7 @@ function ipad(ctx, canvas) {
     drawGlare(c, rect, screenR);
     screenEdge(c, rect, screenR);
   };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: b };
 }
 
 function macbook(ctx, canvas) {
@@ -250,7 +250,7 @@ function macbook(ctx, canvas) {
     drawGlare(c, rect, screenR);
     screenEdge(c, rect, screenR);
   };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: fit };
 }
 
 function watch(ctx, canvas) {
@@ -298,7 +298,7 @@ function watch(ctx, canvas) {
   ctx.save(); ctx.fillStyle = '#000'; rr(ctx, rect.x, rect.y, rect.w, rect.h, screenR); ctx.fill(); ctx.restore();
 
   const overlay = (c) => { drawGlare(c, rect, screenR); screenEdge(c, rect, screenR); };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: fit };
 }
 
 function studioDisplay(ctx, canvas) {
@@ -338,7 +338,7 @@ function studioDisplay(ctx, canvas) {
   ctx.save(); ctx.fillStyle = '#000'; rr(ctx, rect.x, rect.y, rect.w, rect.h, screenR); ctx.fill(); ctx.restore();
 
   const overlay = (c) => { drawGlare(c, rect, screenR); screenEdge(c, rect, screenR); };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: fit };
 }
 
 function pixel(ctx, canvas) {
@@ -373,7 +373,7 @@ function pixel(ctx, canvas) {
     drawGlare(c, rect, screenR);
     screenEdge(c, rect, screenR);
   };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: b };
 }
 
 function winlaptop(ctx, canvas) {
@@ -427,7 +427,7 @@ function winlaptop(ctx, canvas) {
     drawGlare(c, rect, screenR);
     screenEdge(c, rect, screenR);
   };
-  return { rect, radius: screenR, overlay };
+  return { rect, radius: screenR, overlay, bounds: fit };
 }
 
 // ---- dispatch --------------------------------------------------------------

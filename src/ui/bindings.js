@@ -86,12 +86,34 @@ function updateTextControls() {
   if (el.addTextBtn) el.addTextBtn.textContent = state.textOverlay.enabled ? '✏️ Edit Text' : '+ Add Text';
 }
 
+// v14 — fill in the text-effect sub-objects on designs saved before v14 (which
+// only had the flat textOverlay), so the controls and edits have somewhere to
+// write. Idempotent: a no-op once the groups exist.
+function ensureTextEffectDefaults() {
+  const t = state.textOverlay;
+  if (!t.stroke) t.stroke = { enabled: false, width: 2, color: '#000000' };
+  if (!t.gradient) t.gradient = { enabled: false, color1: '#ffffff', color2: '#2348ff', angle: 0 };
+  if (!t.highlight) t.highlight = { enabled: false, color: '#ffff00', padding: 8, radius: 6 };
+  if (!t.shadow) t.shadow = { enabled: false, blur: 6, x: 2, y: 2, color: '#000000' };
+}
+
+function updateTextEffectControls() {
+  if (el.textStrokeControls) el.textStrokeControls.style.display = state.textOverlay.stroke?.enabled ? 'block' : 'none';
+  if (el.textGradientControls) el.textGradientControls.style.display = state.textOverlay.gradient?.enabled ? 'block' : 'none';
+  if (el.textHighlightControls) el.textHighlightControls.style.display = state.textOverlay.highlight?.enabled ? 'block' : 'none';
+  if (el.textShadowControls) el.textShadowControls.style.display = state.textOverlay.shadow?.enabled ? 'block' : 'none';
+}
+
 function updateWatermarkControls() {
   if (el.watermarkControls) el.watermarkControls.style.display = state.watermark.enabled ? 'block' : 'none';
 }
 
 function updateSpotlightControls() {
   if (el.spotlightControls) el.spotlightControls.style.display = state.spotlight.enabled ? 'block' : 'none';
+}
+
+function updateReflectionControls() {
+  if (el.reflectionControls) el.reflectionControls.style.display = state.reflection.enabled ? 'block' : 'none';
 }
 
 function updateQualityControls() {
@@ -251,6 +273,18 @@ function bindRedactionSpotlight() {
   linkSlider(el.spotlightOpacity, el.spotlightOpacityValue, v => v + '%', v => state.spotlight.opacity = v / 100);
 }
 
+function bindReflection() {
+  if (el.reflectionEnabled) el.reflectionEnabled.addEventListener('change', (e) => {
+    saveStateToHistory();
+    state.reflection.enabled = e.target.checked;
+    updateReflectionControls();
+    render();
+  });
+  linkSlider(el.reflectionOpacity, el.reflectionOpacityValue, v => v + '%', v => state.reflection.opacity = v / 100);
+  linkSlider(el.reflectionLength, el.reflectionLengthValue, v => v + '%', v => state.reflection.length = v / 100);
+  linkSlider(el.reflectionGap, el.reflectionGapValue, v => v + 'px', v => state.reflection.gap = v);
+}
+
 function bindCanvasSize() {
   const update = () => {
     state.canvas.width = parseInt(el.canvasWidth.value, 10) || 1200;
@@ -308,6 +342,41 @@ function bindText() {
   });
 }
 
+function bindTextEffects() {
+  const to = () => state.textOverlay;
+  const toggle = (input, key) => {
+    if (!input) return;
+    input.addEventListener('change', (e) => {
+      ensureTextEffectDefaults();
+      saveStateToHistory();
+      to()[key].enabled = e.target.checked;
+      updateTextEffectControls();
+      render();
+    });
+  };
+  toggle(el.textStrokeEnabled, 'stroke');
+  toggle(el.textGradientEnabled, 'gradient');
+  toggle(el.textHighlightEnabled, 'highlight');
+  toggle(el.textShadowEnabled, 'shadow');
+
+  // Outline
+  linkSlider(el.textStrokeWidth, el.textStrokeWidthValue, v => v + 'px', v => to().stroke.width = v);
+  linkColor(el.textStrokeColor, el.textStrokeColorText, v => to().stroke.color = v);
+  // Gradient fill
+  linkColor(el.textGradientColor1, el.textGradientColor1Text, v => to().gradient.color1 = v);
+  linkColor(el.textGradientColor2, el.textGradientColor2Text, v => to().gradient.color2 = v);
+  linkSlider(el.textGradientAngle, el.textGradientAngleValue, v => v + '°', v => to().gradient.angle = v);
+  // Highlight
+  linkColor(el.textHighlightColor, el.textHighlightColorText, v => to().highlight.color = v);
+  linkSlider(el.textHighlightPadding, el.textHighlightPaddingValue, v => v + 'px', v => to().highlight.padding = v);
+  linkSlider(el.textHighlightRadius, el.textHighlightRadiusValue, v => v + 'px', v => to().highlight.radius = v);
+  // Drop shadow
+  linkSlider(el.textShadowBlur, el.textShadowBlurValue, v => v + 'px', v => to().shadow.blur = v);
+  linkSlider(el.textShadowX, el.textShadowXValue, v => v + 'px', v => to().shadow.x = v);
+  linkSlider(el.textShadowY, el.textShadowYValue, v => v + 'px', v => to().shadow.y = v);
+  linkColor(el.textShadowColor, el.textShadowColorText, v => to().shadow.color = v);
+}
+
 function bindWatermark() {
   if (el.watermarkEnabled) el.watermarkEnabled.addEventListener('change', (e) => {
     saveStateToHistory();
@@ -362,6 +431,8 @@ export function updateUIFromState() {
   const set = (e, val) => { if (e) e.value = val; };
   const txt = (e, val) => { if (e) e.textContent = val; };
 
+  ensureTextEffectDefaults();   // backfill v14 text-effect groups on older designs
+
   set(el.brightness, state.imageFilters.brightness); txt(el.brightnessValue, state.imageFilters.brightness + '%');
   set(el.contrast, state.imageFilters.contrast); txt(el.contrastValue, state.imageFilters.contrast + '%');
   set(el.saturation, state.imageFilters.saturation); txt(el.saturationValue, state.imageFilters.saturation + '%');
@@ -407,6 +478,25 @@ export function updateUIFromState() {
     if (el.textBold) el.textBold.checked = state.textOverlay.bold;
     if (el.textItalic) el.textItalic.checked = state.textOverlay.italic;
     updateTextControls();
+
+    const to = state.textOverlay;
+    if (el.textStrokeEnabled) el.textStrokeEnabled.checked = to.stroke.enabled;
+    set(el.textStrokeWidth, to.stroke.width); txt(el.textStrokeWidthValue, to.stroke.width + 'px');
+    set(el.textStrokeColor, to.stroke.color); set(el.textStrokeColorText, to.stroke.color);
+    if (el.textGradientEnabled) el.textGradientEnabled.checked = to.gradient.enabled;
+    set(el.textGradientColor1, to.gradient.color1); set(el.textGradientColor1Text, to.gradient.color1);
+    set(el.textGradientColor2, to.gradient.color2); set(el.textGradientColor2Text, to.gradient.color2);
+    set(el.textGradientAngle, to.gradient.angle); txt(el.textGradientAngleValue, to.gradient.angle + '°');
+    if (el.textHighlightEnabled) el.textHighlightEnabled.checked = to.highlight.enabled;
+    set(el.textHighlightColor, to.highlight.color); set(el.textHighlightColorText, to.highlight.color);
+    set(el.textHighlightPadding, to.highlight.padding); txt(el.textHighlightPaddingValue, to.highlight.padding + 'px');
+    set(el.textHighlightRadius, to.highlight.radius); txt(el.textHighlightRadiusValue, to.highlight.radius + 'px');
+    if (el.textShadowEnabled) el.textShadowEnabled.checked = to.shadow.enabled;
+    set(el.textShadowBlur, to.shadow.blur); txt(el.textShadowBlurValue, to.shadow.blur + 'px');
+    set(el.textShadowX, to.shadow.x); txt(el.textShadowXValue, to.shadow.x + 'px');
+    set(el.textShadowY, to.shadow.y); txt(el.textShadowYValue, to.shadow.y + 'px');
+    set(el.textShadowColor, to.shadow.color); set(el.textShadowColorText, to.shadow.color);
+    updateTextEffectControls();
   }
 
   if (el.watermarkEnabled) {
@@ -424,6 +514,17 @@ export function updateUIFromState() {
     set(el.spotlightOpacity, Math.round(state.spotlight.opacity * 100));
     txt(el.spotlightOpacityValue, Math.round(state.spotlight.opacity * 100) + '%');
     updateSpotlightControls();
+  }
+
+  if (el.reflectionEnabled) {
+    el.reflectionEnabled.checked = state.reflection.enabled;
+    set(el.reflectionOpacity, Math.round(state.reflection.opacity * 100));
+    txt(el.reflectionOpacityValue, Math.round(state.reflection.opacity * 100) + '%');
+    set(el.reflectionLength, Math.round(state.reflection.length * 100));
+    txt(el.reflectionLengthValue, Math.round(state.reflection.length * 100) + '%');
+    set(el.reflectionGap, state.reflection.gap);
+    txt(el.reflectionGapValue, state.reflection.gap + 'px');
+    updateReflectionControls();
   }
 
   set(el.redactType, state.redactType);
@@ -447,8 +548,10 @@ export function bindAllControls() {
   bindDeviceFrame();
   bindShadow();
   bindRedactionSpotlight();
+  bindReflection();
   bindCanvasSize();
   bindText();
+  bindTextEffects();
   bindWatermark();
   bindExportFormat();
   bindAutoLayout();
@@ -458,8 +561,10 @@ export function bindAllControls() {
   updateDeviceFrameSubcontrols();
   updateBorderControls();
   updateTextControls();
+  updateTextEffectControls();
   updateWatermarkControls();
   updateSpotlightControls();
+  updateReflectionControls();
   updateQualityControls();
   updateGradientPreview();
 

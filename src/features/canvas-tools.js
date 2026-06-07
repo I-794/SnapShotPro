@@ -1,4 +1,4 @@
-import { state } from '../state/state.js';
+import { state, imageRegistry } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
@@ -6,6 +6,7 @@ import { drawArrow, drawStroke, annotationBBox } from '../render/annotations.js'
 import { hitTestExtraImageAtPoint } from './extra-images.js';
 import { getCanvasCoords } from '../utils/geometry.js';
 import { activePointers, gesture } from './gesture.js';
+import { snapDragPosition, snapTextCenter, snapExtraImageCenter, clearGuides } from './snapping.js';
 
 let drawing = { active: false, startX: 0, startY: 0, points: [] };
 let dragOffset = { dx: 0, dy: 0 };
@@ -24,6 +25,7 @@ function cancelInteraction() {
   isDraggingAnnotation = false;
   isDraggingExtraImage = false;
   gesture.canvasBusy = false;
+  clearGuides();
   if (capturedPointerId !== null) {
     try { el.previewCanvas.releasePointerCapture(capturedPointerId); } catch (_) {}
     capturedPointerId = null;
@@ -82,6 +84,85 @@ export function deleteSelected() {
     state.selectedRedaction = null;
     render();
   }
+}
+
+// v14 — resolve the currently "selected" element into a uniform handle: its
+// bounding box (canvas px) and a moveTo(x,y) that repositions its top-left.
+// Priority: annotation → redaction → extra image → text overlay (there is no
+// multi-select, so one element is active at a time).
+function selectedTarget() {
+  const canvas = el.previewCanvas;
+  const cw = canvas.width, ch = canvas.height;
+
+  if (state.selectedAnnotation !== null && state.annotations[state.selectedAnnotation]) {
+    const ann = state.annotations[state.selectedAnnotation];
+    const bb = annotationBBox(ann);
+    return { box: bb, moveTo(nx, ny) {
+      const sx = nx - bb.x, sy = ny - bb.y;
+      if (Array.isArray(ann.points)) ann.points.forEach(p => { p.x += sx; p.y += sy; });
+      ann.x1 += sx; ann.y1 += sy; ann.x2 += sx; ann.y2 += sy;
+    } };
+  }
+  if (state.selectedRedaction !== null && state.redactions[state.selectedRedaction]) {
+    const r = state.redactions[state.selectedRedaction];
+    return { box: { x: r.x, y: r.y, w: r.w, h: r.h }, moveTo(nx, ny) { r.x = nx; r.y = ny; } };
+  }
+  if (state.selectedExtraImage !== null) {
+    const ei = state.extraImages.find(e => e.id === state.selectedExtraImage);
+    const img = ei && imageRegistry[ei.id];
+    if (ei && img) {
+      const w = img.width * ei.scaleFrac, h = img.height * ei.scaleFrac;
+      return { box: { x: cw * ei.xFrac - w / 2, y: ch * ei.yFrac - h / 2, w, h }, moveTo(nx, ny) {
+        ei.xFrac = (nx + w / 2) / cw; ei.yFrac = (ny + h / 2) / ch;
+      } };
+    }
+  }
+  if (state.textOverlay.enabled && state.textOverlay.content) {
+    const t = state.textOverlay;
+    const ctx = canvas.getContext('2d');
+    let f = '';
+    if (t.italic) f += 'italic ';
+    if (t.bold) f += 'bold ';
+    ctx.save(); ctx.font = `${f}${t.size}px ${t.font}`;
+    const w = ctx.measureText(t.content).width; ctx.restore();
+    const h = t.size;
+    return { box: { x: cw * t.x - w / 2, y: ch * t.y - h / 2, w, h }, moveTo(nx, ny) {
+      t.x = (nx + w / 2) / cw; t.y = (ny + h / 2) / ch;
+    } };
+  }
+  return null;
+}
+
+// Arrow-key nudge of the selected element by (dx,dy) canvas px. `save` records a
+// single history entry at the start of a key-repeat burst. Returns whether
+// anything moved (so the caller can decide to preventDefault).
+export function nudgeSelected(dx, dy, save) {
+  const t = selectedTarget();
+  if (!t) return false;
+  if (save) saveStateToHistory();
+  t.moveTo(t.box.x + dx, t.box.y + dy);
+  render();
+  return true;
+}
+
+// Align the selected element's bounding box to the canvas.
+export function alignSelectedToCanvas(how) {
+  const canvas = el.previewCanvas;
+  const t = selectedTarget();
+  if (!t) return;
+  saveStateToHistory();
+  const { box } = t;
+  let nx = box.x, ny = box.y;
+  switch (how) {
+    case 'left':    nx = 0; break;
+    case 'hcenter': nx = (canvas.width - box.w) / 2; break;
+    case 'right':   nx = canvas.width - box.w; break;
+    case 'top':     ny = 0; break;
+    case 'vcenter': ny = (canvas.height - box.h) / 2; break;
+    case 'bottom':  ny = canvas.height - box.h; break;
+  }
+  t.moveTo(nx, ny);
+  render();
 }
 
 function drawPreviewAnnotation(startX, startY, curX, curY) {
@@ -218,8 +299,9 @@ function canvasMouseMove(e) {
   const { x, y } = getCanvasCoords(e, canvas);
 
   if (isDraggingText) {
-    state.textOverlay.x = Math.max(0, Math.min(1, (x - textDragOffset.dx) / canvas.width));
-    state.textOverlay.y = Math.max(0, Math.min(1, (y - textDragOffset.dy) / canvas.height));
+    const { cx, cy } = snapTextCenter(x - textDragOffset.dx, y - textDragOffset.dy, canvas);
+    state.textOverlay.x = Math.max(0, Math.min(1, cx / canvas.width));
+    state.textOverlay.y = Math.max(0, Math.min(1, cy / canvas.height));
     render();
     return;
   }
@@ -227,8 +309,10 @@ function canvasMouseMove(e) {
   if (isDraggingExtraImage && state.selectedExtraImage !== null) {
     const eiIdx = state.extraImages.findIndex(ei => ei.id === state.selectedExtraImage);
     if (eiIdx !== -1) {
-      state.extraImages[eiIdx].xFrac = Math.max(0, Math.min(1, (x - dragOffset.dx) / canvas.width));
-      state.extraImages[eiIdx].yFrac = Math.max(0, Math.min(1, (y - dragOffset.dy) / canvas.height));
+      const ei = state.extraImages[eiIdx];
+      const { cx, cy } = snapExtraImageCenter(ei, x - dragOffset.dx, y - dragOffset.dy, canvas);
+      ei.xFrac = Math.max(0, Math.min(1, cx / canvas.width));
+      ei.yFrac = Math.max(0, Math.min(1, cy / canvas.height));
       render();
     }
     return;
@@ -237,24 +321,26 @@ function canvasMouseMove(e) {
   if (state.tool === 'select' && isDraggingAnnotation) {
     if (state.selectedAnnotation !== null && state.annotations[state.selectedAnnotation]) {
       const ann = state.annotations[state.selectedAnnotation];
-      const newX1 = x - dragOffset.dx;
-      const newY1 = y - dragOffset.dy;
-      const shiftX = newX1 - ann.x1;
-      const shiftY = newY1 - ann.y1;
+      // Intended move, then snap the resulting bounding box to canvas/peers.
+      const bb = annotationBBox(ann);
+      let shiftX = (x - dragOffset.dx) - ann.x1;
+      let shiftY = (y - dragOffset.dy) - ann.y1;
+      const snapped = snapDragPosition('annotation',
+        { x: bb.x + shiftX, y: bb.y + shiftY, w: bb.w, h: bb.h }, canvas, state.selectedAnnotation);
+      shiftX += snapped.x - (bb.x + shiftX);
+      shiftY += snapped.y - (bb.y + shiftY);
       if ((ann.type === 'pen' || ann.type === 'highlighter') && Array.isArray(ann.points)) {
         ann.points.forEach(p => { p.x += shiftX; p.y += shiftY; });
       }
-      const dx = ann.x2 - ann.x1;
-      const dy = ann.y2 - ann.y1;
-      ann.x1 = newX1;
-      ann.y1 = newY1;
-      ann.x2 = ann.x1 + dx;
-      ann.y2 = ann.y1 + dy;
+      ann.x1 += shiftX; ann.y1 += shiftY;
+      ann.x2 += shiftX; ann.y2 += shiftY;
       render();
     } else if (state.selectedRedaction !== null && state.redactions[state.selectedRedaction]) {
       const r = state.redactions[state.selectedRedaction];
-      r.x = x - dragOffset.dx;
-      r.y = y - dragOffset.dy;
+      const snapped = snapDragPosition('redaction',
+        { x: x - dragOffset.dx, y: y - dragOffset.dy, w: r.w, h: r.h }, canvas, state.selectedRedaction);
+      r.x = snapped.x;
+      r.y = snapped.y;
       render();
     }
     return;
@@ -279,10 +365,12 @@ function canvasMouseMove(e) {
 function canvasMouseUp(e) {
   canvasUpLogic(e);
   gesture.canvasBusy = false;
+  clearGuides();
   if (capturedPointerId !== null) {
     try { el.previewCanvas.releasePointerCapture(capturedPointerId); } catch (_) {}
     capturedPointerId = null;
   }
+  render();
 }
 
 function canvasUpLogic(e) {
@@ -421,5 +509,10 @@ export function bindCanvasTools() {
     state.annotations = [];
     state.selectedAnnotation = null;
     render();
+  });
+
+  // v14 — align the selected element to the canvas.
+  document.querySelectorAll('.align-canvas-btn[data-align-canvas]').forEach(btn => {
+    btn.addEventListener('click', () => alignSelectedToCanvas(btn.dataset.alignCanvas));
   });
 }

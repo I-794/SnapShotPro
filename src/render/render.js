@@ -16,6 +16,8 @@ import { getAnimationState } from '../features/animation.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { bakePerspective } from './perspective.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
+import { drawGuides } from '../features/snapping.js';
+import { drawReflection } from './reflection.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -81,6 +83,12 @@ export function renderInto(canvas, forExport) {
       drawAnnotations(octx);
       renderExtraImages(octx, off);
 
+      // v14 — reflection of the whole device, drawn into the offscreen so it
+      // inherits the 3D tilt when the device is baked with perspective.
+      if (state.reflection && state.reflection.enabled && out.bounds) {
+        drawReflection(octx, off, out.bounds);
+      }
+
       const t = state.tilt3d;
       if (t && (t.rx || t.ry || t.rz)) {
         bakePerspective(ctx, off, t, { fit: true, margin: Math.max(20, state.padding) });
@@ -88,6 +96,7 @@ export function renderInto(canvas, forExport) {
         ctx.drawImage(off, 0, 0);
       }
 
+      if (!forExport) drawGuides(ctx);
       drawTextOverlay(ctx, canvas);
       drawWatermark(ctx, canvas);
       drawLogo(ctx, canvas);
@@ -160,6 +169,12 @@ export function renderInto(canvas, forExport) {
   drawAnnotations(ctx);
   renderExtraImages(ctx, canvas);
   if (animState) ctx.restore();
+
+  // v14 — mirrored reflection of the framed subject, below it.
+  if (state.reflection && state.reflection.enabled && state.lastImageRect) {
+    drawReflection(ctx, canvas, state.lastImageRect);
+  }
+  if (!forExport) drawGuides(ctx);
 
   drawTextOverlay(ctx, canvas);
   drawWatermark(ctx, canvas);
