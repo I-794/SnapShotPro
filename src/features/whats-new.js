@@ -10,17 +10,16 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '15';
+const CURRENT_VERSION = '15.1';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
+// Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v15",
+  heading: "What's new in v15.1",
   items: [
-    { title: 'Layer blend modes',
-      desc: 'Composite any layer with multiply, screen, overlay and more, straight from the layers panel.' },
-    { title: 'Per-layer opacity',
-      desc: 'Dial in the opacity of the main image, an annotation, an added image, or text on its own.' },
+    { title: 'Timeline scrubber',
+      desc: 'Trim clips on a filmstrip with drag handles and a playhead. Snaps to frames; , and . step a frame.' },
     { title: 'Export controls',
       desc: 'Choose the resolution, quality, and looping when you export a clip as MP4 or GIF.' }
   ]
