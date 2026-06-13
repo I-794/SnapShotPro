@@ -20,7 +20,9 @@ const WHATS_NEW = {
     { title: 'Layer blend modes',
       desc: 'Composite any layer with multiply, screen, overlay and more, straight from the layers panel.' },
     { title: 'Per-layer opacity',
-      desc: 'Dial in the opacity of the main image, an annotation, an added image, or text on its own.' }
+      desc: 'Dial in the opacity of the main image, an annotation, an added image, or text on its own.' },
+    { title: 'Export controls',
+      desc: 'Choose the resolution, quality, and looping when you export a clip as MP4 or GIF.' }
   ]
 };
 
