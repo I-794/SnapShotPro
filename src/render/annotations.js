@@ -1,10 +1,16 @@
 import { state } from '../state/state.js';
 import { hexToRgba } from '../utils/color.js';
+import { withLayer } from './blend.js';
 
 export function drawAnnotations(ctx) {
   if (!state.annotations) return;
   state.annotations.forEach((ann, idx) => {
     if (ann.visible === false) return;
+    withLayer(ctx, ann, () => drawAnnotation(ctx, ann, idx));
+  });
+}
+
+function drawAnnotation(ctx, ann, idx) {
     ctx.save();
     ctx.strokeStyle = ann.color;
     ctx.fillStyle = ann.color;
@@ -59,7 +65,6 @@ export function drawAnnotations(ctx) {
     }
 
     ctx.restore();
-  });
 }
 
 export function drawStroke(ctx, ann) {

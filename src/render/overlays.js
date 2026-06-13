@@ -1,9 +1,14 @@
 import { state, brandAssets } from '../state/state.js';
 import { roundRectPath } from '../utils/geometry.js';
+import { withLayer } from './blend.js';
 
 export function drawTextOverlay(ctx, canvas) {
   const t = state.textOverlay;
   if (!t.enabled || !t.content) return;
+  withLayer(ctx, t, () => drawTextOverlayBody(ctx, canvas, t));
+}
+
+function drawTextOverlayBody(ctx, canvas, t) {
 
   // v14 — effect sub-objects. `|| {}` keeps pre-v14 saves (which lack these)
   // rendering: an absent group reads as disabled.

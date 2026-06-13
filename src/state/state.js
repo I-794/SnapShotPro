@@ -7,6 +7,10 @@ export const state = {
   svgCode: null,
   imageTransform: { rotation: 0, flipH: false, flipV: false },
   imageFilters: { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0 },
+  // v15.0 — blend mode + opacity for the main screenshot layer. Per-item blend/
+  // opacity for annotations / extra images / the text overlay ride on those
+  // objects themselves. Defaults are no-ops so pre-v15 designs render unchanged.
+  imageLayer: { blend: 'source-over', opacity: 100 },
   textOverlay: {
     enabled: false, content: '', size: 48, font: 'Arial', color: '#ffffff', bold: false, italic: false, x: 0.5, y: 0.5,
     // v14 — richer text effects. All default off; pre-v14 saves lack these and

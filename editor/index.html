@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v14 · Pro Editor</title>
+    <title>SnapShot-Pro v15 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v14</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v15</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -796,6 +796,17 @@
         <div class="layers-list" id="layers-list">
             <div class="layers-empty">Load an image to see layers</div>
         </div>
+        <div class="layers-footer" id="layers-footer" hidden>
+            <label class="layers-footer-row">
+                <span>Blend</span>
+                <select id="layer-blend"></select>
+            </label>
+            <label class="layers-footer-row">
+                <span>Opacity</span>
+                <input type="range" id="layer-opacity" min="0" max="100" step="1" value="100">
+                <output id="layer-opacity-value">100%</output>
+            </label>
+        </div>
     </aside>
 
 <div class="status-pill" id="status-pill"></div>
@@ -889,6 +900,16 @@
                 <button class="btn btn-primary" id="welcome-next">Next</button>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="whatsnew-toast" id="whatsnew-toast" role="status" aria-live="polite">
+    <button class="whatsnew-close" id="whatsnew-close" aria-label="Dismiss">✕</button>
+    <div class="whatsnew-head"><span class="whatsnew-spark">✨</span><h3 id="whatsnew-heading"></h3></div>
+    <ul class="whatsnew-list" id="whatsnew-list"></ul>
+    <div class="whatsnew-actions">
+        <a class="whatsnew-link" id="whatsnew-changelog" href="/changelog/" target="_blank" rel="noopener">See full changelog →</a>
+        <button class="btn btn-primary" id="whatsnew-got">Got it</button>
     </div>
 </div>
 

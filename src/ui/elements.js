@@ -84,6 +84,7 @@ const IDS = [
 
   // v4 — layers, history, palette, zoom, stickers, tilt, scenes
   'layers-panel', 'layers-list', 'layers-toggle-btn',
+  'layers-footer', 'layer-blend', 'layer-opacity', 'layer-opacity-value',
   'history-track', 'history-position', 'history-undo-btn', 'history-redo-btn',
   'palette-overlay', 'palette-input', 'palette-results',
   'canvas-viewport', 'zoom-controls', 'zoom-label', 'zoom-in', 'zoom-out', 'zoom-fit',

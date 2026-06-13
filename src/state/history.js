@@ -11,6 +11,7 @@ function snapshot() {
   return JSON.parse(JSON.stringify({
     imageTransform: state.imageTransform,
     imageFilters: state.imageFilters,
+    imageLayer: state.imageLayer,
     textOverlay: state.textOverlay,
     windowOverlay: state.windowOverlay,
     watermark: state.watermark,
