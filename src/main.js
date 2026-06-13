@@ -49,6 +49,7 @@ import { bindAnimation } from './features/animation.js';
 import { bindGifExport } from './features/gif-export.js';
 import { bindVideo } from './features/video.js';
 import { bindVideoExport } from './features/video-export.js';
+import { bindTimeline } from './features/timeline.js';
 import { bindScreenRecord } from './features/screen-record.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { bindKeyboard } from './features/keyboard.js';
@@ -123,6 +124,7 @@ function init() {
   bindGifExport();
   bindVideo();
   bindVideoExport();
+  bindTimeline();
   bindScreenRecord();
   registerCommands();
   bindPalette();

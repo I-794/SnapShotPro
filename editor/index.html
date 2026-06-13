@@ -233,9 +233,22 @@
                     <button class="btn btn-secondary" style="flex:2;" id="video-play-btn">▶ Play</button>
                     <button class="btn btn-secondary" style="flex:1;" id="video-remove-btn">Remove</button>
                 </div>
-                <div class="control-group"><label class="control-label">Trim start <span class="range-value" id="video-in-label">0.00s</span></label><input type="range" class="range-input" id="video-in" min="0" max="10" step="0.05" value="0"></div>
-                <div class="control-group"><label class="control-label">Trim end <span class="range-value" id="video-out-label">0.00s</span></label><input type="range" class="range-input" id="video-out" min="0" max="10" step="0.05" value="10"></div>
-                <p class="info-text" id="video-duration-label" style="margin-bottom:10px;">Clip: 0.00s</p>
+                <div class="control-group">
+                    <label class="control-label">Trim &amp; scrub</label>
+                    <div class="vtimeline" id="video-timeline">
+                        <div class="vtimeline-strip" id="video-filmstrip"></div>
+                        <div class="vtimeline-region" id="video-trim-region"></div>
+                        <div class="vtimeline-handle vts-handle" id="video-handle-in" title="Trim start"></div>
+                        <div class="vtimeline-handle vts-handle" id="video-handle-out" title="Trim end"></div>
+                        <div class="vtimeline-playhead" id="video-playhead"></div>
+                    </div>
+                    <div class="vtimeline-labels">
+                        <span id="video-in-label">0.00s · f0</span>
+                        <span id="video-duration-label">Clip: 0.00s</span>
+                        <span id="video-out-label">0.00s · f0</span>
+                    </div>
+                    <p class="info-text" style="margin-top:6px;">Drag the ends to trim, drag the body to scrub. <kbd>,</kbd> <kbd>.</kbd> step a frame, <kbd>[</kbd> <kbd>]</kbd> set in/out.</p>
+                </div>
                 <div class="control-group"><label class="control-label">Frame rate</label><select class="control-input" id="video-fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
                 <div class="control-group"><label class="control-label">Resolution</label><select class="control-input" id="motion-resolution"><option value="0.5">0.5× (smaller file)</option><option value="1" selected>1× (design size)</option><option value="2">2× (sharper)</option></select></div>
                 <div class="control-group"><label class="control-label">Quality</label><select class="control-input" id="motion-quality"><option value="low">Low</option><option value="high" selected>High</option><option value="max">Max</option></select></div>
