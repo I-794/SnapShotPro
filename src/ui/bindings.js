@@ -6,6 +6,7 @@ import { gradientPresets, shadowPresets, sizePresets } from '../state/presets.js
 import { isValidHex } from '../utils/color.js';
 import { applyMeshPreset, renderMeshPad } from '../features/mesh-pad.js';
 import { renderGradientEditor, syncFromGradientState } from '../features/gradient-editor.js';
+import { syncMotionExportControls } from '../features/video-export.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -441,6 +442,8 @@ export function updateUIFromState() {
 
   ensureTextEffectDefaults();   // backfill v14 text-effect groups on older designs
   ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
+  if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
+  syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 
   set(el.brightness, state.imageFilters.brightness); txt(el.brightnessValue, state.imageFilters.brightness + '%');
   set(el.contrast, state.imageFilters.contrast); txt(el.contrastValue, state.imageFilters.contrast + '%');

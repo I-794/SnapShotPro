@@ -117,10 +117,12 @@ export async function encodeGif(frameProvider, { width, height, fps, count, qual
   for (let i = 0; i < count; i++) {
     const src = await frameProvider(i);
     // gif.addFrame samples the canvas async during render, so hand it a copy —
-    // the caller reuses its render canvas across frames.
+    // the caller reuses its render canvas across frames. Scale src to the target
+    // size so a resolution multiplier (src at design size, target larger) fills
+    // the frame; for the 1× case this is a straight same-size copy.
     const copy = document.createElement('canvas');
     copy.width = width; copy.height = height;
-    copy.getContext('2d').drawImage(src, 0, 0);
+    copy.getContext('2d').drawImage(src, 0, 0, width, height);
     gif.addFrame(copy, { delay: 1000 / fps, copy: true });
     if (onCapture && i % 5 === 0) onCapture(i + 1, count);
   }

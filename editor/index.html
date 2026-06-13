@@ -237,6 +237,9 @@
                 <div class="control-group"><label class="control-label">Trim end <span class="range-value" id="video-out-label">0.00s</span></label><input type="range" class="range-input" id="video-out" min="0" max="10" step="0.05" value="10"></div>
                 <p class="info-text" id="video-duration-label" style="margin-bottom:10px;">Clip: 0.00s</p>
                 <div class="control-group"><label class="control-label">Frame rate</label><select class="control-input" id="video-fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
+                <div class="control-group"><label class="control-label">Resolution</label><select class="control-input" id="motion-resolution"><option value="0.5">0.5× (smaller file)</option><option value="1" selected>1× (design size)</option><option value="2">2× (sharper)</option></select></div>
+                <div class="control-group"><label class="control-label">Quality</label><select class="control-input" id="motion-quality"><option value="low">Low</option><option value="high" selected>High</option><option value="max">Max</option></select></div>
+                <div class="control-group"><label class="control-label">GIF loop</label><select class="control-input" id="motion-loop"><option value="0" selected>Loop forever</option><option value="-1">Play once</option></select></div>
                 <div style="display:flex;gap:6px;">
                     <button class="btn btn-primary" style="flex:1;" id="video-mp4-btn">⬇ MP4</button>
                     <button class="btn btn-secondary" style="flex:1;" id="video-gif-btn">⬇ GIF</button>

@@ -23,6 +23,11 @@ export const state = {
   windowOverlay: { enabled: false, style: 'macos', title: 'Screenshot', height: 40, showControls: true },
   watermark: { enabled: false, text: '', position: 'bottom-right', size: 16, opacity: 50, color: '#ffffff' },
   exportSettings: { format: 'png', quality: 92 },
+  // v15.1 — motion (MP4/GIF) export controls. resolution multiplies the encode
+  // canvas (render stays design-size); quality maps to MP4 bitrate / gif.js
+  // quality; loop is gif.js `repeat` (-1 = once, 0 = forever). fps stays on
+  // state.video.fps (the existing Frame rate control).
+  exportMotion: { resolution: 1, quality: 'high', loop: 0 },
   gradient: { type: 'linear', angle: 135, colors: ['#667eea', '#764ba2'], positions: [0, 100] },
   padding: 60,
   scale: 100,

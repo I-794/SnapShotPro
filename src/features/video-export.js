@@ -28,6 +28,17 @@ function frameTimes() {
   return { times, fps };
 }
 
+// Export controls (resolution multiplier, quality preset, GIF loop). Read with
+// fallbacks so an Object.assign project restore that drops the key is safe.
+function motionOpts() {
+  const m = state.exportMotion || {};
+  return {
+    resolution: m.resolution || 1,
+    quality: m.quality || 'high',
+    loop: m.loop != null ? m.loop : 0
+  };
+}
+
 export async function exportVideoMp4() {
   if (!state.video.loaded) { showNotification('Load a clip first.', 'error'); return; }
   if (!mp4Supported()) {
@@ -35,7 +46,8 @@ export async function exportVideoMp4() {
     return;
   }
   const { seekTo } = getVideoContext();
-  const width = state.canvas.width, height = state.canvas.height;
+  const { resolution, quality } = motionOpts();
+  const width = state.canvas.width * resolution, height = state.canvas.height * resolution;
   const { times, fps } = frameTimes();
 
   // renderInto resizes its target canvas to state.canvas (which may be odd), so
@@ -51,7 +63,7 @@ export async function exportVideoMp4() {
       renderInto(renderCanvas, true);
       return renderCanvas;
     }, {
-      width, height, fps, count: times.length,
+      width, height, fps, count: times.length, quality,
       onProgress: (n, total) => setProgress(`Encoding ${n}/${total}…`),
       onCaptured: () => setProgress('Finalizing…')
     });
@@ -73,9 +85,11 @@ export async function exportVideoMp4() {
 export async function exportVideoGif() {
   if (!state.video.loaded) { showNotification('Load a clip first.', 'error'); return; }
   const { seekTo } = getVideoContext();
-  const width = state.canvas.width, height = state.canvas.height;
-  const exportCanvas = document.createElement('canvas');
-  exportCanvas.width = width; exportCanvas.height = height;
+  const { resolution, quality, loop } = motionOpts();
+  // Render at design size; the encoder scales each frame to the target size.
+  const renderCanvas = document.createElement('canvas');
+  renderCanvas.width = state.canvas.width; renderCanvas.height = state.canvas.height;
+  const width = state.canvas.width * resolution, height = state.canvas.height * resolution;
   // GIFs are heavy — cap fps lower than MP4.
   const fps = Math.min(20, state.video.fps || 20);
   const span = Math.min(state.video.out - state.video.in, MAX_DURATION);
@@ -85,10 +99,10 @@ export async function exportVideoGif() {
   try {
     const blob = await encodeGif(async (i) => {
       await seekTo(state.video.in + i / fps);
-      renderInto(exportCanvas, true);
-      return exportCanvas;
+      renderInto(renderCanvas, true);
+      return renderCanvas;
     }, {
-      width, height, fps, count,
+      width, height, fps, count, quality, loop,
       onCapture: (n, total) => setProgress(`Capturing ${n}/${total}…`),
       onProgress: (p) => setProgress(`Encoding ${Math.round(p * 100)}%…`)
     });
@@ -102,9 +116,30 @@ export async function exportVideoGif() {
   }
 }
 
+// Reflect state.exportMotion into the three control selects. Called on bind and
+// whenever the UI re-syncs from state (e.g. after loading a project).
+export function syncMotionExportControls() {
+  const m = state.exportMotion || {};
+  const res = document.getElementById('motion-resolution');
+  const q = document.getElementById('motion-quality');
+  const loop = document.getElementById('motion-loop');
+  if (res) res.value = String(m.resolution ?? 1);
+  if (q) q.value = m.quality || 'high';
+  if (loop) loop.value = String(m.loop ?? 0);
+}
+
 export function bindVideoExport() {
   const mp4 = document.getElementById('video-mp4-btn');
   const gif = document.getElementById('video-gif-btn');
   if (mp4) mp4.addEventListener('click', exportVideoMp4);
   if (gif) gif.addEventListener('click', exportVideoGif);
+
+  if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
+  const res = document.getElementById('motion-resolution');
+  const q = document.getElementById('motion-quality');
+  const loop = document.getElementById('motion-loop');
+  if (res) res.addEventListener('change', (e) => { state.exportMotion.resolution = parseFloat(e.target.value); });
+  if (q) q.addEventListener('change', (e) => { state.exportMotion.quality = e.target.value; });
+  if (loop) loop.addEventListener('change', (e) => { state.exportMotion.loop = parseInt(e.target.value, 10); });
+  syncMotionExportControls();
 }

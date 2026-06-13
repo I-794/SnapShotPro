@@ -34,7 +34,7 @@ export const SCHEMA_VERSION = 12;
 export const PROJECT_FIELDS = [
   ...SERIALIZED_FIELDS,
   'windowOverlay', 'annotationColor', 'annotationStrokeWidth', 'nextNumber',
-  'redactType', 'redactIntensity', 'logo', 'exportSettings'
+  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion'
 ];
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the
