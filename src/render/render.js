@@ -18,6 +18,7 @@ import { bakePerspective } from './perspective.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
 import { drawGuides } from '../features/snapping.js';
 import { drawReflection } from './reflection.js';
+import { withLayer } from './blend.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -156,7 +157,7 @@ export function renderInto(canvas, forExport) {
     }
   }
 
-  drawImageContent(ctx, x, y, imgWidth, imgHeight);
+  withLayer(ctx, state.imageLayer, () => drawImageContent(ctx, x, y, imgWidth, imgHeight));
 
   if (state.showBorder) drawBorder(ctx, x, y, imgWidth, imgHeight);
 

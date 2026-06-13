@@ -3,6 +3,7 @@ import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { escapeHTML } from '../utils/dom.js';
+import { BLEND_MODES } from '../render/blend.js';
 
 function buildLayerList() {
   const layers = [];
@@ -43,6 +44,7 @@ export function renderLayersPanel() {
   const layers = buildLayerList();
   if (layers.length === 0) {
     list.innerHTML = '<div class="layers-empty">Load an image to see layers</div>';
+    updateLayerStyleControls();
     return;
   }
   const reversed = layers.slice().reverse();
@@ -99,6 +101,68 @@ export function renderLayersPanel() {
       if (act === 'lock') toggleLayerLock(id);
     });
   });
+  updateLayerStyleControls();
+}
+
+// ── v15.0 — per-layer blend mode + opacity (layers panel footer) ──────────────
+// Map a layer id to the object that actually carries the `blend`/`opacity`
+// fields. The main image keeps them on a dedicated `state.imageLayer`; text /
+// extra images / annotations carry them on the layer object itself. Other
+// layer kinds (redaction, spotlight, watermark) don't support layer styles.
+function styleTargetFor(id) {
+  if (id === 'L:image') return state.imageLayer;
+  if (id === 'L:text') return state.textOverlay;
+  const f = findLayerRef(id);
+  if (f && (f.kind === 'extra' || f.kind === 'ann')) return f.ref;
+  return null;
+}
+
+function currentStyleTarget() {
+  const ids = state.selection.layerIds;
+  if (ids.length !== 1) return null;
+  return styleTargetFor(ids[0]);
+}
+
+// Show the footer only for a single selection that supports layer styles, and
+// sync the controls to that layer's current values.
+function updateLayerStyleControls() {
+  const footer = el.layersFooter;
+  if (!footer) return;
+  const tgt = currentStyleTarget();
+  if (!tgt) { footer.hidden = true; return; }
+  footer.hidden = false;
+  const opacity = tgt.opacity != null ? tgt.opacity : 100;
+  if (el.layerBlend) el.layerBlend.value = tgt.blend || 'source-over';
+  if (el.layerOpacity) el.layerOpacity.value = opacity;
+  if (el.layerOpacityValue) el.layerOpacityValue.textContent = opacity + '%';
+}
+
+function bindLayerStyleControls() {
+  if (el.layerBlend) {
+    el.layerBlend.innerHTML = BLEND_MODES.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    el.layerBlend.addEventListener('change', (e) => {
+      const tgt = currentStyleTarget();
+      if (!tgt) return;
+      saveStateToHistory();
+      tgt.blend = e.target.value;
+      render();
+    });
+  }
+  if (el.layerOpacity) {
+    // Live preview on drag; commit one history entry on release (matches the
+    // linkSlider convention used by the rest of the editor's sliders).
+    el.layerOpacity.addEventListener('input', (e) => {
+      const tgt = currentStyleTarget();
+      if (!tgt) return;
+      const v = parseInt(e.target.value, 10);
+      tgt.opacity = v;
+      if (el.layerOpacityValue) el.layerOpacityValue.textContent = v + '%';
+      render();
+    });
+    el.layerOpacity.addEventListener('change', () => {
+      if (currentStyleTarget()) saveStateToHistory();
+    });
+  }
 }
 
 function findLayerRef(id) {
@@ -173,6 +237,7 @@ export function toggleLayersPanel() {
 
 export function bindLayersEvents() {
   if (el.layersToggleBtn) el.layersToggleBtn.addEventListener('click', toggleLayersPanel);
+  bindLayerStyleControls();
 }
 
 export function altSelectAt(e) {

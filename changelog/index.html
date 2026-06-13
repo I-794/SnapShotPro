@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v14 with alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v15 with layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v14.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v15.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -133,21 +133,17 @@
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v14 · June 2026</div>
-                <h2>Alignment, reflections, and text effects</h2>
-                <p class="spot-lede">A polish release. Place elements precisely with snapping guides, drop a glossy reflection under any device, and style text with outlines, gradients, highlights, and shadows.</p>
+                <div class="spot-ver">v15 · June 2026</div>
+                <h2>Layer blending and opacity</h2>
+                <p class="spot-lede">Composite like a real image editor. Give any layer a blend mode, from multiply and screen to overlay and luminosity, and set its opacity on its own.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.5"/></svg></span>
-                        <div><strong>Snapping and alignment guides</strong><span>Drag an element and it snaps to the canvas center, edges, and other elements, with live guide lines. Nudge with the arrow keys or align to the canvas in one click.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="12" r="6"/><circle cx="14.5" cy="12" r="6"/></svg></span>
+                        <div><strong>Layer blend modes</strong><span>Ten curated modes, from multiply and screen to overlay, color dodge, and luminosity. Set one on the main image, an annotation, an added image, or text, right from the layers panel.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M8 8.5 12 4l4 4.5"/><path d="M8 15.5 12 20l4-4.5" opacity="0.45"/></svg></span>
-                        <div><strong>Device reflection</strong><span>Add a soft mirrored reflection under any device mockup or framed screenshot for a premium product-shot look, with tunable opacity, length, and gap.</span></div>
-                    </div>
-                    <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 10.5 5l5.5 14"/><path d="M7.2 13.5h6.6"/><path d="M18 7h3m-1.5-1.5v3" opacity="0.55"/></svg></span>
-                        <div><strong>Richer text effects</strong><span>Give text overlays an outline, gradient fill, highlight box, or drop shadow, on their own or combined, with the layering handled for you.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></span>
+                        <div><strong>Per-layer opacity</strong><span>Dial the strength of any single layer with a slider, so you can fade a watermark, soften an overlay, or ghost an image without touching the rest of the design.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -159,7 +155,7 @@
                 <div>
                     <div class="spot-browser">
                         <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                        <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Steel_Vengeance_01.jpg/1280px-Steel_Vengeance_01.jpg" alt="A screenshot framed inside the SnapShot-Pro studio, with a glossy reflection beneath it" loading="eager" width="1280" height="853">
+                        <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Steel_Vengeance_01.jpg/1280px-Steel_Vengeance_01.jpg" alt="A screenshot framed inside the SnapShot-Pro studio, with blended layers composited over it" loading="eager" width="1280" height="853">
                     </div>
                     <p style="margin-top:10px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Steel Vengeance, Cedar Point. Jeremy Thompson, <a href="https://creativecommons.org/licenses/by/2.0/" style="color:rgba(255,255,255,0.82);">CC BY 2.0</a></p>
                 </div>
@@ -174,6 +170,16 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v15</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Layer blending and opacity</h2>
+                    <ul class="changes">
+                        <li><b>Layer blend modes.</b> Any layer can now composite with a blend mode instead of just stacking on top. Ten curated modes ship: normal, multiply, screen, overlay, soft light, hard light, color dodge, color burn, difference, and luminosity. Set one on the main screenshot, an annotation, an added image, or a text overlay, straight from the layers panel.</li>
+                        <li><b>Per-layer opacity.</b> Each layer has its own opacity slider, so you can fade a watermark, soften an overlay, or ghost an added image without changing anything else. Blend mode and opacity ride along in saved projects and version history, and both are undoable. Designs saved before v15 render unchanged.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v14</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Alignment, reflections, and text effects</h2>
@@ -317,7 +323,7 @@
             <a href="/editor/">Open studio</a>
             <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a>
         </div>
-        <div class="foot-note">Free &amp; open source · v14</div>
+        <div class="foot-note">Free &amp; open source · v15</div>
     </div>
 </footer>
 

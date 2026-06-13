@@ -56,6 +56,7 @@ import { bindAllControls, updateUIFromState } from './ui/bindings.js';
 import { bindMobileNav } from './ui/mobile-nav.js';
 import { bindStudioNav } from './features/studio-nav.js';
 import { bindWelcome } from './features/welcome.js';
+import { bindWhatsNew } from './features/whats-new.js';
 
 function bindHeader() {
   el.themeToggleBtn.addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
@@ -130,6 +131,7 @@ function init() {
   bindMobileNav();
   bindStudioNav();
   bindWelcome();
+  bindWhatsNew();
 
   setInitialActivePresets();
   renderMeshPad();

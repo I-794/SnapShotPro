@@ -97,6 +97,14 @@ function ensureTextEffectDefaults() {
   if (!t.shadow) t.shadow = { enabled: false, blur: 6, x: 2, y: 2, color: '#000000' };
 }
 
+// v15.0 — restore the main-image layer style on designs saved before v15 (an
+// Object.assign restore drops any key the saved object lacks). Per-item blend/
+// opacity on annotations / extra images / text are optional and read as no-ops
+// when absent, so only the dedicated imageLayer object needs backfilling.
+function ensureLayerStyleDefaults() {
+  if (!state.imageLayer) state.imageLayer = { blend: 'source-over', opacity: 100 };
+}
+
 function updateTextEffectControls() {
   if (el.textStrokeControls) el.textStrokeControls.style.display = state.textOverlay.stroke?.enabled ? 'block' : 'none';
   if (el.textGradientControls) el.textGradientControls.style.display = state.textOverlay.gradient?.enabled ? 'block' : 'none';
@@ -432,6 +440,7 @@ export function updateUIFromState() {
   const txt = (e, val) => { if (e) e.textContent = val; };
 
   ensureTextEffectDefaults();   // backfill v14 text-effect groups on older designs
+  ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
 
   set(el.brightness, state.imageFilters.brightness); txt(el.brightnessValue, state.imageFilters.brightness + '%');
   set(el.contrast, state.imageFilters.contrast); txt(el.contrastValue, state.imageFilters.contrast + '%');

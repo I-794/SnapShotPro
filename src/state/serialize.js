@@ -9,7 +9,7 @@
 import { state } from './state.js';
 
 export const SERIALIZED_FIELDS = [
-  'imageTransform', 'imageFilters', 'textOverlay', 'watermark', 'gradient',
+  'imageTransform', 'imageFilters', 'imageLayer', 'textOverlay', 'watermark', 'gradient',
   'padding', 'scale', 'borderRadius', 'showBorder', 'borderWidth', 'borderColor',
   'shadow', 'reflection', 'canvas', 'bgMode', 'bgColor', 'deviceFrame', 'annotations',
   'redactions', 'spotlight', 'meshGradient', 'tilt3d', 'scene', 'autoLayout'
