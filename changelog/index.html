@@ -122,6 +122,23 @@
         .changes b { color: var(--ink); font-weight: 600; }
         .log-head { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: clamp(20px, 3vw, 32px); }
 
+        /* v16 — the glass reacts to the cursor: a soft specular highlight tracks
+           the pointer across the panel, like light moving over real glass. The
+           position comes from --mx/--my set by a pointermove handler. */
+        .glass-interactive { position: relative; overflow: hidden; }
+        .glass-interactive > * { position: relative; z-index: 1; }
+        .glass-interactive::after {
+            content: ''; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
+            pointer-events: none; opacity: var(--ga, 0); transition: opacity .3s ease;
+        }
+        .spot-copy.glass-interactive::after {
+            background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.34), transparent 60%);
+            mix-blend-mode: screen;
+        }
+        .entry.glass-interactive::after {
+            background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(35,72,255,0.20), transparent 55%);
+        }
+
         /* Solid fallback where translucency is unwanted or unsupported. */
         @media (prefers-reduced-transparency: reduce) {
             .spot-copy { background: rgba(12,17,33,0.94); backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -207,9 +224,9 @@
                 <div>
                     <div class="spot-browser">
                         <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                        <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Steel_Vengeance_01.jpg/1280px-Steel_Vengeance_01.jpg" alt="A screenshot framed inside the SnapShot-Pro studio, with blended layers composited over it" loading="eager" width="1280" height="853">
+                        <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Millennium_Force_%28Cedar_Point%29_06.JPG/1280px-Millennium_Force_%28Cedar_Point%29_06.JPG" alt="The Millennium Force roller coaster framed inside the SnapShot-Pro studio" loading="eager" width="1280" height="960">
                     </div>
-                    <p style="margin-top:10px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Steel Vengeance, Cedar Point. Jeremy Thompson, <a href="https://creativecommons.org/licenses/by/2.0/" style="color:rgba(255,255,255,0.82);">CC BY 2.0</a></p>
+                    <p style="margin-top:10px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Millennium Force, Cedar Point. Coasterman1234, <a href="https://creativecommons.org/licenses/by-sa/3.0/" style="color:rgba(255,255,255,0.82);">CC BY-SA 3.0</a></p>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -435,5 +452,25 @@
 </footer>
 
 <script src="/site.js"></script>
+<script>
+    // v16 — cursor-reactive glass. Track the pointer over each glass panel and
+    // feed its position to the CSS highlight via --mx/--my (cheap var writes, no
+    // re-layout). Skipped entirely under reduced-motion.
+    (function () {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        document.querySelectorAll('.spot-copy, .entry').forEach(function (elGlass) {
+            elGlass.classList.add('glass-interactive');
+            elGlass.addEventListener('pointermove', function (e) {
+                var r = elGlass.getBoundingClientRect();
+                elGlass.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+                elGlass.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+                elGlass.style.setProperty('--ga', '1');
+            });
+            elGlass.addEventListener('pointerleave', function () {
+                elGlass.style.setProperty('--ga', '0');
+            });
+        });
+    })();
+</script>
 </body>
 </html>
