@@ -1,6 +1,31 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { readFileSync } from 'fs';
 import { VitePWA } from 'vite-plugin-pwa';
+
+// Phase 2a — shared HTML partials. Replaces placeholder comments with shared
+// markup from site/partials/ at build AND in dev (transformIndexHtml runs for
+// every HTML entry), so nav/footer/logo are defined once and stay consistent.
+// {{VERSION}} in the footer is filled from package.json so the version is never
+// stale. Injection is placeholder-driven: a page only changes if it contains the
+// placeholder, so the editor (no placeholders) is left untouched.
+function htmlPartials() {
+  const dir = resolve(__dirname, 'site/partials');
+  const read = (f) => readFileSync(resolve(dir, f), 'utf8');
+  return {
+    name: 'html-partials',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        const version = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')).version;
+        return html
+          .split('<!--PARTIAL:mark-->').join(read('mark.html'))
+          .split('<!--PARTIAL:nav-->').join(read('nav.html'))
+          .split('<!--PARTIAL:footer-->').join(read('footer.html').split('{{VERSION}}').join(version));
+      }
+    }
+  };
+}
 
 // Replaces __OG_BASE__ in HTML with the absolute site URL so social embeds
 // (Discord, X, Slack) resolve og:image/og:url. On Vercel this comes from the
@@ -48,6 +73,7 @@ export default defineConfig({
     open: true,
   },
   plugins: [
+    htmlPartials(),
     ogBase(),
     VitePWA({
       registerType: 'autoUpdate',
