@@ -245,56 +245,24 @@ export async function aiScreenshotToCode() {
   if (out) showAiResult(out);
 }
 
-export async function aiGenerateBackground() {
-  const promptInp = document.getElementById('ai-bg-prompt');
-  const promptText = promptInp ? promptInp.value.trim() : '';
-  if (!promptText) { showNotification('Enter a prompt for the background.', 'error'); return; }
-  setAiStatus('Generating background image…');
-  try {
-    let b64 = await callHostedImageGenerate(promptText, '1536x1024');
-    if (!b64) {
-      const key = getKey('openai');
-      if (!key) {
-        showNotification('Hosted AI is not configured yet. Add an OpenAI key locally or set OPENAI_API_KEY on Vercel.', 'error');
-        promptForKey();
-        return;
-      }
-      const OpenAI = (await import('openai')).default;
-      const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
-      const res = await client.images.generate({
-        model: 'dall-e-3',
-        prompt: promptText,
-        size: '1792x1024',
-        response_format: 'b64_json',
-        n: 1
-      });
-      b64 = res.data?.[0]?.b64_json;
-      if (!b64) throw new Error('No image returned');
-    }
-    const dataUrl = 'data:image/png;base64,' + b64;
-    const img = new Image();
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = dataUrl;
-    });
-    saveStateToHistory();
-    // Apply as a solid background with image overlay via a custom approach:
-    // Drop the result into a new ImageBitmap and set as bgImage. The simplest
-    // path: replace the image as a backdrop by switching to "solid" mode and
-    // painting via mesh — but cleanest is dedicated state.bgImage handled by
-    // background renderer. For minimal scope, swap state.image with the generated
-    // image as a backdrop and notify the user.
-    state.bgImage = img;
-    state.bgMode = 'image';
-    render();
-    setAiStatus('Background applied.');
-    showNotification('AI background generated.', 'success');
-  } catch (e) {
-    console.error(e);
-    setAiStatus('Failed.');
-    showNotification(`Background gen failed: ${e.message || e}`, 'error');
+// v19 — reusable text→background generator. Tries hosted gpt-image-2, then a
+// BYO OpenAI key (also gpt-image-2, for consistent output). Returns a loaded
+// Image. Throws an error with code 'NO_KEY' when neither is available.
+export async function generateBackgroundImage(prompt, size) {
+  let b64 = await callHostedImageGenerate(prompt, size);
+  if (!b64) {
+    const key = getKey('openai');
+    if (!key) { const e = new Error('No AI key'); e.code = 'NO_KEY'; throw e; }
+    const OpenAI = (await import('openai')).default;
+    const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+    const res = await client.images.generate({ model: 'gpt-image-2', prompt, size, n: 1 });
+    b64 = res.data?.[0]?.b64_json;
+    if (!b64) throw new Error('No image returned');
   }
+  const dataUrl = 'data:image/png;base64,' + b64;
+  const img = new Image();
+  await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = dataUrl; });
+  return img;
 }
 
 async function copyAiResult() {
@@ -310,11 +278,9 @@ export function bindAiCloud() {
   const alt = document.getElementById('ai-alt-btn');
   const cap = document.getElementById('ai-caption-btn');
   const s2c = document.getElementById('ai-s2c-btn');
-  const bg = document.getElementById('ai-bg-btn');
   const cp = document.getElementById('ai-copy-btn');
   if (alt) alt.addEventListener('click', aiAltText);
   if (cap) cap.addEventListener('click', aiCaption);
   if (s2c) s2c.addEventListener('click', aiScreenshotToCode);
-  if (bg) bg.addEventListener('click', aiGenerateBackground);
   if (cp) cp.addEventListener('click', copyAiResult);
 }
