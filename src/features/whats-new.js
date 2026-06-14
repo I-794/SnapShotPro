@@ -23,7 +23,9 @@ const WHATS_NEW = {
     { title: 'Entrance animations for any element',
       desc: 'Give a text overlay, an annotation, or an added image its own entrance from the layers panel. Each plays on its own track.' },
     { title: 'Easing curves',
-      desc: 'Pick from eight easing curves per animation track, from linear and ease in-out to overshoot, elastic, and bounce.' }
+      desc: 'Pick from eight easing curves per animation track, from linear and ease in-out to overshoot, elastic, and bounce.' },
+    { title: 'Export a still as MP4',
+      desc: 'Animated stills and Ken Burns moves now export to MP4, not just GIF, with the same resolution and quality controls.' }
   ]
 };
 
