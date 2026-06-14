@@ -18,6 +18,8 @@ const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismiss
 const WHATS_NEW = {
   heading: "What's new in v15.2",
   items: [
+    { title: 'Ken Burns pan and zoom',
+      desc: 'Bring a still to life with a slow pan and zoom. Pick a preset, press play, and it exports as motion too.' },
     { title: 'Entrance animations for any element',
       desc: 'Give a text overlay, an annotation, or an added image its own entrance from the layers panel. Each plays on its own track.' },
     { title: 'Easing curves',
