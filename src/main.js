@@ -28,6 +28,8 @@ import { bindTemplates } from './features/templates.js';
 import { bindGradientEditor } from './features/gradient-editor.js';
 import { bindCustomFont } from './features/custom-font.js';
 import { bindPaletteExtractor } from './features/palette-extract.js';
+import { bindPalettes } from './features/palettes.js';
+import { bindColorMap } from './features/color-map.js';
 import { bindBrandKit } from './features/brand-kit.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindOcr } from './features/ocr.js';
@@ -105,6 +107,8 @@ function init() {
   bindGradientEditor();
   bindCustomFont();
   bindPaletteExtractor();
+  bindPalettes();      // v17 — custom palette library + harmonies
+  bindColorMap();      // v17 — palette-driven color mapping
   bindBrandKit();
   bindBgRemove();
   bindOcr();

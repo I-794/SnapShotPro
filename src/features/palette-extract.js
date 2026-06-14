@@ -4,6 +4,7 @@ import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { syncFromGradientState } from './gradient-editor.js';
+import { saveSwatchesAsPalette } from './palettes.js';
 
 const K = 5;
 const SAMPLE = 80;
@@ -150,14 +151,22 @@ function applyTextColor() {
   render();
 }
 
+// v17 — save the extracted colors into the Color palette library.
+function saveAsPalette() {
+  if (lastPalette.length === 0) { showNotification('Extract a palette first.', 'error'); return; }
+  saveSwatchesAsPalette(lastPalette, 'Extracted');
+}
+
 export function bindPaletteExtractor() {
   const btn = document.getElementById('palette-extract-btn');
   const gradBtn = document.getElementById('palette-as-gradient');
   const meshBtn = document.getElementById('palette-as-mesh');
   const textBtn = document.getElementById('palette-as-text');
+  const saveBtn = document.getElementById('palette-as-saved');
   if (btn) btn.addEventListener('click', extract);
   if (gradBtn) gradBtn.addEventListener('click', applyAsGradient);
   if (meshBtn) meshBtn.addEventListener('click', applyAsMesh);
   if (textBtn) textBtn.addEventListener('click', applyTextColor);
+  if (saveBtn) saveBtn.addEventListener('click', saveAsPalette);
   renderSwatches();
 }

@@ -16,6 +16,17 @@ const IDS = [
   'brightness', 'brightness-value', 'contrast', 'contrast-value',
   'saturation', 'saturation-value', 'blur', 'blur-value',
   'grayscale', 'grayscale-value', 'sepia', 'sepia-value',
+  // v17 — color filters (temperature/tint baked per-pixel)
+  'temperature', 'temperature-value', 'tint', 'tint-value',
+
+  // v17 — Color: custom palette library + harmonies + Color Map
+  'palette-as-saved',
+  'color-palette-list', 'color-palette-new', 'color-palette-delete',
+  'color-palette-editor', 'color-palette-name', 'color-palette-swatches',
+  'color-add-swatch', 'color-harmony-base', 'color-harmony-type', 'color-harmony-generate',
+  'color-palette-hint',
+  'color-map-mode', 'color-map-controls', 'color-map-intensity', 'color-map-intensity-value',
+  'color-map-steps-row', 'color-map-steps', 'color-map-steps-value', 'color-map-hint',
 
   // Gradient
   'gradient-type', 'gradient-angle', 'gradient-angle-value', 'gradient-angle-group',

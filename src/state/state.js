@@ -6,7 +6,10 @@ export const state = {
   image: null,
   svgCode: null,
   imageTransform: { rotation: 0, flipH: false, flipV: false },
-  imageFilters: { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0 },
+  // v17 — temperature/tint extend the filter set. They can't be expressed by
+  // ctx.filter, so render/color-grade.js bakes them per-pixel (see colorMap).
+  // 0 = neutral for both; pre-v17 saves backfill via ensureColorDefaults().
+  imageFilters: { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0, temperature: 0, tint: 0 },
   // v15.0 — blend mode + opacity for the main screenshot layer. Per-item blend/
   // opacity for annotations / extra images / the text overlay ride on those
   // objects themselves. Defaults are no-ops so pre-v15 designs render unchanged.
@@ -148,7 +151,18 @@ export const state = {
   // v10 — Brand Kit logo watermark. `src` is a dataUrl (JSON-serializable so it
   // travels with brand kits/templates); the decoded Image lives in `brandAssets`
   // below. `scale`/`opacity` are fractions/percent; position mirrors watermark.
-  logo: { enabled: false, src: null, position: 'bottom-right', scale: 0.12, opacity: 90 }
+  logo: { enabled: false, src: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
+
+  // v17 — Color release.
+  // colorPalettes: the active palette id + an in-memory mirror of the saved
+  // library. The durable copy lives in localStorage (snapshotpro_colorpalettes,
+  // managed by features/palettes.js); `library` here is hydrated on load so undo
+  // snapshots and the Color Map can read it without touching storage.
+  colorPalettes: { active: null, library: {} },
+  // colorMap: palette-driven per-pixel grade applied by render/color-grade.js.
+  // mode 'off' is a no-op passthrough (the common case). intensity blends the
+  // graded result with the original; steps controls recolor posterization.
+  colorMap: { mode: 'off', intensity: 100, steps: 6 }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).

@@ -13,6 +13,7 @@
 // it has no fragile cross-module dependencies.
 
 import { state } from '../state/state.js';
+import { getGradedImage } from './color-grade.js';
 
 export const DEVICE_TYPES = new Set([
   'iphone', 'iphone16pro', 'ipadpro', 'macbookpro', 'watch', 'studiodisplay',
@@ -103,7 +104,7 @@ export function drawScreenImage(ctx, rect, radius) {
   if (f.sepia > 0)          fl.push(`sepia(${f.sepia}%)`);
   if (fl.length) ctx.filter = fl.join(' ');
 
-  const img = state.image;
+  const img = getGradedImage(state.image);   // v17 — color-graded source
   const ir = img.width / img.height;
   const rrt = w / h;
   let dw, dh;

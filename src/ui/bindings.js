@@ -10,6 +10,8 @@ import { syncMotionExportControls } from '../features/video-export.js';
 import { refreshAnimationUI } from '../features/animation.js';
 import { refreshKenBurnsUI } from '../features/ken-burns.js';
 import { refreshEffectsUI } from '../features/effects-ui.js';
+import { refreshPalettesUI } from '../features/palettes.js';
+import { refreshColorMapUI } from '../features/color-map.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -133,6 +135,18 @@ function ensureEffectsDefaults() {
 function ensurePatternDefaults() {
   if (!state.pattern) state.pattern = { type: 'dots', fg: '#ffffff', bg: '#1a1a2e', size: 24, opacity: 100, angle: 0 };
 }
+
+// v17 — backfill the Color blocks on designs/templates saved before v17 (an
+// Object.assign restore drops keys the saved object lacks). temperature/tint
+// join imageFilters; colorPalettes/colorMap get their neutral no-op defaults.
+function ensureColorDefaults() {
+  const f = state.imageFilters || (state.imageFilters = {});
+  if (typeof f.temperature !== 'number') f.temperature = 0;
+  if (typeof f.tint !== 'number') f.tint = 0;
+  if (!state.colorPalettes || typeof state.colorPalettes !== 'object') state.colorPalettes = { active: null, library: {} };
+  if (!state.colorPalettes.library) state.colorPalettes.library = {};
+  if (!state.colorMap || typeof state.colorMap !== 'object') state.colorMap = { mode: 'off', intensity: 100, steps: 6 };
+}
 function refreshPatternUI() {
   const p = state.pattern;
   if (el.patternFg) el.patternFg.value = p.fg;
@@ -212,6 +226,9 @@ function bindImageEditing() {
   linkSlider(el.blur, el.blurValue, v => v + 'px', v => state.imageFilters.blur = v);
   linkSlider(el.grayscale, el.grayscaleValue, v => v + '%', v => state.imageFilters.grayscale = v);
   linkSlider(el.sepia, el.sepiaValue, v => v + '%', v => state.imageFilters.sepia = v);
+  // v17 — temperature/tint (per-pixel grade via render/color-grade.js).
+  linkSlider(el.temperature, el.temperatureValue, v => String(v), v => state.imageFilters.temperature = v);
+  linkSlider(el.tint, el.tintValue, v => String(v), v => state.imageFilters.tint = v);
 }
 
 function bindBackground() {
@@ -532,10 +549,13 @@ export function updateUIFromState() {
   ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
   ensureEffectsDefaults();      // backfill v16.1 glass + grain blocks on older designs
   ensurePatternDefaults();      // backfill v16.2 pattern block on older designs
+  ensureColorDefaults();        // backfill v17 temperature/tint + colorPalettes/colorMap
   refreshAnimationUI();         // reflect persisted animation (tracks, duration, toggle)
   refreshKenBurnsUI();          // reflect persisted Ken Burns toggle + controls
   refreshEffectsUI();           // reflect persisted glass + grain controls
   refreshPatternUI();           // reflect persisted pattern background controls
+  refreshPalettesUI();          // reflect v17 palette library + editor
+  refreshColorMapUI();          // reflect v17 color-map mode + controls
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 
@@ -545,6 +565,8 @@ export function updateUIFromState() {
   set(el.blur, state.imageFilters.blur); txt(el.blurValue, state.imageFilters.blur + 'px');
   set(el.grayscale, state.imageFilters.grayscale); txt(el.grayscaleValue, state.imageFilters.grayscale + '%');
   set(el.sepia, state.imageFilters.sepia); txt(el.sepiaValue, state.imageFilters.sepia + '%');
+  set(el.temperature, state.imageFilters.temperature); txt(el.temperatureValue, String(state.imageFilters.temperature));
+  set(el.tint, state.imageFilters.tint); txt(el.tintValue, String(state.imageFilters.tint));
 
   set(el.padding, state.padding); txt(el.paddingValue, state.padding + 'px');
   set(el.scale, state.scale); txt(el.scaleValue, state.scale + '%');

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v16.2 · Pro Editor</title>
+    <title>SnapShot-Pro v17.0 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v16.2</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v17.0</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -118,6 +118,10 @@
                 <button class="tab-btn" data-art-preset="vintage">Vintage</button>
                 <button class="tab-btn" data-art-preset="vivid">Vivid</button>
                 <button class="tab-btn" data-art-preset="faded">Faded</button>
+                <button class="tab-btn" data-art-preset="tealorange">Teal/Orange</button>
+                <button class="tab-btn" data-art-preset="moody">Moody</button>
+                <button class="tab-btn" data-art-preset="bleach">Bleach</button>
+                <button class="tab-btn" data-art-preset="golden">Golden</button>
             </div>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Brightness</label><div class="range-group"><input type="range" class="range-input" id="brightness" min="0" max="200" value="100"><span class="range-value" id="brightness-value">100%</span></div></div>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Contrast</label><div class="range-group"><input type="range" class="range-input" id="contrast" min="0" max="200" value="100"><span class="range-value" id="contrast-value">100%</span></div></div>
@@ -125,6 +129,9 @@
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Blur</label><div class="range-group"><input type="range" class="range-input" id="blur" min="0" max="20" value="0"><span class="range-value" id="blur-value">0px</span></div></div>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Grayscale</label><div class="range-group"><input type="range" class="range-input" id="grayscale" min="0" max="100" value="0"><span class="range-value" id="grayscale-value">0%</span></div></div>
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Sepia</label><div class="range-group"><input type="range" class="range-input" id="sepia" min="0" max="100" value="0"><span class="range-value" id="sepia-value">0%</span></div></div>
+            <!-- v17 — temperature/tint bake per-pixel in render/color-grade.js (CSS filters can't do them). -->
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Temperature</label><div class="range-group"><input type="range" class="range-input" id="temperature" min="-100" max="100" value="0"><span class="range-value" id="temperature-value">0</span></div></div>
+            <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Tint</label><div class="range-group"><input type="range" class="range-input" id="tint" min="-100" max="100" value="0"><span class="range-value" id="tint-value">0</span></div></div>
         </div>
 
         <div class="sidebar-section">
@@ -471,7 +478,56 @@
                 <button class="btn btn-secondary" id="palette-as-mesh" style="flex:1;">→ Mesh</button>
                 <button class="btn btn-secondary" id="palette-as-text" style="flex:1;">→ Text</button>
             </div>
+            <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="palette-as-saved">💾 Save as Palette</button>
             <p class="info-text" style="margin-top:8px;">Click a swatch to copy its hex.</p>
+        </div>
+
+        <!-- v17 — Color: the headline of the Color release. Custom palette library
+             with harmonies, plus palette-driven Color Map (gradient / recolor /
+             transfer). Reuses existing sidebar control classes. -->
+        <div class="sidebar-section">
+            <h3 class="section-title">Color <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v17</span></h3>
+
+            <label class="control-label">Custom Palette</label>
+            <div class="control-group"><select class="control-input" id="color-palette-list"><option value="">-- No palette --</option></select></div>
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+                <button class="btn btn-primary" id="color-palette-new" style="flex:1;">+ New</button>
+                <button class="btn btn-secondary" id="color-palette-delete" style="flex:0 0 auto;" title="Delete palette">🗑</button>
+            </div>
+            <div id="color-palette-editor" style="display:none;">
+                <div class="control-group"><input type="text" class="control-input" id="color-palette-name" placeholder="Palette name"></div>
+                <div id="color-palette-swatches" class="palette-swatches"></div>
+                <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="color-add-swatch">+ Add Swatch</button>
+                <div class="divider"></div>
+                <label class="control-label">Generate Harmony</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                    <input type="color" id="color-harmony-base" value="#2348ff" style="width:44px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;">
+                    <select class="control-input" id="color-harmony-type" style="flex:1;">
+                        <option value="complementary">Complementary</option>
+                        <option value="analogous">Analogous</option>
+                        <option value="triadic">Triadic</option>
+                        <option value="split-complementary">Split-Complementary</option>
+                        <option value="tetradic">Tetradic</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" style="width:100%;" id="color-harmony-generate">✨ Generate into Palette</button>
+            </div>
+            <p class="info-text" id="color-palette-hint" style="margin-top:8px;">Create a palette, then use it in the Color Map below.</p>
+
+            <div class="divider"></div>
+
+            <label class="control-label">Color Map</label>
+            <div class="control-group"><select class="control-input" id="color-map-mode">
+                <option value="off">Off</option>
+                <option value="gradient">Gradient Map / Duotone</option>
+                <option value="recolor">Recolor to Palette</option>
+                <option value="transfer">Color Transfer</option>
+            </select></div>
+            <div id="color-map-controls" style="display:none;">
+                <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Intensity</label><div class="range-group"><input type="range" class="range-input" id="color-map-intensity" min="0" max="100" value="100"><span class="range-value" id="color-map-intensity-value">100%</span></div></div>
+                <div class="control-group" id="color-map-steps-row"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Posterize Steps</label><div class="range-group"><input type="range" class="range-input" id="color-map-steps" min="0" max="16" value="6"><span class="range-value" id="color-map-steps-value">6</span></div></div>
+            </div>
+            <p class="info-text" id="color-map-hint" style="margin-top:8px;">Maps your active palette onto the image. Bakes into exports.</p>
         </div>
 
         <div class="sidebar-section">

@@ -52,12 +52,21 @@ export const tiltPresets = {
 // v16.2 — art-filter presets. Each is a complete imageFilters object, so
 // applying one replaces the current filters wholesale (and exports for free,
 // since render reads state.imageFilters). "None" is the neutral reset.
+// v17 — every preset now carries temperature/tint (baked per-pixel in
+// render/color-grade.js). They MUST be present on every preset or a previous
+// preset's warmth would leak through on switch; "none" resets them to 0.
 export const artFilterPresets = {
-  none:    { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0 },
-  noir:    { brightness: 100, contrast: 120, saturation: 100, blur: 0, grayscale: 100, sepia: 0 },
-  vintage: { brightness: 100, contrast: 110, saturation: 80,  blur: 0, grayscale: 0,   sepia: 60 },
-  vivid:   { brightness: 100, contrast: 115, saturation: 160, blur: 0, grayscale: 0,   sepia: 0 },
-  faded:   { brightness: 108, contrast: 95,  saturation: 70,  blur: 0, grayscale: 0,   sepia: 0 }
+  none:    { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0, temperature: 0, tint: 0 },
+  noir:    { brightness: 100, contrast: 120, saturation: 100, blur: 0, grayscale: 100, sepia: 0, temperature: 0, tint: 0 },
+  vintage: { brightness: 100, contrast: 110, saturation: 80,  blur: 0, grayscale: 0,   sepia: 60, temperature: 18, tint: 6 },
+  vivid:   { brightness: 100, contrast: 115, saturation: 160, blur: 0, grayscale: 0,   sepia: 0, temperature: 0, tint: 0 },
+  faded:   { brightness: 108, contrast: 95,  saturation: 70,  blur: 0, grayscale: 0,   sepia: 0, temperature: 6, tint: -4 },
+  // v17 — cinematic color grades. The "feel" comes mostly from temperature/tint
+  // plus contrast/saturation, so they read as deliberate looks, not just tone.
+  tealorange: { brightness: 102, contrast: 118, saturation: 125, blur: 0, grayscale: 0, sepia: 0, temperature: 24, tint: -10 },
+  moody:      { brightness: 94,  contrast: 122, saturation: 78,  blur: 0, grayscale: 0, sepia: 0, temperature: -18, tint: 8 },
+  bleach:     { brightness: 110, contrast: 130, saturation: 55,  blur: 0, grayscale: 0, sepia: 0, temperature: 4, tint: 0 },
+  golden:     { brightness: 104, contrast: 106, saturation: 120, blur: 0, grayscale: 0, sepia: 15, temperature: 30, tint: 4 }
 };
 
 // v15.2 — Ken Burns pan/zoom keyframes. Focal points are 0..1 of the image,

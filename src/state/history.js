@@ -52,7 +52,12 @@ function snapshot() {
     glass: state.glass,
     grain: state.grain,
     // v16.2 — pattern background.
-    pattern: state.pattern
+    pattern: state.pattern,
+    // v17 — Color: active palette + edits and the color-map settings are
+    // undoable. imageFilters (above) already carries temperature/tint. The
+    // persisted palette library is localStorage-only, deliberately not snapshotted.
+    colorPalettes: state.colorPalettes,
+    colorMap: state.colorMap
   }));
 }
 

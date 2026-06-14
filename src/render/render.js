@@ -21,6 +21,7 @@ import { renderSetPreview } from '../features/screenshot-set.js';
 import { drawGuides } from '../features/snapping.js';
 import { drawReflection } from './reflection.js';
 import { withLayer } from './blend.js';
+import { getGradedImage } from './color-grade.js';
 
 function getFrameInsets() {
   const t = state.deviceFrame.type;
@@ -245,7 +246,9 @@ function drawImageContent(ctx, x, y, imgWidth, imgHeight) {
   // the full destination rect, zooming/panning the still. Off while a clip is
   // loaded (auto-zoom owns the crop). Falls back to a plain full-image draw.
   const kb = state.kenBurns;
-  const img = state.image;
+  // v17 — draw the color-graded image (temperature/tint + Color Map baked in).
+  // Returns state.image unchanged when no per-pixel grade is active.
+  const img = getGradedImage(state.image);
   if (kb && kb.enabled && !state.video.loaded && img && img.width && img.height) {
     const a = state.animation;
     const p = (a && a.duration > 0) ? (a.currentTime || 0) / a.duration : 0;

@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v16 with vector shape tools, on top of motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v17 with color filters, custom palettes, harmonies, and palette-driven color mapping, on top of vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v16.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v17.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,6 +94,40 @@
         .spot-bar .url { margin-left: 10px; height: 21px; flex: 1; border-radius: 6px; background: #e7e7e3; display: flex; align-items: center; padding: 0 11px; font-family: var(--font-mono); font-size: 10px; color: #9b9b95; }
         .spot-shot { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: #e7e7e3; }
 
+        /* v17 — Color release spotlight. Its own motif: a chromatic spectrum band
+           and a solid color-forward panel, deliberately NOT the v16 frosted-glass
+           treatment, so each major release reads distinctly down the page. The
+           product shot carries a duotone overlay that demonstrates the new
+           gradient-map, the headline feature of this release. */
+        .spotlight-color {
+            background:
+                radial-gradient(58% 90% at 6% 2%, rgba(255,90,90,0.20), transparent 55%),
+                radial-gradient(58% 90% at 94% 8%, rgba(74,168,255,0.22), transparent 55%),
+                radial-gradient(85% 105% at 62% 106%, rgba(87,227,155,0.16), transparent 58%),
+                #0b0d14;
+        }
+        .spotlight-color::after { display: none; }   /* drop the v16 light-speck layer */
+        .spotlight-color .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        /* The spectrum bar IS the gradient-map feature, used as the section signature. */
+        .spectrum-bar { height: 12px; border-radius: var(--r-pill); margin-bottom: 22px; background: linear-gradient(90deg, #ff5a5a, #ffb14a, #ffe24a, #57e39b, #4aa8ff, #8a6bff); }
+        .swatch-row { display: flex; gap: 9px; margin-bottom: 24px; }
+        .swatch-row i { width: 30px; height: 30px; border-radius: 9px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); }
+        .spotlight-color .spot-feat-ico { background: linear-gradient(135deg, rgba(74,168,255,0.34), rgba(138,107,255,0.28)); }
+        .spotlight-color .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-color .btn-primary:hover { background: #f0f0ee; }
+        /* Duotone overlay: a color ramp blended over the shot to preview the map. */
+        .spot-shot-wrap { position: relative; }
+        .spot-shot-wrap::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(125deg, #1a1147, #4aa8ff 46%, #ffe24a 78%, #ff5a5a);
+            mix-blend-mode: color; opacity: 0.62;
+        }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -173,25 +207,26 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight reveal">
+        <div class="spotlight spotlight-color reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v16 · June 2026</div>
-                <h2>Effects that make a shot look designed</h2>
-                <p class="spot-lede">Frost a panel of glass over your content, lay down cinematic film grain, drop in vector shapes, and finish with patterns and one-tap looks.</p>
+                <div class="spot-ver">v17 · June 2026</div>
+                <div class="spectrum-bar"></div>
+                <h2>Color, mapped onto your image</h2>
+                <p class="spot-lede">Grade with temperature and tint, build palettes and harmonies you can reuse, then map a palette straight onto the shot. Every change bakes into the export.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M7 9.5l4.5 4.5" opacity="0.7"/><path d="M7 13l2.5 2.5" opacity="0.5"/></svg></span>
-                        <div><strong>Liquid glass</strong><span>Drag a frosted glass panel over your screenshot. It samples and blurs whatever sits behind it, with adjustable blur, tint, corner radius, and a rim highlight, and it bakes into every export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16" fill="currentColor" opacity="0.25"/></svg></span>
+                        <div><strong>Color filters and grades</strong><span>New temperature and tint sliders sit with the filters, plus cinematic one-tap looks: Teal/Orange, Moody, Bleach, and Golden.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="1"/><circle cx="12" cy="5.5" r="1"/><circle cx="18" cy="8" r="1"/><circle cx="8" cy="13" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="19" cy="16" r="1"/><circle cx="6" cy="18" r="1"/><circle cx="12" cy="17.5" r="1"/></svg></span>
-                        <div><strong>Film grain</strong><span>Lay cinematic grain over the whole canvas, with adjustable amount, grain size, blend mode, and a monochrome toggle. Captions and watermarks stay crisp on top.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.4"/><circle cx="6" cy="15" r="2.4"/><circle cx="18" cy="15" r="2.4"/><path d="M12 8.4v3.2M10 13.5l-2 0.6M14 13.5l2 0.6" opacity="0.7"/></svg></span>
+                        <div><strong>Custom palettes and harmonies</strong><span>Save your own palettes or auto-generate complementary, analogous, triadic, split-complementary, and tetradic sets from one base color.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 14.5 9 21 9.4 16 13.7 17.7 20 12 16.3 6.3 20 8 13.7 3 9.4 9.5 9"/></svg></span>
-                        <div><strong>Vector shapes</strong><span>Lines, ellipses, triangles, polygons, and stars, with fill or stroke and adjustable points, drawn right on the canvas and selectable like any other element.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M3.5 14l4-4 4 3.5 3-2.5 6 5" opacity="0.8"/></svg></span>
+                        <div><strong>Color mapping</strong><span>Map a palette onto your image three ways: gradient-map and duotone, recolor to the palette, or a full color transfer. It all bakes into exports.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -203,9 +238,14 @@
                 <div>
                     <div class="spot-browser">
                         <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                        <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Millennium_Force_%28Cedar_Point%29_06.JPG/1280px-Millennium_Force_%28Cedar_Point%29_06.JPG" alt="The Millennium Force roller coaster framed inside the SnapShot-Pro studio" loading="eager" width="1280" height="960">
+                        <div class="spot-shot-wrap">
+                            <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Millennium_Force_%28Cedar_Point%29_06.JPG/1280px-Millennium_Force_%28Cedar_Point%29_06.JPG" alt="A roller coaster photo with a duotone color map applied, previewing the v17 gradient-map" loading="eager" width="1280" height="960">
+                        </div>
                     </div>
-                    <p style="margin-top:10px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Millennium Force, Cedar Point. Coasterman1234, <a href="https://creativecommons.org/licenses/by-sa/3.0/" style="color:rgba(255,255,255,0.82);">CC BY-SA 3.0</a></p>
+                    <div class="swatch-row" aria-hidden="true">
+                        <i style="background:#ff5a5a;"></i><i style="background:#ffb14a;"></i><i style="background:#ffe24a;"></i><i style="background:#57e39b;"></i><i style="background:#4aa8ff;"></i><i style="background:#8a6bff;"></i>
+                    </div>
+                    <p style="margin-top:2px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Millennium Force, Cedar Point. Coasterman1234, <a href="https://creativecommons.org/licenses/by-sa/3.0/" style="color:rgba(255,255,255,0.82);">CC BY-SA 3.0</a>. Duotone map applied.</p>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -218,6 +258,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v17.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Color: filters, palettes, and mapping</h2>
+                    <ul class="changes">
+                        <li><b>Color filters and grades.</b> Temperature and tint join the filter sliders, baked per-pixel so they reach effects that CSS filters cannot. Four cinematic one-tap looks land above them: Teal/Orange, Moody, Bleach, and Golden, each setting tone and color together so the sliders move to match.</li>
+                        <li><b>Custom palettes and harmonies.</b> Build and name your own palettes in a saved library, edit and reorder swatches, or paste hex. Generate a full harmony from one base color, complementary, analogous, triadic, split-complementary, or tetradic, and save any extracted palette straight into the library.</li>
+                        <li><b>Color mapping.</b> Map your active palette onto the image three ways: a gradient-map and duotone, recolor to the nearest palette color, or a LAB color transfer that matches the image to the palette's tone. Intensity and posterize steps are adjustable, and it renders through the same path as everything else, so it bakes into every export and is fully undoable.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v16.2</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Pattern backgrounds and art filters</h2>
