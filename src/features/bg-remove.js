@@ -81,13 +81,15 @@ function progressLabel(key, current, total) {
   return { pct: 0, label: `${key || 'Working'}…`, indeterminate: true };
 }
 
-async function removeBackground() {
-  if (busy) return;
-  if (!state.image) { showNotification('Load an image first.', 'error'); return; }
+// v19 — core subject cut, reusable by AI Assets. Runs @imgly removal on
+// state.image and returns the cut Image. Does NOT mutate state (caller decides
+// what to do with the result). Returns null if no image / already busy.
+export async function cutSubject() {
+  if (busy) return null;
+  if (!state.image) return null;
   busy = true;
   try {
     startHeartbeat(modelLoaded ? 'Preparing your image…' : 'Loading AI model (first run downloads ~40MB)…');
-    // Let the UI paint before heavy work
     await new Promise(r => setTimeout(r, 30));
 
     const mod = await import('@imgly/background-removal');
@@ -114,20 +116,31 @@ async function removeBackground() {
       img.onerror = reject;
       img.src = url;
     });
+    setProgress(null);
+    return img;
+  } catch (e) {
+    stopHeartbeat();
+    setProgress(null);
+    throw e;
+  } finally {
+    busy = false;
+  }
+}
+
+async function removeBackground() {
+  if (!state.image) { showNotification('Load an image first.', 'error'); return; }
+  try {
+    const img = await cutSubject();
+    if (!img) return;
     saveStateToHistory();
     state.image = img;
     state.bgMode = 'transparent';
     render();
-    setProgress(null);
     showNotification('Background removed.', 'success');
   } catch (e) {
     console.error('[bg-remove] failed:', e);
-    stopHeartbeat();
-    setProgress(null);
     const msg = e?.message || String(e);
     showNotification('Background removal failed: ' + msg, 'error');
-  } finally {
-    busy = false;
   }
 }
 
