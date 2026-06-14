@@ -22,6 +22,7 @@ import { togglePlay } from './video.js';
 import { focusUrlLoad } from './url-load.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
+import { resetOnboarding } from './welcome.js';
 
 let commands = [];
 
@@ -111,7 +112,8 @@ export function registerCommands() {
     { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif },
     { id: 'gallery-browse',   label: 'Browse community gallery', icon: '🌐', run: openGalleryBrowse },
     { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() },
-    { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() }
+    { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
+    { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } }
   ];
 
   // Quick-add stickers as commands

@@ -80,6 +80,17 @@ function closeWelcome() {
   }
 }
 
+// Clear the first-run flags (welcome tour + What's New toast) and replay the
+// tour now, so a user can revisit onboarding from scratch. The What's New key
+// belongs to whats-new.js; we clear it by name so its toast shows again too.
+export function resetOnboarding() {
+  try {
+    localStorage.removeItem(SEEN_KEY);
+    localStorage.removeItem('snapshotpro_lastseen_version');
+  } catch (e) {}
+  openWelcome();
+}
+
 export function bindWelcome() {
   const overlay = document.getElementById('welcome-overlay');
   if (!overlay) return;
@@ -98,6 +109,7 @@ export function bindWelcome() {
 
   // Re-openable later (e.g. from a help menu / command palette).
   window.__openWelcome = openWelcome;
+  window.__resetOnboarding = resetOnboarding;
 
   let seen = false;
   try { seen = localStorage.getItem(SEEN_KEY) === 'dismissed'; } catch (e) {}
