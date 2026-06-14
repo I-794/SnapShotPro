@@ -55,6 +55,11 @@ export const state = {
   annotationFill: { enabled: false, color: '#ffffff', opacity: 100 },
   polygonSides: 6,
   starPoints: 5,
+  // v16.1 — Studio Effects overlays, both off by default (no-op until enabled).
+  // glass: a frosted glassmorphism panel that samples + blurs the pixels behind
+  // it (fractional x/y/w/h of the canvas). grain: a full-canvas film-grain pass.
+  glass: { enabled: false, x: 0.3, y: 0.3, w: 0.4, h: 0.3, radius: 24, blur: 12, tint: '#ffffff', tintOpacity: 12, rim: true, rimOpacity: 40 },
+  grain: { enabled: false, amount: 18, scale: 1, blend: 'overlay', monochrome: true },
   tool: 'select',
   selectedAnnotation: null,
   selectedRedaction: null,

@@ -47,6 +47,12 @@ const IDS = [
   // Spotlight
   'spotlight-enabled', 'spotlight-controls', 'spotlight-opacity', 'spotlight-opacity-value',
 
+  // v16.1 — Studio Effects: liquid glass + film grain
+  'glass-enabled', 'glass-controls', 'glass-blur', 'glass-blur-value',
+  'glass-radius', 'glass-radius-value', 'glass-tint', 'glass-tint-opacity', 'glass-tint-opacity-value', 'glass-rim',
+  'grain-enabled', 'grain-controls', 'grain-amount', 'grain-amount-value',
+  'grain-scale', 'grain-scale-value', 'grain-blend', 'grain-monochrome',
+
   // Reflection (v14)
   'reflection-enabled', 'reflection-controls', 'reflection-opacity', 'reflection-opacity-value',
   'reflection-length', 'reflection-length-value', 'reflection-gap', 'reflection-gap-value',

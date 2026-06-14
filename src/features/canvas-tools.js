@@ -215,6 +215,18 @@ function drawPreviewAnnotation(startX, startY, curX, curY) {
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = 'rgba(0,0,0,1)';
     ctx.fillRect(rx, ry, rw, rh);
+  } else if (tool === 'glass') {
+    // v16.1 — preview the glass panel footprint (the real frosted draw happens
+    // on the next render once the region is committed).
+    const rx = Math.min(startX, curX), ry = Math.min(startY, curY);
+    const rw = Math.abs(curX - startX), rh = Math.abs(curY - startY);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(rx, ry, rw, rh);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(rx, ry, rw, rh);
+    ctx.setLineDash([]);
   }
   ctx.restore();
 }
@@ -479,6 +491,22 @@ function canvasUpLogic(e) {
     state.spotlight.enabled = true;
     if (el.spotlightEnabled) el.spotlightEnabled.checked = true;
     if (el.spotlightControls) el.spotlightControls.style.display = 'block';
+  } else if (state.tool === 'glass') {
+    // v16.1 — commit the glass panel region (fractional, like spotlight).
+    const cw = canvas.width, ch = canvas.height;
+    const rx = Math.min(drawing.startX, x);
+    const ry = Math.min(drawing.startY, y);
+    const rw = Math.abs(x - drawing.startX);
+    const rh = Math.abs(y - drawing.startY);
+    if (rw > 8 && rh > 8) {
+      state.glass.x = rx / cw;
+      state.glass.y = ry / ch;
+      state.glass.w = rw / cw;
+      state.glass.h = rh / ch;
+      state.glass.enabled = true;
+      if (el.glassEnabled) el.glassEnabled.checked = true;
+      if (el.glassControls) el.glassControls.style.display = 'block';
+    }
   }
 
   render();

@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '16.0';
+const CURRENT_VERSION = '16.1';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v16.0",
+  heading: "What's new in v16.1",
   items: [
-    { title: 'Vector shape tools',
-      desc: 'Draw lines, ellipses, triangles, polygons, and stars right on the canvas, with live preview and the usual select, move, and align.' },
-    { title: 'Fill or stroke',
-      desc: 'Toggle fill on any closeable shape and pick a fill color, or leave it a clean outline. The choice bakes into each shape.' },
-    { title: 'Adjustable polygons and stars',
-      desc: 'Set how many sides a polygon has and how many points a star has, from three to twelve.' }
+    { title: 'Liquid glass',
+      desc: 'Drag a frosted glass panel over your content. It samples and blurs what is behind it, with adjustable blur, tint, and rim.' },
+    { title: 'Film grain',
+      desc: 'Lay cinematic grain over the whole canvas, with amount, grain size, blend mode, and a monochrome toggle.' },
+    { title: 'Both bake into exports',
+      desc: 'Glass and grain appear in every export, ride along in saved projects, and are fully undoable.' }
   ]
 };
 

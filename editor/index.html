@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v16.0 · Pro Editor</title>
+    <title>SnapShot-Pro v16.1 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v16.0</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v16.1</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -642,6 +642,29 @@
         </div>
 
         <div class="sidebar-section">
+            <h3 class="section-title">Liquid Glass <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v16</span></h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Glass</span><label class="switch"><input type="checkbox" id="glass-enabled"><span class="slider"></span></label></div>
+            <div id="glass-controls" style="display:none;margin-top:16px;">
+                <p class="info-text" style="margin-bottom:12px;">Use the 🔮 Glass tool above the canvas to drag a panel over your content.</p>
+                <div class="control-group"><label class="control-label">Blur</label><div class="range-group"><input type="range" class="range-input" id="glass-blur" min="0" max="40" value="12"><span class="range-value" id="glass-blur-value">12</span></div></div>
+                <div class="control-group"><label class="control-label">Corner Radius</label><div class="range-group"><input type="range" class="range-input" id="glass-radius" min="0" max="80" value="24"><span class="range-value" id="glass-radius-value">24</span></div></div>
+                <div class="control-group"><label class="control-label">Tint</label><div style="display:flex;gap:8px;align-items:center;"><input type="color" id="glass-tint" value="#ffffff" style="width:44px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;"><div class="range-group" style="flex:1;"><input type="range" class="range-input" id="glass-tint-opacity" min="0" max="60" value="12"><span class="range-value" id="glass-tint-opacity-value">12%</span></div></div></div>
+                <div class="toggle-switch"><span class="toggle-label">Rim highlight</span><label class="switch"><input type="checkbox" id="glass-rim" checked><span class="slider"></span></label></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Film Grain <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v16</span></h3>
+            <div class="toggle-switch"><span class="toggle-label">Enable Grain</span><label class="switch"><input type="checkbox" id="grain-enabled"><span class="slider"></span></label></div>
+            <div id="grain-controls" style="display:none;margin-top:16px;">
+                <div class="control-group"><label class="control-label">Amount</label><div class="range-group"><input type="range" class="range-input" id="grain-amount" min="0" max="100" value="18"><span class="range-value" id="grain-amount-value">18%</span></div></div>
+                <div class="control-group"><label class="control-label">Grain Size</label><div class="range-group"><input type="range" class="range-input" id="grain-scale" min="50" max="300" value="100"><span class="range-value" id="grain-scale-value">1.0×</span></div></div>
+                <div class="control-group"><label class="control-label">Blend Mode</label><select class="control-input" id="grain-blend"></select></div>
+                <div class="toggle-switch"><span class="toggle-label">Monochrome</span><label class="switch"><input type="checkbox" id="grain-monochrome" checked><span class="slider"></span></label></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
             <h3 class="section-title">Canvas Settings</h3>
             <div class="control-group"><label class="control-label">Canvas Width</label><input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100"></div>
             <div class="control-group"><label class="control-label">Canvas Height</label><input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100"></div>
@@ -781,6 +804,7 @@
             <button class="ann-tool-btn" data-tool="number">① Number</button>
             <button class="ann-tool-btn" data-tool="redact">▓ Redact</button>
             <button class="ann-tool-btn" data-tool="spotlight">◎ Spotlight</button>
+            <button class="ann-tool-btn" data-tool="glass">🔮 Glass</button>
             <button class="ann-tool-btn" id="sticker-btn" title="Stickers">✨ Stickers</button>
             <div style="width:1px;background:var(--border-color);margin:0 4px;align-self:stretch;"></div>
             <input type="color" id="ann-color" value="#ff3b30" title="Annotation Color" style="width:32px;height:32px;border-radius:6px;border:2px solid var(--border-color);cursor:pointer;">

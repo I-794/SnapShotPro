@@ -47,7 +47,10 @@ function snapshot() {
     // v15.2 — animation edits (tracks, easing, duration) are now undoable.
     // Snapshot a runtime-stripped copy so undo never restores mid-playback.
     animation: { ...state.animation, playing: false, currentTime: 0 },
-    kenBurns: state.kenBurns
+    kenBurns: state.kenBurns,
+    // v16.1 — Studio Effects overlays.
+    glass: state.glass,
+    grain: state.grain
   }));
 }
 

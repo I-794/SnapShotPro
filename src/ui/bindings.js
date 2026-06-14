@@ -9,6 +9,7 @@ import { renderGradientEditor, syncFromGradientState } from '../features/gradien
 import { syncMotionExportControls } from '../features/video-export.js';
 import { refreshAnimationUI } from '../features/animation.js';
 import { refreshKenBurnsUI } from '../features/ken-burns.js';
+import { refreshEffectsUI } from '../features/effects-ui.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -119,6 +120,12 @@ function ensureAnimationDefaults() {
   if (!Array.isArray(a.tracks)) a.tracks = [];
   a.playing = false;
   a.currentTime = 0;
+}
+
+// v16.1 — backfill the Studio Effects blocks on designs saved before v16.
+function ensureEffectsDefaults() {
+  if (!state.glass) state.glass = { enabled: false, x: 0.3, y: 0.3, w: 0.4, h: 0.3, radius: 24, blur: 12, tint: '#ffffff', tintOpacity: 12, rim: true, rimOpacity: 40 };
+  if (!state.grain) state.grain = { enabled: false, amount: 18, scale: 1, blend: 'overlay', monochrome: true };
 }
 
 // v15.2 — backfill the Ken Burns block on designs saved before it existed.
@@ -472,8 +479,10 @@ export function updateUIFromState() {
   ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
   ensureAnimationDefaults();    // backfill v15.2 animation block; force runtime off
   ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
+  ensureEffectsDefaults();      // backfill v16.1 glass + grain blocks on older designs
   refreshAnimationUI();         // reflect persisted animation (tracks, duration, toggle)
   refreshKenBurnsUI();          // reflect persisted Ken Burns toggle + controls
+  refreshEffectsUI();           // reflect persisted glass + grain controls
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 
