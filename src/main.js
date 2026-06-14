@@ -33,6 +33,7 @@ import { bindColorMap } from './features/color-map.js';
 import { bindCompose } from './features/compose.js';
 import { bindBrandKit } from './features/brand-kit.js';
 import { bindBgRemove } from './features/bg-remove.js';
+import { bindAiAssets } from './features/ai-assets.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
@@ -113,6 +114,7 @@ function init() {
   bindCompose();       // v18 — design variations generator
   bindBrandKit();
   bindBgRemove();
+  bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindOcr();
   bindApiKeysPanel();
   bindAiCloud();

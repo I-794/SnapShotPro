@@ -430,9 +430,19 @@
                 <button class="btn btn-primary" style="width:100%;margin-top:6px;" id="art-director-btn">🎬 Generate full design</button>
             </div>
             <div class="control-group" style="margin-top:8px;">
-                <label class="control-label">AI Background</label>
-                <input type="text" class="control-input" id="ai-bg-prompt" placeholder="e.g. soft pastel waves, abstract">
-                <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="ai-bg-btn">🎨 Generate Background</button>
+                <label class="control-label">AI Assets <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v19</span></label>
+                <p class="info-text" style="margin-bottom:8px;">Generate an on-brand background, and optionally drop your subject onto it.</p>
+                <input type="text" class="control-input" id="ai-asset-prompt" placeholder="e.g. soft sunrise over mountains" style="margin-bottom:8px;">
+                <div class="tab-row" style="flex-wrap:wrap;margin-bottom:8px;">
+                    <button class="tab-btn active" data-asset-style="photographic">Photographic</button>
+                    <button class="tab-btn" data-asset-style="abstract">Abstract</button>
+                    <button class="tab-btn" data-asset-style="studio">Studio</button>
+                    <button class="tab-btn" data-asset-style="gradient">Gradient</button>
+                </div>
+                <div class="toggle-switch"><span class="toggle-label">Use my palette</span><label class="switch"><input type="checkbox" id="ai-asset-brand" checked><span class="slider"></span></label></div>
+                <div class="toggle-switch"><span class="toggle-label">Place behind subject</span><label class="switch"><input type="checkbox" id="ai-asset-isolate"><span class="slider"></span></label></div>
+                <button class="vary-generate" id="ai-asset-generate">✨ Generate Background</button>
+                <p class="info-text" id="ai-asset-status" style="margin-top:8px;"></p>
             </div>
             <p class="info-text" id="ai-cloud-status" style="min-height:14px;margin-top:4px;"></p>
             <div id="ai-cloud-result" class="ocr-result" style="display:none;max-height:220px;"></div>
