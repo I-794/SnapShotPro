@@ -13,6 +13,7 @@ import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
+import { sampleKenBurns } from '../features/ken-burns.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { bakePerspective } from './perspective.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
@@ -235,6 +236,25 @@ function drawImageContent(ctx, x, y, imgWidth, imgHeight) {
   if (state.imageTransform.rotation === 90 || state.imageTransform.rotation === 270) {
     drawWidth = imgHeight; drawHeight = imgWidth;
   }
-  ctx.drawImage(state.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+  // v15.2 — Ken Burns crops the source by the sampled window and maps it onto
+  // the full destination rect, zooming/panning the still. Off while a clip is
+  // loaded (auto-zoom owns the crop). Falls back to a plain full-image draw.
+  const kb = state.kenBurns;
+  const img = state.image;
+  if (kb && kb.enabled && !state.video.loaded && img && img.width && img.height) {
+    const a = state.animation;
+    const p = (a && a.duration > 0) ? (a.currentTime || 0) / a.duration : 0;
+    const s = sampleKenBurns(kb, p);
+    const sw = img.width / s.scale;
+    const sh = img.height / s.scale;
+    let sx = s.cx * img.width - sw / 2;
+    let sy = s.cy * img.height - sh / 2;
+    sx = Math.max(0, Math.min(sx, img.width - sw));
+    sy = Math.max(0, Math.min(sy, img.height - sh));
+    ctx.drawImage(img, sx, sy, sw, sh, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+  } else {
+    ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+  }
   ctx.restore();
 }

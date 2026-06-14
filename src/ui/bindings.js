@@ -7,6 +7,8 @@ import { isValidHex } from '../utils/color.js';
 import { applyMeshPreset, renderMeshPad } from '../features/mesh-pad.js';
 import { renderGradientEditor, syncFromGradientState } from '../features/gradient-editor.js';
 import { syncMotionExportControls } from '../features/video-export.js';
+import { refreshAnimationUI } from '../features/animation.js';
+import { refreshKenBurnsUI } from '../features/ken-burns.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -470,6 +472,8 @@ export function updateUIFromState() {
   ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
   ensureAnimationDefaults();    // backfill v15.2 animation block; force runtime off
   ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
+  refreshAnimationUI();         // reflect persisted animation (tracks, duration, toggle)
+  refreshKenBurnsUI();          // reflect persisted Ken Burns toggle + controls
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 

@@ -188,6 +188,18 @@
         <div class="sidebar-section">
             <h3 class="section-title">Animation</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Animation</span><label class="switch"><input type="checkbox" id="animation-enabled"><span class="slider"></span></label></div>
+            <div class="toggle-switch"><span class="toggle-label">Ken Burns pan / zoom</span><label class="switch"><input type="checkbox" id="ken-burns-enabled"><span class="slider"></span></label></div>
+            <div id="ken-burns-controls" style="display:none;">
+                <p class="info-text" style="margin-bottom:6px;">Slowly pan and zoom a still while it plays. Disabled while a clip is loaded.</p>
+                <label class="control-label">Presets</label>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;">
+                    <button class="btn btn-secondary" data-kb-preset="zoomIn" style="font-size:11px;padding:7px 4px;">Zoom in</button>
+                    <button class="btn btn-secondary" data-kb-preset="zoomOut" style="font-size:11px;padding:7px 4px;">Zoom out</button>
+                    <button class="btn btn-secondary" data-kb-preset="panLeft" style="font-size:11px;padding:7px 4px;">Pan left</button>
+                    <button class="btn btn-secondary" data-kb-preset="panRight" style="font-size:11px;padding:7px 4px;">Pan right</button>
+                    <button class="btn btn-secondary" data-kb-preset="classic" style="font-size:11px;padding:7px 4px;">Classic</button>
+                </div>
+            </div>
             <div id="animation-controls" style="display:none;">
                 <div class="control-group">
                     <label class="control-label">Duration</label>

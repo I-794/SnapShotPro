@@ -103,6 +103,8 @@ const IDS = [
   // v7 — animation
   'animation-enabled', 'animation-controls', 'animation-duration', 'animation-duration-value',
   'animation-play-btn', 'animation-track-list', 'gif-export-btn', 'gif-progress',
+  // v15.2 — Ken Burns + still MP4 export
+  'ken-burns-enabled', 'ken-burns-controls', 'mp4-export-btn',
 
   // v7 — AI enhance
   'ai-enhance-btn', 'style-reset-btn',

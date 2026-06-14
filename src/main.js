@@ -46,6 +46,7 @@ import { bindShare } from './features/share.js';
 import { bindCollab } from './features/collab.js';
 import { bindAiEnhance } from './features/ai-enhance.js';
 import { bindAnimation } from './features/animation.js';
+import { bindKenBurns } from './features/ken-burns.js';
 import { bindGifExport } from './features/gif-export.js';
 import { bindVideo } from './features/video.js';
 import { bindVideoExport } from './features/video-export.js';
@@ -121,6 +122,7 @@ function init() {
   bindCollab();
   bindAiEnhance();
   bindAnimation();
+  bindKenBurns();
   bindGifExport();
   bindVideo();
   bindVideoExport();

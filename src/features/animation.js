@@ -36,8 +36,12 @@ let animationFrameId = null;
 let startTime = 0;
 
 function playAnimation() {
-  if (!state.animation.enabled || state.animation.tracks.length === 0) {
-    showNotification('Add an animation preset first.', 'error');
+  // v15.2 — Ken Burns drives the same clock, so playback runs when either an
+  // entrance track exists OR Ken Burns is enabled (and no clip is loaded).
+  const hasTracks = state.animation.enabled && state.animation.tracks.length > 0;
+  const hasKenBurns = state.kenBurns && state.kenBurns.enabled && !state.video.loaded;
+  if (!hasTracks && !hasKenBurns) {
+    showNotification('Add an animation preset or enable Ken Burns first.', 'error');
     return;
   }
 
@@ -219,6 +223,25 @@ export function animationPresetIds() {
   return Object.keys(ANIMATION_PRESETS);
 }
 
+// v15.2 — reflect animation state into the section after a load / reset / undo.
+// The toggle, duration, controls visibility, and track list weren't synced on
+// restore before animation persisted (Feature 4); now that it does, a loaded
+// design opens showing its tracks with the controls revealed when motion is set.
+export function refreshAnimationUI() {
+  const toggle = document.getElementById('animation-enabled');
+  const controls = document.getElementById('animation-controls');
+  const durationSlider = document.getElementById('animation-duration');
+  const durationValue = document.getElementById('animation-duration-value');
+  const secs = (state.animation.duration || 3000) / 1000;
+  if (toggle) toggle.checked = !!state.animation.enabled;
+  if (durationSlider) durationSlider.value = secs;
+  if (durationValue) durationValue.textContent = `${secs}s`;
+  if (controls) controls.style.display =
+    (state.animation.enabled || (state.kenBurns && state.kenBurns.enabled)) ? 'block' : 'none';
+  updateTrackDisplay();
+  updatePlaybackUI();
+}
+
 export function bindAnimation() {
   const toggle = document.getElementById('animation-enabled');
   const controls = document.getElementById('animation-controls');
@@ -229,7 +252,10 @@ export function bindAnimation() {
   if (toggle) {
     toggle.addEventListener('change', () => {
       state.animation.enabled = toggle.checked;
-      if (controls) controls.style.display = toggle.checked ? 'block' : 'none';
+      // Keep the controls visible if Ken Burns is still on (it shares Play +
+      // Duration), so disabling entrance animation doesn't hide them.
+      if (controls) controls.style.display =
+        (toggle.checked || (state.kenBurns && state.kenBurns.enabled)) ? 'block' : 'none';
     });
   }
 
