@@ -29,10 +29,11 @@ function setBg(mode) {
   saveStateToHistory();
   state.bgMode = mode;
   document.querySelectorAll('.tab-btn[data-bg]').forEach(b => b.classList.toggle('active', b.dataset.bg === mode));
-  ['bgGradientPanel', 'bgMeshPanel', 'bgSolidPanel', 'bgTransparentPanel'].forEach(k => { if (el[k]) el[k].style.display = 'none'; });
+  ['bgGradientPanel', 'bgMeshPanel', 'bgSolidPanel', 'bgPatternPanel', 'bgTransparentPanel'].forEach(k => { if (el[k]) el[k].style.display = 'none'; });
   if (mode === 'gradient' && el.bgGradientPanel) el.bgGradientPanel.style.display = 'block';
   if (mode === 'mesh' && el.bgMeshPanel) el.bgMeshPanel.style.display = 'block';
   if (mode === 'solid' && el.bgSolidPanel) el.bgSolidPanel.style.display = 'block';
+  if (mode === 'pattern' && el.bgPatternPanel) el.bgPatternPanel.style.display = 'block';
   if (mode === 'transparent' && el.bgTransparentPanel) el.bgTransparentPanel.style.display = 'block';
   render();
 }

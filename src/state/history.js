@@ -50,7 +50,9 @@ function snapshot() {
     kenBurns: state.kenBurns,
     // v16.1 — Studio Effects overlays.
     glass: state.glass,
-    grain: state.grain
+    grain: state.grain,
+    // v16.2 — pattern background.
+    pattern: state.pattern
   }));
 }
 

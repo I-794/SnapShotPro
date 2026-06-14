@@ -17,7 +17,9 @@ export const SERIALIZED_FIELDS = [
   // defining and lightweight, so shared/gallery designs animate too.
   'animation', 'kenBurns',
   // v16.1 — Studio Effects overlays (liquid glass + film grain).
-  'glass', 'grain'
+  'glass', 'grain',
+  // v16.2 — pattern background (active only when bgMode === 'pattern').
+  'pattern'
 ];
 
 // v15.2 — strip the animation playback runtime so a saved, shared, or restored

@@ -44,6 +44,9 @@ export const state = {
   bgMode: 'gradient',
   bgColor: '#1a1a2e',
   bgImage: null,
+  // v16.2 — tiled pattern background. Active only when bgMode === 'pattern', so
+  // the gradient default is untouched until the user picks the Pattern tab.
+  pattern: { type: 'dots', fg: '#ffffff', bg: '#1a1a2e', size: 24, opacity: 100, angle: 0 },
   deviceFrame: { type: null, color: 'dark', glare: true, url: 'https://example.com', title: 'Screenshot' },
   annotations: [],
   redactions: [],

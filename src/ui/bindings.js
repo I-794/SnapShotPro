@@ -2,7 +2,7 @@ import { state } from '../state/state.js';
 import { el } from './elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
-import { gradientPresets, shadowPresets, sizePresets } from '../state/presets.js';
+import { gradientPresets, shadowPresets, sizePresets, artFilterPresets } from '../state/presets.js';
 import { isValidHex } from '../utils/color.js';
 import { applyMeshPreset, renderMeshPad } from '../features/mesh-pad.js';
 import { renderGradientEditor, syncFromGradientState } from '../features/gradient-editor.js';
@@ -51,6 +51,7 @@ function setBgMode(mode) {
   if (el.bgGradientPanel) el.bgGradientPanel.style.display = mode === 'gradient' ? 'block' : 'none';
   if (el.bgMeshPanel) el.bgMeshPanel.style.display = mode === 'mesh' ? 'block' : 'none';
   if (el.bgSolidPanel) el.bgSolidPanel.style.display = mode === 'solid' ? 'block' : 'none';
+  if (el.bgPatternPanel) el.bgPatternPanel.style.display = mode === 'pattern' ? 'block' : 'none';
   if (el.bgTransparentPanel) el.bgTransparentPanel.style.display = mode === 'transparent' ? 'block' : 'none';
   if (mode === 'mesh') {
     renderMeshPad();
@@ -126,6 +127,25 @@ function ensureAnimationDefaults() {
 function ensureEffectsDefaults() {
   if (!state.glass) state.glass = { enabled: false, x: 0.3, y: 0.3, w: 0.4, h: 0.3, radius: 24, blur: 12, tint: '#ffffff', tintOpacity: 12, rim: true, rimOpacity: 40 };
   if (!state.grain) state.grain = { enabled: false, amount: 18, scale: 1, blend: 'overlay', monochrome: true };
+}
+
+// v16.2 — backfill + reflect the pattern background block.
+function ensurePatternDefaults() {
+  if (!state.pattern) state.pattern = { type: 'dots', fg: '#ffffff', bg: '#1a1a2e', size: 24, opacity: 100, angle: 0 };
+}
+function refreshPatternUI() {
+  const p = state.pattern;
+  if (el.patternFg) el.patternFg.value = p.fg;
+  if (el.patternFgText) el.patternFgText.value = p.fg;
+  if (el.patternBg) el.patternBg.value = p.bg;
+  if (el.patternBgText) el.patternBgText.value = p.bg;
+  if (el.patternSize) el.patternSize.value = p.size;
+  if (el.patternSizeValue) el.patternSizeValue.textContent = p.size;
+  if (el.patternOpacity) el.patternOpacity.value = p.opacity;
+  if (el.patternOpacityValue) el.patternOpacityValue.textContent = p.opacity + '%';
+  if (el.patternAngle) el.patternAngle.value = p.angle;
+  if (el.patternAngleValue) el.patternAngleValue.textContent = p.angle + '°';
+  document.querySelectorAll('.tab-btn[data-pattern-type]').forEach(b => b.classList.toggle('active', b.dataset.patternType === p.type));
 }
 
 // v15.2 — backfill the Ken Burns block on designs saved before it existed.
@@ -233,6 +253,37 @@ function bindBackground() {
   });
 
   linkColor(el.bgSolidColor, el.bgSolidColorText, v => state.bgColor = v);
+
+  // v16.2 — pattern background controls.
+  document.querySelectorAll('.tab-btn[data-pattern-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      saveStateToHistory();
+      state.pattern.type = btn.dataset.patternType;
+      document.querySelectorAll('.tab-btn[data-pattern-type]').forEach(b => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+  linkColor(el.patternFg, el.patternFgText, v => state.pattern.fg = v);
+  linkColor(el.patternBg, el.patternBgText, v => state.pattern.bg = v);
+  linkSlider(el.patternSize, el.patternSizeValue, v => v, v => state.pattern.size = v);
+  linkSlider(el.patternOpacity, el.patternOpacityValue, v => v + '%', v => state.pattern.opacity = v);
+  linkSlider(el.patternAngle, el.patternAngleValue, v => v + '°', v => state.pattern.angle = v);
+}
+
+// v16.2 — art-filter presets: each replaces state.imageFilters wholesale, then
+// updateUIFromState re-syncs every filter slider. Exports for free (render reads
+// state.imageFilters).
+function bindArtFilterPresets() {
+  document.querySelectorAll('.tab-btn[data-art-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = artFilterPresets[btn.dataset.artPreset];
+      if (!preset) return;
+      saveStateToHistory();
+      state.imageFilters = { ...preset };
+      updateUIFromState();
+      render();
+    });
+  });
 }
 
 function bindImageSettings() {
@@ -480,9 +531,11 @@ export function updateUIFromState() {
   ensureAnimationDefaults();    // backfill v15.2 animation block; force runtime off
   ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
   ensureEffectsDefaults();      // backfill v16.1 glass + grain blocks on older designs
+  ensurePatternDefaults();      // backfill v16.2 pattern block on older designs
   refreshAnimationUI();         // reflect persisted animation (tracks, duration, toggle)
   refreshKenBurnsUI();          // reflect persisted Ken Burns toggle + controls
   refreshEffectsUI();           // reflect persisted glass + grain controls
+  refreshPatternUI();           // reflect persisted pattern background controls
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 
@@ -597,6 +650,7 @@ export function updateUIFromState() {
 export function bindAllControls() {
   bindImageEditing();
   bindBackground();
+  bindArtFilterPresets();
   bindImageSettings();
   bindDeviceFrame();
   bindShadow();

@@ -26,6 +26,10 @@ const IDS = [
   // Background panels
   'bg-gradient-panel', 'bg-solid-panel', 'bg-transparent-panel', 'bg-mesh-panel',
   'bg-solid-color', 'bg-solid-color-text',
+  // v16.2 — pattern background
+  'bg-pattern-panel', 'pattern-fg', 'pattern-fg-text', 'pattern-bg', 'pattern-bg-text',
+  'pattern-size', 'pattern-size-value', 'pattern-opacity', 'pattern-opacity-value',
+  'pattern-angle', 'pattern-angle-value',
 
   // Image settings
   'padding', 'padding-value', 'scale', 'scale-value',
