@@ -4,6 +4,8 @@ import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { escapeHTML } from '../utils/dom.js';
 import { BLEND_MODES } from '../render/blend.js';
+import { EASING_OPTIONS } from '../render/easing.js';
+import { animationPresetIds, trackForTarget, addAnimationTrack, removeAnimationTrack } from './animation.js';
 
 function buildLayerList() {
   const layers = [];
@@ -123,11 +125,21 @@ function currentStyleTarget() {
   return styleTargetFor(ids[0]);
 }
 
+// v15.2 — map a selected layer id to its animation target ('image' for the main
+// screenshot, else the layer id which the per-element draws key off).
+function animTargetForId(id) {
+  if (id === 'L:image') return 'image';
+  if (id === 'L:text' || /^L:(ann|extra):/.test(id)) return id;
+  return null;
+}
+
 // Show the footer only for a single selection that supports layer styles, and
 // sync the controls to that layer's current values.
 function updateLayerStyleControls() {
   const footer = el.layersFooter;
   if (!footer) return;
+  const ids = state.selection.layerIds;
+  const single = ids.length === 1 ? ids[0] : null;
   const tgt = currentStyleTarget();
   if (!tgt) { footer.hidden = true; return; }
   footer.hidden = false;
@@ -135,6 +147,13 @@ function updateLayerStyleControls() {
   if (el.layerBlend) el.layerBlend.value = tgt.blend || 'source-over';
   if (el.layerOpacity) el.layerOpacity.value = opacity;
   if (el.layerOpacityValue) el.layerOpacityValue.textContent = opacity + '%';
+
+  // Entrance animation controls: reflect the track targeting this layer.
+  const target = animTargetForId(single);
+  const track = target ? trackForTarget(target) : null;
+  if (el.layerEntrancePreset) el.layerEntrancePreset.value = track ? track.preset : '';
+  if (el.layerEntranceEasing) el.layerEntranceEasing.value = track ? (track.easing || 'easeInOut') : 'easeInOut';
+  if (el.layerEntranceEasingRow) el.layerEntranceEasingRow.hidden = !track;
 }
 
 function bindLayerStyleControls() {
@@ -161,6 +180,32 @@ function bindLayerStyleControls() {
     });
     el.layerOpacity.addEventListener('change', () => {
       if (currentStyleTarget()) saveStateToHistory();
+    });
+  }
+
+  // v15.2 — per-element entrance preset + easing for the single selection.
+  if (el.layerEntrancePreset) {
+    el.layerEntrancePreset.innerHTML = '<option value="">None</option>' +
+      animationPresetIds().map(p => `<option value="${p}">${p}</option>`).join('');
+    el.layerEntrancePreset.addEventListener('change', (e) => {
+      const ids = state.selection.layerIds;
+      if (ids.length !== 1) return;
+      if (e.target.value) addAnimationTrack(e.target.value);   // targets the selection
+      else removeAnimationTrack(animTargetForId(ids[0]));
+      updateLayerStyleControls();
+    });
+  }
+  if (el.layerEntranceEasing) {
+    el.layerEntranceEasing.innerHTML = EASING_OPTIONS.map(o =>
+      `<option value="${o.id}">${o.name}</option>`).join('');
+    el.layerEntranceEasing.addEventListener('change', (e) => {
+      const ids = state.selection.layerIds;
+      if (ids.length !== 1) return;
+      const track = trackForTarget(animTargetForId(ids[0]));
+      if (!track) return;
+      saveStateToHistory();
+      track.easing = e.target.value;
+      render();
     });
   }
 }

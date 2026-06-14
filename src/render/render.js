@@ -165,11 +165,15 @@ export function renderInto(canvas, forExport) {
     drawDeviceFrame(ctx, x, y - titleBarHeight, imgWidth, imgHeight + titleBarHeight + bottomPad);
   }
 
+  // v15.2 — close the main-image entrance transform here so it wraps only the
+  // framed screenshot (image + border + frame), not the annotations / extra
+  // images below, which carry their own per-element entrances (applyEntrance).
+  if (animState) ctx.restore();
+
   drawRedactions(ctx, canvas);
   drawSpotlight(ctx, canvas);
   drawAnnotations(ctx);
   renderExtraImages(ctx, canvas);
-  if (animState) ctx.restore();
 
   // v14 — mirrored reflection of the framed subject, below it.
   if (state.reflection && state.reflection.enabled && state.lastImageRect) {
