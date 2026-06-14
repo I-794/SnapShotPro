@@ -44,12 +44,25 @@ export const state = {
   bgMode: 'gradient',
   bgColor: '#1a1a2e',
   bgImage: null,
+  // v16.2 — tiled pattern background. Active only when bgMode === 'pattern', so
+  // the gradient default is untouched until the user picks the Pattern tab.
+  pattern: { type: 'dots', fg: '#ffffff', bg: '#1a1a2e', size: 24, opacity: 100, angle: 0 },
   deviceFrame: { type: null, color: 'dark', glare: true, url: 'https://example.com', title: 'Screenshot' },
   annotations: [],
   redactions: [],
   spotlight: { enabled: false, x: 0.2, y: 0.2, w: 0.6, h: 0.6, opacity: 0.65 },
   annotationColor: '#ff3b30',
   annotationStrokeWidth: 4,
+  // v16.0 — vector shape tools. Fill applies to the closeable shapes
+  // (rect/circle/triangle/polygon/star); line + arrow stay stroke-only.
+  annotationFill: { enabled: false, color: '#ffffff', opacity: 100 },
+  polygonSides: 6,
+  starPoints: 5,
+  // v16.1 — Studio Effects overlays, both off by default (no-op until enabled).
+  // glass: a frosted glassmorphism panel that samples + blurs the pixels behind
+  // it (fractional x/y/w/h of the canvas). grain: a full-canvas film-grain pass.
+  glass: { enabled: false, x: 0.3, y: 0.3, w: 0.4, h: 0.3, radius: 24, blur: 12, tint: '#ffffff', tintOpacity: 12, rim: true, rimOpacity: 40 },
+  grain: { enabled: false, amount: 18, scale: 1, blend: 'overlay', monochrome: true },
   tool: 'select',
   selectedAnnotation: null,
   selectedRedaction: null,

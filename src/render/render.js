@@ -14,6 +14,7 @@ import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
 import { sampleKenBurns } from '../features/ken-burns.js';
+import { drawEffects } from './effects.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { bakePerspective } from './perspective.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
@@ -99,6 +100,7 @@ export function renderInto(canvas, forExport) {
       }
 
       if (!forExport) drawGuides(ctx);
+      drawEffects(ctx, canvas);   // v16.1 — glass + grain over the composited mockup (samples the main canvas)
       drawTextOverlay(ctx, canvas);
       drawWatermark(ctx, canvas);
       drawLogo(ctx, canvas);
@@ -181,6 +183,8 @@ export function renderInto(canvas, forExport) {
     drawReflection(ctx, canvas, state.lastImageRect);
   }
   if (!forExport) drawGuides(ctx);
+
+  drawEffects(ctx, canvas);   // v16.1 — glass + grain over the framed subject, under text/watermark/logo
 
   drawTextOverlay(ctx, canvas);
   drawWatermark(ctx, canvas);

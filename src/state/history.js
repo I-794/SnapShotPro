@@ -33,6 +33,9 @@ function snapshot() {
     spotlight: state.spotlight,
     annotationColor: state.annotationColor,
     annotationStrokeWidth: state.annotationStrokeWidth,
+    annotationFill: state.annotationFill,
+    polygonSides: state.polygonSides,
+    starPoints: state.starPoints,
     nextNumber: state.nextNumber,
     redactType: state.redactType,
     redactIntensity: state.redactIntensity,
@@ -44,7 +47,12 @@ function snapshot() {
     // v15.2 — animation edits (tracks, easing, duration) are now undoable.
     // Snapshot a runtime-stripped copy so undo never restores mid-playback.
     animation: { ...state.animation, playing: false, currentTime: 0 },
-    kenBurns: state.kenBurns
+    kenBurns: state.kenBurns,
+    // v16.1 — Studio Effects overlays.
+    glass: state.glass,
+    grain: state.grain,
+    // v16.2 — pattern background.
+    pattern: state.pattern
   }));
 }
 

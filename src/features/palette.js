@@ -22,6 +22,7 @@ import { togglePlay } from './video.js';
 import { focusUrlLoad } from './url-load.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
+import { resetOnboarding } from './welcome.js';
 
 let commands = [];
 
@@ -29,10 +30,11 @@ function setBg(mode) {
   saveStateToHistory();
   state.bgMode = mode;
   document.querySelectorAll('.tab-btn[data-bg]').forEach(b => b.classList.toggle('active', b.dataset.bg === mode));
-  ['bgGradientPanel', 'bgMeshPanel', 'bgSolidPanel', 'bgTransparentPanel'].forEach(k => { if (el[k]) el[k].style.display = 'none'; });
+  ['bgGradientPanel', 'bgMeshPanel', 'bgSolidPanel', 'bgPatternPanel', 'bgTransparentPanel'].forEach(k => { if (el[k]) el[k].style.display = 'none'; });
   if (mode === 'gradient' && el.bgGradientPanel) el.bgGradientPanel.style.display = 'block';
   if (mode === 'mesh' && el.bgMeshPanel) el.bgMeshPanel.style.display = 'block';
   if (mode === 'solid' && el.bgSolidPanel) el.bgSolidPanel.style.display = 'block';
+  if (mode === 'pattern' && el.bgPatternPanel) el.bgPatternPanel.style.display = 'block';
   if (mode === 'transparent' && el.bgTransparentPanel) el.bgTransparentPanel.style.display = 'block';
   render();
 }
@@ -110,7 +112,9 @@ export function registerCommands() {
     { id: 'video-gif',        label: 'Video: Export GIF',    icon: '⬇', run: exportVideoGif },
     { id: 'gallery-browse',   label: 'Browse community gallery', icon: '🌐', run: openGalleryBrowse },
     { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() },
-    { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() }
+    { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
+    { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
+    { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 
   // Quick-add stickers as commands

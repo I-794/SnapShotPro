@@ -15,7 +15,11 @@ export const SERIALIZED_FIELDS = [
   'redactions', 'spotlight', 'meshGradient', 'tilt3d', 'scene', 'autoLayout',
   // v15.2 — animation tracks (entrance + easing) and Ken Burns are design-
   // defining and lightweight, so shared/gallery designs animate too.
-  'animation', 'kenBurns'
+  'animation', 'kenBurns',
+  // v16.1 — Studio Effects overlays (liquid glass + film grain).
+  'glass', 'grain',
+  // v16.2 — pattern background (active only when bgMode === 'pattern').
+  'pattern'
 ];
 
 // v15.2 — strip the animation playback runtime so a saved, shared, or restored
@@ -40,14 +44,17 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 15;
+export const SCHEMA_VERSION = 16;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
 export const PROJECT_FIELDS = [
   ...SERIALIZED_FIELDS,
   'windowOverlay', 'annotationColor', 'annotationStrokeWidth', 'nextNumber',
-  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion'
+  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion',
+  // v16.0 — shape-tool defaults (per-shape fill/sides/points already ride along
+  // inside each `annotations` record, which is serialized above).
+  'annotationFill', 'polygonSides', 'starPoints'
 ];
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the

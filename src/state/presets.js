@@ -49,6 +49,17 @@ export const tiltPresets = {
   card: { rx:  -8, ry:  0, rz: -4, perspective: 1600 }
 };
 
+// v16.2 — art-filter presets. Each is a complete imageFilters object, so
+// applying one replaces the current filters wholesale (and exports for free,
+// since render reads state.imageFilters). "None" is the neutral reset.
+export const artFilterPresets = {
+  none:    { brightness: 100, contrast: 100, saturation: 100, blur: 0, grayscale: 0, sepia: 0 },
+  noir:    { brightness: 100, contrast: 120, saturation: 100, blur: 0, grayscale: 100, sepia: 0 },
+  vintage: { brightness: 100, contrast: 110, saturation: 80,  blur: 0, grayscale: 0,   sepia: 60 },
+  vivid:   { brightness: 100, contrast: 115, saturation: 160, blur: 0, grayscale: 0,   sepia: 0 },
+  faded:   { brightness: 108, contrast: 95,  saturation: 70,  blur: 0, grayscale: 0,   sepia: 0 }
+};
+
 // v15.2 — Ken Burns pan/zoom keyframes. Focal points are 0..1 of the image,
 // scale is >=1. Pan presets keep a constant scale > 1 so there is room to move
 // the crop window; the zoom presets hold the center and change scale.

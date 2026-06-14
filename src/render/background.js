@@ -19,11 +19,70 @@ export function drawBackground(ctx, canvas, forExport) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else if (state.bgMode === 'mesh') {
     drawMeshGradient(ctx, canvas);
+  } else if (state.bgMode === 'pattern') {
+    drawPattern(ctx, canvas);
   } else if (state.bgMode === 'image' && state.bgImage) {
     drawImageBackground(ctx, canvas);
   } else {
     drawGradient(ctx, canvas);
   }
+}
+
+// v16.2 — tiled pattern background. The tile carries only the foreground motif
+// (transparent elsewhere); the solid bg is filled first and the motif drawn over
+// it at the chosen opacity, so opacity fades the motif against the bg color.
+function patternTile(p) {
+  const s = Math.max(4, p.size || 24);
+  const c = document.createElement('canvas');
+  c.width = s; c.height = s;
+  const x = c.getContext('2d');
+  x.fillStyle = p.fg;
+  x.strokeStyle = p.fg;
+  const lw = Math.max(1, Math.round(s * 0.07));
+  if (p.type === 'dots') {
+    x.beginPath();
+    x.arc(s / 2, s / 2, Math.max(1, s * 0.16), 0, Math.PI * 2);
+    x.fill();
+  } else if (p.type === 'grid') {
+    x.fillRect(0, 0, s, lw);
+    x.fillRect(0, 0, lw, s);
+  } else if (p.type === 'lines') {
+    x.fillRect(0, 0, s, lw);
+  } else if (p.type === 'checker') {
+    x.fillRect(0, 0, s / 2, s / 2);
+    x.fillRect(s / 2, s / 2, s / 2, s / 2);
+  } else if (p.type === 'diagonal') {
+    x.lineWidth = lw;
+    x.beginPath();
+    x.moveTo(0, s); x.lineTo(s, 0);
+    x.moveTo(-1, 1); x.lineTo(1, -1);
+    x.moveTo(s - 1, s + 1); x.lineTo(s + 1, s - 1);
+    x.stroke();
+  }
+  return c;
+}
+
+function drawPattern(ctx, canvas) {
+  const p = state.pattern || {};
+  const w = canvas.width, h = canvas.height;
+  ctx.save();
+  ctx.fillStyle = p.bg || '#1a1a2e';
+  ctx.fillRect(0, 0, w, h);
+  const pat = ctx.createPattern(patternTile(p), 'repeat');
+  if (pat) {
+    ctx.globalAlpha = Math.max(0, Math.min(1, (p.opacity ?? 100) / 100));
+    ctx.fillStyle = pat;
+    if (p.angle) {
+      const cx = w / 2, cy = h / 2, d = Math.hypot(w, h);
+      ctx.translate(cx, cy);
+      ctx.rotate((p.angle * Math.PI) / 180);
+      ctx.translate(-cx, -cy);
+      ctx.fillRect(cx - d, cy - d, d * 2, d * 2);
+    } else {
+      ctx.fillRect(0, 0, w, h);
+    }
+  }
+  ctx.restore();
 }
 
 function drawGradient(ctx, canvas) {

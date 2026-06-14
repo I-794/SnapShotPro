@@ -26,6 +26,10 @@ const IDS = [
   // Background panels
   'bg-gradient-panel', 'bg-solid-panel', 'bg-transparent-panel', 'bg-mesh-panel',
   'bg-solid-color', 'bg-solid-color-text',
+  // v16.2 — pattern background
+  'bg-pattern-panel', 'pattern-fg', 'pattern-fg-text', 'pattern-bg', 'pattern-bg-text',
+  'pattern-size', 'pattern-size-value', 'pattern-opacity', 'pattern-opacity-value',
+  'pattern-angle', 'pattern-angle-value',
 
   // Image settings
   'padding', 'padding-value', 'scale', 'scale-value',
@@ -46,6 +50,12 @@ const IDS = [
 
   // Spotlight
   'spotlight-enabled', 'spotlight-controls', 'spotlight-opacity', 'spotlight-opacity-value',
+
+  // v16.1 — Studio Effects: liquid glass + film grain
+  'glass-enabled', 'glass-controls', 'glass-blur', 'glass-blur-value',
+  'glass-radius', 'glass-radius-value', 'glass-tint', 'glass-tint-opacity', 'glass-tint-opacity-value', 'glass-rim',
+  'grain-enabled', 'grain-controls', 'grain-amount', 'grain-amount-value',
+  'grain-scale', 'grain-scale-value', 'grain-blend', 'grain-monochrome',
 
   // Reflection (v14)
   'reflection-enabled', 'reflection-controls', 'reflection-opacity', 'reflection-opacity-value',

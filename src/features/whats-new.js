@@ -10,22 +10,18 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '15.2';
+const CURRENT_VERSION = '16.2';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v15.2",
+  heading: "What's new in v16.2",
   items: [
-    { title: 'Ken Burns pan and zoom',
-      desc: 'Bring a still to life with a slow pan and zoom. Pick a preset, press play, and it exports as motion too.' },
-    { title: 'Entrance animations for any element',
-      desc: 'Give a text overlay, an annotation, or an added image its own entrance from the layers panel. Each plays on its own track.' },
-    { title: 'Easing curves',
-      desc: 'Pick from eight easing curves per animation track, from linear and ease in-out to overshoot, elastic, and bounce.' },
-    { title: 'Export a still as MP4',
-      desc: 'Animated stills and Ken Burns moves now export to MP4, not just GIF, with the same resolution and quality controls.' }
+    { title: 'Pattern backgrounds',
+      desc: 'A new Pattern background with dots, grid, lines, checker, and diagonal, each with color, size, opacity, and angle.' },
+    { title: 'Art filter presets',
+      desc: 'One-tap looks above the filter sliders: Noir, Vintage, Vivid, and Faded, plus None to reset.' }
   ]
 };
 

@@ -1,31 +1,44 @@
-/* Shared design system for SnapShot-Pro content pages (changelog, privacy,
-   app-store-screenshots). Mirrors the landing page tokens so sub-pages stay
-   visually consistent. The landing (index.html) keeps its own inline styles. */
+/* Shared dark-glass design system for SnapShot-Pro content pages (guide,
+   changelog, privacy, app-store-screenshots). Mirrors the landing page so the
+   whole marketing site is one cohesive premium glassmorphism look. Token NAMES
+   are preserved (--bg-raise, --line, --ink, etc.) so each page's existing
+   component CSS adapts to the dark theme automatically. */
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    --bg: #f7f7f4;
-    --bg-raise: #ffffff;
-    --bg-sunken: #efefe9;
-    --ink: #15161a;
-    --ink-2: #55565e;
-    --ink-3: #8a8b92;
-    --line: rgba(21, 22, 26, 0.09);
-    --line-strong: rgba(21, 22, 26, 0.16);
-    --accent: #2348ff;
-    --accent-press: #1a37d6;
-    --accent-soft: rgba(35, 72, 255, 0.08);
-    --accent-line: rgba(35, 72, 255, 0.22);
+    /* Dark glass — deep navy base, never pure black */
+    --bg: #080b14;
+    --bg-2: #0c1020;
+    --bg-raise: #121829;      /* raised card surface */
+    --bg-sunken: #0b0f1c;
+    --ink: #eef1f8;
+    --ink-2: #aab2c8;
+    --ink-3: #6f7794;
+    --line: rgba(255, 255, 255, 0.10);
+    --line-strong: rgba(255, 255, 255, 0.18);
+    /* Frosted surfaces */
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-2: rgba(255, 255, 255, 0.08);
+    --glass-line: rgba(255, 255, 255, 0.12);
+    --glass-hi: rgba(255, 255, 255, 0.55);
+    /* Electric cobalt — the one and only accent (brighter on dark) */
+    --accent: #4f7cff;
+    --accent-deep: #2348ff;
+    --accent-press: #6d91ff;
+    --accent-soft: rgba(79, 124, 255, 0.14);
+    --accent-line: rgba(79, 124, 255, 0.40);
     --on-accent: #ffffff;
 
     --r-card: 22px;
     --r-sm: 12px;
     --r-pill: 999px;
 
-    --shadow-sm: 0 1px 2px rgba(22, 25, 50, 0.04), 0 6px 18px rgba(22, 25, 50, 0.05);
-    --shadow-lift: 0 2px 4px rgba(22, 25, 50, 0.05), 0 22px 50px rgba(22, 25, 50, 0.10);
-    --shadow-product: 0 2px 6px rgba(20, 28, 70, 0.06), 0 50px 100px -30px rgba(20, 28, 70, 0.34);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.26);
+    --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.35), 0 28px 60px rgba(0, 0, 0, 0.45);
+    --shadow-product: 0 2px 6px rgba(0, 0, 0, 0.4), 0 50px 100px -30px rgba(0, 0, 0, 0.6);
+    --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 24px 60px rgba(4, 8, 24, 0.55);
+    --shadow-accent: 0 10px 30px rgba(35, 72, 255, 0.45);
 
     --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
@@ -36,27 +49,44 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
     font-family: var(--font); background: var(--bg); color: var(--ink);
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden; line-height: 1.5;
+    overflow-x: hidden; line-height: 1.5; position: relative;
 }
+/* Fixed aurora the frosted glass refracts. */
+body::before {
+    content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+        radial-gradient(46% 50% at 14% 2%, rgba(79, 124, 255, 0.28), transparent 60%),
+        radial-gradient(40% 46% at 88% 8%, rgba(122, 92, 255, 0.24), transparent 58%),
+        radial-gradient(55% 55% at 80% 98%, rgba(35, 72, 255, 0.20), transparent 60%),
+        var(--bg);
+}
+
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 
 .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
 .wrap-narrow { max-width: 760px; }
-.mono-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.mono-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 
-/* Nav */
+/* Shared frosted-glass surface utility. */
+.glass {
+    background: linear-gradient(150deg, rgba(255,255,255,0.09), rgba(255,255,255,0.035));
+    backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass);
+}
+
+/* Nav (glass) */
 nav {
     position: sticky; top: 0; z-index: 100; height: 66px; display: flex; align-items: center;
-    background: rgba(247, 247, 244, 0.72); backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    background: rgba(8, 11, 20, 0.55); backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
     border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
 }
-nav.scrolled { border-bottom-color: var(--line); }
+nav.scrolled { border-bottom-color: var(--glass-line); background: rgba(8, 11, 20, 0.72); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-.brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; }
+.brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; color: var(--ink); }
 .brand-mark { width: 30px; height: 30px; flex-shrink: 0; }
-.nav-right { display: flex; align-items: center; gap: clamp(16px, 3vw, 34px); }
+.nav-right { display: flex; align-items: center; gap: clamp(16px, 3vw, 30px); }
 .nav-link { font-size: 14.5px; font-weight: 500; color: var(--ink-2); transition: color 0.18s; }
 .nav-link:hover { color: var(--ink); }
 
@@ -66,19 +96,23 @@ nav.scrolled { border-bottom-color: var(--line); }
     font-weight: 600; letter-spacing: -0.01em; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
 }
 .btn:active { transform: translateY(0) scale(0.985); }
-.btn-primary { background: var(--accent); color: var(--on-accent); border-radius: var(--r-pill); padding: 11px 22px; font-size: 14.5px; box-shadow: var(--shadow-sm); }
-.btn-primary:hover { background: var(--accent-press); transform: translateY(-1px); box-shadow: var(--shadow-lift); }
-.btn-ghost { background: var(--bg-raise); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 10px 21px; font-size: 14.5px; }
-.btn-ghost:hover { border-color: var(--ink); transform: translateY(-1px); }
+.btn-primary { background: var(--accent-deep); color: var(--on-accent); border-radius: var(--r-pill); padding: 11px 22px; font-size: 14.5px; box-shadow: var(--shadow-accent); }
+.btn-primary:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 14px 38px rgba(35, 72, 255, 0.6); }
+.btn-ghost {
+    background: var(--glass); color: var(--ink); border: 1px solid var(--glass-line);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--r-pill); padding: 10px 21px; font-size: 14.5px;
+}
+.btn-ghost:hover { border-color: var(--glass-hi); background: var(--glass-2); transform: translateY(-1px); }
 .btn-lg { padding: 15px 30px; font-size: 15.5px; }
 .btn .ar { transition: transform 0.2s var(--ease); }
 .btn:hover .ar { transform: translateX(3px); }
 
 /* Page header band */
 .page-head { padding: clamp(56px, 9vw, 110px) 0 clamp(36px, 5vw, 56px); position: relative; overflow: hidden; }
-.page-head .glow { position: absolute; top: -30%; right: -8%; width: 60vw; height: 70vh; background: radial-gradient(closest-side, var(--accent-soft), transparent 72%); pointer-events: none; z-index: 0; }
+.page-head .glow { position: absolute; top: -30%; right: -8%; width: 60vw; height: 70vh; background: radial-gradient(closest-side, rgba(79,124,255,0.22), transparent 72%); pointer-events: none; z-index: 0; }
 .page-head .wrap { position: relative; z-index: 1; }
-.page-head h1 { font-size: clamp(36px, 5.5vw, 62px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; margin-bottom: 18px; }
+.page-head h1 { font-size: clamp(36px, 5.5vw, 62px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; margin-bottom: 18px; color: var(--ink); }
 .page-head h1 .accent { color: var(--accent); }
 .page-head .lede { font-size: clamp(16px, 1.5vw, 19px); color: var(--ink-2); max-width: 58ch; line-height: 1.6; }
 
@@ -86,17 +120,23 @@ nav.scrolled { border-bottom-color: var(--line); }
 section { position: relative; }
 .section-pad { padding: clamp(56px, 8vw, 100px) 0; }
 .head-block { max-width: 40ch; margin-bottom: clamp(32px, 5vw, 52px); }
-.head-block h2 { font-size: clamp(26px, 3.6vw, 42px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 14px; }
+.head-block h2 { font-size: clamp(26px, 3.6vw, 42px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 14px; color: var(--ink); }
 .head-block p { font-size: 16.5px; color: var(--ink-2); line-height: 1.6; }
 
-/* Footer */
-footer { border-top: 1px solid var(--line); padding: 40px 0; margin-top: 20px; }
-.foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-.foot-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+/* Footer — columned for clearer organization */
+footer { border-top: 1px solid var(--glass-line); padding: clamp(40px, 5vw, 64px) 0 32px; margin-top: 20px; }
+.foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: clamp(24px, 4vw, 48px); padding-bottom: 32px; }
+.foot-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--ink); }
 .foot-brand .brand-mark { width: 26px; height: 26px; }
-.foot-links { display: flex; gap: 26px; font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
-.foot-links a:hover { color: var(--accent); }
+.foot-tag { margin-top: 12px; font-size: 13.5px; color: var(--ink-3); max-width: 30ch; line-height: 1.5; }
+.foot-col { display: flex; flex-direction: column; gap: 10px; }
+.foot-col h4 { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
+.foot-col a { font-size: 14px; color: var(--ink-2); transition: color 0.18s; }
+.foot-col a:hover { color: var(--accent); }
+.foot-base { border-top: 1px solid var(--glass-line); padding-top: 24px; }
 .foot-note { font-size: 13px; color: var(--ink-3); }
+@media (max-width: 760px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px) { .foot-grid { grid-template-columns: 1fr; } }
 
 /* Reveal motion */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
@@ -109,4 +149,80 @@ footer { border-top: 1px solid var(--line); padding: 40px 0; margin-top: 20px; }
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
     .reveal { opacity: 1; transform: none; transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+    nav, .btn-ghost, .glass, .glass-card, .stat, .glass-interactive { backdrop-filter: none; -webkit-backdrop-filter: none; }
+    nav { background: var(--bg-2); }
+    .glass-card, .stat { background: var(--bg-raise); }
+}
+
+/* ─────────── Cinematic motion + shared primitives (v16 redesign) ─────────── */
+
+/* Drifting aurora — slow, transform-only; the * reduced-motion rule disables it. */
+@keyframes auroraDrift { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-3%, 2%, 0) scale(1.08); } }
+body::before { animation: auroraDrift 34s ease-in-out infinite alternate; }
+
+/* Cursor-reactive glass: a specular highlight tracks --mx/--my (set by site.js).
+   Page-specific rules with higher specificity may override the gradient. */
+.glass-interactive { position: relative; overflow: hidden; }
+.glass-interactive > * { position: relative; z-index: 1; }
+.glass-interactive::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.14), transparent 55%);
+    opacity: var(--ga,0); transition: opacity .3s ease;
+}
+
+/* 3D tilt: site.js writes --rx/--ry from the pointer; CSS does the transform. */
+[data-tilt] { transform: perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transition: transform .25s var(--ease); transform-style: preserve-3d; will-change: transform; }
+
+/* Animated gradient headline. */
+.grad-text { background: linear-gradient(110deg, #6d91ff, #8a6bff 45%, #4f7cff 80%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradShift 8s ease-in-out infinite alternate; }
+@keyframes gradShift { to { background-position: 100% 0; } }
+
+/* Eyebrow + section header */
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.section-head { max-width: 44ch; margin-bottom: clamp(36px, 5vw, 56px); }
+.section-head h2 { font-size: clamp(28px, 3.8vw, 46px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin: 12px 0 14px; color: var(--ink); }
+.section-head p { font-size: 17px; color: var(--ink-2); line-height: 1.6; }
+
+/* Glass card */
+.glass-card { border-radius: var(--r-card); padding: 26px; background: linear-gradient(150deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); transition: transform .3s var(--ease), border-color .3s; }
+.glass-card:hover { transform: translateY(-4px); border-color: var(--glass-hi); }
+.glass-card h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--ink); }
+.glass-card p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+.card-ico { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); margin-bottom: 16px; }
+.card-ico svg { width: 22px; height: 22px; }
+
+/* Stat row */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.stat { border-radius: var(--r-card); padding: 22px 24px; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.stat .n { font-size: clamp(26px, 3vw, 36px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.stat .l { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
+
+/* Category block (alternating image/text) */
+.feature-cat { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
+.feature-cat.flip > .fc-visual { order: -1; }
+.fc-visual { border-radius: var(--r-card); overflow: hidden; aspect-ratio: 4 / 3; box-shadow: var(--shadow-lift); border: 1px solid var(--glass-line); }
+.fc-visual img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* CTA band (glass over aurora) */
+.cta-band { position: relative; overflow: hidden; border-radius: 30px; padding: clamp(44px, 7vw, 84px) clamp(28px, 6vw, 72px); text-align: center; color: #fff; background: radial-gradient(70% 120% at 20% 0%, rgba(109,145,255,0.45), transparent 60%), radial-gradient(80% 120% at 90% 100%, rgba(122,92,255,0.4), transparent 60%), linear-gradient(150deg, rgba(35,72,255,0.5), rgba(12,16,32,0.6)); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); }
+.cta-band h2 { font-size: clamp(28px, 4.4vw, 52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.04; margin-bottom: 16px; }
+.cta-band p { font-size: 17px; color: rgba(255,255,255,0.86); max-width: 44ch; margin: 0 auto 28px; }
+.cta-band .btn-primary { background: #fff; color: var(--accent-deep); }
+.cta-band .btn-primary:hover { background: #eef1f8; }
+
+/* Card grid helpers */
+.cards2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cards4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+@media (max-width: 860px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .feature-cat { grid-template-columns: 1fr; }
+    .feature-cat.flip > .fc-visual { order: 0; }
+    .cards3, .cards4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+    .cards2, .cards3, .cards4 { grid-template-columns: 1fr; }
 }
