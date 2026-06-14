@@ -28,6 +28,9 @@ const IDS = [
   'color-map-mode', 'color-map-controls', 'color-map-intensity', 'color-map-intensity-value',
   'color-map-steps-row', 'color-map-steps', 'color-map-steps-value', 'color-map-hint',
 
+  // v18 — Design Variations
+  'vary-generate', 'vary-grid', 'vary-shuffle',
+
   // Gradient
   'gradient-type', 'gradient-angle', 'gradient-angle-value', 'gradient-angle-group',
   'angle-indicator', 'gradient-color-1', 'gradient-color-2',

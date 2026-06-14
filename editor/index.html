@@ -134,6 +134,16 @@
             <div class="control-group"><label class="control-label" style="font-size:12px;margin-bottom:4px;">Tint</label><div class="range-group"><input type="range" class="range-input" id="tint" min="-100" max="100" value="0"><span class="range-value" id="tint-value">0</span></div></div>
         </div>
 
+        <!-- v18 — Design Variations: one-click styled looks for the screenshot.
+             Foundation of the AI arc (v19 adds prompts, v20 the agent). -->
+        <div class="sidebar-section">
+            <h3 class="section-title">Design Variations <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v18</span></h3>
+            <p class="info-text" style="margin-bottom:10px;">Generate styled looks for your screenshot, then click one to apply.</p>
+            <button class="vary-generate" id="vary-generate">✨ Generate Variations</button>
+            <div class="vary-grid" id="vary-grid"></div>
+            <button class="btn btn-secondary" id="vary-shuffle" style="width:100%;margin-top:10px;display:none;">🔀 Shuffle again</button>
+        </div>
+
         <div class="sidebar-section">
             <h3 class="section-title">Text &amp; Annotations</h3>
             <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" id="add-text-btn">+ Add Text</button>
