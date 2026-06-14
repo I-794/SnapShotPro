@@ -10,18 +10,18 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '15.1';
+const CURRENT_VERSION = '15.2';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v15.1",
+  heading: "What's new in v15.2",
   items: [
-    { title: 'Timeline scrubber',
-      desc: 'Trim clips on a filmstrip with drag handles and a playhead. Snaps to frames; , and . step a frame.' },
-    { title: 'Export controls',
-      desc: 'Choose the resolution, quality, and looping when you export a clip as MP4 or GIF.' }
+    { title: 'Entrance animations for any element',
+      desc: 'Give a text overlay, an annotation, or an added image its own entrance from the layers panel. Each plays on its own track.' },
+    { title: 'Easing curves',
+      desc: 'Pick from eight easing curves per animation track, from linear and ease in-out to overshoot, elastic, and bounce.' }
   ]
 };
 
