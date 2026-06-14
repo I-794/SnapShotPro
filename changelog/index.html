@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v17 with color filters, custom palettes, harmonies, and palette-driven color mapping, on top of vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v18 with one-click Design Variations, on top of v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v17.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v18.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -128,6 +128,52 @@
             mix-blend-mode: color; opacity: 0.62;
         }
 
+        /* v18 — Design Variations spotlight. Its own motif: a 2x2 grid of mini
+           design tiles (the "pick a variation" idea) plus a generative
+           spectrum-sweep pill as the signature. Distinct from v16 glass and the
+           v17 spectrum band. */
+        .spotlight-variations {
+            background:
+                radial-gradient(52% 82% at 100% 0%, rgba(138,107,255,0.22), transparent 56%),
+                radial-gradient(55% 82% at 0% 100%, rgba(74,168,255,0.18), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-variations::after { display: none; }
+        .spotlight-variations .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-variations .spot-feat-ico { background: linear-gradient(135deg, rgba(138,107,255,0.32), rgba(74,168,255,0.26)); }
+        .spotlight-variations .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-variations .btn-primary:hover { background: #f0f0ee; }
+        /* Generative signature pill: animated spectrum sweep, matching the
+           studio's Generate button. */
+        .gen-pill {
+            display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
+            font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; color: #fff;
+            padding: 7px 14px; border-radius: var(--r-pill);
+            background: linear-gradient(90deg, #ff5a5a, #ffb14a, #57e39b, #4aa8ff, #8a6bff, #ff5a5a);
+            background-size: 220% 100%; animation: gen-sweep 6s linear infinite;
+        }
+        @keyframes gen-sweep { to { background-position: 220% 0; } }
+        /* 2x2 grid of mini design tiles = the variant gallery, depicted. The
+           inner block stands in for the screenshot inside each styled look. */
+        .vary-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .vary-tile {
+            position: relative; aspect-ratio: 16 / 11; border-radius: 14px; overflow: hidden;
+            box-shadow: 0 12px 30px rgba(4,7,18,0.45); display: grid; place-items: center;
+        }
+        .vary-tile span { width: 58%; height: 56%; border-radius: 7px; background: rgba(255,255,255,0.92); box-shadow: 0 6px 16px rgba(0,0,0,0.28); }
+        .vary-tile.active { outline: 2px solid #fff; outline-offset: 3px; }
+        .vary-tile.active::before {
+            content: 'Applied'; position: absolute; top: 8px; right: 8px; z-index: 1;
+            font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; color: #11131c;
+            background: #fff; padding: 2px 7px; border-radius: 999px;
+        }
+        @media (prefers-reduced-motion: reduce) { .gen-pill { animation: none; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -207,26 +253,26 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-color reveal">
+        <div class="spotlight spotlight-variations reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v17 · June 2026</div>
-                <div class="spectrum-bar"></div>
-                <h2>Color, mapped onto your image</h2>
-                <p class="spot-lede">Grade with temperature and tint, build palettes and harmonies you can reuse, then map a palette straight onto the shot. Every change bakes into the export.</p>
+                <div class="spot-ver">v18 · June 2026</div>
+                <div class="gen-pill">✦ Generate variations</div>
+                <h2>Four designs. One click.</h2>
+                <p class="spot-lede">Load a screenshot and generate styled looks in a click. Pick the one you like, then keep editing. Every variation bakes into the export.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16" fill="currentColor" opacity="0.25"/></svg></span>
-                        <div><strong>Color filters and grades</strong><span>New temperature and tint sliders sit with the filters, plus cinematic one-tap looks: Teal/Orange, Moody, Bleach, and Golden.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
+                        <div><strong>One-click variations</strong><span>Generate styled looks for your screenshot, then click a card to apply it: background, frame, layout, shadow, and color grade, all at once.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.4"/><circle cx="6" cy="15" r="2.4"/><circle cx="18" cy="15" r="2.4"/><path d="M12 8.4v3.2M10 13.5l-2 0.6M14 13.5l2 0.6" opacity="0.7"/></svg></span>
-                        <div><strong>Custom palettes and harmonies</strong><span>Save your own palettes or auto-generate complementary, analogous, triadic, split-complementary, and tetradic sets from one base color.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l8 10h2"/><path d="M16 5l3 2-3 2"/><path d="M4 17h4l2-2.6"/></svg></span>
+                        <div><strong>Shuffle for more</strong><span>Not feeling them? Shuffle again for a fresh set drawn from curated style recipes, so every option still looks designed.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M3.5 14l4-4 4 3.5 3-2.5 6 5" opacity="0.8"/></svg></span>
-                        <div><strong>Color mapping</strong><span>Map a palette onto your image three ways: gradient-map and duotone, recolor to the palette, or a full color transfer. It all bakes into exports.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 13.5-5.8L20 9"/><path d="M20 4v5h-5"/><path d="M20 11a8 8 0 0 1-13.5 5.8L4 15"/></svg></span>
+                        <div><strong>Fully editable, fully undoable</strong><span>A variation is just a starting point. Tweak anything after you apply it, and undo it like any other change.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -235,17 +281,11 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div>
-                    <div class="spot-browser">
-                        <div class="spot-bar"><i></i><i></i><i></i><span class="url">snapshot-pro.app/studio</span></div>
-                        <div class="spot-shot-wrap">
-                            <img class="spot-shot" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Millennium_Force_%28Cedar_Point%29_06.JPG/1280px-Millennium_Force_%28Cedar_Point%29_06.JPG" alt="A roller coaster photo with a duotone color map applied, previewing the v17 gradient-map" loading="eager" width="1280" height="960">
-                        </div>
-                    </div>
-                    <div class="swatch-row" aria-hidden="true">
-                        <i style="background:#ff5a5a;"></i><i style="background:#ffb14a;"></i><i style="background:#ffe24a;"></i><i style="background:#57e39b;"></i><i style="background:#4aa8ff;"></i><i style="background:#8a6bff;"></i>
-                    </div>
-                    <p style="margin-top:2px;font-size:11.5px;color:rgba(255,255,255,0.66);text-align:right;">Photo: Millennium Force, Cedar Point. Coasterman1234, <a href="https://creativecommons.org/licenses/by-sa/3.0/" style="color:rgba(255,255,255,0.82);">CC BY-SA 3.0</a>. Duotone map applied.</p>
+                <div class="vary-tiles" aria-hidden="true">
+                    <div class="vary-tile active" style="background:linear-gradient(135deg,#667eea,#764ba2);"><span></span></div>
+                    <div class="vary-tile" style="background:radial-gradient(60% 70% at 25% 30%,#f093fb,transparent 60%),radial-gradient(60% 70% at 80% 80%,#43e97b,transparent 60%),#1f1c2c;"><span></span></div>
+                    <div class="vary-tile" style="background:#11131c;"><span style="background:#0b0d14;box-shadow:inset 0 0 0 6px #2a2a2e,0 6px 16px rgba(0,0,0,0.4);"></span></div>
+                    <div class="vary-tile" style="background:repeating-linear-gradient(45deg,#1a2332 0 8px,#22304a 8px 16px);"><span></span></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -258,6 +298,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v18.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Design Variations</h2>
+                    <ul class="changes">
+                        <li><b>One-click variations.</b> Load a screenshot, click Generate, and get four fully-styled designs of it as preview cards. Each sets the background, device or browser frame, padding and layout, shadow, and color grade together, drawn from curated style recipes so every option looks designed rather than random.</li>
+                        <li><b>Pick, then keep editing.</b> Click a card to apply that look to the canvas. It is a starting point, not a lock-in: every control stays editable afterward, the change is fully undoable, and it bakes into exports like everything else. Not feeling the set? Shuffle again for a fresh four.</li>
+                        <li><b>The start of something bigger.</b> Variations runs on a new design engine that describes a whole look as data and applies it in one step. It is the groundwork for the AI design features coming next.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v17.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Color: filters, palettes, and mapping</h2>
