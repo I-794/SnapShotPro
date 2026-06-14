@@ -47,7 +47,10 @@ export const SCHEMA_VERSION = 15;
 export const PROJECT_FIELDS = [
   ...SERIALIZED_FIELDS,
   'windowOverlay', 'annotationColor', 'annotationStrokeWidth', 'nextNumber',
-  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion'
+  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion',
+  // v16.0 — shape-tool defaults (per-shape fill/sides/points already ride along
+  // inside each `annotations` record, which is serialized above).
+  'annotationFill', 'polygonSides', 'starPoints'
 ];
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the

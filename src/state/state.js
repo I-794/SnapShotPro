@@ -50,6 +50,11 @@ export const state = {
   spotlight: { enabled: false, x: 0.2, y: 0.2, w: 0.6, h: 0.6, opacity: 0.65 },
   annotationColor: '#ff3b30',
   annotationStrokeWidth: 4,
+  // v16.0 — vector shape tools. Fill applies to the closeable shapes
+  // (rect/circle/triangle/polygon/star); line + arrow stay stroke-only.
+  annotationFill: { enabled: false, color: '#ffffff', opacity: 100 },
+  polygonSides: 6,
+  starPoints: 5,
   tool: 'select',
   selectedAnnotation: null,
   selectedRedaction: null,

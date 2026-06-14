@@ -2,7 +2,7 @@ import { state, imageRegistry } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
-import { drawArrow, drawStroke, annotationBBox } from '../render/annotations.js';
+import { drawArrow, drawStroke, annotationBBox, drawShape, SHAPE_TYPES } from '../render/annotations.js';
 import { hitTestExtraImageAtPoint } from './extra-images.js';
 import { getCanvasCoords } from '../utils/geometry.js';
 import { activePointers, gesture } from './gesture.js';
@@ -186,16 +186,16 @@ function drawPreviewAnnotation(startX, startY, curX, curY) {
       color: state.annotationColor,
       strokeWidth: state.annotationStrokeWidth
     });
-  } else if (tool === 'rect') {
-    const rx = Math.min(startX, curX), ry = Math.min(startY, curY);
-    const rw = Math.abs(curX - startX), rh = Math.abs(curY - startY);
-    ctx.strokeRect(rx, ry, rw, rh);
-  } else if (tool === 'circle') {
-    const cx = (startX + curX) / 2, cy = (startY + curY) / 2;
-    const rx2 = Math.abs(curX - startX) / 2, ry2 = Math.abs(curY - startY) / 2;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, rx2, ry2, 0, 0, Math.PI * 2);
-    ctx.stroke();
+  } else if (SHAPE_TYPES.has(tool)) {
+    // v16.0 — live preview mirrors the final paint via the shared renderer.
+    drawShape(ctx, {
+      type: tool, x1: startX, y1: startY, x2: curX, y2: curY,
+      fill: tool !== 'line' && state.annotationFill.enabled,
+      fillColor: state.annotationFill.color,
+      fillOpacity: state.annotationFill.opacity,
+      sides: state.polygonSides,
+      points: state.starPoints
+    });
   } else if (tool === 'redact') {
     const rx = Math.min(startX, curX), ry = Math.min(startY, curY);
     const rw = Math.abs(curX - startX), rh = Math.abs(curY - startY);
@@ -424,8 +424,8 @@ function canvasUpLogic(e) {
       });
     }
     drawing.points = [];
-  } else if (state.tool === 'arrow' || state.tool === 'rect' || state.tool === 'circle') {
-    state.annotations.push({
+  } else if (state.tool === 'arrow' || SHAPE_TYPES.has(state.tool)) {
+    const ann = {
       id: Date.now(),
       type: state.tool,
       x1: drawing.startX, y1: drawing.startY,
@@ -433,7 +433,17 @@ function canvasUpLogic(e) {
       color: state.annotationColor,
       strokeWidth: state.annotationStrokeWidth,
       number: null
-    });
+    };
+    // v16.0 — bake the fill + shape params onto closeable shapes at creation, so
+    // each record renders independently of the current toolbar state.
+    if (state.tool !== 'arrow' && state.tool !== 'line' && state.annotationFill.enabled) {
+      ann.fill = true;
+      ann.fillColor = state.annotationFill.color;
+      ann.fillOpacity = state.annotationFill.opacity;
+    }
+    if (state.tool === 'polygon') ann.sides = state.polygonSides;
+    if (state.tool === 'star') ann.points = state.starPoints;
+    state.annotations.push(ann);
   } else if (state.tool === 'number') {
     state.annotations.push({
       id: Date.now(),
@@ -503,6 +513,17 @@ export function bindCanvasTools() {
   const annClearBtn = document.getElementById('ann-clear-btn');
   if (annColor) annColor.addEventListener('input', (e) => { state.annotationColor = e.target.value; });
   if (annStroke) annStroke.addEventListener('change', (e) => { state.annotationStrokeWidth = parseInt(e.target.value); });
+
+  // v16.0 — shape fill + polygon/star params. Live preview reads these on the
+  // next drag; they bake onto each new record at creation.
+  const annFillEnabled = document.getElementById('ann-fill-enabled');
+  const annFillColor = document.getElementById('ann-fill-color');
+  const annSides = document.getElementById('ann-sides');
+  const annPoints = document.getElementById('ann-points');
+  if (annFillEnabled) annFillEnabled.addEventListener('change', (e) => { state.annotationFill.enabled = e.target.checked; });
+  if (annFillColor) annFillColor.addEventListener('input', (e) => { state.annotationFill.color = e.target.value; });
+  if (annSides) annSides.addEventListener('change', (e) => { state.polygonSides = Math.max(3, Math.min(12, parseInt(e.target.value) || 6)); });
+  if (annPoints) annPoints.addEventListener('change', (e) => { state.starPoints = Math.max(3, Math.min(12, parseInt(e.target.value) || 5)); });
   if (annDeleteBtn) annDeleteBtn.addEventListener('click', deleteSelected);
   if (annClearBtn) annClearBtn.addEventListener('click', () => {
     saveStateToHistory();

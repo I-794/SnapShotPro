@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v15.2 · Pro Editor</title>
+    <title>SnapShot-Pro v16.0 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v15.2</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v16.0</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -772,6 +772,10 @@
             <button class="ann-tool-btn" data-tool="arrow">→ Arrow</button>
             <button class="ann-tool-btn" data-tool="rect">▭ Rect</button>
             <button class="ann-tool-btn" data-tool="circle">○ Circle</button>
+            <button class="ann-tool-btn" data-tool="line">╱ Line</button>
+            <button class="ann-tool-btn" data-tool="triangle">△ Triangle</button>
+            <button class="ann-tool-btn" data-tool="polygon">⬡ Polygon</button>
+            <button class="ann-tool-btn" data-tool="star">★ Star</button>
             <button class="ann-tool-btn" data-tool="pen">✎ Pen</button>
             <button class="ann-tool-btn" data-tool="highlighter">🖍 Highlight</button>
             <button class="ann-tool-btn" data-tool="number">① Number</button>
@@ -783,6 +787,10 @@
             <select id="ann-stroke" style="padding:4px 8px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
                 <option value="2">Thin</option><option value="4" selected>Medium</option><option value="6">Thick</option><option value="8">Bold</option>
             </select>
+            <label title="Fill shapes" style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer;"><input type="checkbox" id="ann-fill-enabled"> Fill</label>
+            <input type="color" id="ann-fill-color" value="#ffffff" title="Fill color" style="width:32px;height:32px;border-radius:6px;border:2px solid var(--border-color);cursor:pointer;">
+            <input type="number" id="ann-sides" min="3" max="12" value="6" title="Polygon sides" style="width:46px;padding:4px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
+            <input type="number" id="ann-points" min="3" max="12" value="5" title="Star points" style="width:46px;padding:4px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
             <button id="ann-delete-btn" class="ann-tool-btn" style="margin-left:4px;">🗑 Delete</button>
             <button id="ann-clear-btn" class="ann-tool-btn">Clear All</button>
         </div>
