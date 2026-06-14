@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v18 with one-click Design Variations, on top of v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v19 with AI Assets (on-brand AI backgrounds and place-behind-subject), on top of v18 one-click Design Variations, v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v18.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v19.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -174,6 +174,49 @@
         }
         @media (prefers-reduced-motion: reduce) { .gen-pill { animation: none; } }
 
+        /* v19 — AI Assets spotlight. Its own motif: a prompt line resolving into
+           a generated image tile (prompt → image) with a generation shimmer.
+           Distinct from v16 glass, v17 spectrum band, v18 variant grid. */
+        .spotlight-assets {
+            background:
+                radial-gradient(55% 85% at 0% 0%, rgba(74,168,255,0.20), transparent 56%),
+                radial-gradient(55% 85% at 100% 100%, rgba(255,90,90,0.16), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-assets::after { display: none; }
+        .spotlight-assets .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-assets .spot-feat-ico { background: linear-gradient(135deg, rgba(74,168,255,0.32), rgba(138,107,255,0.26)); }
+        .spotlight-assets .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-assets .btn-primary:hover { background: #f0f0ee; }
+        .asset-demo { display: flex; flex-direction: column; gap: 14px; }
+        .prompt-line {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; padding: 12px 14px;
+            font-family: var(--font-mono); font-size: 13px; color: rgba(255,255,255,0.82);
+        }
+        .prompt-line .spark { color: #ffe24a; }
+        .asset-shot {
+            position: relative; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden;
+            background: radial-gradient(70% 90% at 30% 20%, #ffb14a, transparent 60%),
+                        radial-gradient(80% 90% at 80% 90%, #4aa8ff, transparent 60%),
+                        linear-gradient(135deg, #1a1147, #2b1d6b);
+            box-shadow: 0 18px 44px rgba(4,7,18,0.5); display: grid; place-items: center;
+        }
+        .asset-shot span { width: 54%; height: 60%; border-radius: 9px; background: rgba(255,255,255,0.95); box-shadow: 0 10px 26px rgba(0,0,0,0.4); }
+        .asset-shot::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
+            background-size: 220% 100%; animation: asset-shimmer 3.6s ease-in-out infinite;
+        }
+        @keyframes asset-shimmer { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
+        @media (prefers-reduced-motion: reduce) { .asset-shot::after { animation: none; opacity: 0; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -253,26 +296,26 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-variations reveal">
+        <div class="spotlight spotlight-assets reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v18 · June 2026</div>
-                <div class="gen-pill">✦ Generate variations</div>
-                <h2>Four designs. One click.</h2>
-                <p class="spot-lede">Load a screenshot and generate styled looks in a click. Pick the one you like, then keep editing. Every variation bakes into the export.</p>
+                <div class="spot-ver">v19 · June 2026</div>
+                <div class="gen-pill">✦ Generate background</div>
+                <h2>Describe it. Generate it.</h2>
+                <p class="spot-lede">Type the background you want and generate it on the spot. Keep it on-brand with your palette, then drop your subject onto the new scene in a click.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
-                        <div><strong>One-click variations</strong><span>Generate styled looks for your screenshot, then click a card to apply it: background, frame, layout, shadow, and color grade, all at once.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 16l5-4 4 3 3-2.5 4 3.5"/></svg></span>
+                        <div><strong>AI backgrounds</strong><span>Describe a scene and generate it as your background, at your canvas size. It renders behind your shot and bakes into the export.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l8 10h2"/><path d="M16 5l3 2-3 2"/><path d="M4 17h4l2-2.6"/></svg></span>
-                        <div><strong>Shuffle for more</strong><span>Not feeling them? Shuffle again for a fresh set drawn from curated style recipes, so every option still looks designed.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><circle cx="6" cy="6.5" r="1.6"/><circle cx="18" cy="6.5" r="1.6"/><circle cx="18" cy="17.5" r="1.6"/><path d="M9 9.5l1.6 1.2M15 9.5l-1.6 1.2M15 14.5l-1.6-1.1" opacity="0.7"/></svg></span>
+                        <div><strong>On-brand by default</strong><span>Turn on Use my palette and the generation follows your saved colors, so the result fits the rest of your design.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 13.5-5.8L20 9"/><path d="M20 4v5h-5"/><path d="M20 11a8 8 0 0 1-13.5 5.8L4 15"/></svg></span>
-                        <div><strong>Fully editable, fully undoable</strong><span>A variation is just a starting point. Tweak anything after you apply it, and undo it like any other change.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 3.5 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 6.5 12 3z"/></svg></span>
+                        <div><strong>Place behind subject</strong><span>One toggle cuts your screenshot out and drops it onto the generated scene, for an instant product-shot composite.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -281,11 +324,9 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="vary-tiles" aria-hidden="true">
-                    <div class="vary-tile active" style="background:linear-gradient(135deg,#667eea,#764ba2);"><span></span></div>
-                    <div class="vary-tile" style="background:radial-gradient(60% 70% at 25% 30%,#f093fb,transparent 60%),radial-gradient(60% 70% at 80% 80%,#43e97b,transparent 60%),#1f1c2c;"><span></span></div>
-                    <div class="vary-tile" style="background:#11131c;"><span style="background:#0b0d14;box-shadow:inset 0 0 0 6px #2a2a2e,0 6px 16px rgba(0,0,0,0.4);"></span></div>
-                    <div class="vary-tile" style="background:repeating-linear-gradient(45deg,#1a2332 0 8px,#22304a 8px 16px);"><span></span></div>
+                <div class="asset-demo" aria-hidden="true">
+                    <div class="prompt-line"><span class="spark">✦</span> sunrise over calm mountains, on-brand</div>
+                    <div class="asset-shot"><span></span></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -298,6 +339,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v19.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>AI Assets</h2>
+                    <ul class="changes">
+                        <li><b>AI backgrounds.</b> Describe the background you want and generate it on the spot. The image is created at your canvas aspect ratio, renders behind your screenshot like any other background, and bakes into every export.</li>
+                        <li><b>On-brand generation.</b> Turn on Use my palette and the prompt carries your active palette colors into the generation, so the result matches the rest of your design instead of clashing with it.</li>
+                        <li><b>Place behind subject.</b> One toggle removes your screenshot's own background and drops the subject onto the generated scene, for an instant product-shot composite. It is the first of the AI tools the next release builds on.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v18.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Design Variations</h2>
