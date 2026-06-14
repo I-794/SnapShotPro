@@ -77,6 +77,18 @@ export const state = {
     currentTime: 0,
     tracks: []
   },
+  // v15.2 — Ken Burns pan/zoom on a still. Two keyframes (from/to) of a focal
+  // point (0..1 of the image) and a scale (>=1); the clock drives p=0..1 and
+  // drawImageContent crops the source accordingly. Disabled while a clip is
+  // loaded (auto-zoom owns the crop then).
+  kenBurns: {
+    enabled: false,
+    fromScale: 1.0,
+    toScale: 1.2,
+    fromX: 0.5, fromY: 0.5,
+    toX: 0.5, toY: 0.5,
+    easing: 'easeInOut'
+  },
   aiEnhance: {
     stylePreset: null,
     lastSuggestion: null

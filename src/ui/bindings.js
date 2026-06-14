@@ -106,6 +106,32 @@ function ensureLayerStyleDefaults() {
   if (!state.imageLayer) state.imageLayer = { blend: 'source-over', opacity: 100 };
 }
 
+// v15.2 — backfill the animation block on designs saved before animation was
+// serialized (an Object.assign restore drops any key the saved object lacks),
+// and force the playback runtime off so a restored design never starts mid-
+// frame. Idempotent.
+function ensureAnimationDefaults() {
+  const a = state.animation || (state.animation = {});
+  if (typeof a.enabled !== 'boolean') a.enabled = false;
+  if (typeof a.duration !== 'number') a.duration = 3000;
+  if (!Array.isArray(a.tracks)) a.tracks = [];
+  a.playing = false;
+  a.currentTime = 0;
+}
+
+// v15.2 — backfill the Ken Burns block on designs saved before it existed.
+function ensureKenBurnsDefaults() {
+  const k = state.kenBurns || (state.kenBurns = {});
+  if (typeof k.enabled !== 'boolean') k.enabled = false;
+  if (typeof k.fromScale !== 'number') k.fromScale = 1.0;
+  if (typeof k.toScale !== 'number') k.toScale = 1.2;
+  if (typeof k.fromX !== 'number') k.fromX = 0.5;
+  if (typeof k.fromY !== 'number') k.fromY = 0.5;
+  if (typeof k.toX !== 'number') k.toX = 0.5;
+  if (typeof k.toY !== 'number') k.toY = 0.5;
+  if (typeof k.easing !== 'string') k.easing = 'easeInOut';
+}
+
 function updateTextEffectControls() {
   if (el.textStrokeControls) el.textStrokeControls.style.display = state.textOverlay.stroke?.enabled ? 'block' : 'none';
   if (el.textGradientControls) el.textGradientControls.style.display = state.textOverlay.gradient?.enabled ? 'block' : 'none';
@@ -442,6 +468,8 @@ export function updateUIFromState() {
 
   ensureTextEffectDefaults();   // backfill v14 text-effect groups on older designs
   ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
+  ensureAnimationDefaults();    // backfill v15.2 animation block; force runtime off
+  ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 

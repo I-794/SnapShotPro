@@ -40,7 +40,11 @@ function snapshot() {
     autoLayout: state.autoLayout,
     meshGradient: state.meshGradient,
     tilt3d: state.tilt3d,
-    scene: state.scene
+    scene: state.scene,
+    // v15.2 — animation edits (tracks, easing, duration) are now undoable.
+    // Snapshot a runtime-stripped copy so undo never restores mid-playback.
+    animation: { ...state.animation, playing: false, currentTime: 0 },
+    kenBurns: state.kenBurns
   }));
 }
 
