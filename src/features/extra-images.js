@@ -4,6 +4,7 @@ import { showNotification } from '../ui/notification.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { withLayer } from '../render/blend.js';
+import { applyEntrance } from './animation.js';
 
 const ACCENT = '#5470ff';
 
@@ -54,6 +55,9 @@ export function renderExtraImages(ctx, canvas) {
     const ty = ch * ei.yFrac - ih / 2;
     const radius = Math.max(4, Math.min(iw, ih) * 0.05);
 
+    // v15.2 — per-element entrance, about the image's center. Wraps the draw
+    // (not the selection chrome, which must stay legible/untransformed).
+    const entered = applyEntrance(ctx, 'L:extra:' + ei.id, cw * ei.xFrac, ch * ei.yFrac);
     // v15.0 — blend mode + opacity for this image layer. Wraps the shadow + the
     // image itself; the selection chrome below stays at full strength so it's
     // always legible regardless of the layer's opacity.
@@ -75,6 +79,7 @@ export function renderExtraImages(ctx, canvas) {
       ctx.drawImage(img, tx, ty, iw, ih);
       ctx.restore();
     });
+    if (entered) ctx.restore();
 
     if (state.selectedExtraImage === ei.id) {
       drawSelectionChrome(ctx, tx, ty, iw, ih, radius, cw);

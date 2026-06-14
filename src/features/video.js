@@ -23,6 +23,12 @@ let rafId = null;
 
 const MAX_DURATION = 30; // seconds — warn beyond this
 
+// v15.1 — one-way hooks the timeline registers so video.js stays unaware of it:
+// `loaded` fires when a clip's metadata is ready; `time` fires each playback
+// frame so the timeline can move its playhead.
+const vhooks = { loaded: null, time: null };
+export function setVideoHooks(h) { Object.assign(vhooks, h); }
+
 export function getVideoContext() {
   return { videoEl, frameCanvas, drawFrame, seekTo };
 }
@@ -104,7 +110,7 @@ export function loadVideoFile(file) {
     videoEl.addEventListener('loadeddata', () => { drawFrame(); render(); fitZoom(); }, { once: true });
     seekTo(0).then(() => { render(); fitZoom(); });
     showVideoControls(true);
-    syncTrimUI();
+    if (vhooks.loaded) vhooks.loaded();
     if (state.video.duration > MAX_DURATION) {
       showNotification(`Clip is ${Math.round(state.video.duration)}s — exports are capped to ${MAX_DURATION}s for performance.`, 'info');
     } else {
@@ -129,6 +135,7 @@ function tick() {
   if (videoEl.currentTime >= state.video.out) videoEl.currentTime = state.video.in;
   drawFrame();
   render();
+  if (vhooks.time) vhooks.time(videoEl.currentTime);
   rafId = requestAnimationFrame(tick);
 }
 
@@ -166,22 +173,6 @@ function updatePlayBtn() {
   if (btn) btn.textContent = state.video.playing ? '⏸ Pause' : '▶ Play';
 }
 
-function fmt(t) { return `${t.toFixed(2)}s`; }
-
-function syncTrimUI() {
-  const v = state.video;
-  const inR = document.getElementById('video-in');
-  const outR = document.getElementById('video-out');
-  const inL = document.getElementById('video-in-label');
-  const outL = document.getElementById('video-out-label');
-  const durL = document.getElementById('video-duration-label');
-  if (inR) { inR.max = v.duration; inR.value = v.in; }
-  if (outR) { outR.max = v.duration; outR.value = v.out; }
-  if (inL) inL.textContent = fmt(v.in);
-  if (outL) outL.textContent = fmt(v.out);
-  if (durL) durL.textContent = `Clip: ${fmt(v.out - v.in)} of ${fmt(v.duration)}`;
-}
-
 export function bindVideo() {
   const input = document.getElementById('video-file-input');
   const addBtn = document.getElementById('video-add-btn');
@@ -195,20 +186,8 @@ export function bindVideo() {
   const playBtn = document.getElementById('video-play-btn');
   if (playBtn) playBtn.addEventListener('click', togglePlay);
 
-  const inR = document.getElementById('video-in');
-  if (inR) inR.addEventListener('input', () => {
-    pause();
-    state.video.in = Math.min(parseFloat(inR.value), state.video.out - 0.1);
-    syncTrimUI();
-    seekTo(state.video.in).then(render);
-  });
-  const outR = document.getElementById('video-out');
-  if (outR) outR.addEventListener('input', () => {
-    pause();
-    state.video.out = Math.max(parseFloat(outR.value), state.video.in + 0.1);
-    syncTrimUI();
-    seekTo(state.video.out).then(render);
-  });
+  // Trim is owned by the timeline scrubber (timeline.js); it writes the same
+  // state.video.{in,out} the old #video-in / #video-out sliders did.
 
   const fpsSel = document.getElementById('video-fps');
   if (fpsSel) fpsSel.addEventListener('change', () => { state.video.fps = parseInt(fpsSel.value, 10); });

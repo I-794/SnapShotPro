@@ -23,6 +23,11 @@ export const state = {
   windowOverlay: { enabled: false, style: 'macos', title: 'Screenshot', height: 40, showControls: true },
   watermark: { enabled: false, text: '', position: 'bottom-right', size: 16, opacity: 50, color: '#ffffff' },
   exportSettings: { format: 'png', quality: 92 },
+  // v15.1 — motion (MP4/GIF) export controls. resolution multiplies the encode
+  // canvas (render stays design-size); quality maps to MP4 bitrate / gif.js
+  // quality; loop is gif.js `repeat` (-1 = once, 0 = forever). fps stays on
+  // state.video.fps (the existing Frame rate control).
+  exportMotion: { resolution: 1, quality: 'high', loop: 0 },
   gradient: { type: 'linear', angle: 135, colors: ['#667eea', '#764ba2'], positions: [0, 100] },
   padding: 60,
   scale: 100,
@@ -71,6 +76,18 @@ export const state = {
     playing: false,
     currentTime: 0,
     tracks: []
+  },
+  // v15.2 — Ken Burns pan/zoom on a still. Two keyframes (from/to) of a focal
+  // point (0..1 of the image) and a scale (>=1); the clock drives p=0..1 and
+  // drawImageContent crops the source accordingly. Disabled while a clip is
+  // loaded (auto-zoom owns the crop then).
+  kenBurns: {
+    enabled: false,
+    fromScale: 1.0,
+    toScale: 1.2,
+    fromX: 0.5, fromY: 0.5,
+    toX: 0.5, toY: 0.5,
+    easing: 'easeInOut'
   },
   aiEnhance: {
     stylePreset: null,

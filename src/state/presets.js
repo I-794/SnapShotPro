@@ -49,6 +49,17 @@ export const tiltPresets = {
   card: { rx:  -8, ry:  0, rz: -4, perspective: 1600 }
 };
 
+// v15.2 — Ken Burns pan/zoom keyframes. Focal points are 0..1 of the image,
+// scale is >=1. Pan presets keep a constant scale > 1 so there is room to move
+// the crop window; the zoom presets hold the center and change scale.
+export const kenBurnsPresets = {
+  zoomIn:   { fromScale: 1.0,  toScale: 1.25, fromX: 0.5,  fromY: 0.5,  toX: 0.5,  toY: 0.5 },
+  zoomOut:  { fromScale: 1.25, toScale: 1.0,  fromX: 0.5,  fromY: 0.5,  toX: 0.5,  toY: 0.5 },
+  panLeft:  { fromScale: 1.18, toScale: 1.18, fromX: 0.72, fromY: 0.5,  toX: 0.28, toY: 0.5 },
+  panRight: { fromScale: 1.18, toScale: 1.18, fromX: 0.28, fromY: 0.5,  toX: 0.72, toY: 0.5 },
+  classic:  { fromScale: 1.05, toScale: 1.22, fromX: 0.4,  fromY: 0.42, toX: 0.6,  toY: 0.58 }
+};
+
 export const stickers = {
   reactions: ['🔥','👍','💡','⭐','❤️','🎉','😍','🚀','💯','✨','👀','🤯','💎','⚡','🏆','🎯','💪','🙌','👏','🤝'],
   badges:    ['NEW','HOT','FREE','PRO','BETA','SALE','TOP','LIVE','TIP','★','✓','!'],

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v15 · Pro Editor</title>
+    <title>SnapShot-Pro v15.2 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v15</span></span>
+                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v15.2</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -188,6 +188,18 @@
         <div class="sidebar-section">
             <h3 class="section-title">Animation</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Animation</span><label class="switch"><input type="checkbox" id="animation-enabled"><span class="slider"></span></label></div>
+            <div class="toggle-switch"><span class="toggle-label">Ken Burns pan / zoom</span><label class="switch"><input type="checkbox" id="ken-burns-enabled"><span class="slider"></span></label></div>
+            <div id="ken-burns-controls" style="display:none;">
+                <p class="info-text" style="margin-bottom:6px;">Slowly pan and zoom a still while it plays. Disabled while a clip is loaded.</p>
+                <label class="control-label">Presets</label>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;">
+                    <button class="btn btn-secondary" data-kb-preset="zoomIn" style="font-size:11px;padding:7px 4px;">Zoom in</button>
+                    <button class="btn btn-secondary" data-kb-preset="zoomOut" style="font-size:11px;padding:7px 4px;">Zoom out</button>
+                    <button class="btn btn-secondary" data-kb-preset="panLeft" style="font-size:11px;padding:7px 4px;">Pan left</button>
+                    <button class="btn btn-secondary" data-kb-preset="panRight" style="font-size:11px;padding:7px 4px;">Pan right</button>
+                    <button class="btn btn-secondary" data-kb-preset="classic" style="font-size:11px;padding:7px 4px;">Classic</button>
+                </div>
+            </div>
             <div id="animation-controls" style="display:none;">
                 <div class="control-group">
                     <label class="control-label">Duration</label>
@@ -207,6 +219,7 @@
                 <div style="display:flex;gap:6px;">
                     <button class="btn btn-primary" style="flex:1;" id="animation-play-btn">&#9654; Play</button>
                     <button class="btn btn-success" style="flex:1;" id="gif-export-btn">Export GIF</button>
+                    <button class="btn btn-success" style="flex:1;" id="mp4-export-btn">Export MP4</button>
                 </div>
                 <div id="gif-progress" class="ai-progress" style="display:none;margin-top:8px;">
                     <div class="ai-progress-bar"><div class="ai-progress-fill" style="width:0%"></div></div>
@@ -233,10 +246,26 @@
                     <button class="btn btn-secondary" style="flex:2;" id="video-play-btn">▶ Play</button>
                     <button class="btn btn-secondary" style="flex:1;" id="video-remove-btn">Remove</button>
                 </div>
-                <div class="control-group"><label class="control-label">Trim start <span class="range-value" id="video-in-label">0.00s</span></label><input type="range" class="range-input" id="video-in" min="0" max="10" step="0.05" value="0"></div>
-                <div class="control-group"><label class="control-label">Trim end <span class="range-value" id="video-out-label">0.00s</span></label><input type="range" class="range-input" id="video-out" min="0" max="10" step="0.05" value="10"></div>
-                <p class="info-text" id="video-duration-label" style="margin-bottom:10px;">Clip: 0.00s</p>
+                <div class="control-group">
+                    <label class="control-label">Trim &amp; scrub</label>
+                    <div class="vtimeline" id="video-timeline">
+                        <div class="vtimeline-strip" id="video-filmstrip"></div>
+                        <div class="vtimeline-region" id="video-trim-region"></div>
+                        <div class="vtimeline-handle vts-handle" id="video-handle-in" title="Trim start"></div>
+                        <div class="vtimeline-handle vts-handle" id="video-handle-out" title="Trim end"></div>
+                        <div class="vtimeline-playhead" id="video-playhead"></div>
+                    </div>
+                    <div class="vtimeline-labels">
+                        <span id="video-in-label">0.00s · f0</span>
+                        <span id="video-duration-label">Clip: 0.00s</span>
+                        <span id="video-out-label">0.00s · f0</span>
+                    </div>
+                    <p class="info-text" style="margin-top:6px;">Drag the ends to trim, drag the body to scrub. <kbd>,</kbd> <kbd>.</kbd> step a frame, <kbd>[</kbd> <kbd>]</kbd> set in/out.</p>
+                </div>
                 <div class="control-group"><label class="control-label">Frame rate</label><select class="control-input" id="video-fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
+                <div class="control-group"><label class="control-label">Resolution</label><select class="control-input" id="motion-resolution"><option value="0.5">0.5× (smaller file)</option><option value="1" selected>1× (design size)</option><option value="2">2× (sharper)</option></select></div>
+                <div class="control-group"><label class="control-label">Quality</label><select class="control-input" id="motion-quality"><option value="low">Low</option><option value="high" selected>High</option><option value="max">Max</option></select></div>
+                <div class="control-group"><label class="control-label">GIF loop</label><select class="control-input" id="motion-loop"><option value="0" selected>Loop forever</option><option value="-1">Play once</option></select></div>
                 <div style="display:flex;gap:6px;">
                     <button class="btn btn-primary" style="flex:1;" id="video-mp4-btn">⬇ MP4</button>
                     <button class="btn btn-secondary" style="flex:1;" id="video-gif-btn">⬇ GIF</button>
@@ -805,6 +834,14 @@
                 <span>Opacity</span>
                 <input type="range" id="layer-opacity" min="0" max="100" step="1" value="100">
                 <output id="layer-opacity-value">100%</output>
+            </label>
+            <label class="layers-footer-row">
+                <span>Entrance</span>
+                <select id="layer-entrance-preset"></select>
+            </label>
+            <label class="layers-footer-row" id="layer-entrance-easing-row">
+                <span>Easing</span>
+                <select id="layer-entrance-easing"></select>
             </label>
         </div>
     </aside>

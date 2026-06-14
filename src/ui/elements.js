@@ -85,6 +85,7 @@ const IDS = [
   // v4 — layers, history, palette, zoom, stickers, tilt, scenes
   'layers-panel', 'layers-list', 'layers-toggle-btn',
   'layers-footer', 'layer-blend', 'layer-opacity', 'layer-opacity-value',
+  'layer-entrance-preset', 'layer-entrance-easing', 'layer-entrance-easing-row',
   'history-track', 'history-position', 'history-undo-btn', 'history-redo-btn',
   'palette-overlay', 'palette-input', 'palette-results',
   'canvas-viewport', 'zoom-controls', 'zoom-label', 'zoom-in', 'zoom-out', 'zoom-fit',
@@ -102,6 +103,8 @@ const IDS = [
   // v7 — animation
   'animation-enabled', 'animation-controls', 'animation-duration', 'animation-duration-value',
   'animation-play-btn', 'animation-track-list', 'gif-export-btn', 'gif-progress',
+  // v15.2 — Ken Burns + still MP4 export
+  'ken-burns-enabled', 'ken-burns-controls', 'mp4-export-btn',
 
   // v7 — AI enhance
   'ai-enhance-btn', 'style-reset-btn',

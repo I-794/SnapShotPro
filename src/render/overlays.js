@@ -1,11 +1,15 @@
 import { state, brandAssets } from '../state/state.js';
 import { roundRectPath } from '../utils/geometry.js';
 import { withLayer } from './blend.js';
+import { applyEntrance } from '../features/animation.js';
 
 export function drawTextOverlay(ctx, canvas) {
   const t = state.textOverlay;
   if (!t.enabled || !t.content) return;
+  // v15.2 — per-element entrance, about the text anchor.
+  const pushed = applyEntrance(ctx, 'L:text', canvas.width * t.x, canvas.height * t.y);
   withLayer(ctx, t, () => drawTextOverlayBody(ctx, canvas, t));
+  if (pushed) ctx.restore();
 }
 
 function drawTextOverlayBody(ctx, canvas, t) {

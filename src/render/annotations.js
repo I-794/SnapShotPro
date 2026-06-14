@@ -1,12 +1,19 @@
 import { state } from '../state/state.js';
 import { hexToRgba } from '../utils/color.js';
 import { withLayer } from './blend.js';
+import { applyEntrance } from '../features/animation.js';
 
 export function drawAnnotations(ctx) {
   if (!state.annotations) return;
   state.annotations.forEach((ann, idx) => {
     if (ann.visible === false) return;
+    // v15.2 — per-element entrance, transformed about the annotation's center.
+    const bb = annotationBBox(ann);
+    let cx = bb.x + bb.w / 2, cy = bb.y + bb.h / 2;
+    if (!isFinite(cx) || !isFinite(cy)) { cx = ann.x1 || 0; cy = ann.y1 || 0; }
+    const pushed = applyEntrance(ctx, 'L:ann:' + ann.id, cx, cy);
     withLayer(ctx, ann, () => drawAnnotation(ctx, ann, idx));
+    if (pushed) ctx.restore();
   });
 }
 

@@ -1117,6 +1117,45 @@ kbd {
     .whatsnew-toast { left: 16px; right: 16px; bottom: 16px; width: auto; }
 }
 
+/* v15.1 — video timeline scrubber (filmstrip + drag trim handles + playhead) */
+.vtimeline {
+    position: relative; height: 52px; border-radius: var(--radius-sm);
+    overflow: hidden; background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    cursor: pointer; user-select: none; touch-action: none;
+}
+.vtimeline-strip { position: absolute; inset: 0; display: flex; pointer-events: none; }
+.vts-thumb { flex: 1 1 0; min-width: 0; height: 100%; display: block; object-fit: cover; opacity: 0.85; }
+.vtimeline-region {
+    position: absolute; top: 0; bottom: 0; box-sizing: border-box;
+    border-left: 2px solid var(--accent-primary); border-right: 2px solid var(--accent-primary);
+    background: var(--accent-light); pointer-events: none; z-index: 1;
+}
+.vtimeline-handle {
+    position: absolute; top: 0; bottom: 0; width: 10px; margin-left: -5px;
+    background: var(--accent-primary); border-radius: 3px; z-index: 2;
+    cursor: ew-resize; touch-action: none;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+}
+.vtimeline-handle::after {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 2px; height: 16px; background: rgba(255,255,255,0.85); border-radius: 1px;
+}
+.vtimeline-playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px;
+    background: #fff; z-index: 3; pointer-events: none;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+.vtimeline-labels {
+    display: flex; justify-content: space-between; gap: 8px; margin-top: 6px;
+    font-size: 11px; color: var(--text-tertiary); font-variant-numeric: tabular-nums;
+}
+.control-group kbd {
+    font-family: var(--font-mono, monospace); font-size: 10px;
+    background: var(--bg-tertiary); border: 1px solid var(--border-color);
+    border-radius: 4px; padding: 1px 5px; color: var(--text-secondary);
+}
+
 .present-overlay {
     position: fixed; inset: 0; z-index: 3000; display: none;
     background: #0a0a0f; align-items: center; justify-content: center;

@@ -6,6 +6,9 @@ import { gradientPresets, shadowPresets, sizePresets } from '../state/presets.js
 import { isValidHex } from '../utils/color.js';
 import { applyMeshPreset, renderMeshPad } from '../features/mesh-pad.js';
 import { renderGradientEditor, syncFromGradientState } from '../features/gradient-editor.js';
+import { syncMotionExportControls } from '../features/video-export.js';
+import { refreshAnimationUI } from '../features/animation.js';
+import { refreshKenBurnsUI } from '../features/ken-burns.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -103,6 +106,32 @@ function ensureTextEffectDefaults() {
 // when absent, so only the dedicated imageLayer object needs backfilling.
 function ensureLayerStyleDefaults() {
   if (!state.imageLayer) state.imageLayer = { blend: 'source-over', opacity: 100 };
+}
+
+// v15.2 — backfill the animation block on designs saved before animation was
+// serialized (an Object.assign restore drops any key the saved object lacks),
+// and force the playback runtime off so a restored design never starts mid-
+// frame. Idempotent.
+function ensureAnimationDefaults() {
+  const a = state.animation || (state.animation = {});
+  if (typeof a.enabled !== 'boolean') a.enabled = false;
+  if (typeof a.duration !== 'number') a.duration = 3000;
+  if (!Array.isArray(a.tracks)) a.tracks = [];
+  a.playing = false;
+  a.currentTime = 0;
+}
+
+// v15.2 — backfill the Ken Burns block on designs saved before it existed.
+function ensureKenBurnsDefaults() {
+  const k = state.kenBurns || (state.kenBurns = {});
+  if (typeof k.enabled !== 'boolean') k.enabled = false;
+  if (typeof k.fromScale !== 'number') k.fromScale = 1.0;
+  if (typeof k.toScale !== 'number') k.toScale = 1.2;
+  if (typeof k.fromX !== 'number') k.fromX = 0.5;
+  if (typeof k.fromY !== 'number') k.fromY = 0.5;
+  if (typeof k.toX !== 'number') k.toX = 0.5;
+  if (typeof k.toY !== 'number') k.toY = 0.5;
+  if (typeof k.easing !== 'string') k.easing = 'easeInOut';
 }
 
 function updateTextEffectControls() {
@@ -441,6 +470,12 @@ export function updateUIFromState() {
 
   ensureTextEffectDefaults();   // backfill v14 text-effect groups on older designs
   ensureLayerStyleDefaults();   // backfill v15 main-image layer style on older designs
+  ensureAnimationDefaults();    // backfill v15.2 animation block; force runtime off
+  ensureKenBurnsDefaults();     // backfill v15.2 Ken Burns block on older designs
+  refreshAnimationUI();         // reflect persisted animation (tracks, duration, toggle)
+  refreshKenBurnsUI();          // reflect persisted Ken Burns toggle + controls
+  if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
+  syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 
   set(el.brightness, state.imageFilters.brightness); txt(el.brightnessValue, state.imageFilters.brightness + '%');
   set(el.contrast, state.imageFilters.contrast); txt(el.contrastValue, state.imageFilters.contrast + '%');

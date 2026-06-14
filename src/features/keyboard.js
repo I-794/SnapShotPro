@@ -7,6 +7,7 @@ import { openPalette, closePalette } from './palette.js';
 import { closeStickerDrawer } from './stickers.js';
 import { setTool, deleteSelected, nudgeSelected } from './canvas-tools.js';
 import { isTypingTarget } from '../utils/dom.js';
+import { timelineActive, timelineStepFrame, timelineSetIn, timelineSetOut } from './timeline.js';
 
 function showShortcuts(show) {
   if (!el.shortcutsOverlay) return;
@@ -43,6 +44,13 @@ export function bindKeyboard() {
       if (e.shiftKey && e.key.toLowerCase() === 'c') { e.preventDefault(); copyToClipboard(); return; }
     } else {
       if (e.key === '?') { e.preventDefault(); showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return; }
+      // v15.1 — frame-accurate timeline control when a clip is loaded.
+      if (timelineActive()) {
+        if (e.key === ',') { e.preventDefault(); timelineStepFrame(-1); return; }
+        if (e.key === '.') { e.preventDefault(); timelineStepFrame(1); return; }
+        if (e.key === '[') { e.preventDefault(); timelineSetIn(); return; }
+        if (e.key === ']') { e.preventDefault(); timelineSetOut(); return; }
+      }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); return; }
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         // Nudge the selected element: 1px, or 10px with Shift. One history entry

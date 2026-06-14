@@ -12,13 +12,26 @@ export const SERIALIZED_FIELDS = [
   'imageTransform', 'imageFilters', 'imageLayer', 'textOverlay', 'watermark', 'gradient',
   'padding', 'scale', 'borderRadius', 'showBorder', 'borderWidth', 'borderColor',
   'shadow', 'reflection', 'canvas', 'bgMode', 'bgColor', 'deviceFrame', 'annotations',
-  'redactions', 'spotlight', 'meshGradient', 'tilt3d', 'scene', 'autoLayout'
+  'redactions', 'spotlight', 'meshGradient', 'tilt3d', 'scene', 'autoLayout',
+  // v15.2 — animation tracks (entrance + easing) and Ken Burns are design-
+  // defining and lightweight, so shared/gallery designs animate too.
+  'animation', 'kenBurns'
 ];
+
+// v15.2 — strip the animation playback runtime so a saved, shared, or restored
+// design never arrives mid-frame (mid-playback or at a non-zero currentTime).
+// Mutates the passed design's animation in place and returns it.
+export function sanitizeAnimationRuntime(design) {
+  if (design && design.animation) {
+    design.animation = { ...design.animation, playing: false, currentTime: 0 };
+  }
+  return design;
+}
 
 export function snapshotProject() {
   const out = {};
   for (const k of SERIALIZED_FIELDS) out[k] = state[k];
-  return JSON.parse(JSON.stringify(out));
+  return sanitizeAnimationRuntime(JSON.parse(JSON.stringify(out)));
 }
 
 // ── v12 — Projects & Version History ──────────────────────────────────────
@@ -27,14 +40,14 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 12;
+export const SCHEMA_VERSION = 15;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
 export const PROJECT_FIELDS = [
   ...SERIALIZED_FIELDS,
   'windowOverlay', 'annotationColor', 'annotationStrokeWidth', 'nextNumber',
-  'redactType', 'redactIntensity', 'logo', 'exportSettings'
+  'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion'
 ];
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the
@@ -61,7 +74,7 @@ export function serializeFull() {
   for (const k of PROJECT_FIELDS) design[k] = state[k];
   return {
     schemaVersion: SCHEMA_VERSION,
-    design: JSON.parse(JSON.stringify(design)),
+    design: sanitizeAnimationRuntime(JSON.parse(JSON.stringify(design))),
     image: getImageDataURL(),
     svgCode: state.svgCode || null
   };
@@ -77,11 +90,11 @@ export function normalizeProject(payload) {
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: payload.design,
+      design: sanitizeAnimationRuntime(payload.design),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: payload, image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: sanitizeAnimationRuntime(payload), image: null, svgCode: payload.svgCode || null };
 }
