@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="A showcase of screenshots styled in SnapShot-Pro: gradients, mesh, liquid glass, device mockups, and App Store sets. Filter by style.">
+    <title>Gallery · SnapShot-Pro</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SnapShot-Pro · Gallery">
+    <meta property="og:description" content="See what a screenshot can become: gradients, mesh, liquid glass, device mockups, and store sets.">
+    <meta property="og:image" content="__OG_BASE__/og.png">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <style>
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: clamp(28px, 4vw, 40px); }
+        .chip { font-family: var(--font); font-size: 13.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; padding: 9px 16px; border-radius: var(--r-pill); background: var(--glass); border: 1px solid var(--glass-line); transition: color .2s, border-color .2s, background .2s; }
+        .chip:hover { color: var(--ink); border-color: var(--glass-hi); }
+        .chip.active { background: var(--accent-deep); color: #fff; border-color: transparent; }
+        .gal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .shot { border-radius: var(--r-card); overflow: hidden; position: relative; aspect-ratio: 4 / 3; padding: 20px; display: flex; align-items: flex-end; box-shadow: var(--shadow-lift); }
+        .shot.hide { display: none; }
+        .shot .pic { position: absolute; inset: 18px 18px 60px; border-radius: 10px; overflow: hidden; box-shadow: 0 16px 36px -10px rgba(0,0,0,0.6); transform: rotate(-1.3deg); }
+        .shot .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .shot .cap { position: relative; z-index: 1; color: #fff; }
+        .shot .cap strong { display: block; font-size: 14.5px; font-weight: 600; }
+        .shot .cap span { font-size: 12px; opacity: 0.82; }
+        .g1 { background: linear-gradient(160deg, #ff8a5c, #ff5e7e 55%, #c5318f); }
+        .g2 { background: linear-gradient(160deg, #2bd4c4, #2348ff 60%, #1631a8); }
+        .g3 { background: linear-gradient(160deg, #3a2d6b, #15161a); }
+        .g4 { background: linear-gradient(160deg, #5b82ff, #2348ff 55%, #6a3cff); }
+        .g5 { background: linear-gradient(160deg, #11998e, #38ef7d); }
+        .g6 { background: linear-gradient(160deg, #f857a6, #ff5858); }
+        @media (max-width: 860px) { .gal { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 560px) { .gal { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <p class="eyebrow" style="margin-bottom:16px;">Showcase</p>
+        <h1>What a screenshot <span class="grad-text">can become</span>.</h1>
+        <p class="lede">A few looks built entirely in the studio. Every one started as a plain capture. Filter by style, then open the editor and make your own.</p>
+    </div>
+</header>
+
+<section class="section-pad" style="padding-top:clamp(20px,3vw,32px);">
+    <div class="wrap">
+        <div class="filters" id="filters">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="gradient">Gradient</button>
+            <button class="chip" data-filter="mesh">Mesh</button>
+            <button class="chip" data-filter="glass">Liquid glass</button>
+            <button class="chip" data-filter="device">Device</button>
+            <button class="chip" data-filter="store">App Store</button>
+        </div>
+        <div class="gal" id="gal">
+            <div class="shot g1" data-cat="gradient"><div class="pic"><img src="https://picsum.photos/seed/snap-g1/800/600" alt="Screenshot on a warm gradient" loading="lazy"></div><div class="cap"><strong>Warm gradient</strong><span>Soft shadow, rounded corners</span></div></div>
+            <div class="shot g2" data-cat="mesh"><div class="pic"><img src="https://picsum.photos/seed/snap-g2/800/600" alt="Screenshot on a cobalt mesh" loading="lazy"></div><div class="cap"><strong>Cobalt mesh</strong><span>Browser frame, 3D tilt</span></div></div>
+            <div class="shot g3" data-cat="glass"><div class="pic"><img src="https://picsum.photos/seed/snap-g3/800/600" alt="Screenshot with liquid glass" loading="lazy"></div><div class="cap"><strong>Glass &amp; spotlight</strong><span>Liquid glass, annotations</span></div></div>
+            <div class="shot g4" data-cat="device"><div class="pic"><img src="https://picsum.photos/seed/snap-g4/800/600" alt="Screenshot in a device mockup" loading="lazy"></div><div class="cap"><strong>Device mockup</strong><span>iPhone frame, reflection</span></div></div>
+            <div class="shot g5" data-cat="store"><div class="pic"><img src="https://picsum.photos/seed/snap-g5/800/600" alt="App Store screenshot set" loading="lazy"></div><div class="cap"><strong>App Store set</strong><span>Captioned, every size</span></div></div>
+            <div class="shot g6" data-cat="gradient"><div class="pic"><img src="https://picsum.photos/seed/snap-g6/800/600" alt="Screenshot on a vivid gradient" loading="lazy"></div><div class="cap"><strong>Sunset pop</strong><span>Vivid filter, film grain</span></div></div>
+            <div class="shot g2" data-cat="mesh"><div class="pic"><img src="https://picsum.photos/seed/snap-g7/800/600" alt="Screenshot on a mesh background" loading="lazy"></div><div class="cap"><strong>Aurora mesh</strong><span>Pattern overlay</span></div></div>
+            <div class="shot g3" data-cat="glass"><div class="pic"><img src="https://picsum.photos/seed/snap-g8/800/600" alt="Screenshot with a glass panel" loading="lazy"></div><div class="cap"><strong>Frosted panel</strong><span>Glass over a hero shot</span></div></div>
+            <div class="shot g4" data-cat="device"><div class="pic"><img src="https://picsum.photos/seed/snap-g9/800/600" alt="Laptop mockup scene" loading="lazy"></div><div class="cap"><strong>Laptop scene</strong><span>Mockup, soft shadow</span></div></div>
+        </div>
+        <p class="lede" style="margin-top:32px;font-size:15px;">Want to publish your own? The studio has a community gallery built in, so you can share a design or browse what others have made.</p>
+        <div style="margin-top:28px;">
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+
+<script src="/site.js"></script>
+<script>
+    // Gallery style filter. Plain class toggles, no dependencies.
+    (function () {
+        const chips = document.querySelectorAll('#filters .chip');
+        const shots = Array.from(document.querySelectorAll('#gal .shot'));
+        chips.forEach((chip) => chip.addEventListener('click', () => {
+            chips.forEach((c) => c.classList.toggle('active', c === chip));
+            const f = chip.dataset.filter;
+            shots.forEach((s) => {
+                const cats = (s.dataset.cat || '').split(' ');
+                s.classList.toggle('hide', f !== 'all' && !cats.includes(f));
+            });
+        }));
+    })();
+</script>
+</body>
+</html>

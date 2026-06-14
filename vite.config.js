@@ -57,7 +57,11 @@ export default defineConfig({
         changelog: resolve(__dirname, 'changelog/index.html'),
         privacy: resolve(__dirname, 'privacy/index.html'),
         appStoreScreenshots: resolve(__dirname, 'app-store-screenshots/index.html'),
-        guide: resolve(__dirname, 'guide/index.html')
+        guide: resolve(__dirname, 'guide/index.html'),
+        features: resolve(__dirname, 'features/index.html'),
+        gallery: resolve(__dirname, 'gallery/index.html'),
+        useCases: resolve(__dirname, 'use-cases/index.html'),
+        pricing: resolve(__dirname, 'pricing/index.html')
       },
       output: {
         manualChunks: {
