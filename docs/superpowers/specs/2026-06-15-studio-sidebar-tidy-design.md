@@ -2,8 +2,10 @@
 
 **Status:** Approved design (not yet implemented)
 **Date:** 2026-06-15
-**Type:** Housekeeping / tidy — **NOT a release.** No major version bump, no
-what's-new toast, no changelog entry. Optional quiet patch (`20.0.1`) only.
+**Type:** Housekeeping / tidy — not a feature release, but **users should be told
+it's more organized.** So: a small **minor bump to `20.1.0`**, a brief what's-new
+toast item, and one short changelog timeline entry (NO spotlight swap, no new
+motif). Not a major version.
 
 ## Goal
 
@@ -121,9 +123,18 @@ collapse states are applied.
 - Narrow screen: single scroll, collapsing works.
 - `npm run build` succeeds.
 
+## Release (light, user-facing notice)
+
+- Bump `package.json` to `20.1.0` and the editor header/title to `v20.1` so the
+  what's-new toast fires for returning users (`whats-new.js` compares
+  CURRENT_VERSION to last-seen).
+- `whats-new.js`: `CURRENT_VERSION = '20.1'`, a single item, e.g. "A tidier
+  studio: cleaner sidebar with collapsible sections and clearer grouping."
+- `changelog/index.html`: add ONE short `.entry` timeline item for v20.1 (demote
+  the v20.0 `.entry.latest` to `.entry`; the v20 spotlight stays). No new motif.
+
 ## Out of scope
 
-- Any version bump beyond an optional patch; no what's-new, no changelog.
 - New tabs, renaming the 8 groups, or a search/jump box (that was the larger IA
   option, declined).
 - Theme/color restyle, new feature behavior, or touching feature logic/state.
