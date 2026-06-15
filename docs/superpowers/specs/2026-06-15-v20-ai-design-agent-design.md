@@ -37,6 +37,12 @@ and it remembers the conversation and the user's recurring preferences.
    (localStorage, per project) and resumes across reloads. A global "design
    memory" of recurring preferences + brand is accumulated and injected into the
    system prompt each session. (No editable memory panel in v1.)
+6. **Add-ons folded in (from add-on brainstorm) = streaming + suggestion chips.**
+   The agent narrates live as it works (streamed assistant text + per-step action
+   lines as each tool resolves), and after each turn surfaces 2-4 clickable
+   next-step prompt chips. Other add-ons (voice input, design-critique mode,
+   editable memory panel, multi-variant proposals, App Store set) are parked for
+   v20.1.
 
 ## Architecture
 
@@ -62,6 +68,9 @@ frame."). Tools:
    vision model with a fixed critique prompt → return the textual critique.
 8. `remember({ note })` → append a concise durable preference to the global
    design-memory store (capped + deduped).
+9. `suggest_next({ chips })` → store 2-4 short next-step prompt strings; the panel
+   renders them as clickable chips. The system prompt instructs the agent to call
+   this as its final action each turn (provider-agnostic; no fragile parsing).
 
 All design mutations are followed by `render()`; UI re-sync (`render()` +
 `window.__updateUIFromState()`) happens at the end of each user turn.
@@ -85,16 +94,27 @@ Owns conversation state, the tool-use loop, memory, and the panel.
   tasteful, stay on-brand, use `look_at_canvas` when unsure, prefer `apply_design`
   for presentation changes).
 
-### Extend: `src/features/ai-cloud.js` — `runAgentTurn(messages, tools)`
+### Extend: `src/features/ai-cloud.js` — `runAgentTurn(messages, tools, { onText })`
 One normalized tool-calling chat call across both providers:
 - Picks provider via `chooseProvider(false)`; model from `AGENT_MODELS[provider]`.
-- **OpenAI:** `chat.completions.create({ model, messages, tools })`; reads
-  `choices[0].message.tool_calls`.
-- **Anthropic:** `messages.create({ model, system, messages, tools })`; reads
-  `content` blocks of type `tool_use`.
+- **OpenAI:** `chat.completions.create({ model, messages, tools, stream: true })`;
+  accumulates streamed content deltas (calls `onText(delta)` for live display) and
+  assembles `tool_calls`.
+- **Anthropic:** `messages.stream({ model, system, messages, tools })`; streams
+  `text` deltas to `onText`, assembles `tool_use` content blocks.
 - Returns a normalized `{ text, toolCalls: [{ id, name, args }], stop }` and
   helpers to append tool results in each provider's format. Throws `{code:'NO_KEY'}`
   when no provider is configured.
+
+### Streaming + suggestion chips
+- **Streaming:** `runAgentTurn` streams assistant text deltas via `onText`, which
+  the panel appends into the active assistant bubble in real time. Tool actions
+  are narrated as separate lines the moment each tool resolves (already per-step),
+  so the user watches the agent work rather than waiting for the whole turn.
+- **Suggestion chips:** the agent's final `suggest_next({ chips })` call populates
+  a row of clickable chips below the input. Clicking a chip fills the input and
+  sends it as the next user message. If the agent omits `suggest_next`, the chip
+  row is simply empty (graceful).
 
 ### Memory store
 - **Conversation:** localStorage key `snapshotpro_agent_chat_<projectId>` (per
@@ -108,10 +128,12 @@ One normalized tool-calling chat call across both providers:
 
 New **"Design Agent"** studio section (its own collapsible section in the editor
 sidebar, in/near the AI group): a scrollable chat log (user / agent / narrated
-tool-action lines), a text input with **Send** and **Stop**, a per-turn status
-line, and the v18 spectrum-gradient signature on the Send affordance. Honors
-`prefers-reduced-motion`. New element ids registered; `bindAiAgent()` called from
-`main.js`. Reuses existing control/styles; minimal new CSS (chat bubbles + log).
+tool-action lines) with **streamed** assistant text, a row of **suggestion
+chips** below the input, a text input with **Send** and **Stop**, a per-turn
+status line, and the v18 spectrum-gradient signature on the Send affordance.
+Honors `prefers-reduced-motion`. New element ids registered; `bindAiAgent()`
+called from `main.js`. Reuses existing control/styles; minimal new CSS (chat
+bubbles + log + chips).
 
 ## Data flow
 
@@ -160,6 +182,8 @@ normal render path.
 - Stop aborts a long run.
 - No key → guidance + key panel; tool failure → agent reports gracefully.
 - Provider-agnostic: works on the OpenAI key; works on an Anthropic key if added.
+- Streaming: assistant text appears progressively; tool actions narrate as they run.
+- Suggestion chips appear after a turn; clicking one sends it as the next message.
 - `npm run build` succeeds.
 
 ## Release chores
@@ -180,6 +204,6 @@ normal render path.
 - Editing screenshot *content* beyond isolate / background (no inpainting via the
   agent in v1; the existing magic-eraser/extend tools stay manual).
 - Deck / multi-page orchestration by the agent.
-- Streaming token-by-token output (narrate per completed step instead; streaming
-  is a later polish).
+- Voice input, design-critique mode, editable memory panel, multi-variant
+  proposals, and "design a whole App Store set" (all parked for v20.1).
 - Cross-device memory sync (localStorage only; cloud-sync is future work).
