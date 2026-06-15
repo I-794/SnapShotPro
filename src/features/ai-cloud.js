@@ -284,3 +284,124 @@ export function bindAiCloud() {
   if (s2c) s2c.addEventListener('click', aiScreenshotToCode);
   if (cp) cp.addEventListener('click', copyAiResult);
 }
+
+// v20 — AI Design Agent provider layer. Configurable model per provider (bump
+// these as stronger models ship; defaults are known-good ids in this codebase).
+export const AGENT_MODELS = { openai: 'gpt-4o', anthropic: 'claude-sonnet-4-6' };
+const AGENT_MAX_TOKENS = 1500;
+
+// Convert neutral history → OpenAI chat messages.
+function toOpenAIMessages(system, messages) {
+  const out = [{ role: 'system', content: system }];
+  for (const m of messages) {
+    if (m.role === 'user') out.push({ role: 'user', content: m.content });
+    else if (m.role === 'assistant') {
+      const msg = { role: 'assistant', content: m.content || '' };
+      if (m.toolCalls && m.toolCalls.length) {
+        msg.content = m.content || null;
+        msg.tool_calls = m.toolCalls.map(t => ({ id: t.id, type: 'function', function: { name: t.name, arguments: JSON.stringify(t.args || {}) } }));
+      }
+      out.push(msg);
+    } else if (m.role === 'tool') {
+      out.push({ role: 'tool', tool_call_id: m.toolCallId, content: m.content });
+    }
+  }
+  return out;
+}
+
+// Convert neutral history → Anthropic messages (tool_result blocks must ride in a
+// user turn; consecutive tool messages are merged into one user message).
+function toAnthropicMessages(messages) {
+  const out = [];
+  for (const m of messages) {
+    if (m.role === 'user') out.push({ role: 'user', content: m.content });
+    else if (m.role === 'assistant') {
+      const content = [];
+      if (m.content) content.push({ type: 'text', text: m.content });
+      for (const t of (m.toolCalls || [])) content.push({ type: 'tool_use', id: t.id, name: t.name, input: t.args || {} });
+      out.push({ role: 'assistant', content });
+    } else if (m.role === 'tool') {
+      const block = { type: 'tool_result', tool_use_id: m.toolCallId, content: m.content };
+      const last = out[out.length - 1];
+      if (last && last.role === 'user' && Array.isArray(last.content)) last.content.push(block);
+      else out.push({ role: 'user', content: [block] });
+    }
+  }
+  return out;
+}
+
+async function openAIAgentTurn(key, system, messages, tools, onText) {
+  const OpenAI = (await import('openai')).default;
+  const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+  const stream = await client.chat.completions.create({
+    model: AGENT_MODELS.openai,
+    max_tokens: AGENT_MAX_TOKENS,
+    messages: toOpenAIMessages(system, messages),
+    tools: tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } })),
+    stream: true
+  });
+  let text = '';
+  const acc = [];
+  for await (const chunk of stream) {
+    const d = chunk.choices?.[0]?.delta || {};
+    if (d.content) { text += d.content; onText && onText(d.content); }
+    for (const tc of (d.tool_calls || [])) {
+      const i = tc.index;
+      acc[i] = acc[i] || { id: '', name: '', args: '' };
+      if (tc.id) acc[i].id = tc.id;
+      if (tc.function?.name) acc[i].name += tc.function.name;
+      if (tc.function?.arguments) acc[i].args += tc.function.arguments;
+    }
+  }
+  const toolCalls = acc.filter(Boolean).map(t => ({ id: t.id, name: t.name, args: safeJson(t.args) }));
+  return { text, toolCalls };
+}
+
+async function anthropicAgentTurn(key, system, messages, tools, onText) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+  const stream = client.messages.stream({
+    model: AGENT_MODELS.anthropic,
+    max_tokens: AGENT_MAX_TOKENS,
+    system,
+    messages: toAnthropicMessages(messages),
+    tools: tools.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }))
+  });
+  if (onText) stream.on('text', (t) => onText(t));
+  const final = await stream.finalMessage();
+  let text = '';
+  const toolCalls = [];
+  for (const block of (final.content || [])) {
+    if (block.type === 'text') text += block.text;
+    else if (block.type === 'tool_use') toolCalls.push({ id: block.id, name: block.name, args: block.input || {} });
+  }
+  return { text, toolCalls };
+}
+
+function safeJson(s) { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } }
+
+// One normalized, streaming tool-calling turn. Returns { text, toolCalls:[{id,name,args}] }.
+// Throws { code:'NO_KEY' } when no provider configured.
+export async function runAgentTurn(messages, tools, { system = '', onText = null } = {}) {
+  const choice = await chooseProvider(false);
+  if (!choice) { const e = new Error('No AI key'); e.code = 'NO_KEY'; throw e; }
+  return choice.provider === 'anthropic'
+    ? anthropicAgentTurn(choice.key, system, messages, tools, onText)
+    : openAIAgentTurn(choice.key, system, messages, tools, onText);
+}
+
+// Vision critique of an arbitrary rendered dataURL (the agent's look_at_canvas).
+// Reuses the existing hosted/BYO vision paths. Returns text or a graceful note.
+export async function runVisionOnDataUrl(prompt, dataUrl) {
+  try {
+    const hosted = await callHostedVision(prompt, dataUrl);
+    if (hosted?.text) return hosted.text;
+  } catch (_) {}
+  const choice = await chooseProvider(true);
+  if (!choice) return 'I could not see the canvas (no vision-capable key configured).';
+  try {
+    return choice.provider === 'anthropic'
+      ? await callAnthropicVision(choice.key, prompt, dataUrl)
+      : await callOpenAIVision(choice.key, prompt, dataUrl);
+  } catch (e) { return 'I could not analyze the canvas right now.'; }
+}
