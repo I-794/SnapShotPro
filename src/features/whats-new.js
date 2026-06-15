@@ -10,18 +10,18 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '19.0';
+const CURRENT_VERSION = '20.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v19 — AI Assets",
+  heading: "What's new in v20 — the AI Design Agent",
   items: [
-    { title: 'AI backgrounds',
-      desc: 'Describe a background and generate it on the spot. Turn on "Use my palette" and it matches your colors, at your canvas size.' },
-    { title: 'Place behind subject',
-      desc: 'One toggle cuts your screenshot out and drops it onto the generated scene, for an instant product-shot composite.' }
+    { title: 'Design by conversation',
+      desc: 'Tell the agent what you want and it designs it: background, frame, layout, palette, headline. Then refine by chatting, "make it warmer, bigger headline".' },
+    { title: 'It generates, sees, and remembers',
+      desc: 'It can generate backgrounds, isolate your subject, look at the canvas to critique itself, and it remembers your style across sessions.' }
   ]
 };
 
