@@ -61,7 +61,8 @@ export default defineConfig({
         features: resolve(__dirname, 'features/index.html'),
         gallery: resolve(__dirname, 'gallery/index.html'),
         useCases: resolve(__dirname, 'use-cases/index.html'),
-        pricing: resolve(__dirname, 'pricing/index.html')
+        pricing: resolve(__dirname, 'pricing/index.html'),
+        agent: resolve(__dirname, 'agent/index.html')
       },
       output: {
         manualChunks: {

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Meet the SnapShot-Pro AI Design Agent: describe what you want and it designs it, generates backgrounds, sees the canvas, and remembers your style. The biggest update yet.">
+    <title>The AI Design Agent · SnapShot-Pro</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SnapShot-Pro · The AI Design Agent">
+    <meta property="og:description" content="Describe it. The agent designs it. The biggest SnapShot-Pro update yet.">
+    <meta property="og:image" content="__OG_BASE__/og.png">
+    <meta name="theme-color" content="#0b0d14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <style>
+        /* v20 launch page. Page base stays on the site's LIGHT theme so the shared
+           nav/footer fit; the flagship feel comes from large DARK islands (the
+           same deliberate device the changelog spotlight uses). Motif: a
+           "conversation -> design" demo. Accent: the site cobalt; the spectrum is
+           used only as the established generative signature, never as a second CTA
+           accent. Radius: 16px panels, pill buttons. No em-dashes anywhere. */
+
+        /* ---- shared dark island ---- */
+        .ag-dark {
+            position: relative; isolation: isolate; overflow: hidden;
+            border-radius: 28px; color: #fff;
+            background:
+                radial-gradient(60% 90% at 8% 0%, rgba(74,168,255,0.20), transparent 56%),
+                radial-gradient(55% 85% at 100% 100%, rgba(138,107,255,0.22), transparent 56%),
+                #0b0d14;
+            box-shadow: var(--shadow-product, 0 40px 90px -30px rgba(10,16,50,0.5));
+        }
+
+        /* ---- hero ---- */
+        .ag-hero {
+            display: grid; grid-template-columns: 1.02fr 0.98fr; gap: clamp(28px, 4vw, 56px);
+            align-items: center; padding: clamp(28px, 4vw, 56px);
+        }
+        .ag-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;
+            font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11.5px; font-weight: 600; color: #fff;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            padding: 7px 13px; border-radius: var(--r-pill, 999px);
+            background: linear-gradient(90deg, #ff5a5a, #ffb14a, #57e39b, #4aa8ff, #8a6bff, #ff5a5a);
+            background-size: 220% 100%; animation: ag-sweep 7s linear infinite;
+        }
+        @keyframes ag-sweep { to { background-position: 220% 0; } }
+        .ag-hero h1 { font-size: clamp(34px, 4.6vw, 56px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; margin-bottom: 18px; }
+        .ag-hero .lede { font-size: clamp(16px, 1.5vw, 19px); color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 46ch; margin-bottom: 28px; }
+        .ag-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .ag-dark .btn-primary { background: #fff; color: #11131c; }
+        .ag-dark .btn-primary:hover { background: #eef0f4; transform: translateY(-1px); }
+        .ag-dark .btn-ghost { background: rgba(255,255,255,0.07); color: #fff; border-color: rgba(255,255,255,0.45); }
+        .ag-dark .btn-ghost:hover { background: rgba(255,255,255,0.14); border-color: #fff; transform: translateY(-1px); }
+
+        /* the conversation -> design demo */
+        .ag-demo { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .ag-thread { display: flex; flex-direction: column; gap: 9px; }
+        .ag-b { padding: 10px 13px; border-radius: 14px; font-size: 13.5px; line-height: 1.45; max-width: 88%; }
+        .ag-u { align-self: flex-end; background: var(--accent, #2348ff); color: #fff; border-bottom-right-radius: 5px; }
+        .ag-a { align-self: flex-start; background: rgba(255,255,255,0.10); color: #fff; border: 1px solid rgba(255,255,255,0.14); border-bottom-left-radius: 5px; }
+        .ag-act { align-self: flex-start; font-family: var(--font-mono, monospace); font-size: 11.5px; color: rgba(255,255,255,0.62); padding-left: 4px; }
+        .ag-result { position: relative; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6); }
+        .ag-bar { height: 34px; background: #f3f3f1; display: flex; align-items: center; gap: 7px; padding: 0 13px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .ag-bar i { width: 10px; height: 10px; border-radius: 50%; }
+        .ag-bar i:nth-child(1){ background:#ff5f57; } .ag-bar i:nth-child(2){ background:#febc2e; } .ag-bar i:nth-child(3){ background:#28c840; }
+        .ag-shot-pad { padding: 22px; background: linear-gradient(135deg, #2348ff, #6f4bd8); }
+        .ag-shot-pad img { display: block; width: 100%; border-radius: 9px; box-shadow: 0 14px 30px rgba(0,0,0,0.32); }
+        .ag-result::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(110deg, transparent 38%, rgba(255,255,255,0.20) 50%, transparent 62%);
+            background-size: 250% 100%; animation: ag-shimmer 4.2s ease-in-out infinite;
+        }
+        @keyframes ag-shimmer { 0% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+
+        /* ---- how it works: connected flow ---- */
+        .ag-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; align-items: stretch; }
+        .ag-step { padding: clamp(22px, 2.4vw, 30px); position: relative; }
+        .ag-step:not(:last-child) { border-right: 1px solid var(--line, rgba(10,16,40,0.10)); }
+        .ag-step .n { font-family: var(--font-mono, monospace); font-size: 13px; color: var(--accent, #2348ff); margin-bottom: 12px; }
+        .ag-step h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 7px; color: var(--ink, #0b0d14); }
+        .ag-step p { font-size: 15px; color: var(--ink-2, #41485a); line-height: 1.55; }
+
+        /* ---- bento ---- */
+        .ag-bento { display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 1fr; gap: 16px; }
+        .ag-tile { border-radius: 16px; padding: clamp(20px, 2vw, 26px); border: 1px solid var(--line, rgba(10,16,40,0.10)); background: var(--bg-raise, #fff); display: flex; flex-direction: column; gap: 10px; min-height: 168px; }
+        .ag-tile h3 { font-size: 17px; font-weight: 650; letter-spacing: -0.015em; color: var(--ink, #0b0d14); }
+        .ag-tile p { font-size: 14px; color: var(--ink-2, #41485a); line-height: 1.5; }
+        .ag-tile .ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft, rgba(35,72,255,0.10)); color: var(--accent, #2348ff); }
+        .ag-tile .ico svg { width: 20px; height: 20px; }
+        .ag-c6 { grid-column: span 6; } .ag-c4 { grid-column: span 4; } .ag-c3 { grid-column: span 3; } .ag-c2 { grid-column: span 2; }
+        /* the two visual cells */
+        .ag-tile.feature { color: #fff; border: none; background:
+            radial-gradient(70% 90% at 12% 0%, rgba(74,168,255,0.35), transparent 60%),
+            radial-gradient(70% 90% at 100% 100%, rgba(138,107,255,0.4), transparent 60%), #0b0d14; }
+        .ag-tile.feature h3 { color: #fff; } .ag-tile.feature p { color: rgba(255,255,255,0.78); }
+        .ag-tile.feature .ico { background: rgba(255,255,255,0.14); color: #fff; }
+        .ag-tile.spectrum { color: #fff; border: none; background:
+            linear-gradient(120deg, #ff5a5a, #ffb14a, #57e39b, #4aa8ff, #8a6bff); }
+        .ag-tile.spectrum h3 { color: #fff; } .ag-tile.spectrum p { color: rgba(255,255,255,0.9); }
+        .ag-tile.spectrum .ico { background: rgba(255,255,255,0.2); color: #fff; }
+
+        /* ---- conversation island ---- */
+        .ag-convo { padding: clamp(30px, 4vw, 56px); display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(28px, 4vw, 56px); align-items: center; }
+        .ag-convo h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; margin-bottom: 14px; }
+        .ag-convo p { color: rgba(255,255,255,0.8); font-size: 16px; line-height: 1.6; max-width: 42ch; }
+        .ag-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+        .ag-chip { font-size: 12px; color: #fff; border: 1px solid rgba(255,255,255,0.22); border-radius: 999px; padding: 5px 12px; }
+
+        /* ---- arc band + final cta ---- */
+        .ag-arc { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: clamp(22px, 3vw, 34px) clamp(24px, 4vw, 44px); border-radius: 20px; background: var(--accent-soft, rgba(35,72,255,0.08)); border: 1px solid var(--accent-line, rgba(35,72,255,0.18)); }
+        .ag-arc p { font-size: 16px; color: var(--ink-2, #41485a); max-width: 60ch; }
+        .ag-arc b { color: var(--ink, #0b0d14); font-weight: 650; }
+        .ag-cta { text-align: center; padding: clamp(40px, 6vw, 72px) clamp(24px, 4vw, 44px); }
+        .ag-cta h2 { font-size: clamp(30px, 4vw, 48px); font-weight: 700; letter-spacing: -0.035em; margin-bottom: 22px; color: #fff; }
+
+        .ag-head { font-size: clamp(24px, 3vw, 34px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; color: var(--ink, #0b0d14); }
+        .ag-sub { font-size: 16px; color: var(--ink-2, #41485a); margin-bottom: clamp(24px, 3vw, 36px); max-width: 60ch; }
+
+        @media (max-width: 900px) {
+            .ag-hero, .ag-convo { grid-template-columns: 1fr; }
+            .ag-flow { grid-template-columns: 1fr; }
+            .ag-step:not(:last-child) { border-right: none; border-bottom: 1px solid var(--line, rgba(10,16,40,0.10)); }
+            .ag-bento { grid-template-columns: 1fr 1fr; }
+            .ag-c6, .ag-c4, .ag-c3, .ag-c2 { grid-column: span 2; }
+        }
+        @media (max-width: 560px) {
+            .ag-bento { grid-template-columns: 1fr; }
+            .ag-c6, .ag-c4, .ag-c3, .ag-c2 { grid-column: span 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ag-eyebrow { animation: none; }
+            .ag-result::after { animation: none; opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<!-- HERO ------------------------------------------------------------------ -->
+<section style="padding: clamp(24px, 4vw, 44px) 0 clamp(36px, 5vw, 64px);">
+    <div class="wrap">
+        <div class="ag-dark ag-hero reveal">
+            <div>
+                <span class="ag-eyebrow">The biggest update yet</span>
+                <h1>Describe it. The agent designs it.</h1>
+                <p class="lede">Tell SnapShot-Pro what you want and it designs the whole shot. Then refine it by chatting.</p>
+                <div class="ag-actions">
+                    <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+                    <a href="#how" class="btn btn-ghost btn-lg">See it work</a>
+                </div>
+            </div>
+            <div class="ag-demo" aria-hidden="true">
+                <div class="ag-thread">
+                    <div class="ag-b ag-u">design a calm fintech hero</div>
+                    <div class="ag-b ag-a">On it. Composing a clean, trustworthy look.</div>
+                    <div class="ag-act">• Generated a soft blue background</div>
+                    <div class="ag-act">• Set an iPhone frame and a headline</div>
+                    <div class="ag-b ag-u">make it warmer</div>
+                    <div class="ag-act">• Warmed the grade and palette</div>
+                </div>
+                <div class="ag-result">
+                    <div class="ag-bar"><i></i><i></i><i></i></div>
+                    <div class="ag-shot-pad"><img src="https://picsum.photos/seed/snapshotpro-agent-fintech/1200/740" alt="A screenshot styled by the agent: framed in a device on a warm gradient background" loading="eager" width="1200" height="740"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS ---------------------------------------------------------- -->
+<section class="section-pad" id="how" style="padding-top: clamp(12px,2vw,24px);">
+    <div class="wrap">
+        <h2 class="ag-head reveal">From a sentence to a finished shot</h2>
+        <p class="ag-sub reveal">No menus to learn. Talk to the studio the way you would brief a designer.</p>
+        <div class="ag-flow reveal" style="border:1px solid var(--line, rgba(10,16,40,0.10)); border-radius:20px; overflow:hidden;">
+            <div class="ag-step">
+                <div class="n">Describe</div>
+                <h3>Say what you want</h3>
+                <p>One line is enough. "A bold dark-mode hero for a dev tool," or "soft and minimal for a wellness app."</p>
+            </div>
+            <div class="ag-step">
+                <div class="n">It designs</div>
+                <h3>The agent builds it</h3>
+                <p>It sets the background, frame, layout, color grade, and headline, calling the studio's own tools and narrating each step.</p>
+            </div>
+            <div class="ag-step">
+                <div class="n">Refine</div>
+                <h3>Adjust by chatting</h3>
+                <p>"Bigger headline. Warmer. Try dark mode." It tweaks what you ask and leaves the rest, fully undoable.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHAT IT CAN DO (bento) ------------------------------------------------ -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,20px);">
+    <div class="wrap">
+        <h2 class="ag-head reveal">One agent, the whole studio</h2>
+        <p class="ag-sub reveal">It does not just suggest. It drives every tool you would reach for yourself.</p>
+        <div class="ag-bento reveal">
+            <div class="ag-tile feature ag-c4">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H8l-4 3.5z"/><path d="M8 9.5h8M8 12.5h5" opacity="0.7"/></svg></div>
+                <h3>Composes full designs</h3>
+                <p>Background, device or browser frame, padding, shadow, and color grade, set together from one request and tuned on follow-ups.</p>
+            </div>
+            <div class="ag-tile ag-c2">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 16l5-4 4 3 3-2.5 4 3.5"/></svg></div>
+                <h3>Generates backgrounds</h3>
+                <p>On-brand AI imagery at your canvas size.</p>
+            </div>
+            <div class="ag-tile ag-c2">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 3.5 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 6.5 12 3z"/></svg></div>
+                <h3>Isolates the subject</h3>
+                <p>Drops your screenshot onto the new scene.</p>
+            </div>
+            <div class="ag-tile ag-c2">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.2"/><circle cx="6" cy="15" r="2.2"/><circle cx="18" cy="15" r="2.2"/></svg></div>
+                <h3>Palettes and headlines</h3>
+                <p>Builds harmonies and writes the copy.</p>
+            </div>
+            <div class="ag-tile spectrum ag-c2">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></div>
+                <h3>Sees the canvas</h3>
+                <p>Looks at the result to critique and fix its own work.</p>
+            </div>
+            <div class="ag-tile ag-c6">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M9 4v5h6" opacity="0.7"/><circle cx="12" cy="14" r="2.2"/></svg></div>
+                <h3>Remembers your style</h3>
+                <p>The conversation resumes across sessions, and the agent learns your brand and recurring choices so it stays on-brand without being told twice.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- THE CONVERSATION (dark island) --------------------------------------- -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,20px);">
+    <div class="wrap">
+        <div class="ag-dark ag-convo reveal">
+            <div>
+                <h2>It is a conversation, not a form</h2>
+                <p>Replies stream as it works, it suggests the next move, and the thread picks up where you left off, even after you close the tab.</p>
+                <div class="ag-chips" aria-hidden="true">
+                    <span class="ag-chip">Bolder headline</span>
+                    <span class="ag-chip">Try dark mode</span>
+                    <span class="ag-chip">Add a logo</span>
+                </div>
+            </div>
+            <div class="ag-thread" aria-hidden="true">
+                <div class="ag-b ag-u">use my brand blue and keep it minimal</div>
+                <div class="ag-b ag-a">Saved that you like minimal and cobalt. Applied it.</div>
+                <div class="ag-act">• Set the cobalt palette</div>
+                <div class="ag-act">• Trimmed the layout</div>
+                <div class="ag-b ag-u">is the text readable?</div>
+                <div class="ag-b ag-a">Looked at it. The subhead was low contrast, so I darkened it.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BUILT ON THE ARC ------------------------------------------------------ -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,20px);">
+    <div class="wrap">
+        <div class="ag-arc reveal">
+            <p><b>The culmination of a year of building.</b> The agent stands on Design Variations and AI Assets, driving the same engine that powers the rest of the studio.</p>
+            <a href="/changelog/" class="btn btn-ghost">Read the changelog <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA ------------------------------------------------------------- -->
+<section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+    <div class="wrap">
+        <div class="ag-dark ag-cta reveal">
+            <h2>Stop nudging sliders. Just say it.</h2>
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>
