@@ -10,18 +10,16 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '20.0';
+const CURRENT_VERSION = '20.1';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "What's new in v20 — the AI Design Agent",
+  heading: "A tidier studio",
   items: [
-    { title: 'Design by conversation',
-      desc: 'Tell the agent what you want and it designs it: background, frame, layout, palette, headline. Then refine by chatting, "make it warmer, bigger headline".' },
-    { title: 'It generates, sees, and remembers',
-      desc: 'It can generate backgrounds, isolate your subject, look at the canvas to critique itself, and it remembers your style across sessions.' }
+    { title: 'Cleaner, more organized sidebar',
+      desc: 'Every panel now lives in the right tab, sections collapse so you only see what you need, and the version tags next to feature names are gone.' }
   ]
 };
 
