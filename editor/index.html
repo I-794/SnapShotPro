@@ -56,7 +56,7 @@
     </nav>
 
     <div class="sidebar">
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="import">
             <h3 class="section-title">Image Upload</h3>
             <div style="display:flex;gap:8px;margin-bottom:12px;">
                 <button class="btn btn-primary" style="flex:1;" id="upload-btn"><span>📁</span> Choose Image</button>
@@ -78,7 +78,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="import">
             <h3 class="section-title">Auto Layout</h3>
             <div class="layout-picker-grid">
                 <button class="layout-btn active" data-layout="free" title="Free positioning"><div class="lp" style="flex-direction:column;"><div class="lp-img" style="flex:1;"></div></div></button>
@@ -101,7 +101,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="adjust">
             <h3 class="section-title">Image Editing</h3>
             <label class="control-label">Transform</label>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px;">
@@ -136,15 +136,15 @@
 
         <!-- v18 — Design Variations: one-click styled looks for the screenshot.
              Foundation of the AI arc (v19 adds prompts, v20 the agent). -->
-        <div class="sidebar-section">
-            <h3 class="section-title">Design Variations <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v18</span></h3>
+        <div class="sidebar-section" data-group="adjust">
+            <h3 class="section-title">Design Variations</h3>
             <p class="info-text" style="margin-bottom:10px;">Generate styled looks for your screenshot, then click one to apply.</p>
             <button class="vary-generate" id="vary-generate">✨ Generate Variations</button>
             <div class="vary-grid" id="vary-grid"></div>
             <button class="btn btn-secondary" id="vary-shuffle" style="width:100%;margin-top:10px;display:none;">🔀 Shuffle again</button>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="markup">
             <h3 class="section-title">Text &amp; Annotations</h3>
             <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" id="add-text-btn">+ Add Text</button>
             <div id="text-controls" style="display:none;">
@@ -156,7 +156,7 @@
                 <div class="toggle-switch"><span class="toggle-label">Italic</span><label class="switch"><input type="checkbox" id="text-italic"><span class="slider"></span></label></div>
 
                 <div class="divider"></div>
-                <label class="control-label">Text Effects <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v14</span></label>
+                <label class="control-label">Text Effects</label>
 
                 <div class="toggle-switch"><span class="toggle-label">Outline</span><label class="switch"><input type="checkbox" id="text-stroke-enabled"><span class="slider"></span></label></div>
                 <div id="text-stroke-controls" style="display:none;">
@@ -209,7 +209,7 @@
             <p class="info-text" style="margin-top:8px;">Aligns the selected element. Tip: nudge with arrow keys (Shift = 10px).</p>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="markup">
             <h3 class="section-title">Animation</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Animation</span><label class="switch"><input type="checkbox" id="animation-enabled"><span class="slider"></span></label></div>
             <div class="toggle-switch"><span class="toggle-label">Ken Burns pan / zoom</span><label class="switch"><input type="checkbox" id="ken-burns-enabled"><span class="slider"></span></label></div>
@@ -252,8 +252,8 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">🎬 Video / Clip <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v9</span></h3>
+        <div class="sidebar-section" data-group="export">
+            <h3 class="section-title">🎬 Video / Clip</h3>
             <p class="info-text" id="video-empty-hint" style="margin-bottom:8px;">Drop a video on the canvas, or add one — then frame it in any device mockup and export MP4/GIF.</p>
             <button class="btn btn-primary" style="width:100%;" id="video-add-btn">🎬 Add video clip</button>
             <input type="file" id="video-file-input" accept="video/*" style="display:none;">
@@ -298,7 +298,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="background">
             <h3 class="section-title">Background</h3>
             <div class="tab-row">
                 <button class="tab-btn active" data-bg="gradient">Gradient</button>
@@ -380,8 +380,8 @@
         </div>
 
         <!-- v20 — AI Design Agent copilot -->
-        <div class="sidebar-section">
-            <h3 class="section-title">Design Agent <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v20</span></h3>
+        <div class="sidebar-section" data-group="ai">
+            <h3 class="section-title">Design Agent</h3>
             <p class="info-text" style="margin-bottom:8px;">Describe what you want, then refine by chatting. The agent designs, generates, and remembers your style.</p>
             <div id="agent-log" class="agent-log"></div>
             <div id="agent-chips" class="agent-chips"></div>
@@ -393,8 +393,8 @@
             <p class="info-text" id="agent-status" style="margin-top:6px;min-height:14px;"></p>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">✨ AI Tools <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v7</span></h3>
+        <div class="sidebar-section" data-group="ai">
+            <h3 class="section-title">✨ AI Tools</h3>
             <label class="control-label">In-browser (free)</label>
             <button class="btn btn-primary" style="width:100%;margin-bottom:6px;" id="bg-remove-btn">🪄 Remove Background</button>
             <div id="bg-remove-progress" class="ai-progress" style="display:none;">
@@ -444,7 +444,7 @@
                 <button class="btn btn-primary" style="width:100%;margin-top:6px;" id="art-director-btn">🎬 Generate full design</button>
             </div>
             <div class="control-group" style="margin-top:8px;">
-                <label class="control-label">AI Assets <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v19</span></label>
+                <label class="control-label">AI Assets</label>
                 <p class="info-text" style="margin-bottom:8px;">Generate an on-brand background, and optionally drop your subject onto it.</p>
                 <input type="text" class="control-input" id="ai-asset-prompt" placeholder="e.g. soft sunrise over mountains" style="margin-bottom:8px;">
                 <div class="tab-row" style="flex-wrap:wrap;margin-bottom:8px;">
@@ -462,7 +462,7 @@
             <div id="ai-cloud-result" class="ocr-result" style="display:none;max-height:220px;"></div>
 
             <div class="divider"></div>
-            <label class="control-label">Generative AI <span style="font-size:10px;color:var(--text-secondary);">v9 · gpt-image-2</span></label>
+            <label class="control-label">Generative AI</label>
             <div class="control-group" style="margin-bottom:8px;">
                 <label class="control-label" style="font-size:11px;">Replace background</label>
                 <input type="text" class="control-input" id="ai-edit-bg-prompt" placeholder="e.g. sunlit minimalist desk, soft bokeh">
@@ -502,7 +502,7 @@
             <button class="btn btn-secondary" style="width:100%;" id="style-reset-btn">Reset Filters</button>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="adjust">
             <h3 class="section-title">Smart Palette</h3>
             <p class="info-text" style="margin-bottom:8px;">Extract a 5-color palette from your image.</p>
             <button class="btn btn-primary" style="width:100%;" id="palette-extract-btn">🎨 Extract Palette</button>
@@ -519,8 +519,8 @@
         <!-- v17 — Color: the headline of the Color release. Custom palette library
              with harmonies, plus palette-driven Color Map (gradient / recolor /
              transfer). Reuses existing sidebar control classes. -->
-        <div class="sidebar-section">
-            <h3 class="section-title">Color <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v17</span></h3>
+        <div class="sidebar-section" data-group="adjust">
+            <h3 class="section-title">Color</h3>
 
             <label class="control-label">Custom Palette</label>
             <div class="control-group"><select class="control-input" id="color-palette-list"><option value="">-- No palette --</option></select></div>
@@ -564,7 +564,7 @@
             <p class="info-text" id="color-map-hint" style="margin-top:8px;">Maps your active palette onto the image. Bakes into exports.</p>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="project">
             <h3 class="section-title">Brand Kit</h3>
             <p class="info-text" style="margin-bottom:8px;">Save your brand's colors, font, gradient, logo &amp; watermark, then apply it to any design or App Store set in one click.</p>
             <div class="control-group"><label class="control-label">Brand Kit Name</label><input type="text" class="control-input" id="brand-name" placeholder="My Brand"></div>
@@ -602,7 +602,7 @@
             <p class="info-text" id="brand-info" style="margin-top:8px;">No brand kits saved</p>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="adjust">
             <h3 class="section-title">Image Settings</h3>
             <div class="control-group"><label class="control-label">Padding</label><div class="range-group"><input type="range" class="range-input" id="padding" min="0" max="200" value="60"><span class="range-value" id="padding-value">60px</span></div></div>
             <div class="control-group"><label class="control-label">Scale</label><div class="range-group"><input type="range" class="range-input" id="scale" min="50" max="150" value="100"><span class="range-value" id="scale-value">100%</span></div></div>
@@ -616,7 +616,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">3D Tilt</h3>
             <div class="control-group"><label class="control-label">Rotate X</label><div class="range-group"><input type="range" class="range-input" id="tilt-rx" min="-60" max="60" value="0"><span class="range-value" id="tilt-rx-value">0°</span></div></div>
             <div class="control-group"><label class="control-label">Rotate Y</label><div class="range-group"><input type="range" class="range-input" id="tilt-ry" min="-60" max="60" value="0"><span class="range-value" id="tilt-ry-value">0°</span></div></div>
@@ -630,7 +630,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="background">
             <h3 class="section-title">Mockup Scenes</h3>
             <div class="scenes-grid" id="scenes-grid">
                 <div class="scene-tile active" data-scene=""><div class="scene-thumb">⊘</div>None</div>
@@ -642,7 +642,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">Device &amp; Window Frame</h3>
             <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><optgroup label="Devices"><option value="iphone16pro">iPhone 16 Pro</option><option value="ipadpro">iPad Pro</option><option value="macbookpro">MacBook Pro</option><option value="watch">Apple Watch</option><option value="studiodisplay">Studio Display</option><option value="pixel">Pixel (Android)</option></optgroup><optgroup label="Windows"><option value="macos">macOS Window</option><option value="windows">Windows Window</option><option value="winlaptop">Windows Laptop</option></optgroup><optgroup label="Browsers"><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></optgroup></select></div>
             <div id="device-frame-controls" style="display:none;">
@@ -653,7 +653,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">✨ Mockup Presets</h3>
             <div class="scenes-grid">
                 <div class="scene-tile" data-mockup-preset="appstore"><div class="scene-thumb">📱</div>App Store</div>
@@ -663,8 +663,8 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">📱 App Store Sets <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v9</span></h3>
+        <div class="sidebar-section" data-group="export">
+            <h3 class="section-title">📱 App Store Sets</h3>
             <div class="app-mode-toggle">
                 <button class="app-mode-btn active" data-app-mode="single">Single</button>
                 <button class="app-mode-btn" data-app-mode="set">Set</button>
@@ -708,7 +708,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">Shadow Settings</h3>
             <div class="shadow-preset-grid">
                 <div class="shadow-preset-btn active" data-shadow="soft">Soft</div>
@@ -725,8 +725,8 @@
             <div class="control-group"><label class="control-label">Shadow Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="shadow-color" value="#000000"></div><input type="text" class="control-input" id="shadow-color-text" value="#000000" style="flex:1;"></div></div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">Reflection <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v14</span></h3>
+        <div class="sidebar-section" data-group="frame">
+            <h3 class="section-title">Reflection</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Reflection</span><label class="switch"><input type="checkbox" id="reflection-enabled"><span class="slider"></span></label></div>
             <div id="reflection-controls" style="display:none;margin-top:16px;">
                 <p class="info-text" style="margin-bottom:12px;">A faded mirror of the device or framed subject, for a glossy product-shot look. Included in exports.</p>
@@ -736,7 +736,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="markup">
             <h3 class="section-title">Privacy Tools</h3>
             <p class="info-text" style="margin-bottom:12px;">Use the ▓ Redact tool in the toolbar above the canvas to draw boxes.</p>
             <div class="control-group"><label class="control-label">Redaction Style</label><select class="control-input" id="redact-type"><option value="pixelate">Pixelate</option><option value="blur">Blur</option></select></div>
@@ -744,7 +744,7 @@
             <button class="btn btn-secondary" style="width:100%;" id="clear-redactions-btn">Clear All Redactions</button>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="markup">
             <h3 class="section-title">Spotlight Effect</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Spotlight</span><label class="switch"><input type="checkbox" id="spotlight-enabled"><span class="slider"></span></label></div>
             <div id="spotlight-controls" style="display:none;margin-top:16px;">
@@ -753,8 +753,8 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">Liquid Glass <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v16</span></h3>
+        <div class="sidebar-section" data-group="markup">
+            <h3 class="section-title">Liquid Glass</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Glass</span><label class="switch"><input type="checkbox" id="glass-enabled"><span class="slider"></span></label></div>
             <div id="glass-controls" style="display:none;margin-top:16px;">
                 <p class="info-text" style="margin-bottom:12px;">Use the 🔮 Glass tool above the canvas to drag a panel over your content.</p>
@@ -765,8 +765,8 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">Film Grain <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v16</span></h3>
+        <div class="sidebar-section" data-group="markup">
+            <h3 class="section-title">Film Grain</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Grain</span><label class="switch"><input type="checkbox" id="grain-enabled"><span class="slider"></span></label></div>
             <div id="grain-controls" style="display:none;margin-top:16px;">
                 <div class="control-group"><label class="control-label">Amount</label><div class="range-group"><input type="range" class="range-input" id="grain-amount" min="0" max="100" value="18"><span class="range-value" id="grain-amount-value">18%</span></div></div>
@@ -776,7 +776,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">Canvas Settings</h3>
             <div class="control-group"><label class="control-label">Canvas Width</label><input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100"></div>
             <div class="control-group"><label class="control-label">Canvas Height</label><input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100"></div>
@@ -793,7 +793,7 @@
             <p class="info-text">Export quality: PNG (Lossless)</p>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="markup">
             <h3 class="section-title">Watermark</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Watermark</span><label class="switch"><input type="checkbox" id="watermark-enabled"><span class="slider"></span></label></div>
             <div id="watermark-controls" style="display:none;margin-top:16px;">
@@ -805,7 +805,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="export">
             <h3 class="section-title">Export Settings</h3>
             <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="gif">GIF (Animated)</option></select></div>
             <div id="quality-controls" style="display:none;">
@@ -815,7 +815,7 @@
             <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="export-html-btn">🌐 Export as HTML Card</button>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="export">
             <h3 class="section-title">Share</h3>
             <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="share-btn">&#128279; Share Image</button>
             <p class="info-text" style="margin-bottom:8px;">Upload to Supabase Storage and get a shareable link. Requires cloud setup.</p>
@@ -832,7 +832,7 @@
             <button class="btn btn-secondary" style="width:100%;" id="qr-btn">QR Code</button>
             <div id="qr-container" style="display:none;margin-top:8px;text-align:center;"></div>
             <div class="divider"></div>
-            <label class="control-label">👥 Live collaboration <span style="font-weight:400;color:var(--text-secondary);">v11</span></label>
+            <label class="control-label">👥 Live collaboration</label>
             <p class="info-text" style="margin:4px 0 8px;">Start a session and share the link; edits and cursors sync live. Requires cloud setup.</p>
             <button class="btn btn-primary" style="width:100%;" id="collab-start-btn">👥 Start live session</button>
             <div id="collab-link-box" style="display:none;margin-top:8px;">
@@ -844,8 +844,8 @@
             <p class="info-text" id="collab-status" style="min-height:14px;margin-top:6px;"></p>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">📁 Projects <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v12</span></h3>
+        <div class="sidebar-section" data-group="project">
+            <h3 class="section-title">📁 Projects</h3>
             <p class="info-text" style="margin-bottom:8px;">Your work autosaves to a project and is versioned automatically. Sign in to sync across devices.</p>
             <div class="project-current">
                 <span class="project-current-name" id="projects-current-name">No project yet</span>
@@ -859,8 +859,8 @@
             <div id="projects-list"></div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">🗂 Pages &amp; Deck <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v13</span></h3>
+        <div class="sidebar-section" data-group="project">
+            <h3 class="section-title">🗂 Pages &amp; Deck</h3>
             <p class="info-text" style="margin-bottom:8px;">Build a multi-page document. Each page keeps its own size and design. Switch pages from the filmstrip under the canvas.</p>
             <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <button class="btn btn-secondary" style="flex:1;" id="deck-add-btn">＋ Add page</button>
@@ -874,8 +874,8 @@
             <p class="info-text" id="deck-status" style="min-height:14px;margin-top:6px;"></p>
         </div>
 
-        <div class="sidebar-section" id="gallery-panel">
-            <h3 class="section-title">🌐 Community Gallery <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v11</span></h3>
+        <div class="sidebar-section" id="gallery-panel" data-group="project">
+            <h3 class="section-title">🌐 Community Gallery</h3>
             <p class="info-text" style="margin-bottom:8px;">Publish a design or Brand Kit for everyone, or browse and apply others'. Sign in to publish; anyone can browse.</p>
             <input type="text" class="control-input" id="gallery-name" placeholder="Name your submission" style="margin-bottom:8px;">
             <div style="display:flex;gap:8px;margin-bottom:8px;">
@@ -888,7 +888,7 @@
             <div id="gallery-list"></div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" data-group="project">
             <h3 class="section-title">Templates</h3>
             <div class="control-group"><label class="control-label">Template Name</label><input type="text" class="control-input" id="template-name" placeholder="My Template"></div>
             <div style="display:flex;gap:8px;margin-bottom:12px;">
