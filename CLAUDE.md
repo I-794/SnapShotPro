@@ -37,6 +37,9 @@ Each file in `src/features/` (and some in `src/render/`) exports a `bind<Feature
 ### DOM access is centralized
 `src/ui/elements.js` exports `el`, populated by `initElements()` — all `getElementById` refs live here. `src/ui/bindings.js` wires the sidebar controls and exposes `updateUIFromState()`, which pushes `state` → DOM (call it after programmatically changing state so controls reflect it). Cross-module calls go through a few `window.__*` globals (`window.__updateUIFromState`, `window.__openWhatsNew`, `window.__refreshSetUi`, `window.__refreshTemplateList`, etc.) to avoid import cycles.
 
+### Studio sidebar IA
+The editor sidebar is an icon rail + one contextual panel (`src/features/studio-nav.js`). Each `<div class="sidebar-section">` in `editor/index.html` carries an explicit `data-group="import|adjust|background|frame|markup|ai|export|project"`; the active rail tab shows only its group (a title-substring fallback exists if a section ever lacks `data-group`). Sections are **collapsible** — the `.section-title` row toggles `.collapsed` on its section (CSS hides everything but the title), persisted per-section in `localStorage` (`snapshotpro_section_collapsed`). **When adding a new feature section, give it a `data-group`**; don't add a per-feature version badge next to the title (those were removed in the v20.1 tidy).
+
 ### Persistence
 User data (templates, brand kits, projects, onboarding flags) is stored in `localStorage` under `snapshotpro_*` keys, each feature managing its own. `src/state/serialize.js` handles project save/load. Cloud sync (optional) goes through Supabase.
 
