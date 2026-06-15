@@ -1,17 +1,18 @@
-// v13.5 — Studio workspace navigation.
+// v13.5 — Studio workspace navigation.  (v20.1 — explicit grouping + collapsible)
 //
-// The studio's left sidebar used to be one long scroll of ~25 panels. This turns
-// it into an icon rail + a single contextual panel: each rail tab reveals only
-// its group of panels. Grouping is derived from each panel's existing title, so
-// no panel markup or control wiring changes — every element ID stays put.
+// The left sidebar is an icon rail + a single contextual panel: each rail tab
+// reveals only its group of panels. Grouping now comes from each section's
+// explicit data-group attribute (set in editor/index.html); a title-substring
+// fallback remains so a section is never orphaned. Sections are collapsible: the
+// title row toggles its body, and the open/closed state persists per section.
+// Every element ID stays put, so feature wiring is unaffected.
 //
-// On narrow screens grouping is disabled (all panels show in one scroll) so the
-// existing mobile sidebar-toggle behavior is preserved.
+// On narrow screens grouping is disabled (all panels show in one scroll).
 
 const NARROW = 860;
 const ACTIVE_KEY = 'snapshotpro_studio_group';
+const COLLAPSE_KEY = 'snapshotpro_section_collapsed';
 
-// Ordered tabs (must match the rail buttons in editor/index.html).
 const TABS = [
   { id: 'import', label: 'Import' },
   { id: 'adjust', label: 'Adjust' },
@@ -23,23 +24,30 @@ const TABS = [
   { id: 'project', label: 'Project' }
 ];
 
-// Map a panel to a group by a distinctive substring of its title.
+// Fallback only: used when a section has no data-group. Mirrors the v20.1 map.
 const TITLE_GROUPS = [
   ['Image Upload', 'import'], ['Auto Layout', 'import'],
-  ['Image Editing', 'adjust'], ['Image Settings', 'adjust'], ['3D Tilt', 'adjust'], ['Smart Palette', 'adjust'],
+  ['Image Editing', 'adjust'], ['Color', 'adjust'], ['Smart Palette', 'adjust'], ['Design Variations', 'adjust'], ['Image Settings', 'adjust'],
   ['Background', 'background'], ['Mockup Scenes', 'background'],
-  ['Device', 'frame'], ['Mockup Presets', 'frame'], ['Shadow', 'frame'], ['Canvas', 'frame'],
-  ['Annotations', 'markup'], ['Privacy', 'markup'], ['Spotlight', 'markup'], ['Watermark', 'markup'], ['Animation', 'markup'],
-  ['AI Tools', 'ai'], ['Brand Kit', 'ai'],
+  ['Device', 'frame'], ['Mockup Presets', 'frame'], ['Shadow', 'frame'], ['Reflection', 'frame'], ['3D Tilt', 'frame'], ['Canvas', 'frame'],
+  ['Annotations', 'markup'], ['Animation', 'markup'], ['Spotlight', 'markup'], ['Privacy', 'markup'], ['Watermark', 'markup'], ['Liquid Glass', 'markup'], ['Film Grain', 'markup'],
+  ['Design Agent', 'ai'], ['AI Tools', 'ai'],
   ['Video', 'export'], ['App Store', 'export'], ['Export Settings', 'export'], ['Share', 'export'],
-  ['Projects', 'project'], ['Pages', 'project'], ['Gallery', 'project'], ['Templates', 'project']
+  ['Projects', 'project'], ['Pages', 'project'], ['Templates', 'project'], ['Brand Kit', 'project'], ['Gallery', 'project']
 ];
 
 function groupForTitle(title) {
-  for (const [needle, group] of TITLE_GROUPS) {
-    if (title.includes(needle)) return group;
-  }
-  return 'import'; // fallback so nothing is ever orphaned
+  for (const [needle, group] of TITLE_GROUPS) if (title.includes(needle)) return group;
+  return 'import';
+}
+
+const norm = s => (s || '').toLowerCase().replace(/[^a-z]/g, '');
+
+function loadCollapsed() {
+  try { return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveCollapsed(map) {
+  try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(map)); } catch (e) {}
 }
 
 let active = 'import';
@@ -56,10 +64,13 @@ function apply() {
 
   sections.forEach(({ el, group, titleEl, redundant }) => {
     el.style.display = (narrow || group === active) ? '' : 'none';
-    // The panel header already names the group, so hide a panel's own title when
-    // it just repeats it (e.g. "Background"). On mobile the header is hidden, so
-    // the title comes back.
-    if (redundant && titleEl) titleEl.style.display = narrow ? '' : 'none';
+    // Hide a panel's own title when it just repeats the group name (wide only).
+    if (redundant && titleEl) {
+      titleEl.style.display = narrow ? '' : 'none';
+      // A title hidden as redundant can't be the collapse control, so keep that
+      // section expanded on wide screens (its body must stay visible).
+      if (!narrow) el.classList.remove('collapsed');
+    }
   });
 
   document.querySelectorAll('.rail-btn').forEach(b =>
@@ -81,26 +92,44 @@ export function bindStudioNav() {
   const sidebar = document.querySelector('.sidebar');
   if (!sidebar) return;
 
-  // Tag every panel with its group from the title.
   const labelByGroup = Object.fromEntries(TABS.map(t => [t.id, t.label]));
-  const norm = s => (s || '').toLowerCase().replace(/[^a-z]/g, '');
+  const collapsed = loadCollapsed();
+
   sections = Array.from(sidebar.querySelectorAll('.sidebar-section')).map(el => {
     const titleEl = el.querySelector('.section-title');
     const title = titleEl ? titleEl.textContent : '';
-    const group = groupForTitle(title);
+    const group = el.dataset.group || groupForTitle(title);
     el.dataset.group = group;
     const redundant = !!titleEl && norm(title) === norm(labelByGroup[group]);
+
+    // Collapsible: the title row toggles the section body. Persist per section.
+    if (titleEl) {
+      const key = norm(title) || group;
+      if (collapsed[key]) el.classList.add('collapsed');
+      titleEl.setAttribute('role', 'button');
+      titleEl.setAttribute('tabindex', '0');
+      titleEl.setAttribute('aria-expanded', String(!el.classList.contains('collapsed')));
+      const toggle = () => {
+        const now = el.classList.toggle('collapsed');
+        titleEl.setAttribute('aria-expanded', String(!now));
+        const map = loadCollapsed();
+        if (now) map[key] = true; else delete map[key];
+        saveCollapsed(map);
+      };
+      titleEl.addEventListener('click', toggle);
+      titleEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    }
     return { el, group, titleEl, redundant };
   });
 
-  // Sticky contextual-panel header showing the active group.
   const header = document.createElement('div');
   header.className = 'panel-header';
   header.id = 'panel-header';
   header.innerHTML = '<h2 id="panel-title">Import</h2>';
   sidebar.prepend(header);
 
-  // Rail buttons.
   document.querySelectorAll('.rail-btn').forEach(b =>
     b.addEventListener('click', () => setGroup(b.dataset.group)));
 
