@@ -379,6 +379,20 @@
             </div>
         </div>
 
+        <!-- v20 — AI Design Agent copilot -->
+        <div class="sidebar-section">
+            <h3 class="section-title">Design Agent <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v20</span></h3>
+            <p class="info-text" style="margin-bottom:8px;">Describe what you want, then refine by chatting. The agent designs, generates, and remembers your style.</p>
+            <div id="agent-log" class="agent-log"></div>
+            <div id="agent-chips" class="agent-chips"></div>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+                <input type="text" id="agent-input" class="control-input" placeholder="e.g. design a calm fintech hero" style="flex:1;">
+                <button class="vary-generate" id="agent-send" style="width:auto;margin:0;padding:9px 14px;">Send</button>
+                <button class="btn btn-secondary" id="agent-stop" style="display:none;padding:9px 12px;">Stop</button>
+            </div>
+            <p class="info-text" id="agent-status" style="margin-top:6px;min-height:14px;"></p>
+        </div>
+
         <div class="sidebar-section">
             <h3 class="section-title">✨ AI Tools <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">v7</span></h3>
             <label class="control-label">In-browser (free)</label>
