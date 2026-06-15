@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v19 with AI Assets (on-brand AI backgrounds and place-behind-subject), on top of v18 one-click Design Variations, v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShot-Pro changelog. What shipped in each release, from the first single-file editor to v20 with the AI Design Agent (a conversational copilot that designs, generates, sees the canvas, and remembers your style), on top of v19 AI Assets, v18 one-click Design Variations, v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v19.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v20, the AI Design Agent.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -217,6 +217,34 @@
         @keyframes asset-shimmer { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
         @media (prefers-reduced-motion: reduce) { .asset-shot::after { animation: none; opacity: 0; } }
 
+        /* v20 — AI Design Agent spotlight. Its own motif: a chat thread (user +
+           agent + action lines) that drives a design result. Distinct from v16
+           glass, v17 spectrum, v18 variant grid, v19 prompt-to-image. */
+        .spotlight-agent {
+            background:
+                radial-gradient(55% 85% at 100% 0%, rgba(87,227,155,0.18), transparent 56%),
+                radial-gradient(55% 85% at 0% 100%, rgba(138,107,255,0.20), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-agent::after { display: none; }
+        .spotlight-agent .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-agent .spot-feat-ico { background: linear-gradient(135deg, rgba(87,227,155,0.30), rgba(74,168,255,0.26)); }
+        .spotlight-agent .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-agent .btn-primary:hover { background: #f0f0ee; }
+        /* The chat thread = the agent conversation, depicted. */
+        .agent-thread { display: flex; flex-direction: column; gap: 10px; }
+        .chat-b { padding: 10px 13px; border-radius: 14px; font-size: 13.5px; line-height: 1.45; max-width: 86%; }
+        .chat-u { align-self: flex-end; background: #2348ff; color: #fff; border-bottom-right-radius: 5px; }
+        .chat-a { align-self: flex-start; background: rgba(255,255,255,0.10); color: #fff; border: 1px solid rgba(255,255,255,0.14); border-bottom-left-radius: 5px; }
+        .chat-act { align-self: flex-start; font-family: var(--font-mono); font-size: 11.5px; color: rgba(255,255,255,0.66); padding-left: 4px; }
+        .chat-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+        .chat-chip { font-size: 11.5px; color: #fff; border: 1px solid rgba(255,255,255,0.22); border-radius: 999px; padding: 4px 11px; }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -296,26 +324,26 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-assets reveal">
+        <div class="spotlight spotlight-agent reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v19 · June 2026</div>
-                <div class="gen-pill">✦ Generate background</div>
-                <h2>Describe it. Generate it.</h2>
-                <p class="spot-lede">Type the background you want and generate it on the spot. Keep it on-brand with your palette, then drop your subject onto the new scene in a click.</p>
+                <div class="spot-ver">v20 · June 2026</div>
+                <div class="gen-pill">✦ Design Agent</div>
+                <h2>Describe it. The agent designs it.</h2>
+                <p class="spot-lede">Tell the agent what you want and it composes the whole design, then refine by chatting. It generates, sees the canvas, and remembers your style.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 16l5-4 4 3 3-2.5 4 3.5"/></svg></span>
-                        <div><strong>AI backgrounds</strong><span>Describe a scene and generate it as your background, at your canvas size. It renders behind your shot and bakes into the export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H8l-4 3.5z"/><path d="M8 9.5h8M8 12.5h5" opacity="0.7"/></svg></span>
+                        <div><strong>Design by conversation</strong><span>Say "design a calm fintech hero" and it sets the background, frame, layout, palette, and headline. Then say "make it warmer" to refine.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><circle cx="6" cy="6.5" r="1.6"/><circle cx="18" cy="6.5" r="1.6"/><circle cx="18" cy="17.5" r="1.6"/><path d="M9 9.5l1.6 1.2M15 9.5l-1.6 1.2M15 14.5l-1.6-1.1" opacity="0.7"/></svg></span>
-                        <div><strong>On-brand by default</strong><span>Turn on Use my palette and the generation follows your saved colors, so the result fits the rest of your design.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
+                        <div><strong>Generates and sees</strong><span>It generates backgrounds, isolates your subject, and can look at the canvas to critique its own work and fix it.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 3.5 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 6.5 12 3z"/></svg></span>
-                        <div><strong>Place behind subject</strong><span>One toggle cuts your screenshot out and drops it onto the generated scene, for an instant product-shot composite.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M9 4v5h6" opacity="0.7"/><circle cx="12" cy="14" r="2.2"/></svg></span>
+                        <div><strong>Remembers your style</strong><span>The conversation resumes across sessions, and the agent learns your recurring preferences and brand so it stays on-brand.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -324,9 +352,14 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="asset-demo" aria-hidden="true">
-                    <div class="prompt-line"><span class="spark">✦</span> sunrise over calm mountains, on-brand</div>
-                    <div class="asset-shot"><span></span></div>
+                <div class="agent-thread" aria-hidden="true">
+                    <div class="chat-b chat-u">design a calm fintech hero</div>
+                    <div class="chat-b chat-a">On it. Composing a clean, trustworthy look.</div>
+                    <div class="chat-act">• Generated a soft blue gradient background</div>
+                    <div class="chat-act">• Set an iPhone frame and a headline</div>
+                    <div class="chat-b chat-u">make it warmer</div>
+                    <div class="chat-act">• Warmed the grade and palette</div>
+                    <div class="chat-chips"><span class="chat-chip">Bolder headline</span><span class="chat-chip">Try dark mode</span><span class="chat-chip">Add a logo</span></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -339,6 +372,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v20.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>The AI Design Agent</h2>
+                    <ul class="changes">
+                        <li><b>Design by conversation.</b> A new copilot designs the whole presentation from a sentence. Describe what you want and it calls the studio's own tools, composing the background, frame, layout, palette, color grade, and headline, then refines on request: "make it warmer, bigger headline." It narrates each change as it works.</li>
+                        <li><b>It generates, sees, and remembers.</b> The agent generates backgrounds, isolates your subject, and can look at the canvas to critique and fix its own work. It streams its replies, offers suggested next steps, resumes the conversation across reloads, and learns your recurring style and brand so it stays on-brand without being re-told.</li>
+                        <li><b>Built on the whole studio.</b> Every change runs through the same engine as the rest of the app, so it bakes into exports and a whole agent turn undoes in one step. It works with your OpenAI or Claude key, and the model is configurable as stronger ones ship. This is the culmination of the Design Variations and AI Assets releases.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v19.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>AI Assets</h2>
