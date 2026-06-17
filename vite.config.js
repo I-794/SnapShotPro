@@ -62,13 +62,16 @@ export default defineConfig({
         gallery: resolve(__dirname, 'gallery/index.html'),
         useCases: resolve(__dirname, 'use-cases/index.html'),
         pricing: resolve(__dirname, 'pricing/index.html'),
-        agent: resolve(__dirname, 'agent/index.html')
+        agent: resolve(__dirname, 'agent/index.html'),
+        about: resolve(__dirname, 'about/index.html'),
+        ai: resolve(__dirname, 'ai/index.html')
       },
       output: {
         manualChunks: {
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-openai': ['openai'],
-          'vendor-anthropic': ['@anthropic-ai/sdk']
+          'vendor-anthropic': ['@anthropic-ai/sdk'],
+          'vendor-three': ['three']
         }
       }
     }

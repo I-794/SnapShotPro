@@ -245,6 +245,37 @@
         .chat-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
         .chat-chip { font-size: 11.5px; color: #fff; border: 1px solid rgba(255,255,255,0.22); border-radius: 999px; padding: 4px 11px; }
 
+        /* v21 — 3D Mockups spotlight. Its own motif: the device rendered in real
+           perspective (the new 3D mockup) tilted in space over a soft floor
+           shadow. Cobalt accent, distinct from every prior spotlight. */
+        .spotlight-3d {
+            background:
+                radial-gradient(58% 88% at 4% 0%, rgba(79,124,255,0.24), transparent 56%),
+                radial-gradient(56% 84% at 100% 100%, rgba(122,92,255,0.24), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-3d::after { display: none; }
+        .spotlight-3d .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-3d .spot-feat-ico { background: linear-gradient(135deg, rgba(79,124,255,0.32), rgba(122,92,255,0.28)); }
+        .spotlight-3d .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-3d .btn-primary:hover { background: #f0f0ee; }
+        /* the device, rendered in perspective: this IS the 3D mockup feature, depicted */
+        .mock3d-stage { width: 100%; display: flex; align-items: center; justify-content: center; perspective: 1100px; }
+        .mock3d {
+            position: relative; width: min(72%, 320px); border-radius: 34px; padding: 9px;
+            background: linear-gradient(160deg, #1a2030, #0c0f1a); overflow: hidden;
+            transform: rotateY(-26deg) rotateX(7deg) rotateZ(1deg); transform-style: preserve-3d;
+            box-shadow: 0 46px 80px -26px rgba(0,0,0,0.72), inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+        .mock3d img { display: block; width: 100%; border-radius: 26px; aspect-ratio: 9 / 16; object-fit: cover; }
+        @media (prefers-reduced-motion: reduce) { .mock3d { transform: rotateY(-18deg); } }
+        @media (max-width: 860px) { .mock3d { transform: rotateY(-14deg); width: 58%; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -324,26 +355,25 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-agent reveal">
+        <div class="spotlight spotlight-3d reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v20 · June 2026</div>
-                <div class="gen-pill">✦ Design Agent</div>
-                <h2>Describe it. The agent designs it.</h2>
-                <p class="spot-lede">Tell the agent what you want and it composes the whole design, then refine by chatting. It generates, sees the canvas, and remembers your style.</p>
+                <div class="spot-ver">v21 · June 2026</div>
+                <h2>Your screenshot, in three dimensions.</h2>
+                <p class="spot-lede">Drop a shot onto a real 3D phone, tablet, or laptop, then drag the preview to orbit it. When you want motion, spin it into a turntable.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H8l-4 3.5z"/><path d="M8 9.5h8M8 12.5h5" opacity="0.7"/></svg></span>
-                        <div><strong>Design by conversation</strong><span>Say "design a calm fintech hero" and it sets the background, frame, layout, palette, and headline. Then say "make it warmer" to refine.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 11l8-4.5M12 11v9M12 11L4 6.5" opacity="0.7"/></svg></span>
+                        <div><strong>True 3D, not a flat tilt</strong><span>A real device with depth, lighting, and reflections. Orbit it live in the preview to find the perfect angle.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
-                        <div><strong>Generates and sees</strong><span>It generates backgrounds, isolates your subject, and can look at the canvas to critique its own work and fix it.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></svg></span>
+                        <div><strong>Spin it into a video</strong><span>Turn on Spin and export a smooth turntable as a GIF or MP4, straight from the usual export buttons.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M9 4v5h6" opacity="0.7"/><circle cx="12" cy="14" r="2.2"/></svg></span>
-                        <div><strong>Remembers your style</strong><span>The conversation resumes across sessions, and the agent learns your recurring preferences and brand so it stays on-brand.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 9h17" opacity="0.7"/><path d="M9 19v-4"/></svg></span>
+                        <div><strong>Bakes into every export</strong><span>It composites into the same canvas as everything else, so what you see in the preview is exactly what you export.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -352,14 +382,8 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="agent-thread" aria-hidden="true">
-                    <div class="chat-b chat-u">design a calm fintech hero</div>
-                    <div class="chat-b chat-a">On it. Composing a clean, trustworthy look.</div>
-                    <div class="chat-act">• Generated a soft blue gradient background</div>
-                    <div class="chat-act">• Set an iPhone frame and a headline</div>
-                    <div class="chat-b chat-u">make it warmer</div>
-                    <div class="chat-act">• Warmed the grade and palette</div>
-                    <div class="chat-chips"><span class="chat-chip">Bolder headline</span><span class="chat-chip">Try dark mode</span><span class="chat-chip">Add a logo</span></div>
+                <div class="mock3d-stage" aria-hidden="true">
+                    <div class="mock3d"><img src="https://picsum.photos/seed/snapshotpro-3d-mockup/540/960" alt="A screenshot mapped onto a 3D phone, tilted in space" loading="eager" width="540" height="960"></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -372,6 +396,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v21.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>3D mockups</h2>
+                    <ul class="changes">
+                        <li><b>3D device mockups.</b> A new 3D Mockup section in the Frame tab puts your screenshot on a real three-dimensional phone, tablet, or laptop, with depth, lighting, and reflections. Drag the preview to orbit it, and tune the angle, zoom, material, and scene.</li>
+                        <li><b>Spin export.</b> Turn on Spin to export a smooth turntable as a GIF or MP4 from the usual export buttons. The animation runs through the same renderer, so it stays crisp at any size.</li>
+                        <li><b>One page for AI, and an About page.</b> The site gains a single AI hub that gathers the Design Agent, AI Assets, Enhance, and Vision, plus an About page on why the studio exists. The nav now points to the AI hub, with the Design Agent a click away.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v20.1</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>A tidier studio</h2>
