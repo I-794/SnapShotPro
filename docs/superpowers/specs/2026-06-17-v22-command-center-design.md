@@ -211,6 +211,12 @@ No test runner exists; verify in `npm run dev`:
 - Add a "what's new" entry in `src/features/whats-new.js`.
 - Add a `v22 · …` entry to `changelog/index.html` with its own motif
   (a command-line / palette motif), consistent with prior release spotlights.
+  **Build this changelog entry with the frontend taste skill** (`taste-skill` /
+  `design-taste-frontend`) — same as the v20 launch-page work — so the spotlight
+  matches the quality bar of the existing release cards. Note: the editor is
+  vanilla JS with no framework, so apply the skill's design judgment (layout,
+  type, motion, motif) to the existing changelog HTML/CSS; do not introduce
+  React/Tailwind/Next conventions.
 
 ## Files touched (recap)
 
