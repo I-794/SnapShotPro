@@ -44,6 +44,10 @@ function snapshot() {
     meshGradient: state.meshGradient,
     tilt3d: state.tilt3d,
     scene: state.scene,
+    // v21 — 3D mockup. Strip the runtime-only orbitProgress (set per export
+    // frame for the turntable spin) so undo never restores mid-spin, mirroring
+    // how animation playing/currentTime are stripped above.
+    mockup3d: { ...state.mockup3d, orbitProgress: 0 },
     // v15.2 — animation edits (tracks, easing, duration) are now undoable.
     // Snapshot a runtime-stripped copy so undo never restores mid-playback.
     animation: { ...state.animation, playing: false, currentTime: 0 },

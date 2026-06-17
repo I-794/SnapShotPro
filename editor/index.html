@@ -654,6 +654,29 @@
         </div>
 
         <div class="sidebar-section" data-group="frame">
+            <h3 class="section-title">3D Mockup</h3>
+            <label class="control-label">Demos</label>
+            <div class="scenes-grid" style="margin-bottom:12px;">
+                <div class="scene-tile" data-demo3d="floating"><div class="scene-thumb">📱</div>Floating iPhone</div>
+                <div class="scene-tile" data-demo3d="isomac"><div class="scene-thumb">💻</div>Iso MacBook</div>
+                <div class="scene-tile" data-demo3d="ipad"><div class="scene-thumb">🖼️</div>Showcase iPad</div>
+                <div class="scene-tile" data-demo3d="spin"><div class="scene-thumb">🔄</div>Spin reel</div>
+            </div>
+            <div class="control-group"><label class="control-label">Device</label><select class="control-input" id="mockup-3d-device"><option value="">None</option><option value="iphone">iPhone</option><option value="ipad">iPad</option><option value="macbook">MacBook</option></select></div>
+            <div id="mockup-3d-controls" style="display:none;">
+                <div class="control-group"><label class="control-label">Scene</label><select class="control-input" id="mockup-3d-scene"><option value="studio">Studio</option><option value="float">Floating</option><option value="iso">Isometric</option></select></div>
+                <div class="control-group"><label class="control-label">Material</label><select class="control-input" id="mockup-3d-material"><option value="graphite">Graphite</option><option value="silver">Silver</option><option value="gold">Gold</option></select></div>
+                <div class="control-group"><label class="control-label">Orbit X <span id="mockup-3d-rx-value">12°</span></label><input type="range" id="mockup-3d-rx" min="-40" max="40" value="12"></div>
+                <div class="control-group"><label class="control-label">Orbit Y <span id="mockup-3d-ry-value">-25°</span></label><input type="range" id="mockup-3d-ry" min="-180" max="180" value="-25"></div>
+                <div class="control-group"><label class="control-label">Zoom <span id="mockup-3d-zoom-value">1.0×</span></label><input type="range" id="mockup-3d-zoom" min="0.5" max="2" step="0.05" value="1"></div>
+                <div class="control-group"><label class="control-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="mockup-3d-reflections" checked style="width:auto;"> Environment reflections</label></div>
+                <div class="control-group"><label class="control-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="mockup-3d-spin" style="width:auto;"> Turntable spin (export)</label></div>
+                <div class="control-group"><label class="control-label">Spin turns <span id="mockup-3d-turns-value">1</span></label><input type="range" id="mockup-3d-turns" min="1" max="4" step="1" value="1"></div>
+                <p class="info-text" style="margin-top:4px;">Drag the preview to orbit. Enable spin, then export GIF/MP4 for a turntable.</p>
+            </div>
+        </div>
+
+        <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">✨ Mockup Presets</h3>
             <div class="scenes-grid">
                 <div class="scene-tile" data-mockup-preset="appstore"><div class="scene-thumb">📱</div>App Store</div>

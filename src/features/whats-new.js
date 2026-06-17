@@ -10,16 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '20.1';
+const CURRENT_VERSION = '21.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "A tidier studio",
+  heading: "3D mockups have landed",
   items: [
-    { title: 'Cleaner, more organized sidebar',
-      desc: 'Every panel now lives in the right tab, sections collapse so you only see what you need, and the version tags next to feature names are gone.' }
+    { title: 'Put your screenshot on a real 3D device',
+      desc: 'New 3D Mockup section in the Frame tab: drop your shot onto a true three-dimensional phone, tablet, or laptop, then drag the preview to orbit it.' },
+    { title: 'Spin it into a video',
+      desc: 'Turn on Spin and export a smooth turntable as a GIF or MP4, straight from the usual export buttons.' },
+    { title: 'New pages on the site',
+      desc: 'An About page and a single AI hub that gathers the Design Agent, AI Assets, Enhance, and Vision in one place.' }
   ]
 };
 

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Why SnapShot-Pro exists: a browser screenshot studio that runs on your machine, keeps your images private, and stays free and open source.">
+    <title>About · SnapShot-Pro</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SnapShot-Pro · About">
+    <meta property="og:description" content="Screenshots deserve better. A private, in-browser studio that is free and open source.">
+    <meta property="og:image" content="__OG_BASE__/og.png">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <style>
+        /* About / manifesto. Design read: OSS product-manifesto page for makers
+           and developers, dark-tech language, leaning on the shared /site.css
+           system with restrained CSS motion. Dials: variance 6, motion 4,
+           density 3. One accent (cobalt), one theme (dark glass), one eyebrow on
+           the whole page. No em-dashes anywhere. */
+
+        /* belief grid — 2x2 so it never reads as "three equal cards" */
+        .ab-beliefs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 22px); }
+        .ab-belief { display: flex; flex-direction: column; gap: 10px; }
+        .ab-belief .k { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+        .ab-belief .k svg { width: 21px; height: 21px; }
+        .ab-belief h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; color: var(--ink); }
+        .ab-belief p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
+
+        /* the story — one calm prose island */
+        .ab-story { border-radius: var(--r-card); padding: clamp(28px, 4vw, 52px); background: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); }
+        .ab-story p { font-size: clamp(16px, 1.5vw, 18px); color: var(--ink-2); line-height: 1.7; max-width: 64ch; }
+        .ab-story p + p { margin-top: 18px; }
+        .ab-story b { color: var(--ink); font-weight: 600; }
+
+        /* open-source band */
+        .ab-os { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-radius: 20px; padding: clamp(24px, 3.5vw, 40px); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+        .ab-os h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: 700; letter-spacing: -0.025em; color: var(--ink); margin-bottom: 8px; }
+        .ab-os p { font-size: 16px; color: var(--ink-2); max-width: 52ch; line-height: 1.55; }
+        .ab-os .acts { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        @media (max-width: 760px) {
+            .ab-beliefs { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<!-- HEADER ---------------------------------------------------------------- -->
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <span class="eyebrow reveal">Our manifesto</span>
+        <h1 class="reveal" style="margin-top:14px;">Screenshots deserve <span class="grad-text">better</span>.</h1>
+        <p class="lede reveal">A raw screenshot is a record. A good one is a story. SnapShot-Pro exists to make the second kind take seconds, in your browser, without handing your work to anyone.</p>
+    </div>
+</header>
+
+<!-- THE BELIEFS ----------------------------------------------------------- -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,24px);">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>What we believe</h2>
+            <p>Four ideas shape every feature we ship.</p>
+        </div>
+        <div class="ab-beliefs">
+            <div class="glass-card ab-belief reveal">
+                <div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6" opacity="0.7"/></svg></div>
+                <h3>Beautiful by default</h3>
+                <p>You should not need a design degree to make a clean shot. Sensible padding, framing, and color come ready the moment you drop an image in.</p>
+            </div>
+            <div class="glass-card ab-belief reveal">
+                <div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+                <h3>Yours, on your machine</h3>
+                <p>The editor renders in your browser. Your images never leave your device unless you choose a cloud feature, and even then you stay in control.</p>
+            </div>
+            <div class="glass-card ab-belief reveal">
+                <div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5"/><path d="M5 8v8l7 5 7-5V8" opacity="0.6"/></svg></div>
+                <h3>Free, and open</h3>
+                <p>The whole studio is free and the source is public. You can read how it works, fork it, and trust it because nothing is hidden behind a wall.</p>
+            </div>
+            <div class="glass-card ab-belief reveal">
+                <div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 9h17M8 19v-4" opacity="0.7"/></svg></div>
+                <h3>One canvas, every output</h3>
+                <p>Stills, social sizes, store sets, GIFs, and video all come from the same scene. Compose once and ship it everywhere it needs to go.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- THE STORY ------------------------------------------------------------- -->
+<section class="section-pad" style="padding-top: 0;">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>How it started</h2>
+        </div>
+        <div class="ab-story reveal">
+            <p>SnapShot-Pro began as a single HTML file. One canvas, a handful of sliders, and a stubborn belief that beautifying a screenshot should not require an account, an upload, or a subscription.</p>
+            <p>It grew the way good tools do, one real need at a time. Device frames so a screen looked like a screen. Backgrounds so it had somewhere to live. Annotations, mockups, motion, and a color engine, then a layer of AI that drafts the whole look for you. Underneath all of it, the same rule held: <b>everything renders locally, from one source of truth, into one canvas.</b></p>
+            <p>That architecture is why the tool stays fast and private. The pixels you export are the pixels your browser drew, on your hardware, from your file. No round trip, no watermark you did not ask for, no surprise.</p>
+        </div>
+    </div>
+</section>
+
+<!-- OPEN SOURCE ----------------------------------------------------------- -->
+<section class="section-pad" style="padding-top: 0;">
+    <div class="wrap">
+        <div class="ab-os reveal">
+            <div>
+                <h2>Built in the open</h2>
+                <p>Read the code, file an issue, or follow what ships next. The project is free and open source, and it stays that way.</p>
+            </div>
+            <div class="acts">
+                <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener" class="btn btn-primary">View on GitHub <span class="ar">→</span></a>
+                <a href="/changelog/" class="btn btn-ghost">Read the changelog</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA ------------------------------------------------------------- -->
+<section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Make your next screenshot the good kind.</h2>
+            <p>No sign-up. It opens straight into the studio.</p>
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>

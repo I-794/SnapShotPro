@@ -16,6 +16,7 @@ import { getAnimationState } from '../features/animation.js';
 import { sampleKenBurns } from '../features/ken-burns.js';
 import { drawEffects } from './effects.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
+import { isDeviceMockup3d, render3dMockup } from './mockups-3d.js';
 import { bakePerspective } from './perspective.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
 import { drawGuides } from '../features/snapping.js';
@@ -59,6 +60,37 @@ export function renderInto(canvas, forExport) {
   // Auto-layout takes over if active
   if (state.autoLayout.pattern !== 'free') {
     renderAutoLayout(ctx, canvas);
+    drawTextOverlay(ctx, canvas);
+    drawWatermark(ctx, canvas);
+    drawLogo(ctx, canvas);
+    if (!forExport) renderMinimap();
+    return;
+  }
+
+  // v21 — true 3D / isometric device mockup. Renders a WebGL device with the
+  // screenshot mapped onto its screen, composited over the (already-drawn) page
+  // background. Reachable independent of deviceFrame.type. Annotations /
+  // redactions / spotlight are BAKED onto the screen texture (see screenSource
+  // below) so they track the 3D screen surface in both preview and export.
+  if (state.mockup3d?.enabled && isDeviceMockup3d(state.mockup3d.device)) {
+    const screenSource = buildScreenTexture();
+    const gl = render3dMockup(state.mockup3d, canvas.width, canvas.height, screenSource);
+    if (gl) {
+      ctx.drawImage(gl, 0, 0);
+    } else {
+      // three.js still loading — show the graded screenshot as a placeholder so
+      // the preview isn't blank; it will re-render once GL is ready.
+      const img = getGradedImage(state.image);
+      if (img && img.width) {
+        const r = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.7;
+        const dw = img.width * r, dh = img.height * r;
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(img, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+        ctx.globalAlpha = 1;
+      }
+    }
+    if (!forExport) drawGuides(ctx);
+    drawEffects(ctx, canvas);
     drawTextOverlay(ctx, canvas);
     drawWatermark(ctx, canvas);
     drawLogo(ctx, canvas);
@@ -201,6 +233,50 @@ function mockCanvas(w, h) {
   if (_mockOff.width !== w) _mockOff.width = w;
   if (_mockOff.height !== h) _mockOff.height = h;
   return _mockOff;
+}
+
+// v21 — bake the screen content for the 3D mockup onto an offscreen canvas sized
+// to the graded screenshot. The screen-space passes (redactions, spotlight,
+// annotations) are drawn relative to lastImageRect; we temporarily set that to
+// this canvas's full rect so they land on the screenshot in texture space and
+// thus track the 3D screen surface. Returns the texture canvas (or the bare
+// graded image when nothing extra needs baking).
+let _screenTex = null;
+function buildScreenTexture() {
+  const img = getGradedImage(state.image);
+  if (!img || !img.width || !img.height) return img;
+
+  const hasOverlays =
+    (state.annotations && state.annotations.length) ||
+    (state.redactions && state.redactions.length) ||
+    (state.spotlight && state.spotlight.enabled);
+  if (!hasOverlays) return img;
+
+  if (!_screenTex) _screenTex = document.createElement('canvas');
+  // Cap the long edge so the texture stays GPU-friendly.
+  const MAX = 2048;
+  let w = img.width, h = img.height;
+  const longEdge = Math.max(w, h);
+  if (longEdge > MAX) { const s = MAX / longEdge; w = Math.round(w * s); h = Math.round(h * s); }
+  if (_screenTex.width !== w) _screenTex.width = w;
+  if (_screenTex.height !== h) _screenTex.height = h;
+  const tctx = _screenTex.getContext('2d');
+  tctx.setTransform(1, 0, 0, 1, 0, 0);
+  tctx.clearRect(0, 0, w, h);
+  tctx.drawImage(img, 0, 0, w, h);
+
+  // Map the screen-space passes onto the texture by pretending the image rect is
+  // the full texture canvas, then restore the real lastImageRect afterwards.
+  const savedRect = state.lastImageRect;
+  state.lastImageRect = { x: 0, y: 0, w, h };
+  try {
+    drawRedactions(tctx, _screenTex);
+    drawSpotlight(tctx, _screenTex);
+    drawAnnotations(tctx);
+  } finally {
+    state.lastImageRect = savedRect;
+  }
+  return _screenTex;
 }
 
 function drawImageContent(ctx, x, y, imgWidth, imgHeight) {

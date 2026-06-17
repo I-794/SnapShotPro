@@ -54,6 +54,12 @@ const IDS = [
   'device-frame-type', 'device-frame-controls', 'device-frame-color', 'device-frame-glare',
   'frame-url-group', 'frame-title-group', 'frame-url', 'frame-title',
 
+  // v21 — 3D / isometric device mockup
+  'mockup-3d-device', 'mockup-3d-controls', 'mockup-3d-scene', 'mockup-3d-material',
+  'mockup-3d-rx', 'mockup-3d-rx-value', 'mockup-3d-ry', 'mockup-3d-ry-value',
+  'mockup-3d-zoom', 'mockup-3d-zoom-value', 'mockup-3d-reflections',
+  'mockup-3d-spin', 'mockup-3d-turns', 'mockup-3d-turns-value',
+
   // Shadow
   'shadow-blur', 'shadow-blur-value', 'shadow-spread', 'shadow-spread-value',
   'shadow-opacity', 'shadow-opacity-value', 'shadow-x', 'shadow-x-value',
