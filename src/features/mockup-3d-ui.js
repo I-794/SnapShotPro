@@ -10,6 +10,64 @@ import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { isDeviceMockup3d } from '../render/mockups-3d.js';
+import { showStatus } from '../ui/notification.js';
+
+// One-click 3D hero demos: set the device + scene + material + a flattering
+// orbit angle together with a complementary background and canvas size, the same
+// idea as the flat Mockup Presets (mockup-ui.js). "spin" arms the turntable so
+// the normal GIF/MP4 export buttons produce a rotating clip.
+const DEMOS_3D = {
+  floating: {
+    device: 'iphone', scene: 'float', material: 'graphite',
+    orbitX: 14, orbitY: -32, zoom: 1.05, envReflections: true, spin: { enabled: false, turns: 1 },
+    bgMode: 'gradient', gradient: { type: 'linear', angle: 135, colors: ['#2348ff', '#23c4ff'], positions: [0, 100] },
+    padding: 120, canvas: { width: 1200, height: 1500 }
+  },
+  isomac: {
+    device: 'macbook', scene: 'iso', material: 'silver',
+    orbitX: 24, orbitY: -30, zoom: 1, envReflections: true, spin: { enabled: false, turns: 1 },
+    bgMode: 'solid', bgColor: '#0c0f1a', padding: 90, canvas: { width: 1280, height: 960 }
+  },
+  ipad: {
+    device: 'ipad', scene: 'studio', material: 'silver',
+    orbitX: 10, orbitY: -18, zoom: 1, envReflections: true, spin: { enabled: false, turns: 1 },
+    bgMode: 'mesh', padding: 110, canvas: { width: 1600, height: 1200 }
+  },
+  spin: {
+    device: 'iphone', scene: 'studio', material: 'gold',
+    orbitX: 6, orbitY: 0, zoom: 1, envReflections: true, spin: { enabled: true, turns: 1 },
+    bgMode: 'gradient', gradient: { type: 'linear', angle: 120, colors: ['#6a5cff', '#23c4ff'], positions: [0, 100] },
+    padding: 110, canvas: { width: 1080, height: 1080 }
+  }
+};
+
+export function apply3dDemo(name) {
+  const d = DEMOS_3D[name];
+  if (!d) return;
+  saveStateToHistory();
+  const m = state.mockup3d;
+  m.enabled = true;
+  m.device = d.device; m.scene = d.scene; m.material = d.material;
+  m.orbitX = d.orbitX; m.orbitY = d.orbitY; m.zoom = d.zoom;
+  m.envReflections = d.envReflections;
+  m.spin = { ...d.spin };
+  m.orbitProgress = 0;
+  // Clear competing 2D framing so the 3D path owns the composition.
+  state.deviceFrame.type = '';
+  if (state.scene) state.scene.id = '';
+  state.tilt3d = { rx: 0, ry: 0, rz: 0, perspective: 1200 };
+  // Background + canvas.
+  state.bgMode = d.bgMode;
+  if (d.bgColor) state.bgColor = d.bgColor;
+  if (d.gradient) state.gradient = { ...state.gradient, ...d.gradient };
+  if (d.padding != null) state.padding = d.padding;
+  if (d.canvas) state.canvas = { ...d.canvas };
+  toggleControls();
+  refreshMockup3dUI();
+  render();
+  if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
+  showStatus('3D demo: ' + name);
+}
 
 function toggleControls() {
   const on = !!(state.mockup3d.enabled && isDeviceMockup3d(state.mockup3d.device));
@@ -49,6 +107,10 @@ function linkRange(input, valueEl, fmt, apply) {
 
 export function bind3dMockupUi() {
   const m = () => state.mockup3d;
+
+  document.querySelectorAll('[data-demo3d]').forEach((btn) => {
+    btn.addEventListener('click', () => apply3dDemo(btn.dataset.demo3d));
+  });
 
   if (el.mockup3dDevice) {
     el.mockup3dDevice.addEventListener('change', (e) => {
