@@ -12,6 +12,7 @@ import { refreshKenBurnsUI } from '../features/ken-burns.js';
 import { refreshEffectsUI } from '../features/effects-ui.js';
 import { refreshPalettesUI } from '../features/palettes.js';
 import { refreshColorMapUI } from '../features/color-map.js';
+import { refreshMockup3dUI } from '../features/mockup-3d-ui.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -597,6 +598,17 @@ export function updateUIFromState() {
   set(el.frameUrl, state.deviceFrame.url || '');
   set(el.frameTitle, state.deviceFrame.title || '');
   updateDeviceFrameSubcontrols();
+
+  // v21 — backfill the 3D mockup block on pre-v21 designs, then sync its controls.
+  if (!state.mockup3d) {
+    state.mockup3d = {
+      enabled: false, device: 'iphone', scene: 'studio', orbitX: 12, orbitY: -25,
+      zoom: 1, material: 'graphite', envReflections: true,
+      spin: { enabled: false, turns: 1 }, orbitProgress: 0
+    };
+  }
+  if (!state.mockup3d.spin) state.mockup3d.spin = { enabled: false, turns: 1 };
+  refreshMockup3dUI();
 
   if (el.textControls && el.textContent) {
     el.textContent.value = state.textOverlay.content;

@@ -77,6 +77,22 @@ export const state = {
   autoLayout: { pattern: 'free', gap: 40, align: 'center' },
   view: { zoom: 1, panX: 0, panY: 0 },
   tilt3d: { rx: 0, ry: 0, rz: 0, perspective: 1200 },
+  // v21 — true 3D / isometric device mockups. A screenshot is mapped onto a
+  // WebGL (three.js) device the user can orbit; the rendered GL canvas is
+  // composited into the main 2D canvas inside renderInto (so it exports). All
+  // off by default — when `enabled` is false this block is a no-op. orbitProgress
+  // is runtime-only (set per export frame for the turntable spin), NOT persisted.
+  mockup3d: {
+    enabled: false,
+    device: 'iphone',          // 'iphone' | 'ipad' | 'macbook'
+    scene: 'studio',           // 'studio' | 'float' | 'iso'
+    orbitX: 12, orbitY: -25,   // degrees
+    zoom: 1,
+    material: 'graphite',      // 'graphite' | 'silver' | 'gold'
+    envReflections: true,
+    spin: { enabled: false, turns: 1 },
+    orbitProgress: 0           // runtime-only, set per export frame
+  },
   meshGradient: {
     points: [
       { x: 0.20, y: 0.25, color: '#667eea', radius: 0.55 },

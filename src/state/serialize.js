@@ -19,8 +19,19 @@ export const SERIALIZED_FIELDS = [
   // v16.1 — Studio Effects overlays (liquid glass + film grain).
   'glass', 'grain',
   // v16.2 — pattern background (active only when bgMode === 'pattern').
-  'pattern'
+  'pattern',
+  // v21 — 3D / isometric device mockup (orbit/zoom/scene/material/spin).
+  'mockup3d'
 ];
+
+// v21 — strip the runtime-only orbitProgress so a saved/shared/restored design
+// never arrives mid-spin (mirrors sanitizeAnimationRuntime).
+export function sanitizeMockup3dRuntime(design) {
+  if (design && design.mockup3d) {
+    design.mockup3d = { ...design.mockup3d, orbitProgress: 0 };
+  }
+  return design;
+}
 
 // v15.2 — strip the animation playback runtime so a saved, shared, or restored
 // design never arrives mid-frame (mid-playback or at a non-zero currentTime).
@@ -35,7 +46,7 @@ export function sanitizeAnimationRuntime(design) {
 export function snapshotProject() {
   const out = {};
   for (const k of SERIALIZED_FIELDS) out[k] = state[k];
-  return sanitizeAnimationRuntime(JSON.parse(JSON.stringify(out)));
+  return sanitizeMockup3dRuntime(sanitizeAnimationRuntime(JSON.parse(JSON.stringify(out))));
 }
 
 // ── v12 — Projects & Version History ──────────────────────────────────────
@@ -81,7 +92,7 @@ export function serializeFull() {
   for (const k of PROJECT_FIELDS) design[k] = state[k];
   return {
     schemaVersion: SCHEMA_VERSION,
-    design: sanitizeAnimationRuntime(JSON.parse(JSON.stringify(design))),
+    design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(JSON.parse(JSON.stringify(design)))),
     image: getImageDataURL(),
     svgCode: state.svgCode || null
   };
@@ -97,11 +108,11 @@ export function normalizeProject(payload) {
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: sanitizeAnimationRuntime(payload.design),
+      design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload.design)),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: sanitizeAnimationRuntime(payload), image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload)), image: null, svgCode: payload.svgCode || null };
 }

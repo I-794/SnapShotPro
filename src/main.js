@@ -22,6 +22,7 @@ import { bindTiltEvents } from './features/tilt.js';
 import { bindStickerEvents } from './features/stickers.js';
 import { bindSceneEvents } from './features/scene-select.js';
 import { bindMockupUi } from './features/mockup-ui.js';
+import { bind3dMockupUi } from './features/mockup-3d-ui.js';
 import { bindSetUi } from './features/set-ui.js';
 import { bindSvgInput } from './features/svg-input.js';
 import { bindTemplates } from './features/templates.js';
@@ -104,6 +105,7 @@ function init() {
   bindStickerEvents();
   bindSceneEvents();
   bindMockupUi();
+  bind3dMockupUi();
   bindSetUi();
   bindSvgInput();
   bindTemplates();

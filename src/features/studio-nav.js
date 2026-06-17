@@ -29,7 +29,7 @@ const TITLE_GROUPS = [
   ['Image Upload', 'import'], ['Auto Layout', 'import'],
   ['Image Editing', 'adjust'], ['Color', 'adjust'], ['Smart Palette', 'adjust'], ['Design Variations', 'adjust'], ['Image Settings', 'adjust'],
   ['Background', 'background'], ['Mockup Scenes', 'background'],
-  ['Device', 'frame'], ['Mockup Presets', 'frame'], ['Shadow', 'frame'], ['Reflection', 'frame'], ['3D Tilt', 'frame'], ['Canvas', 'frame'],
+  ['Device', 'frame'], ['3D Mockup', 'frame'], ['Mockup Presets', 'frame'], ['Shadow', 'frame'], ['Reflection', 'frame'], ['3D Tilt', 'frame'], ['Canvas', 'frame'],
   ['Annotations', 'markup'], ['Animation', 'markup'], ['Spotlight', 'markup'], ['Privacy', 'markup'], ['Watermark', 'markup'], ['Liquid Glass', 'markup'], ['Film Grain', 'markup'],
   ['Design Agent', 'ai'], ['AI Tools', 'ai'],
   ['Video', 'export'], ['App Store', 'export'], ['Export Settings', 'export'], ['Share', 'export'],

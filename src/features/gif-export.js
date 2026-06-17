@@ -8,9 +8,16 @@ import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
 import { encodeGif, encodeMp4, mp4Supported, evenDim, download } from './motion-export.js';
 
+// v21 — turntable spin: a 3D mockup with spin enabled exports as an orbiting
+// loop, driven by mockup3d.orbitProgress (0..1) instead of the animation clock.
+function isSpinExport() {
+  return !!(state.mockup3d && state.mockup3d.enabled && state.mockup3d.spin && state.mockup3d.spin.enabled);
+}
+
 export async function exportGif() {
   if (!state.image) { showNotification('Upload an image first.', 'error'); return; }
-  if (!state.animation.enabled || state.animation.tracks.length === 0) {
+  const spin = isSpinExport();
+  if (!spin && (!state.animation.enabled || state.animation.tracks.length === 0)) {
     showNotification('Add an animation first.', 'error');
     return;
   }
@@ -20,7 +27,8 @@ export async function exportGif() {
   try {
     const canvas = el.previewCanvas;
     const fps = 20;
-    const durationSecs = state.animation.duration / 1000;
+    // Spin: ~3s loop per turn-set so the turntable reads smoothly.
+    const durationSecs = spin ? 3 : state.animation.duration / 1000;
     const totalFrames = Math.ceil(fps * durationSecs);
 
     const originalTime = state.animation.currentTime;
@@ -28,7 +36,11 @@ export async function exportGif() {
     state.animation.playing = false;
 
     const blob = await encodeGif(async (i) => {
-      state.animation.currentTime = (i / totalFrames) * state.animation.duration;
+      if (spin) {
+        state.mockup3d.orbitProgress = (i % totalFrames) / totalFrames;
+      } else {
+        state.animation.currentTime = (i / totalFrames) * state.animation.duration;
+      }
       render();
       return canvas;
     }, {
@@ -40,6 +52,7 @@ export async function exportGif() {
       onCaptured: () => {
         state.animation.currentTime = originalTime;
         state.animation.playing = originalPlaying;
+        if (spin) state.mockup3d.orbitProgress = 0;
         render();
       },
       onProgress: (p) => {
@@ -79,10 +92,11 @@ function setStillProgress(p) {
 // shared WebCodecs path. Honors the v15.1 export controls (resolution + quality).
 export async function exportStillMp4() {
   if (!state.image) { showNotification('Upload an image first.', 'error'); return; }
+  const spin = isSpinExport();
   const hasAnim = state.animation.enabled && state.animation.tracks.length > 0;
   const hasKenBurns = state.kenBurns && state.kenBurns.enabled && !state.video.loaded;
-  if (!hasAnim && !hasKenBurns) {
-    showNotification('Add an animation or enable Ken Burns first.', 'error');
+  if (!hasAnim && !hasKenBurns && !spin) {
+    showNotification('Add an animation, enable Ken Burns, or turn on Turntable spin first.', 'error');
     return;
   }
   if (!mp4Supported()) {
@@ -95,7 +109,7 @@ export async function exportStillMp4() {
   const resolution = m.resolution || 1;
   const quality = m.quality || 'high';
   const fps = 30;
-  const durationSecs = state.animation.duration / 1000;
+  const durationSecs = spin ? 3 : state.animation.duration / 1000;
   const totalFrames = Math.ceil(fps * durationSecs);
   const width = canvas.width * resolution;
   const height = canvas.height * resolution;
@@ -108,7 +122,11 @@ export async function exportStillMp4() {
 
   try {
     const blob = await encodeMp4(async (i) => {
-      state.animation.currentTime = (i / totalFrames) * state.animation.duration;
+      if (spin) {
+        state.mockup3d.orbitProgress = (i % totalFrames) / totalFrames;
+      } else {
+        state.animation.currentTime = (i / totalFrames) * state.animation.duration;
+      }
       render();
       return canvas;
     }, {
@@ -116,6 +134,7 @@ export async function exportStillMp4() {
       onCaptured: () => {
         state.animation.currentTime = originalTime;
         state.animation.playing = originalPlaying;
+        if (spin) state.mockup3d.orbitProgress = 0;
         render();
       },
       onProgress: (n, total) => setStillProgress(n / total)
@@ -127,6 +146,7 @@ export async function exportStillMp4() {
     // Restore the clock even if encoding threw before onCaptured ran.
     state.animation.currentTime = originalTime;
     state.animation.playing = originalPlaying;
+    if (spin) state.mockup3d.orbitProgress = 0;
     render();
     if (String(err && err.message).startsWith('NO_CODEC')) {
       showNotification(`No supported H.264 config for ${evenDim(width)}x${evenDim(height)}. Try GIF, or a smaller canvas.`, 'error');
