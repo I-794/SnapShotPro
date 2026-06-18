@@ -10,6 +10,7 @@
 // On narrow screens grouping is disabled (all panels show in one scroll).
 
 const NARROW = 860;
+const PHONE = 767;   // v23 — at/below this the Mobile Studio dock+sheet take over
 const ACTIVE_KEY = 'snapshotpro_studio_group';
 const COLLAPSE_KEY = 'snapshotpro_section_collapsed';
 
@@ -54,6 +55,7 @@ let active = 'import';
 let sections = [];
 
 function isNarrow() { return window.innerWidth <= NARROW; }
+export function isPhone() { return window.innerWidth <= PHONE; }
 
 function apply() {
   const narrow = isNarrow();
@@ -62,8 +64,13 @@ function apply() {
   if (rail) rail.style.display = narrow ? 'none' : '';
   if (header) header.style.display = narrow ? 'none' : '';
 
+  // Desktop groups by the active tab. The 768–860 tablet band shows everything
+  // in one scroll (the rail is hidden there). On phones (<=767) the Mobile
+  // Studio bottom dock drives the active group, so we group again — only the
+  // active group's sections are shown in the bottom sheet.
+  const grouped = !narrow || isPhone();
   sections.forEach(({ el, group, titleEl, redundant }) => {
-    el.style.display = (narrow || group === active) ? '' : 'none';
+    el.style.display = (grouped ? group === active : true) ? '' : 'none';
     // Hide a panel's own title when it just repeats the group name (wide only).
     if (redundant && titleEl) {
       titleEl.style.display = narrow ? '' : 'none';

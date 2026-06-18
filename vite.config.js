@@ -98,11 +98,22 @@ export default defineConfig({
           { src: 'pwa-192.svg', sizes: '192x192', type: 'image/svg+xml' },
           { src: 'pwa-512.svg', sizes: '512x512', type: 'image/svg+xml' },
           { src: 'pwa-512-maskable.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' }
-        ]
+        ],
+        // v23 — accept images shared from other apps (Android installed PWA).
+        // The POST is intercepted by the worker (public/share-handler.js).
+        share_target: {
+          action: '/editor/share-target',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: { files: [{ name: 'image', accept: ['image/*'] }] }
+        }
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // v23 — share-target POST handler layered onto the generated SW, so
+        // Workbox keeps owning precache / runtime caching / auto-update.
+        importScripts: ['/share-handler.js'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.origin === 'https://cdn.jsdelivr.net' || url.origin === 'https://staticimgly.com' || url.origin === 'https://unpkg.com',

@@ -8,7 +8,7 @@
     <title>Changelog · SnapShot-Pro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShot-Pro Changelog">
-    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v20, the AI Design Agent.">
+    <meta property="og:description" content="Every SnapShot-Pro release, from the first editor to v23, Mobile Studio: a canvas-first phone layout with a bottom tab dock, a flickable controls sheet, and share-to-edit.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -318,6 +318,63 @@
         .cmdk-keys kbd { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.72); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 1px 6px; }
         .cmdk-rtag { margin-left: auto; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(255,255,255,0.4); }
 
+        /* v23 — Mobile Studio spotlight. Its own motif: a phone showing the
+           canvas-first layout, a full-bleed canvas above the bottom tab dock with
+           the controls sheet peeking up. Teal/aqua accent, distinct from the
+           cobalt of v21 and the amber of v22. */
+        .spotlight-mobile {
+            background:
+                radial-gradient(56% 86% at 0% 0%, rgba(45,212,191,0.20), transparent 56%),
+                radial-gradient(54% 82% at 100% 100%, rgba(56,148,255,0.18), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-mobile::after { display: none; }
+        .spotlight-mobile .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-mobile .spot-feat-ico { background: linear-gradient(135deg, rgba(45,212,191,0.32), rgba(56,148,255,0.26)); }
+        .spotlight-mobile .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-mobile .btn-primary:hover { background: #f0f0ee; }
+        /* the phone, depicting the canvas-first layout. This IS Mobile Studio, shown. */
+        .ms-stage { width: 100%; display: flex; align-items: center; justify-content: center; }
+        .ms-phone {
+            position: relative; width: min(62%, 244px); aspect-ratio: 9 / 19;
+            border-radius: 36px; padding: 9px;
+            background: linear-gradient(165deg, #1b2230, #0c0f1a);
+            box-shadow: 0 44px 74px -26px rgba(0,0,0,0.72), inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+        .ms-screen {
+            position: relative; height: 100%; border-radius: 28px; overflow: hidden;
+            background: linear-gradient(160deg, #11202e, #0c1420);
+            display: flex; flex-direction: column;
+        }
+        /* the canvas: a framed shot floating on a soft aqua backdrop */
+        .ms-canvas {
+            flex: 1; margin: 13px 13px 0; border-radius: 15px;
+            background:
+                radial-gradient(80% 70% at 28% 18%, rgba(45,212,191,0.42), transparent 60%),
+                radial-gradient(82% 82% at 82% 92%, rgba(56,148,255,0.46), transparent 60%),
+                #0e2233;
+            display: grid; place-items: center;
+        }
+        .ms-canvas span { width: 56%; height: 64%; border-radius: 8px; background: rgba(255,255,255,0.96); box-shadow: 0 9px 22px rgba(0,0,0,0.42); }
+        /* the bottom sheet, peeking up with its drag handle and two control rows */
+        .ms-sheet {
+            margin: 11px 11px 0; padding: 9px 0 9px; border-radius: 13px 13px 0 0;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.12); border-bottom: none;
+        }
+        .ms-sheet::before { content: ''; display: block; width: 34px; height: 4px; border-radius: 3px; margin: 0 auto 9px; background: rgba(255,255,255,0.42); }
+        .ms-sheet i { display: block; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.16); margin: 7px 16px; }
+        .ms-sheet i:nth-child(3) { width: 60%; }
+        /* the bottom tab dock, one group active */
+        .ms-dock { display: flex; gap: 5px; padding: 9px 10px 10px; }
+        .ms-dock b { flex: 1; height: 23px; border-radius: 7px; background: rgba(255,255,255,0.08); }
+        .ms-dock b.on { background: linear-gradient(135deg, rgba(45,212,191,0.55), rgba(56,148,255,0.42)); }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -397,25 +454,25 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-command reveal">
+        <div class="spotlight spotlight-mobile reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v22 · June 2026</div>
-                <h2>Every command, one keystroke away.</h2>
-                <p class="spot-lede">Press Cmd-K and the whole studio is at your fingertips. The command palette now learns what you use, sorts everything by task, and shows the shortcut for each action as you go.</p>
+                <div class="spot-ver">v23 · June 2026</div>
+                <h2>The whole studio, in your pocket.</h2>
+                <p class="spot-lede">On a phone the editor is now canvas-first: your design fills the screen, the tools sit in a dock under your thumb, and the controls live in a sheet you flick up only when you need it.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-5z"/></svg></span>
-                        <div><strong>Results that read the moment</strong><span>The palette only offers what makes sense right now, so commands that do not apply stay out of your way.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M6 17h12"/></svg></span>
+                        <div><strong>A layout built for the phone</strong><span>A full-width canvas with a tab dock along the bottom for jumping between Import, Adjust, Background, Frame and the rest, one thumb-tap away.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5" opacity="0.7"/></svg></span>
-                        <div><strong>Recents and categories</strong><span>Open it and your most-used commands sit on top, with everything else sorted into clear groups you can scan.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11l4-4 4 4"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg></span>
+                        <div><strong>A sheet you can flick</strong><span>Drag the controls between peek, half and full height, swipe sideways on the handle to flip tool groups, with a light haptic on every snap.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10" opacity="0.7"/></svg></span>
-                        <div><strong>Shortcuts that never drift</strong><span>Every action shows its keyboard shortcut, and the help overlay is generated from one list, so it always matches the keys.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6M8.2 13.2l7.6 4.6"/></svg></span>
+                        <div><strong>Share an image straight in</strong><span>Install the app to your home screen and it joins your share sheet, so a screenshot from any app opens here, ready to frame.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -424,19 +481,13 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="cmdk" aria-hidden="true">
-                    <div class="cmdk-search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-                        <span class="cmdk-ph"><span class="cmdk-caret"></span>Type a command…</span>
-                        <span class="cmdk-hint">⌘K</span>
-                    </div>
-                    <div class="cmdk-results">
-                        <div class="cmdk-group">Recent</div>
-                        <div class="cmdk-row on"><span>AI Auto-Enhance</span><span class="cmdk-rtag">AI</span></div>
-                        <div class="cmdk-row"><span>Background: Mesh</span><span class="cmdk-rtag">View</span></div>
-                        <div class="cmdk-group">File</div>
-                        <div class="cmdk-row"><span>Export as PNG</span><span class="cmdk-keys"><kbd>⌘</kbd><kbd>S</kbd></span></div>
-                        <div class="cmdk-row"><span>Copy to clipboard</span><span class="cmdk-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span></div>
+                <div class="ms-stage" aria-hidden="true">
+                    <div class="ms-phone">
+                        <div class="ms-screen">
+                            <div class="ms-canvas"><span></span></div>
+                            <div class="ms-sheet"><i></i><i></i><i></i></div>
+                            <div class="ms-dock"><b></b><b class="on"></b><b></b><b></b><b></b><b></b></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -450,6 +501,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v23.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Mobile Studio</h2>
+                    <ul class="changes">
+                        <li><b>A studio built for the phone.</b> On a small screen the editor now leads with the canvas: your design fills the viewport, and a tab dock along the bottom keeps Import, Adjust, Background, Frame, and the rest one thumb-tap away. No more hunting through a long sidebar.</li>
+                        <li><b>A bottom sheet you can flick.</b> Controls live in a sheet you drag between peek, half, and full height, so you see as much canvas or as many options as you want. Swipe sideways on the handle to flip between tool groups, with a light haptic tap on every snap.</li>
+                        <li><b>Share an image straight into the editor.</b> Install SnapShot-Pro to your home screen and it joins your phone's share sheet. Share a screenshot from any app and it opens here, loaded and ready to frame. The desktop studio is untouched, and every tool works exactly as before.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v22.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Command Center</h2>

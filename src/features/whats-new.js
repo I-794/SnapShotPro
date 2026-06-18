@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '22.0';
+const CURRENT_VERSION = '23.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "Command Center is here",
+  heading: "Mobile Studio is here",
   items: [
-    { title: 'Cmd-K palette now knows what you\'re doing',
-      desc: 'The command palette hides commands that don\'t apply to your current state, so you never scroll past irrelevant actions. It also remembers your recent picks so the most useful commands float to the top.' },
-    { title: 'Commands organized into categories',
-      desc: 'Palette results are grouped into clear categories (File, Edit, View, and more) with inline keyboard-shortcut chips, so you can learn shortcuts as you work.' },
-    { title: 'Shortcuts help overlay (press ?)',
-      desc: 'Hit ? anywhere in the editor to open a full shortcut reference. It\'s generated from the same registry that drives the palette, so it\'s always in sync.' }
+    { title: 'A canvas-first layout built for phones',
+      desc: 'On a phone the editor now puts your design front and center: a full-width canvas with a thumb-reachable tab dock along the bottom for jumping between Import, Adjust, Background, Frame and the rest.' },
+    { title: 'A bottom sheet you can flick',
+      desc: 'Controls live in a sheet you drag between peek, half and full height — swipe sideways on the handle to flip between tool groups, with a subtle haptic tap on every snap.' },
+    { title: 'Share an image straight into the editor',
+      desc: 'Install SnapShot-Pro to your home screen and it shows up in your phone’s share sheet. Share a screenshot from any app and it opens here, ready to frame.' }
   ]
 };
 

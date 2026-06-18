@@ -63,8 +63,9 @@ import { registerCommands, bindPalette } from './features/palette.js';
 import { renderShortcutsOverlay } from './features/shortcuts.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
-import { bindMobileNav } from './ui/mobile-nav.js';
+import { bindMobileStudio } from './ui/mobile-studio.js';
 import { bindStudioNav } from './features/studio-nav.js';
+import { bindShareTarget } from './features/share-target.js';
 import { bindWelcome } from './features/welcome.js';
 import { bindWhatsNew } from './features/whats-new.js';
 
@@ -96,6 +97,7 @@ function init() {
 
   bindHeader();
   bindUploadEvents();
+  bindShareTarget();   // v23 — PWA share-target: load an image shared into the app
   bindUrlLoad();
   bindExtraImagesEvents();
   bindCanvasTools();
@@ -148,8 +150,8 @@ function init() {
   renderShortcutsOverlay(el.shortcutsGrid);
   bindAllControls();
   bindKeyboard();
-  bindMobileNav();
   bindStudioNav();
+  bindMobileStudio();   // v23 — phone bottom dock + sheet (after studio-nav wires setGroup)
   bindWelcome();
   bindWhatsNew();
 
