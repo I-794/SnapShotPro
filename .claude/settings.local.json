@@ -40,7 +40,8 @@
       "Bash(curl -s http://localhost:4173/editor/)",
       "Bash(curl -s http://localhost:4173/changelog/)",
       "Bash(kill %1)",
-      "Bash(npx kill-port *)"
+      "Bash(npx kill-port *)",
+      "Bash(mkdir -p /home/user/SnapShotPro/.git/sdd)"
     ]
   }
 }

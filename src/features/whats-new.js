@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '21.0';
+const CURRENT_VERSION = '22.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "3D mockups have landed",
+  heading: "Command Center is here",
   items: [
-    { title: 'Put your screenshot on a real 3D device',
-      desc: 'New 3D Mockup section in the Frame tab: drop your shot onto a true three-dimensional phone, tablet, or laptop, then drag the preview to orbit it.' },
-    { title: 'Spin it into a video',
-      desc: 'Turn on Spin and export a smooth turntable as a GIF or MP4, straight from the usual export buttons.' },
-    { title: 'New pages on the site',
-      desc: 'An About page and a single AI hub that gathers the Design Agent, AI Assets, Enhance, and Vision in one place.' }
+    { title: 'Cmd-K palette now knows what you\'re doing',
+      desc: 'The command palette hides commands that don\'t apply to your current state, so you never scroll past irrelevant actions. It also remembers your recent picks so the most useful commands float to the top.' },
+    { title: 'Commands organized into categories',
+      desc: 'Palette results are grouped into clear categories (File, Edit, View, and more) with inline keyboard-shortcut chips, so you can learn shortcuts as you work.' },
+    { title: 'Shortcuts help overlay (press ?)',
+      desc: 'Hit ? anywhere in the editor to open a full shortcut reference. It\'s generated from the same registry that drives the palette, so it\'s always in sync.' }
   ]
 };
 

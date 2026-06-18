@@ -276,6 +276,48 @@
         @media (prefers-reduced-motion: reduce) { .mock3d { transform: rotateY(-18deg); } }
         @media (max-width: 860px) { .mock3d { transform: rotateY(-14deg); width: 58%; } }
 
+        /* v22 — Command Center spotlight. Its own motif: the Cmd-K command
+           palette, depicted — a search line resolving into grouped, recent,
+           shortcut-hinted results. Warm amber/coral accent, distinct from the
+           cool blues, greens, and violets of every prior spotlight. */
+        .spotlight-command {
+            background:
+                radial-gradient(56% 86% at 0% 0%, rgba(245,176,84,0.20), transparent 56%),
+                radial-gradient(54% 82% at 100% 100%, rgba(255,107,74,0.18), transparent 56%),
+                #0b0d14;
+        }
+        .spotlight-command::after { display: none; }
+        .spotlight-command .spot-copy {
+            background: rgba(12,15,24,0.62);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 20px 52px rgba(4,7,18,0.55);
+        }
+        .spotlight-command .spot-feat-ico { background: linear-gradient(135deg, rgba(245,176,84,0.32), rgba(255,107,74,0.26)); }
+        .spotlight-command .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-command .btn-primary:hover { background: #f0f0ee; }
+        /* the command palette, depicted: search line + grouped/recent results
+           with shortcut-hint chips. This IS the Command Center feature, shown. */
+        .cmdk {
+            width: min(94%, 380px); border-radius: 16px; overflow: hidden;
+            background: #0c0f1a; border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 40px 80px -28px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .cmdk-search { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .cmdk-search svg { width: 16px; height: 16px; color: rgba(255,255,255,0.5); flex-shrink: 0; }
+        .cmdk-ph { font-size: 14.5px; color: rgba(255,255,255,0.42); }
+        .cmdk-caret { display: inline-block; width: 1.5px; height: 16px; background: #f5b054; vertical-align: -3px; margin-right: 2px; }
+        @media (prefers-reduced-motion: no-preference) { .cmdk-caret { animation: cmdk-blink 1.1s steps(1) infinite; } }
+        @keyframes cmdk-blink { 50% { opacity: 0; } }
+        .cmdk-hint { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.4); flex-shrink: 0; }
+        .cmdk-results { padding: 6px; }
+        .cmdk-group { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.38); padding: 9px 10px 4px; }
+        .cmdk-row { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 9px; font-size: 13.5px; color: rgba(255,255,255,0.9); }
+        .cmdk-row.on { background: rgba(245,176,84,0.16); }
+        .cmdk-keys { margin-left: auto; display: flex; gap: 4px; }
+        .cmdk-keys kbd { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.72); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 1px 6px; }
+        .cmdk-rtag { margin-left: auto; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(255,255,255,0.4); }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -355,25 +397,25 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-3d reveal">
+        <div class="spotlight spotlight-command reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v21 · June 2026</div>
-                <h2>Your screenshot, in three dimensions.</h2>
-                <p class="spot-lede">Drop a shot onto a real 3D phone, tablet, or laptop, then drag the preview to orbit it. When you want motion, spin it into a turntable.</p>
+                <div class="spot-ver">v22 · June 2026</div>
+                <h2>Every command, one keystroke away.</h2>
+                <p class="spot-lede">Press Cmd-K and the whole studio is at your fingertips. The command palette now learns what you use, sorts everything by task, and shows the shortcut for each action as you go.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 11l8-4.5M12 11v9M12 11L4 6.5" opacity="0.7"/></svg></span>
-                        <div><strong>True 3D, not a flat tilt</strong><span>A real device with depth, lighting, and reflections. Orbit it live in the preview to find the perfect angle.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-5z"/></svg></span>
+                        <div><strong>Results that read the moment</strong><span>The palette only offers what makes sense right now, so commands that do not apply stay out of your way.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></svg></span>
-                        <div><strong>Spin it into a video</strong><span>Turn on Spin and export a smooth turntable as a GIF or MP4, straight from the usual export buttons.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5" opacity="0.7"/></svg></span>
+                        <div><strong>Recents and categories</strong><span>Open it and your most-used commands sit on top, with everything else sorted into clear groups you can scan.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 9h17" opacity="0.7"/><path d="M9 19v-4"/></svg></span>
-                        <div><strong>Bakes into every export</strong><span>It composites into the same canvas as everything else, so what you see in the preview is exactly what you export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10" opacity="0.7"/></svg></span>
+                        <div><strong>Shortcuts that never drift</strong><span>Every action shows its keyboard shortcut, and the help overlay is generated from one list, so it always matches the keys.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -382,8 +424,20 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="mock3d-stage" aria-hidden="true">
-                    <div class="mock3d"><img src="https://picsum.photos/seed/snapshotpro-3d-mockup/540/960" alt="A screenshot mapped onto a 3D phone, tilted in space" loading="eager" width="540" height="960"></div>
+                <div class="cmdk" aria-hidden="true">
+                    <div class="cmdk-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <span class="cmdk-ph"><span class="cmdk-caret"></span>Type a command…</span>
+                        <span class="cmdk-hint">⌘K</span>
+                    </div>
+                    <div class="cmdk-results">
+                        <div class="cmdk-group">Recent</div>
+                        <div class="cmdk-row on"><span>AI Auto-Enhance</span><span class="cmdk-rtag">AI</span></div>
+                        <div class="cmdk-row"><span>Background: Mesh</span><span class="cmdk-rtag">View</span></div>
+                        <div class="cmdk-group">File</div>
+                        <div class="cmdk-row"><span>Export as PNG</span><span class="cmdk-keys"><kbd>⌘</kbd><kbd>S</kbd></span></div>
+                        <div class="cmdk-row"><span>Copy to clipboard</span><span class="cmdk-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span></div>
+                    </div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -396,6 +450,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v22.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Command Center</h2>
+                    <ul class="changes">
+                        <li><b>A command palette that knows the moment.</b> Press Cmd-K to reach any of the studio's actions. The palette now hides commands that do not apply right now, so you only ever see what you can actually do.</li>
+                        <li><b>Recents, categories, and shortcut hints.</b> Open it and your most-used commands rise to the top, the rest sit in clear groups, and every row shows its keyboard shortcut so you pick up the keys as you work.</li>
+                        <li><b>A help overlay that never drifts.</b> Keyboard shortcuts now come from a single source, and the "?" help overlay is generated from it, so the list you read always matches the keys that actually fire.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v21.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>3D mockups</h2>

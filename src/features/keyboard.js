@@ -8,6 +8,7 @@ import { closeStickerDrawer } from './stickers.js';
 import { setTool, deleteSelected, nudgeSelected } from './canvas-tools.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { timelineActive, timelineStepFrame, timelineSetIn, timelineSetOut } from './timeline.js';
+import { matchEvent } from './shortcuts.js';
 
 function showShortcuts(show) {
   if (!el.shortcutsOverlay) return;
@@ -17,6 +18,8 @@ function showShortcuts(show) {
 export function bindKeyboard() {
   document.addEventListener('keydown', (e) => {
     const cmd = e.ctrlKey || e.metaKey;
+
+    // Cmd/Ctrl+K toggles the palette and must work even while it's open.
     if (cmd && e.key.toLowerCase() === 'k') {
       e.preventDefault();
       if (state.ui.paletteOpen) closePalette(); else openPalette();
@@ -37,13 +40,21 @@ export function bindKeyboard() {
 
     if (isTypingTarget(e.target)) return;
 
-    if (cmd) {
-      if (e.key.toLowerCase() === 'z' && !e.shiftKey) { e.preventDefault(); undo(render); return; }
-      if (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey)) { e.preventDefault(); redo(render); return; }
-      if (e.key.toLowerCase() === 's') { e.preventDefault(); exportImage(); return; }
-      if (e.shiftKey && e.key.toLowerCase() === 'c') { e.preventDefault(); copyToClipboard(); return; }
-    } else {
-      if (e.key === '?') { e.preventDefault(); showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return; }
+    // Declarative global shortcuts — single source of truth is shortcuts.js.
+    const sc = matchEvent(e);
+    if (sc) {
+      e.preventDefault();
+      switch (sc) {
+        case 'undo':   undo(render); return;
+        case 'redo':   redo(render); return;
+        case 'export': exportImage(); return;
+        case 'copy':   copyToClipboard(); return;
+        case 'help':   showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return;
+      }
+    }
+
+    // Bespoke, context-sensitive handlers (listed in shortcuts.js as displayOnly).
+    if (!cmd) {
       // v15.1 — frame-accurate timeline control when a clip is loaded.
       if (timelineActive()) {
         if (e.key === ',') { e.preventDefault(); timelineStepFrame(-1); return; }
