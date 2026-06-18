@@ -23,6 +23,8 @@ import { focusUrlLoad } from './url-load.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
+import { formatKeys } from './shortcuts.js';
+import { getFrequencyBoost } from './command-usage.js';
 
 let commands = [];
 
@@ -37,6 +39,24 @@ function setBg(mode) {
   if (mode === 'pattern' && el.bgPatternPanel) el.bgPatternPanel.style.display = 'block';
   if (mode === 'transparent' && el.bgTransparentPanel) el.bgTransparentPanel.style.display = 'block';
   render();
+}
+
+const GROUP_ORDER = ['File', 'Edit', 'View', 'Tools', 'AI', 'Motion', 'Stickers', 'More'];
+
+function groupFor(id) {
+  if (id.startsWith('sticker-')) return 'Stickers';
+  if (id.startsWith('ai-')) return 'AI';
+  if (id.startsWith('tool-') || id.startsWith('clear-')) return 'Tools';
+  if (id.startsWith('video') || id.startsWith('anim') || id === 'export-gif' ||
+      id === 'screen-record' || id === 'auto-zoom-toggle') return 'Motion';
+  if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
+      id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-')) return 'File';
+  if (id === 'undo' || id === 'redo') return 'Edit';
+  if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
+      id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
+      id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
+      id === 'toggle-spotlight') return 'View';
+  return 'More';
 }
 
 export function registerCommands() {
@@ -121,6 +141,31 @@ export function registerCommands() {
   Object.values(stickers).flat().slice(0, 24).forEach(g => {
     commands.push({ id: 'sticker-' + g, label: 'Add sticker ' + g, icon: g, run: () => addSticker(g) });
   });
+
+  // v22 — Command Center metadata: category, optional shortcut hint, and an
+  // optional context predicate ('when'), applied in one pass so the command
+  // definitions above stay readable.
+  const WHEN = {
+    'video-play':        () => state.video.loaded,
+    'video-mp4':         () => state.video.loaded,
+    'video-gif':         () => state.video.loaded,
+    'anim-play':         () => state.animation.enabled,
+    'export-set':        () => state.mode === 'set',
+    'export-batch':      () => state.mode === 'batch',
+    'clear-annotations': () => state.annotations.length > 0,
+    'clear-redactions':  () => state.redactions.length > 0,
+  };
+  const KEYS = {
+    'export-png':     'mod+s',
+    'copy-clipboard': 'mod+shift+c',
+    'undo':           'mod+z',
+    'redo':           'mod+shift+z',
+  };
+  commands.forEach((c) => {
+    c.group = groupFor(c.id);
+    if (WHEN[c.id]) c.when = WHEN[c.id];
+    if (KEYS[c.id]) c.keys = KEYS[c.id];
+  });
 }
 
 let activeIdx = 0;
@@ -138,13 +183,38 @@ function fuzzyMatch(q, label) {
   return qi === qq.length ? 1 : 0;
 }
 
+function applicable(c) {
+  if (!c.when) return true;
+  try { return !!c.when(); } catch { return false; }
+}
+
+function rowHtml(c, i, active) {
+  const right = c.keys
+    ? `<span class="palette-keys">${formatKeys(c.keys).map((x) => `<kbd>${x}</kbd>`).join('')}</span>`
+    : `<span class="palette-group">${c.group}</span>`;
+  return `<div class="palette-item${active ? ' active' : ''}" data-i="${i}">
+    <span class="palette-icon">${c.icon}</span><span class="palette-label">${c.label}</span>${right}
+  </div>`;
+}
+
+function bindResultRows() {
+  el.paletteResults.querySelectorAll('.palette-item').forEach((item) => {
+    item.addEventListener('click', () => runPaletteIndex(parseInt(item.dataset.i, 10)));
+    item.addEventListener('mouseenter', () => {
+      activeIdx = parseInt(item.dataset.i, 10);
+      el.paletteResults.querySelectorAll('.palette-item').forEach((x, j) => x.classList.toggle('active', j === activeIdx));
+    });
+  });
+}
+
 function renderPaletteResults() {
   const q = el.paletteInput.value.trim();
-  lastResults = commands
-    .map(c => ({ c, s: fuzzyMatch(q, c.label) }))
-    .filter(x => x.s > 0)
+  const pool = commands.filter(applicable);
+  lastResults = pool
+    .map((c) => { const m = fuzzyMatch(q, c.label); return { c, s: m > 0 ? m + getFrequencyBoost(c.id) : 0 }; })
+    .filter((x) => x.s > 0)
     .sort((a, b) => b.s - a.s)
-    .map(x => x.c)
+    .map((x) => x.c)
     .slice(0, 40);
 
   if (lastResults.length === 0) {
@@ -152,18 +222,8 @@ function renderPaletteResults() {
     return;
   }
   activeIdx = Math.min(activeIdx, lastResults.length - 1);
-  el.paletteResults.innerHTML = lastResults.map((c, i) =>
-    `<div class="palette-item${i === activeIdx ? ' active' : ''}" data-i="${i}">
-      <span class="palette-icon">${c.icon}</span><span>${c.label}</span>
-    </div>`
-  ).join('');
-  el.paletteResults.querySelectorAll('.palette-item').forEach(item => {
-    item.addEventListener('click', () => runPaletteIndex(parseInt(item.dataset.i, 10)));
-    item.addEventListener('mouseenter', () => {
-      activeIdx = parseInt(item.dataset.i, 10);
-      el.paletteResults.querySelectorAll('.palette-item').forEach((x, j) => x.classList.toggle('active', j === activeIdx));
-    });
-  });
+  el.paletteResults.innerHTML = lastResults.map((c, i) => rowHtml(c, i, i === activeIdx)).join('');
+  bindResultRows();
 }
 
 function runPaletteIndex(i) {
