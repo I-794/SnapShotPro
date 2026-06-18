@@ -24,7 +24,7 @@ import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
 import { formatKeys } from './shortcuts.js';
-import { getFrequencyBoost } from './command-usage.js';
+import { getFrequencyBoost, getRecent, recordUse } from './command-usage.js';
 
 let commands = [];
 
@@ -210,6 +210,36 @@ function bindResultRows() {
 function renderPaletteResults() {
   const q = el.paletteInput.value.trim();
   const pool = commands.filter(applicable);
+
+  if (!q) {
+    // Empty query → a "Recent" section, then categories in fixed order.
+    const byId = Object.fromEntries(pool.map((c) => [c.id, c]));
+    const recent = getRecent(6).map((id) => byId[id]).filter(Boolean);
+    const recentIds = new Set(recent.map((c) => c.id));
+
+    const sections = [];
+    if (recent.length) sections.push({ title: 'Recent', items: recent });
+    for (const g of GROUP_ORDER) {
+      const items = pool.filter((c) => c.group === g && !recentIds.has(c.id));
+      if (items.length) sections.push({ title: g, items });
+    }
+
+    lastResults = [];
+    let html = '';
+    for (const sec of sections) {
+      html += `<div class="palette-section-header">${sec.title}</div>`;
+      for (const c of sec.items) {
+        const i = lastResults.length;
+        lastResults.push(c);
+        html += rowHtml(c, i, i === activeIdx);
+      }
+    }
+    activeIdx = Math.min(activeIdx, Math.max(0, lastResults.length - 1));
+    el.paletteResults.innerHTML = html;
+    bindResultRows();
+    return;
+  }
+
   lastResults = pool
     .map((c) => { const m = fuzzyMatch(q, c.label); return { c, s: m > 0 ? m + getFrequencyBoost(c.id) : 0 }; })
     .filter((x) => x.s > 0)
@@ -229,6 +259,7 @@ function renderPaletteResults() {
 function runPaletteIndex(i) {
   const cmd = lastResults[i];
   if (!cmd) return;
+  recordUse(cmd.id);
   closePalette();
   try { cmd.run(); } catch (e) { console.error(e); }
 }

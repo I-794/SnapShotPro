@@ -736,6 +736,10 @@ kbd {
     text-transform: uppercase; letter-spacing: 0.04em;
 }
 .palette-empty { padding: 24px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+.palette-section-header {
+    padding: 8px 14px 4px; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);
+}
 
 /* ─── Sticker Drawer ─── */
 .sticker-drawer {
