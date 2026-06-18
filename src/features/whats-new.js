@@ -19,9 +19,9 @@ const WHATS_NEW = {
   heading: "Command Center is here",
   items: [
     { title: 'Cmd-K palette now knows what you\'re doing',
-      desc: 'The command palette hides commands that don\'t apply to your current state — no more scrolling past irrelevant actions. It also remembers your recent picks so the most useful commands float to the top.' },
+      desc: 'The command palette hides commands that don\'t apply to your current state, so you never scroll past irrelevant actions. It also remembers your recent picks so the most useful commands float to the top.' },
     { title: 'Commands organized into categories',
-      desc: 'Palette results are grouped by section (Image, Frame, Export, and more) with inline keyboard-shortcut chips, so you can learn shortcuts as you work.' },
+      desc: 'Palette results are grouped into clear categories (File, Edit, View, and more) with inline keyboard-shortcut chips, so you can learn shortcuts as you work.' },
     { title: 'Shortcuts help overlay (press ?)',
       desc: 'Hit ? anywhere in the editor to open a full shortcut reference. It\'s generated from the same registry that drives the palette, so it\'s always in sync.' }
   ]
