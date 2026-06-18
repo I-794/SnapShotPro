@@ -1291,6 +1291,15 @@ kbd {
     #sidebar-toggle-btn { display: inline-flex; }
     .header { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
     .logo { font-size: 15px; gap: 8px; }
+    /* v23 — compact, canvas-first header. The desktop action row does not fit a
+       phone, so the brand collapses to its icon, low-value buttons (keyboard
+       shortcuts, reset, secondary auth) are dropped, and the rest go glyph-only
+       (Undo/Redo arrows, ☁/🔑/👤 auth, "Export"). Export stays the readable CTA. */
+    .logo > span { display: none; }
+    .header-actions { gap: 5px; }
+    .header-actions .btn { padding: 8px 10px; }
+    .header-actions .btn-text { display: none; }
+    #shortcuts-btn, #reset-btn, #auth-signout-btn, #cloud-reconfigure-btn { display: none; }
     .annotation-toolbar {
         flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
         position: sticky; top: 0; z-index: 80;

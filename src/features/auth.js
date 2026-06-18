@@ -150,20 +150,20 @@ function renderAuthPill() {
   const pill = document.getElementById('auth-pill');
   if (!pill) return;
   if (!isConfigured()) {
-    pill.innerHTML = '<button class="btn btn-secondary" id="cloud-setup-btn" title="Connect a Supabase project">☁ Set up cloud</button>';
+    pill.innerHTML = '<button class="btn btn-secondary" id="cloud-setup-btn" title="Connect a Supabase project">☁ <span class="btn-text">Set up cloud</span></button>';
     document.getElementById('cloud-setup-btn').addEventListener('click', openSetupModal);
     return;
   }
   if (currentUser) {
     const name = currentUser.email || currentUser.user_metadata?.full_name || 'You';
     pill.innerHTML = `
-      <span class="account-pill" title="${name}">👤 ${name.split('@')[0]}</span>
+      <span class="account-pill" title="${name}">👤 <span class="btn-text">${name.split('@')[0]}</span></span>
       <button class="btn btn-secondary" id="auth-signout-btn" style="padding:6px 10px;">Sign out</button>
     `;
     document.getElementById('auth-signout-btn').addEventListener('click', signOut);
   } else {
     pill.innerHTML = `
-      <button class="btn btn-primary" id="auth-signin-btn">🔑 Sign in</button>
+      <button class="btn btn-primary" id="auth-signin-btn">🔑 <span class="btn-text">Sign in</span></button>
       <button class="btn btn-secondary" id="cloud-reconfigure-btn" title="Re-enter Supabase keys" style="padding:6px 8px;">⚙</button>
     `;
     document.getElementById('auth-signin-btn').addEventListener('click', openModal);
