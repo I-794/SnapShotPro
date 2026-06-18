@@ -9,7 +9,7 @@ const IDS = [
   'url-load-input', 'url-load-btn',
   'export-btn', 'reset-btn', 'undo-btn', 'redo-btn', 'drop-zone',
   'notification', 'notification-text', 'theme-toggle-btn',
-  'shortcuts-btn', 'shortcuts-overlay', 'close-shortcuts-btn', 'annotation-toolbar',
+  'shortcuts-btn', 'shortcuts-overlay', 'shortcuts-grid', 'close-shortcuts-btn', 'annotation-toolbar',
 
   // Image editing
   'rotate-left-btn', 'rotate-right-btn', 'flip-h-btn', 'flip-v-btn',

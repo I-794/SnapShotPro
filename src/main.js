@@ -60,6 +60,7 @@ import { bindVideoExport } from './features/video-export.js';
 import { bindTimeline } from './features/timeline.js';
 import { bindScreenRecord } from './features/screen-record.js';
 import { registerCommands, bindPalette } from './features/palette.js';
+import { renderShortcutsOverlay } from './features/shortcuts.js';
 import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
 import { bindMobileNav } from './ui/mobile-nav.js';
@@ -144,6 +145,7 @@ function init() {
   bindScreenRecord();
   registerCommands();
   bindPalette();
+  renderShortcutsOverlay(el.shortcutsGrid);
   bindAllControls();
   bindKeyboard();
   bindMobileNav();
