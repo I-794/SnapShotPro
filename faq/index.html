@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Frequently asked questions about SnapShot-Pro: is it free, do I need an account, does my image stay private, what can I export, and how the optional AI works.">
+    <title>FAQ · SnapShot-Pro</title>
+    <link rel="canonical" href="__OG_BASE__/faq/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SnapShot-Pro · FAQ">
+    <meta property="og:description" content="Is it free, do I need an account, is my image private? The common questions, answered.">
+    <meta property="og:image" content="__OG_BASE__/og.png">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is SnapShot-Pro free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The whole studio is free and open source. There is no trial clock, no per-seat pricing, and no watermark you did not ask for. Optional cloud AI either runs through a hosted backend or uses your own API key." } },
+        { "@type": "Question", "name": "Do I need an account?", "acceptedAnswer": { "@type": "Answer", "text": "No. The editor opens straight into the studio with nothing to sign up for. An optional account exists only to sync your saved projects across devices." } },
+        { "@type": "Question", "name": "Does my screenshot stay private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Editing runs in your browser on your machine. Your image is never uploaded unless you choose a cloud feature such as cloud AI or sharing, and each of those is an explicit action." } },
+        { "@type": "Question", "name": "What can I export?", "acceptedAnswer": { "@type": "Answer", "text": "PNG, JPEG, and WebP for stills, GIF and MP4 for motion, multi-page PDF for decks, and ZIP for batches and App Store screenshot sets. Every visual effect bakes into the export." } },
+        { "@type": "Question", "name": "Do I need an API key for the AI features?", "acceptedAnswer": { "@type": "Answer", "text": "Not always. With a hosted backend configured, AI features work for everyone. You can also bring your own OpenAI or Anthropic key, which is stored only in your browser. Background removal and OCR run locally with no key at all." } },
+        { "@type": "Question", "name": "Does it work offline?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. SnapShot-Pro is an installable progressive web app. After the first load it works offline, and only cloud features such as AI generation or sharing need a connection." } },
+        { "@type": "Question", "name": "Can I use it for commercial work?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can use SnapShot-Pro for client work, products, and marketing. You own what you create. Generated assets are also subject to the terms of whichever AI provider produced them." } },
+        { "@type": "Question", "name": "Is it really open source?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The source is public on GitHub, so you can read exactly how it works, file an issue, or fork it for your team." } }
+      ]
+    }
+    </script>
+    <style>
+        .faq-note { margin-top: clamp(36px, 5vw, 52px); padding: 24px 26px; border-radius: var(--r-card); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+        .faq-note p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
+        .faq-note a { color: var(--accent); font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap wrap-narrow">
+        <p class="mono-label" style="margin-bottom:16px;">FAQ</p>
+        <h1>Questions, <span class="accent">answered</span>.</h1>
+        <p class="lede">The things people ask most before they open the studio. If yours is not here, the source and the issue tracker are public.</p>
+    </div>
+</header>
+
+<section class="section-pad" style="padding-top:0;">
+    <div class="wrap wrap-narrow">
+        <div class="faq-list">
+            <details class="faq-item reveal" open>
+                <summary>Is SnapShot-Pro free?</summary>
+                <div class="a">Yes. The whole studio is free and open source. There is no trial clock, no per-seat pricing, and no watermark you did not ask for. Optional cloud AI either runs through a hosted backend or uses your own API key.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Do I need an account?</summary>
+                <div class="a">No. The editor opens straight into the studio with nothing to sign up for. An optional account exists only to sync your saved projects across devices.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Does my screenshot stay private?</summary>
+                <div class="a">Yes. Editing runs in your browser on your machine. Your image is never uploaded unless you choose a cloud feature such as cloud AI or sharing, and each of those is an explicit action. Read the full <a href="/privacy/">privacy page</a> for the details.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>What can I export?</summary>
+                <div class="a">PNG, JPEG, and WebP for stills, GIF and MP4 for motion, multi-page PDF for decks, and ZIP for batches and App Store screenshot sets. Every visual effect bakes into the export, so what you see is what you download.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Do I need an API key for the AI features?</summary>
+                <div class="a">Not always. With a hosted backend configured, AI features work for everyone. You can also bring your own OpenAI or Anthropic key, which is stored only in your browser and used to call the provider directly. Background removal and OCR run locally with no key at all.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Does it work offline?</summary>
+                <div class="a">Yes. SnapShot-Pro is an installable progressive web app. After the first load it works offline, and only cloud features such as AI generation or sharing need a connection.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Can I use it for commercial work?</summary>
+                <div class="a">Yes. You can use SnapShot-Pro for client work, products, and marketing, and you own what you create. Anything produced with an AI provider is also subject to that provider's terms.</div>
+            </details>
+            <details class="faq-item reveal">
+                <summary>Is it really open source?</summary>
+                <div class="a">Yes. The source is public on <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a>, so you can read exactly how it works, file an issue, or fork it for your team.</div>
+            </details>
+        </div>
+
+        <div class="faq-note reveal">
+            <p>Still stuck or have an idea? Open an issue on <a href="https://github.com/I-794/SnapShotPro" target="_blank" rel="noopener">GitHub</a> and we will take a look.</p>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Ready when you are.</h2>
+            <p>No sign-up. The studio opens in your browser.</p>
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>

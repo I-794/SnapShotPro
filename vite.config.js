@@ -64,7 +64,17 @@ export default defineConfig({
         pricing: resolve(__dirname, 'pricing/index.html'),
         agent: resolve(__dirname, 'agent/index.html'),
         about: resolve(__dirname, 'about/index.html'),
-        ai: resolve(__dirname, 'ai/index.html')
+        ai: resolve(__dirname, 'ai/index.html'),
+        tools: resolve(__dirname, 'tools/index.html'),
+        deviceMockupGenerator: resolve(__dirname, 'device-mockup-generator/index.html'),
+        ogImageGenerator: resolve(__dirname, 'og-image-generator/index.html'),
+        dropShadowGenerator: resolve(__dirname, 'drop-shadow-generator/index.html'),
+        socialMediaMockups: resolve(__dirname, 'social-media-mockups/index.html'),
+        githubReadmeScreenshots: resolve(__dirname, 'github-readme-screenshots/index.html'),
+        alternatives: resolve(__dirname, 'alternatives/index.html'),
+        faq: resolve(__dirname, 'faq/index.html'),
+        roadmap: resolve(__dirname, 'roadmap/index.html'),
+        terms: resolve(__dirname, 'terms/index.html')
       },
       output: {
         manualChunks: {
