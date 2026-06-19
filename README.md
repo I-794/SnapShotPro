@@ -84,4 +84,4 @@ Found a bug or have an idea? [Open an issue](https://github.com/I-794/SnapShotPr
 
 ## License
 
-[MIT](LICENSE) © Charlie Plichterman
+[MIT](LICENSE) © Charlie L.
