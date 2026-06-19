@@ -1338,7 +1338,12 @@ kbd {
 .sheet-handle { display: none; }
 
 @media (max-width: 767px) {
-    :root { --dock-h: 58px; }
+    /* Real dock height = 4px top pad + 48px button + 4px bottom pad + the home
+       indicator inset (the dock adds the inset to its own padding below). The
+       sheet bottom/height and canvas max-height all key off this, so it MUST
+       include the inset or the sheet/canvas get clipped behind the dock on
+       notched iPhones / installed PWAs. */
+    :root { --dock-h: calc(56px + env(safe-area-inset-bottom)); }
 
     /* Bottom tab dock — same 8 groups as the desktop rail, thumb-reachable. */
     .mobile-dock {
@@ -1390,7 +1395,8 @@ kbd {
 
     /* Canvas claims the space above the peeked sheet + dock. dvh avoids the iOS
        URL-bar collapse clipping the canvas (the old 100vh math did). */
-    .main-content { padding-bottom: calc(var(--dock-h) + 64px + env(safe-area-inset-bottom)); }
+    /* --dock-h already includes the safe-area inset, so don't add it again. */
+    .main-content { padding-bottom: calc(var(--dock-h) + 64px); }
     #preview-canvas { max-height: calc(100dvh - 52px - var(--dock-h) - 72px); }
 }
 
