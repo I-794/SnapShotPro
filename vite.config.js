@@ -65,6 +65,7 @@ export default defineConfig({
         agent: resolve(__dirname, 'agent/index.html'),
         about: resolve(__dirname, 'about/index.html'),
         ai: resolve(__dirname, 'ai/index.html'),
+        tools: resolve(__dirname, 'tools/index.html'),
         deviceMockupGenerator: resolve(__dirname, 'device-mockup-generator/index.html'),
         ogImageGenerator: resolve(__dirname, 'og-image-generator/index.html'),
         dropShadowGenerator: resolve(__dirname, 'drop-shadow-generator/index.html'),
