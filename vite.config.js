@@ -45,6 +45,64 @@ function ogBase() {
   };
 }
 
+// Resolve the absolute site URL the same way ogBase() does (Vercel env, or
+// OG_BASE_URL locally), so generated SEO files match the og: tags.
+function siteBase() {
+  const raw =
+    process.env.OG_BASE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
+    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+    '';
+  return raw.replace(/\/+$/, '');
+}
+
+// Emit sitemap.xml + robots.txt at build so Google can discover every page,
+// including the SEO/tool pages. Routes are listed here; keep in sync when adding
+// a public marketing page. Absolute URLs use the resolved deploy base.
+function seoFiles() {
+  // [path, priority, changefreq]
+  const routes = [
+    ['/', '1.0', 'weekly'],
+    ['/editor/', '0.9', 'weekly'],
+    ['/features/', '0.8', 'monthly'],
+    ['/tools/', '0.8', 'monthly'],
+    ['/ai/', '0.8', 'monthly'],
+    ['/agent/', '0.7', 'monthly'],
+    ['/gallery/', '0.7', 'weekly'],
+    ['/use-cases/', '0.7', 'monthly'],
+    ['/pricing/', '0.7', 'monthly'],
+    ['/guide/', '0.7', 'monthly'],
+    ['/changelog/', '0.6', 'weekly'],
+    ['/about/', '0.5', 'yearly'],
+    ['/app-store-screenshots/', '0.8', 'monthly'],
+    ['/device-mockup-generator/', '0.8', 'monthly'],
+    ['/og-image-generator/', '0.8', 'monthly'],
+    ['/drop-shadow-generator/', '0.8', 'monthly'],
+    ['/social-media-mockups/', '0.8', 'monthly'],
+    ['/github-readme-screenshots/', '0.8', 'monthly'],
+    ['/alternatives/', '0.7', 'monthly'],
+    ['/faq/', '0.6', 'monthly'],
+    ['/roadmap/', '0.5', 'monthly'],
+    ['/privacy/', '0.3', 'yearly'],
+    ['/terms/', '0.3', 'yearly'],
+  ];
+  return {
+    name: 'seo-files',
+    generateBundle() {
+      const base = siteBase();
+      const lastmod = new Date().toISOString().slice(0, 10);
+      const urls = routes
+        .map(([loc, priority, changefreq]) =>
+          `  <url>\n    <loc>${base}${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`)
+        .join('\n');
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+      this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemap });
+      const robots = `User-agent: *\nAllow: /\n${base ? `\nSitemap: ${base}/sitemap.xml\n` : ''}`;
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robots });
+    }
+  };
+}
+
 export default defineConfig({
   root: '.',
   build: {
@@ -93,6 +151,7 @@ export default defineConfig({
   plugins: [
     htmlPartials(),
     ogBase(),
+    seoFiles(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
