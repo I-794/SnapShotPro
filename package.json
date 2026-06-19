@@ -3,6 +3,9 @@
   "private": true,
   "version": "23.0.0",
   "type": "module",
+  "license": "MIT",
+  "homepage": "https://snapshotpro.xyz",
+  "repository": { "type": "git", "url": "https://github.com/I-794/SnapShotPro.git" },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
