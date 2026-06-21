@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '24.0';
+const CURRENT_VERSION = '25.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "</> Code Snippet Studio",
+  heading: "🎬 Interactive Tours",
   items: [
-    { title: 'Turn code into a beautiful screenshot',
-      desc: 'Paste a snippet and SnapShot-Pro renders it as a crisp, syntax-highlighted image — 13 languages with auto-detect, line numbers, and a macOS or Windows window. No more flat, ugly code grabs.' },
-    { title: 'Eight editor themes',
-      desc: 'Snazzy, Dracula, Nord, One Dark, Monokai, GitHub (dark & light) and Solarized — pick the look, tune the font, size, padding and tab width.' },
-    { title: 'Drops into the whole studio',
-      desc: 'A code card is just an image here: frame it, add a gradient or mesh background, drop a shadow, redact a secret line, then export a pixel-perfect PNG.' }
+    { title: 'Turn your pages into a clickable demo',
+      desc: 'Flip on Tour mode and every page becomes a step. Drag hotspots onto the canvas, add a callout, and you have a guided, click-through product walkthrough — not just a flat screenshot.' },
+    { title: 'Export one self-contained HTML file',
+      desc: 'Your whole tour ships as a single .html with the frames inlined and a tiny built-in player. It works offline, opens anywhere, and embeds as an <iframe> — no account, no server.' },
+    { title: 'Hotspots, callouts & auto-advance',
+      desc: 'Pin a callout to any side of a hotspot, set a step to auto-advance, and preview the real player inside the editor before you export.' }
   ]
 };
 

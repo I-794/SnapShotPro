@@ -65,7 +65,9 @@ function snapshot() {
     // v24 — Code Snippet Studio settings are undoable. The raster (state.image)
     // is rebuilt from these by code-snippet.js's onHistoryChange listener, since
     // images are never snapshotted (same as the SVG/photo source).
-    codeSnippet: state.codeSnippet
+    codeSnippet: state.codeSnippet,
+    // v25 — Interactive Tour hotspots/callouts for the active step are undoable.
+    tour: state.tour
   }));
 }
 

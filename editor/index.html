@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v24.0 · Pro Editor</title>
+    <title>SnapShotPro v24.0 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShot-Pro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v23.0</span></span>
+                <span>SnapShotPro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v23.0</span></span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
@@ -871,6 +871,45 @@
             </div>
         </div>
 
+        <div class="sidebar-section" data-group="export" id="tour-section">
+            <h3 class="section-title">🎬 Interactive Tour</h3>
+            <p class="info-text" style="margin-bottom:8px;">Turn your pages into a clickable, embeddable product demo. Each page is a step — drop hotspots on the canvas, add callouts, and export a self-contained HTML file that works offline.</p>
+            <button class="btn btn-primary" style="width:100%;" id="tour-toggle-btn">▶ Enter Tour mode</button>
+            <div id="tour-editor" style="display:none;">
+                <div class="divider"></div>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button class="btn btn-secondary" style="flex:1;" id="tour-add-step">＋ Add step</button>
+                    <button class="btn btn-secondary" style="flex:1;" id="tour-dup-step">⧉ Duplicate</button>
+                </div>
+                <p class="info-text" style="margin-bottom:8px;">Switch steps from the filmstrip under the canvas. Drag on the canvas to draw a hotspot.</p>
+                <label class="control-label">Hotspots on this step</label>
+                <div id="tour-hotspot-list"></div>
+                <button class="btn btn-secondary" style="width:100%;margin-top:6px;" id="tour-add-hotspot">＋ Add hotspot</button>
+                <div id="tour-hotspot-editor" style="display:none;">
+                    <div class="divider"></div>
+                    <label class="control-label">Callout title</label>
+                    <input type="text" class="control-input" id="tour-callout-title" placeholder="e.g. Tap to search">
+                    <label class="control-label" style="margin-top:8px;">Callout text</label>
+                    <textarea class="control-input" id="tour-callout-body" rows="2" placeholder="Short explanation shown to the viewer…"></textarea>
+                    <label class="control-label" style="margin-top:8px;">Callout position</label>
+                    <select class="control-input" id="tour-callout-side">
+                        <option value="bottom">Below the hotspot</option>
+                        <option value="top">Above the hotspot</option>
+                        <option value="left">Left of the hotspot</option>
+                        <option value="right">Right of the hotspot</option>
+                    </select>
+                </div>
+                <div class="divider"></div>
+                <label class="control-label">Auto-advance this step</label>
+                <div class="range-group"><input type="range" class="range-input" id="tour-auto" min="0" max="10000" step="500" value="0"><span class="range-value" id="tour-auto-value">Off</span></div>
+                <div class="divider"></div>
+                <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="tour-preview-btn">▶ Preview tour</button>
+                <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="tour-export-btn">⬇ Export tour (HTML)</button>
+                <button class="btn btn-secondary" style="width:100%;" id="tour-embed-btn">&lt;/&gt; Copy embed code</button>
+                <p class="info-text" id="tour-status" style="min-height:14px;margin-top:6px;"></p>
+            </div>
+        </div>
+
         <div class="sidebar-section" data-group="export">
             <h3 class="section-title">Export Settings</h3>
             <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="gif">GIF (Animated)</option></select></div>
@@ -1107,7 +1146,7 @@
 <div class="auth-modal-overlay" id="auth-modal">
     <div class="auth-modal">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>Sign in to SnapShot-Pro</h3>
+            <h3>Sign in to SnapShotPro</h3>
             <button class="btn btn-secondary" id="auth-modal-close" style="padding:4px 10px;">✕</button>
         </div>
         <p class="info-text" style="margin:8px 0 12px;">Optional. Sync your templates, custom fonts, and projects across devices.</p>

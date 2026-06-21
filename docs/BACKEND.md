@@ -1,6 +1,6 @@
-# SnapShot-Pro Backend
+# SnapShotPro Backend
 
-SnapShot-Pro uses Vercel serverless functions in `api/`. There is no separate
+SnapShotPro uses Vercel serverless functions in `api/`. There is no separate
 server process to host: when the site is deployed, the API routes deploy beside
 the Vite frontend.
 

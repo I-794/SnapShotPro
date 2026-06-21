@@ -68,8 +68,22 @@ export const PROJECT_FIELDS = [
   'annotationFill', 'polygonSides', 'starPoints',
   // v24 — Code Snippet Studio settings. The baked image travels in the envelope
   // too (getImageDataURL); on load, applyPayload re-rasterizes for crispness.
-  'codeSnippet'
+  'codeSnippet',
+  // v25 — Interactive Tour. Per-step hotspots/callouts ride the page payload, so
+  // a tour's steps persist with the project (each page is a tour step).
+  'tour'
 ];
+
+// v25 — guarantee every applied design carries a `tour` block. Because
+// applyDesignToState() does Object.assign(state, design), a page payload that
+// predates Tours (or simply has none) must explicitly reset state.tour, or the
+// previous step's hotspots would bleed onto it. Mutates + returns the design.
+export function ensureTourDefaults(design) {
+  if (design && !design.tour) {
+    design.tour = { hotspots: [], autoAdvanceMs: 0 };
+  }
+  return design;
+}
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the
 // project. Capped at 2000px on the long edge + JPEG to keep localStorage/jsonb
@@ -111,11 +125,11 @@ export function normalizeProject(payload) {
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload.design)),
+      design: ensureTourDefaults(sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload.design))),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload)), image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: ensureTourDefaults(sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload))), image: null, svgCode: payload.svgCode || null };
 }

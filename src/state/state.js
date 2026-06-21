@@ -145,7 +145,10 @@ export const state = {
 
   // v9 — App Store screenshot sets + batch.
   // mode: 'single' (normal editor) | 'set' (one design → N captioned store
-  // panels) | 'batch' (one template → N uploaded images → ZIP).
+  // panels) | 'batch' (one template → N uploaded images → ZIP) | 'tour' (v25 —
+  // Interactive Tour authoring: the page sequence becomes clickable steps and a
+  // hotspot-authoring overlay appears on the canvas). 'tour' is a transient UI
+  // mode, not serialized; the per-step hotspots live in `tour` below.
   mode: 'single',
   screenshotSet: {
     preset: 'ios-6.7',
@@ -189,7 +192,18 @@ export const state = {
   // colorMap: palette-driven per-pixel grade applied by render/color-grade.js.
   // mode 'off' is a no-op passthrough (the common case). intensity blends the
   // graded result with the original; steps controls recolor posterization.
-  colorMap: { mode: 'off', intensity: 100, steps: 6 }
+  colorMap: { mode: 'off', intensity: 100, steps: 6 },
+
+  // v25 — Interactive Tour. Per-step hotspots/callouts for the *active* step
+  // (each page carries its own `tour`; this mirrors the active page, same as how
+  // the rest of `state` mirrors the active page's design). Authored as overlay
+  // chrome (NOT baked into renderInto) and exported into a self-contained player.
+  //   hotspots: [{ id, x, y, w, h, label, callout: { title, body, side }, action }]
+  //   x/y/w/h are normalized 0..1 over the rendered frame (survive any export size).
+  //   side: 'top'|'bottom'|'left'|'right' — which edge the callout pins to.
+  //   action: 'next' (MVP) — schema reserves room for { goto: stepIndex } branching.
+  //   autoAdvanceMs: 0 = manual advance; > 0 = auto-advance after that many ms.
+  tour: { hotspots: [], autoAdvanceMs: 0 }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).

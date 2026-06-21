@@ -4,7 +4,7 @@
 **Date:** 2026-06-15
 **Target version:** 20.0.0 (current: 19.0.0)
 
-> The flagship — the biggest release in SnapShot-Pro history. The conversational
+> The flagship — the biggest release in SnapShotPro history. The conversational
 > co-designer that orchestrates the v18 compose engine and v19 asset generation
 > as tools, with multi-turn refinement and memory. All prompt-driven *composing*
 > and refinement lives here (deliberately deferred from v18/v19 to make v20 the

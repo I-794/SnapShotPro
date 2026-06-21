@@ -5,7 +5,7 @@
 **Companion to:** `2026-06-15-v20-ai-design-agent-design.md` (the feature)
 
 > A dedicated marketing/launch page that presents v20 — the AI Design Agent — as
-> the biggest release in SnapShot-Pro history. Built with the
+> the biggest release in SnapShotPro history. Built with the
 > `design-taste-frontend` skill. Separate sub-project from the agent feature: its
 > own spec → plan → build, shipped alongside v20.
 

@@ -21,6 +21,9 @@ import { replaceBackground, extendCanvas, openEraser } from './ai-image-edit.js'
 import { togglePlay } from './video.js';
 import { focusUrlLoad } from './url-load.js';
 import { openCodeStudio } from './code-snippet.js';
+import { toggleTourMode } from './tours.js';
+import { previewTour, exportTour } from './tour-export.js';
+import { addPage } from './pages.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
@@ -52,7 +55,7 @@ function groupFor(id) {
       id === 'screen-record' || id === 'auto-zoom-toggle') return 'Motion';
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
-      id === 'code-studio') return 'File';
+      id.startsWith('tour-') || id === 'code-studio') return 'File';
   if (id === 'undo' || id === 'redo') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
@@ -124,6 +127,10 @@ export function registerCommands() {
     { id: 'mode-batch',       label: 'Mode: Batch',          icon: '🗂', run: () => setMode('batch') },
     { id: 'export-set',       label: 'Export App Store set (ZIP)', icon: '📦', run: exportSet },
     { id: 'export-batch',     label: 'Batch export (ZIP)',   icon: '📦', run: exportBatch },
+    { id: 'tour-toggle',      label: 'Interactive Tour: Toggle mode', icon: '🎬', run: toggleTourMode, when: () => !!state.image },
+    { id: 'tour-add-step',    label: 'Interactive Tour: Add step', icon: '＋', run: () => addPage(), when: () => state.mode === 'tour' },
+    { id: 'tour-preview',     label: 'Interactive Tour: Preview', icon: '▶', run: previewTour, when: () => !!state.image },
+    { id: 'tour-export',      label: 'Interactive Tour: Export (HTML)', icon: '⬇', run: exportTour, when: () => !!state.image },
     { id: 'ai-art-director',  label: 'AI: Art Director (full design)', icon: '🎬', run: () => document.getElementById('art-director-btn')?.click() },
     { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
     { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },

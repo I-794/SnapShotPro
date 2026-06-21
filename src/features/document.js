@@ -54,6 +54,9 @@ export function applyPayload(payload) {
     // v24 — if this design is a code snippet, re-rasterize crisply from its
     // settings (the baked JPEG in the envelope is only a fallback).
     if (typeof window.__reapplyCodeSnippet === 'function') window.__reapplyCodeSnippet();
+    // v25 — once state.tour reflects the applied step, refresh the Tour overlay +
+    // sidebar (this .then runs AFTER Object.assign, unlike pages.js emitChange()).
+    if (typeof window.__refreshTourUi === 'function') window.__refreshTourUi();
   });
 }
 

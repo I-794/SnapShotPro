@@ -40,6 +40,9 @@ let savedCanvas = null;
 
 export function setMode(mode) {
   const prev = state.mode;
+  // v25 — leaving an active Tour for Set/Batch must tear down the hotspot overlay
+  // (it covers the whole canvas), or it would strand and intercept every click.
+  if (prev === 'tour' && mode !== 'tour' && typeof window.__exitTourMode === 'function') window.__exitTourMode();
   if (mode === 'set' && prev !== 'set') savedCanvas = { ...state.canvas };
   state.mode = mode;
   document.querySelectorAll('[data-app-mode]').forEach((b) =>

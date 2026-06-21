@@ -39,11 +39,11 @@ Boilerplate (head/open/close — matches `changelog/index.html`):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="Meet the SnapShot-Pro AI Design Agent: describe what you want and it designs it, generates backgrounds, sees the canvas, and remembers your style. The biggest update yet.">
-    <title>The AI Design Agent · SnapShot-Pro</title>
+    <meta name="description" content="Meet the SnapShotPro AI Design Agent: describe what you want and it designs it, generates backgrounds, sees the canvas, and remembers your style. The biggest update yet.">
+    <title>The AI Design Agent · SnapShotPro</title>
     <meta property="og:type" content="website">
-    <meta property="og:title" content="SnapShot-Pro · The AI Design Agent">
-    <meta property="og:description" content="Describe it. The agent designs it. The biggest SnapShot-Pro update yet.">
+    <meta property="og:title" content="SnapShotPro · The AI Design Agent">
+    <meta property="og:description" content="Describe it. The agent designs it. The biggest SnapShotPro update yet.">
     <meta property="og:image" content="__OG_BASE__/og.png">
     <meta name="theme-color" content="#0b0d14">
     <link rel="preconnect" href="https://fonts.googleapis.com">

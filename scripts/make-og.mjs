@@ -43,7 +43,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
       <circle cx="32" cy="36" r="5" fill="#fff"/>
       <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
     </g>
-    <text x="54" y="30" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#15161a">SnapShot-Pro</text>
+    <text x="54" y="30" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#15161a">SnapShotPro</text>
   </g>
 
   <!-- eyebrow -->

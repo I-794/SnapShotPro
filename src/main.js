@@ -1,4 +1,4 @@
-// SnapShot-Pro v7 — app entry.
+// SnapShotPro v7 — app entry.
 // Initialize DOM refs, bind every module, then render.
 
 import { inject } from '@vercel/analytics';
@@ -46,6 +46,7 @@ import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
 import { bindPages } from './features/pages.js';
+import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
 import { bindCrop } from './features/crop.js';
 import { bindResetButton } from './features/reset.js';
@@ -132,6 +133,7 @@ function init() {
   bindAuth();
   bindCloudSync();
   bindPages();
+  bindTours();
   bindProjects();
   bindGallery();
   bindCrop();
@@ -165,7 +167,7 @@ function init() {
   applyTransform();
   setTool('select');
 
-  showNotification('SnapShot-Pro loaded. Drag, paste, or upload an image to begin.', 'success');
+  showNotification('SnapShotPro loaded. Drag, paste, or upload an image to begin.', 'success');
 }
 
 if (document.readyState === 'loading') {

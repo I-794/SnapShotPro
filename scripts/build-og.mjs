@@ -67,7 +67,7 @@ const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http
     <path d="${rr(64, 54, 46, 46, 13)}" fill="url(#mark)"/>
     <circle cx="87" cy="77" r="13" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-opacity="0.95"/>
     <circle cx="87" cy="77" r="4.4" fill="#ffffff"/>
-    <text x="124" y="86" font-family="Geist" font-weight="600" font-size="27" fill="#eef1f8">SnapShot-Pro</text>
+    <text x="124" y="86" font-family="Geist" font-weight="600" font-size="27" fill="#eef1f8">SnapShotPro</text>
   </g>
 
   <!-- eyebrow pill -->

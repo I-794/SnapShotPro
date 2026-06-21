@@ -1,4 +1,4 @@
-# SnapShot-Pro v9 — Plan
+# SnapShotPro v9 — Plan
 
 **Status:** proposal / spec — no code written yet
 **Author:** drafted 2026-05-31

@@ -1,8 +1,8 @@
 <p align="center">
-  <a href="https://snapshotpro.xyz"><img src="public/og.png" alt="SnapShot-Pro" width="720"></a>
+  <a href="https://snapshotpro.xyz"><img src="public/og.png" alt="SnapShotPro" width="720"></a>
 </p>
 
-<h1 align="center">SnapShot-Pro</h1>
+<h1 align="center">SnapShotPro</h1>
 
 <p align="center">
   The browser screenshot studio. Turn a raw screen grab into a polished, on-brand shot in seconds.
@@ -30,7 +30,7 @@
 
 ## What it is
 
-SnapShot-Pro is a full screenshot and mockup studio that runs entirely in your browser.
+SnapShotPro is a full screenshot and mockup studio that runs entirely in your browser.
 Drop in a screen, and it is already framed and padded. From there you can add device
 mockups, backgrounds, annotations, color grading, motion, and AI, then export anywhere it
 needs to go. Everything renders locally on your machine and bakes into the export, so what

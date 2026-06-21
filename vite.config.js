@@ -27,33 +27,28 @@ function htmlPartials() {
   };
 }
 
+// Canonical production site URL. og:image, og:url, canonical links, and the
+// generated SEO files should always point at the custom domain — not the ugly
+// per-deployment *.vercel.app URL — so social embeds and search engines resolve
+// to snapshotpro.xyz. Override with OG_BASE_URL for a one-off build (e.g. a
+// staging domain).
+const SITE_URL = (process.env.OG_BASE_URL || 'https://snapshotpro.xyz').replace(/\/+$/, '');
+
 // Replaces __OG_BASE__ in HTML with the absolute site URL so social embeds
-// (Discord, X, Slack) resolve og:image/og:url. On Vercel this comes from the
-// build environment automatically; override locally with OG_BASE_URL.
+// (Discord, X, Slack) resolve og:image/og:url to the canonical domain.
 function ogBase() {
-  const raw =
-    process.env.OG_BASE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
-    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
-    '';
-  const base = raw.replace(/\/+$/, '');
   return {
     name: 'og-base',
     transformIndexHtml(html) {
-      return html.split('__OG_BASE__').join(base);
+      return html.split('__OG_BASE__').join(SITE_URL);
     }
   };
 }
 
-// Resolve the absolute site URL the same way ogBase() does (Vercel env, or
-// OG_BASE_URL locally), so generated SEO files match the og: tags.
+// Resolve the absolute site URL the same way ogBase() does, so generated SEO
+// files (sitemap/robots) match the og: tags.
 function siteBase() {
-  const raw =
-    process.env.OG_BASE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
-    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
-    '';
-  return raw.replace(/\/+$/, '');
+  return SITE_URL;
 }
 
 // Emit sitemap.xml + robots.txt at build so Google can discover every page,
@@ -160,8 +155,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'SnapShot-Pro',
-        short_name: 'SnapShot-Pro',
+        name: 'SnapShotPro',
+        short_name: 'SnapShotPro',
         description: 'Pro screenshot & image editor — filters, frames, AI background removal, annotations, mockups, and more.',
         theme_color: '#1a1a2e',
         background_color: '#1a1a2e',

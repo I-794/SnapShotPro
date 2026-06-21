@@ -31,6 +31,9 @@ export function applyTransform() {
     : '';
   w.style.transform = base + tilt;
   if (el.zoomLabel) el.zoomLabel.textContent = Math.round(state.view.zoom * 100) + '%';
+  // v25 — keep the Tour hotspot overlay glued to the canvas through zoom/pan/tilt
+  // (it positions via getBoundingClientRect, so it must re-sync on any transform).
+  if (typeof window.__syncTourOverlay === 'function') window.__syncTourOverlay();
 }
 
 export function setZoom(z, anchorXFrac, anchorYFrac) {

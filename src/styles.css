@@ -906,6 +906,58 @@ kbd {
     padding: 4px 8px; font-size: 11px; font-family: var(--font-sans);
 }
 
+/* ─── v25 Interactive Tour: hotspot authoring overlay ─── */
+.tour-overlay { position: absolute; inset: 0; z-index: 50; cursor: crosshair; pointer-events: auto; touch-action: none; }
+.tour-hotspot {
+    position: absolute; pointer-events: auto; cursor: move; box-sizing: border-box;
+    border: 2px solid var(--accent-primary); border-radius: 8px;
+    background: color-mix(in srgb, var(--accent-primary) 16%, transparent);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.4), 0 6px 18px rgba(0,0,0,0.25);
+    animation: tour-hotspot-pulse 2s ease-in-out infinite;
+}
+.tour-hotspot.selected { border-style: solid; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent-primary); animation: none; }
+@keyframes tour-hotspot-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.4), 0 0 0 0 color-mix(in srgb, var(--accent-primary) 55%, transparent); }
+    50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.4), 0 0 0 8px color-mix(in srgb, var(--accent-primary) 0%, transparent); }
+}
+.tour-hotspot-num {
+    position: absolute; top: -10px; left: -10px; min-width: 20px; height: 20px; padding: 0 5px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-primary); color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 10px; border: 2px solid #fff; pointer-events: none;
+}
+.tour-hotspot-del {
+    position: absolute; top: -10px; right: -10px; width: 20px; height: 20px; padding: 0;
+    display: none; align-items: center; justify-content: center; cursor: pointer;
+    background: #e5484d; color: #fff; font-size: 11px; line-height: 1; border: 2px solid #fff; border-radius: 50%;
+}
+.tour-hotspot.selected .tour-hotspot-del { display: flex; }
+.tour-handle {
+    position: absolute; width: 11px; height: 11px; display: none;
+    background: #fff; border: 2px solid var(--accent-primary); border-radius: 2px; pointer-events: auto;
+}
+.tour-hotspot.selected .tour-handle { display: block; }
+.tour-handle.nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.tour-handle.ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.tour-handle.sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.tour-handle.se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
+/* Tour sidebar: hotspot list rows + active-mode accent on the section */
+.sidebar-section.tour-active { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-primary) 45%, transparent); border-radius: var(--radius-md); }
+.tour-hs-row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 9px; margin-bottom: 5px; cursor: pointer;
+    background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+}
+.tour-hs-row:hover { border-color: var(--accent-primary); }
+.tour-hs-row.active { border-color: var(--accent-primary); background: color-mix(in srgb, var(--accent-primary) 12%, var(--bg-tertiary)); }
+.tour-hs-row-num {
+    flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+    background: var(--accent-primary); color: #fff; font-size: 11px; font-weight: 700; border-radius: 50%;
+}
+.tour-hs-row-label { flex: 1; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tour-hs-row-del { flex-shrink: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; }
+.tour-hs-row-del:hover { background: rgba(229,72,77,0.15); color: #e5484d; }
+
 /* ─── AI Panel & Auth ─── */
 .ai-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 8px 0; }
 .ai-action-grid .btn { padding: 7px 5px; font-size: 11px; }
@@ -1175,6 +1227,16 @@ kbd {
     background: var(--bg-tertiary); border: 1px solid var(--border-color);
     border-radius: 4px; padding: 1px 5px; color: var(--text-secondary);
 }
+
+/* ─── v25 Interactive Tour: in-app preview overlay (holds the shipped player) ─── */
+.tour-preview-overlay { position: fixed; inset: 0; z-index: 3200; display: flex; background: rgba(6,6,12,0.92); backdrop-filter: blur(4px); }
+.tour-preview-frame { flex: 1; width: 100%; height: 100%; border: 0; }
+.tour-preview-close {
+    position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); color: #fff;
+    font-size: 18px; line-height: 1; cursor: pointer; z-index: 1;
+}
+.tour-preview-close:hover { background: rgba(255,255,255,0.22); }
 
 .present-overlay {
     position: fixed; inset: 0; z-index: 3000; display: none;
