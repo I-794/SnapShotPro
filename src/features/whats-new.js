@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '25.0';
+const CURRENT_VERSION = '26.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🎬 Interactive Tours",
+  heading: "🧩 Browser extension",
   items: [
-    { title: 'Turn your pages into a clickable demo',
-      desc: 'Flip on Tour mode and every page becomes a step. Drag hotspots onto the canvas, add a callout, and you have a guided, click-through product walkthrough — not just a flat screenshot.' },
-    { title: 'Export one self-contained HTML file',
-      desc: 'Your whole tour ships as a single .html with the frames inlined and a tiny built-in player. It works offline, opens anywhere, and embeds as an <iframe> — no account, no server.' },
-    { title: 'Hotspots, callouts & auto-advance',
-      desc: 'Pin a callout to any side of a hotspot, set a step to auto-advance, and preview the real player inside the editor before you export.' }
+    { title: 'Capture any page in one click',
+      desc: 'The new SnapShotPro Capture extension for Chrome grabs the visible area, the full scrolling page, or a region you drag, and opens it right here in the studio.' },
+    { title: 'No upload, no account',
+      desc: 'The extension only reads a tab when you click it, hands the capture straight to the editor, and nothing leaves your machine until you choose a cloud feature.' },
+    { title: 'Get it from the Chrome Web Store',
+      desc: 'Add it to your toolbar and the studio is one click away from every webpage. See the new Extension page for the download.' }
   ]
 };
 

@@ -8,7 +8,7 @@
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, from the first editor to v25, Interactive Tours: turn your pages into a clickable, embeddable product demo and export it as one self-contained HTML file.">
+    <meta property="og:description" content="Every SnapShotPro release, from the first editor to v26, the browser extension: capture any webpage — visible, full-page, or a region — in one click and open it straight in the studio.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -464,6 +464,48 @@
         .tp-rail span { margin-left: 6px; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.66); }
         @media (prefers-reduced-motion: reduce) { .tp-hot { animation: none; } }
 
+        /* v26 — Browser extension spotlight. Its own motif: a browser window with
+           a pulsing region-marquee capture and a small extension popup floating
+           at the corner. Distinct from every prior release (glass, spectrum,
+           variant grid, prompt->image, code window, 3D, command palette, mobile
+           sheet, tour player). Cobalt is the only saturated colour. */
+        .spotlight-ext {
+            background:
+                radial-gradient(70% 92% at 6% 2%, #1d3aa8 0%, transparent 52%),
+                radial-gradient(58% 96% at 96% 14%, #243a8f 0%, transparent 50%),
+                #06080f;
+        }
+        .spotlight-ext::after { display: none; }
+        .spotlight-ext .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-ext .spot-feat-ico { background: linear-gradient(135deg, rgba(79,124,255,0.34), rgba(91,130,255,0.24)); }
+        .spotlight-ext .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-ext .btn-primary:hover { background: #f0f0ee; }
+        /* the captured browser, depicted: a window with a region marquee mid-grab
+           and the extension popup at the corner. Abstract shapes, not a fake UI. */
+        .ec-stage { width: 100%; display: flex; align-items: center; justify-content: center; }
+        .ec-win { position: relative; width: min(96%, 400px); border-radius: 13px; overflow: visible; transform: rotate(-1.2deg); }
+        .ec-frame { border-radius: 13px; overflow: hidden; box-shadow: 0 38px 72px -26px rgba(0,0,0,0.72); background: #0e1120; border: 1px solid rgba(255,255,255,0.08); }
+        .ec-bar { height: 30px; background: #151a2b; display: flex; align-items: center; gap: 6px; padding: 0 11px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .ec-bar i { width: 8px; height: 8px; border-radius: 50%; }
+        .ec-bar i:nth-child(1){ background:#ff5f57; } .ec-bar i:nth-child(2){ background:#febc2e; } .ec-bar i:nth-child(3){ background:#28c840; }
+        .ec-bar .u { margin-left: 7px; height: 16px; flex: 1; border-radius: 5px; background: #0b0e1a; }
+        .ec-shot { aspect-ratio: 16 / 10; background: radial-gradient(70% 80% at 22% 18%, #3a4ea8, transparent 60%), radial-gradient(70% 80% at 86% 92%, #5b3ea8, transparent 60%), linear-gradient(150deg, #131a3e, #1d1647); }
+        .ec-marquee { position: absolute; left: 14%; top: 34%; width: 50%; height: 42%; border: 2px solid #5b82ff; border-radius: 4px; background: rgba(91,130,255,0.10); animation: ec-pulse 1.9s ease-in-out infinite; }
+        .ec-marquee b { position: absolute; top: -22px; left: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: #fff; background: #5b82ff; padding: 2px 7px; border-radius: 5px; }
+        .ec-marquee s { position: absolute; width: 8px; height: 8px; background: #fff; border: 2px solid #5b82ff; border-radius: 2px; }
+        .ec-marquee s:nth-child(1){ top:-5px; left:-5px; } .ec-marquee s:nth-child(2){ top:-5px; right:-5px; }
+        .ec-marquee s:nth-child(3){ bottom:-5px; left:-5px; } .ec-marquee s:nth-child(4){ bottom:-5px; right:-5px; }
+        @keyframes ec-pulse {
+            0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.4), 0 0 0 0 rgba(91,130,255,0.5); }
+            50%     { box-shadow: 0 0 0 1px rgba(255,255,255,0.4), 0 0 0 12px rgba(91,130,255,0); }
+        }
+        .ec-pop { position: absolute; right: -10%; bottom: -12%; width: 150px; background: #0b0e1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; box-shadow: 0 24px 50px rgba(0,0,0,0.55); }
+        .ec-pop .h { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+        .ec-pop .h b { color: #fff; font-weight: 700; } .ec-pop .h .d { width: 6px; height: 6px; border-radius: 50%; background: #5b82ff; box-shadow: 0 0 0 3px rgba(91,130,255,0.25); }
+        .ec-pop .r { height: 24px; border-radius: 7px; background: #141a2b; border: 1px solid rgba(255,255,255,0.07); margin-bottom: 5px; }
+        .ec-pop .r.on { border-color: #5b82ff; background: #18203a; }
+        @media (prefers-reduced-motion: reduce) { .ec-marquee { animation: none; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -543,41 +585,45 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-tour reveal">
+        <div class="spotlight spotlight-ext reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v25 · June 2026</div>
-                <h2>Your screenshots, now clickable.</h2>
-                <p class="spot-lede">Interactive Tours turn your pages into a guided, click-through demo. Drop hotspots, write callouts, and export one self-contained HTML file that plays anywhere.</p>
+                <div class="spot-ver">v26 · June 2026</div>
+                <h2>Capture any page, edit it here.</h2>
+                <p class="spot-lede">The new SnapShotPro Capture extension for Chrome grabs the visible area, a full scrolling page, or a region you drag, and opens it straight in the studio.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.5 18 2.5-7.5L20.5 11 3 3z"/></svg></span>
-                        <div><strong>Hotspots and callouts</strong><span>Draw a hotspot on any step and pin a callout beside it. Viewers click it, or Next, to move through the flow.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/></svg></span>
+                        <div><strong>Visible, full page, or region</strong><span>Three captures from the toolbar. Full page scrolls and stitches into one tall image; region lets you drag an exact box.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg></span>
-                        <div><strong>One file, plays anywhere</strong><span>Export a self-contained HTML file with the frames baked in and a built-in player. It works offline and embeds as an iframe.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+                        <div><strong>Straight into the studio</strong><span>The capture lands on the canvas, ready to frame, mockup, annotate, and export. No upload step, no popup-sized editor.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></span>
-                        <div><strong>Built on your pages</strong><span>Every page becomes a step, so your backgrounds, frames, and effects come along. Preview the real player before you export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+                        <div><strong>It only captures on your click</strong><span>activeTab only, no background access, no tracking. The capture goes to the studio and nowhere else.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
-                    <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                    <a href="/editor/" class="btn btn-ghost btn-lg">Build a tour</a>
+                    <a href="/extension/" class="btn btn-primary btn-lg">Get the extension <span class="ar">→</span></a>
+                    <a href="/editor/" class="btn btn-ghost btn-lg">Open the studio</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="tp-stage" aria-hidden="true">
-                    <div class="tp-screen">
-                        <div class="tp-card"></div>
-                        <div class="tp-bar"></div>
-                        <div class="tp-hot"></div>
-                        <div class="tp-callout"><b>Tap to search</b><span>Find anything in one keystroke.</span></div>
+                <div class="ec-stage" aria-hidden="true">
+                    <div class="ec-win">
+                        <div class="ec-frame">
+                            <div class="ec-bar"><i></i><i></i><i></i><span class="u"></span></div>
+                            <div class="ec-shot"></div>
+                        </div>
+                        <div class="ec-marquee"><b>Region</b><s></s><s></s><s></s><s></s></div>
+                        <div class="ec-pop">
+                            <div class="h"><span class="d"></span><b>SnapShotPro</b> Capture</div>
+                            <div class="r"></div><div class="r"></div><div class="r on"></div>
+                        </div>
                     </div>
-                    <div class="tp-rail"><i></i><i class="on"></i><i></i><i></i><span>2 / 4</span></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -590,6 +636,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v26.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Browser extension</h2>
+                    <ul class="changes">
+                        <li><b>Capture any page in one click.</b> The new SnapShotPro Capture extension for Chrome grabs the visible viewport, the entire scrolling page (scrolled and stitched into one tall image, with sticky headers held in place), or a region you drag, and opens it straight in the studio.</li>
+                        <li><b>Straight into the full studio.</b> A capture hands off to snapshotpro.xyz and lands on the canvas, ready to frame, background, mockup, annotate, and export. No upload step and no cramped popup editor. It reuses the same load path as drag, paste, and upload.</li>
+                        <li><b>Private by design.</b> The extension reads a tab only when you click it (activeTab), with no background access, no tracking, and no analytics. The capture goes to the studio and nowhere else. Find it on the new Extension page and the Chrome Web Store.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v25.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Interactive Tours</h2>

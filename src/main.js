@@ -68,6 +68,7 @@ import { bindAllControls, updateUIFromState } from './ui/bindings.js';
 import { bindMobileStudio } from './ui/mobile-studio.js';
 import { bindStudioNav } from './features/studio-nav.js';
 import { bindShareTarget } from './features/share-target.js';
+import { bindExtReceiver } from './features/ext-receiver.js';
 import { bindWelcome } from './features/welcome.js';
 import { bindWhatsNew } from './features/whats-new.js';
 
@@ -100,6 +101,7 @@ function init() {
   bindHeader();
   bindUploadEvents();
   bindShareTarget();   // v23 — PWA share-target: load an image shared into the app
+  bindExtReceiver();   // v26 — receive a capture from the browser extension (?ext)
   bindUrlLoad();
   bindExtraImagesEvents();
   bindCanvasTools();

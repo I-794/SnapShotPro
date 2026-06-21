@@ -1,0 +1,35 @@
+:root {
+  --accent: #2348ff;
+  --bg: #0b0e1a;
+  --surface: #141a2b;
+  --line: rgba(255, 255, 255, 0.09);
+  --ink: #f3f4f8;
+  --ink-2: #9aa3bd;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; width: 280px; padding: 14px;
+  background: var(--bg); color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.head { margin-bottom: 12px; }
+.brand { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-2); }
+.brand strong { color: var(--ink); font-weight: 700; }
+.brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(35, 72, 255, 0.25); }
+
+.modes { display: flex; flex-direction: column; gap: 8px; }
+.mode {
+  display: grid; grid-template-columns: 22px 1fr; grid-template-rows: auto auto;
+  column-gap: 11px; align-items: center; text-align: left;
+  padding: 11px 12px; border-radius: 11px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+  transition: border-color .15s, transform .08s, background .15s;
+}
+.mode:hover { border-color: var(--accent); background: #18203a; }
+.mode:active { transform: translateY(1px); }
+.mode svg { grid-row: 1 / 3; width: 22px; height: 22px; color: var(--accent); }
+.mode .label { font-size: 13.5px; font-weight: 600; }
+.mode .sub { font-size: 11.5px; color: var(--ink-2); }
+
+.status { margin: 12px 2px 2px; font-size: 11.5px; color: var(--ink-2); min-height: 14px; }
+.status.busy { color: var(--ink); }

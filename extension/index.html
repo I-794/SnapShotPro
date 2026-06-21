@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="The SnapShotPro browser extension captures any webpage — visible area, full page, or a drag-selected region — and opens it straight in the studio to frame, annotate, and export. One click, no upload.">
+    <title>Browser Extension · SnapShotPro</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SnapShotPro Capture · Browser Extension">
+    <meta property="og:description" content="Capture any page — visible, full-page, or region — and edit it in the SnapShotPro studio. One click, nothing uploaded until you say so.">
+    <meta property="og:image" content="__OG_BASE__/og.png?v=2">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <style>
+        /* Extension landing. Design read: Chrome-extension page for people who
+           screenshot a lot (devs, PMs, designers), dark-tech language on the
+           shared /site.css system, vanilla CSS + restrained motion. Dials:
+           variance 7, motion 4, density 3. One accent (cobalt), one dark theme,
+           one eyebrow up top. The signature motif is a region-marquee capture
+           resolving into the studio. No em-dashes. */
+
+        /* ── Hero: copy left, a browser-capture mock right ── */
+        .ex-hero { display: grid; grid-template-columns: 1.02fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+        .ex-shot { position: relative; }
+        .ex-browser { border-radius: 14px; overflow: hidden; background: #0e1120; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 40px 80px -26px rgba(0,0,0,0.72); transform: rotate(-1.2deg); }
+        .ex-bar { height: 36px; background: #151a2b; display: flex; align-items: center; gap: 7px; padding: 0 13px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .ex-bar i { width: 10px; height: 10px; border-radius: 50%; }
+        .ex-bar i:nth-child(1){ background:#ff5f57; } .ex-bar i:nth-child(2){ background:#febc2e; } .ex-bar i:nth-child(3){ background:#28c840; }
+        .ex-bar .u { margin-left: 9px; height: 20px; flex: 1; border-radius: 6px; background: #0b0e1a; display: flex; align-items: center; padding: 0 10px; font-family: var(--font-mono); font-size: 10px; color: #6f7794; }
+        .ex-canvas { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; background: #0b0e1a; }
+        /* the region marquee, drawn over the shot = the product's signature move */
+        .ex-marquee { position: absolute; left: 16%; top: 34%; width: 52%; height: 44%; border: 2px solid var(--accent); border-radius: 4px; background: rgba(35,72,255,0.10); box-shadow: 0 0 0 9999px rgba(8,11,20,0.34); }
+        .ex-marquee span { position: absolute; width: 9px; height: 9px; background: #fff; border: 2px solid var(--accent); border-radius: 2px; }
+        .ex-marquee span:nth-child(1){ top:-5px; left:-5px; } .ex-marquee span:nth-child(2){ top:-5px; right:-5px; }
+        .ex-marquee span:nth-child(3){ bottom:-5px; left:-5px; } .ex-marquee span:nth-child(4){ bottom:-5px; right:-5px; }
+        .ex-marquee .dim { position:absolute; top:-26px; left:0; font-family: var(--font-mono); font-size: 11px; color:#fff; background:var(--accent); padding:2px 7px; border-radius:5px; }
+        /* the floating extension popup, depicted */
+        .ex-pop { position: absolute; right: -6%; bottom: -8%; width: 188px; background: #0b0e1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 13px; padding: 11px; box-shadow: 0 24px 50px rgba(0,0,0,0.55); }
+        .ex-pop .ph { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--ink-2); margin-bottom:9px; }
+        .ex-pop .ph b { color:#fff; font-weight:700; } .ex-pop .ph .d { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px rgba(35,72,255,0.25); }
+        .ex-pop .row { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:9px; background:#141a2b; border:1px solid rgba(255,255,255,0.07); margin-bottom:6px; font-size:11.5px; color:var(--ink); }
+        .ex-pop .row.on { border-color: var(--accent); background:#18203a; }
+        .ex-pop .row svg { width:15px; height:15px; color:var(--accent); }
+
+        /* ── Modes bento: 1 big + 2, never three equal cards ── */
+        .ex-modes { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: auto auto; gap: 16px; }
+        .ex-mode { border-radius: var(--r-card); padding: clamp(22px,2.6vw,30px); background: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); display:flex; flex-direction:column; gap:11px; }
+        .ex-mode.lead { grid-row: 1 / 3; justify-content:flex-end; background: radial-gradient(80% 70% at 18% 12%, rgba(35,72,255,0.16), transparent 60%), linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); }
+        .ex-mode .ico { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; background: var(--accent-soft); color:var(--accent); border:1px solid var(--accent-line); }
+        .ex-mode .ico svg { width:22px; height:22px; }
+        .ex-mode h3 { font-size: clamp(18px,2vw,22px); font-weight: 650; letter-spacing:-0.02em; color:var(--ink); }
+        .ex-mode p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+        .ex-mode.lead h3 { font-size: clamp(22px,2.6vw,28px); }
+
+        /* ── Flow strip: capture → studio (3 steps, not cards) ── */
+        .ex-flow { display:grid; grid-template-columns: repeat(3,1fr); gap: clamp(18px,3vw,34px); }
+        .ex-step { padding-top: 22px; border-top: 2px solid var(--accent); }
+        .ex-step .n { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+        .ex-step h3 { font-size: 18px; font-weight: 650; color: var(--ink); margin: 8px 0 7px; letter-spacing:-0.02em; }
+        .ex-step p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+
+        /* ── Trust row ── */
+        .ex-trust { display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; border-radius:20px; padding: clamp(24px,3.5vw,40px); background: var(--accent-soft); border:1px solid var(--accent-line); }
+        .ex-trust h2 { font-size: clamp(22px,2.6vw,30px); font-weight:700; letter-spacing:-0.025em; color:var(--ink); margin-bottom:8px; }
+        .ex-trust ul { list-style:none; display:flex; flex-direction:column; gap:9px; }
+        .ex-trust li { position:relative; padding-left:24px; font-size:15px; color:var(--ink-2); line-height:1.5; }
+        .ex-trust li svg { position:absolute; left:0; top:3px; width:16px; height:16px; color:var(--accent); }
+
+        @media (max-width: 860px) {
+            .ex-hero { grid-template-columns: 1fr; }
+            .ex-shot { order:-1; margin-bottom: 8px; }
+            .ex-modes { grid-template-columns: 1fr; }
+            .ex-mode.lead { grid-row: auto; }
+            .ex-flow { grid-template-columns: 1fr; gap: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<!-- HERO ------------------------------------------------------------------ -->
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <div class="ex-hero">
+            <div>
+                <span class="eyebrow reveal">Chrome extension</span>
+                <h1 class="reveal" style="margin-top:14px;">Capture any page. <span class="grad-text">Edit it in seconds.</span></h1>
+                <p class="lede reveal">One click grabs the visible area, the full scrolling page, or a region you drag. It opens straight in the SnapShotPro studio, framed and ready, with nothing uploaded until you choose to.</p>
+                <div class="hero-actions reveal" style="display:flex;gap:13px;flex-wrap:wrap;margin-top:30px;">
+                    <!-- Replace href with the live Chrome Web Store listing once approved. -->
+                    <a href="https://chromewebstore.google.com/" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right:6px;vertical-align:-3px;"><circle cx="12" cy="12" r="9"/><path d="M12 8h9M7.5 6l4.5 8M16.5 6 12 12"/></svg>
+                        Add to Chrome
+                    </a>
+                    <a href="/editor/" class="btn btn-ghost btn-lg">Open the studio</a>
+                </div>
+            </div>
+            <div class="ex-shot reveal">
+                <div class="ex-browser">
+                    <div class="ex-bar"><i></i><i></i><i></i><span class="u">snapshotpro.xyz/editor</span></div>
+                    <img class="ex-canvas" src="https://picsum.photos/seed/snapshotpro-capture-hero/1280/800" alt="A webpage being captured" loading="eager" width="1280" height="800">
+                </div>
+                <div class="ex-marquee"><span></span><span></span><span></span><span></span><span class="dim">Region</span></div>
+                <div class="ex-pop">
+                    <div class="ph"><span class="d"></span><b>SnapShotPro</b> Capture</div>
+                    <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg> Visible area</div>
+                    <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6"/></svg> Full page</div>
+                    <div class="row on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/></svg> Select region</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- MODES (bento) --------------------------------------------------------- -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,28px);">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>Three ways to grab a shot</h2>
+            <p>Pick the right capture for the job, straight from the toolbar.</p>
+        </div>
+        <div class="ex-modes">
+            <div class="ex-mode lead reveal">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></div>
+                <h3>Full page, stitched clean</h3>
+                <p>Capture an entire scrolling page in one shot. SnapShotPro scrolls, grabs each screen, and stitches them into a single tall image, holding sticky headers in place so they do not repeat.</p>
+            </div>
+            <div class="ex-mode reveal">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
+                <h3>Visible area</h3>
+                <p>Grab exactly what is on screen right now, at full resolution, in an instant.</p>
+            </div>
+            <div class="ex-mode reveal">
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/></svg></div>
+                <h3>Select a region</h3>
+                <p>Drag a box around just the part you want and capture it crisp at the page's pixel density.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FLOW ------------------------------------------------------------------ -->
+<section class="section-pad" style="padding-top: 0;">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>Capture, then make it carry weight</h2>
+            <p>The shot lands in the full studio, not a cramped popup.</p>
+        </div>
+        <div class="ex-flow">
+            <div class="ex-step reveal">
+                <span class="n">01</span>
+                <h3>Click capture</h3>
+                <p>Hit the toolbar button and choose visible, full page, or region. No account, no setup.</p>
+            </div>
+            <div class="ex-step reveal">
+                <span class="n">02</span>
+                <h3>It opens in the studio</h3>
+                <p>The capture hands off to snapshotpro.xyz and loads onto the canvas, ready to frame.</p>
+            </div>
+            <div class="ex-step reveal">
+                <span class="n">03</span>
+                <h3>Frame and export</h3>
+                <p>Add a background, a device frame, annotations, or a shadow, then export a clean PNG.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TRUST ----------------------------------------------------------------- -->
+<section class="section-pad" style="padding-top: 0;">
+    <div class="wrap">
+        <div class="ex-trust reveal">
+            <div>
+                <h2>It only captures when you ask</h2>
+                <p style="font-size:16px;color:var(--ink-2);max-width:46ch;line-height:1.55;">No background access, no tracking, no analytics in the extension.</p>
+            </div>
+            <ul>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Reads a tab only on your click (activeTab)</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The capture goes straight to the studio, nowhere else</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> No remote code, and the source is public</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA ------------------------------------------------------------- -->
+<section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Put the studio one click away.</h2>
+            <p>Free, and it opens straight into SnapShotPro.</p>
+            <a href="https://chromewebstore.google.com/" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Add to Chrome <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>
