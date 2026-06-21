@@ -5,6 +5,17 @@
 export const state = {
   image: null,
   svgCode: null,
+  // v24 — Code Snippet Studio. When enabled, render/code-render.js rasterizes
+  // `code` into state.image (like svg-input), then the normal pipeline frames /
+  // shadows / exports it. windowChrome maps onto state.deviceFrame's macOS /
+  // Windows window. enabled:false is a full no-op, so pre-v24 designs are
+  // untouched. The rasterized canvas itself lives in state.image (not here).
+  codeSnippet: {
+    enabled: false, code: '', language: 'auto', theme: 'snazzy',
+    fontFamily: 'jetbrains', fontSize: 15, lineHeight: 1.6, pad: 28, tabSize: 2,
+    showLineNumbers: true, lineNumberStart: 1, wrap: false, maxWidth: 720,
+    windowChrome: 'macos', windowTitle: 'untitled'
+  },
   imageTransform: { rotation: 0, flipH: false, flipV: false },
   // v17 — temperature/tint extend the filter set. They can't be expressed by
   // ctx.filter, so render/color-grade.js bakes them per-pixel (see colorMap).

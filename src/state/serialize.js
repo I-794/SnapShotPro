@@ -55,7 +55,7 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 16;
+export const SCHEMA_VERSION = 17;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
@@ -65,7 +65,10 @@ export const PROJECT_FIELDS = [
   'redactType', 'redactIntensity', 'logo', 'exportSettings', 'exportMotion',
   // v16.0 — shape-tool defaults (per-shape fill/sides/points already ride along
   // inside each `annotations` record, which is serialized above).
-  'annotationFill', 'polygonSides', 'starPoints'
+  'annotationFill', 'polygonSides', 'starPoints',
+  // v24 — Code Snippet Studio settings. The baked image travels in the envelope
+  // too (getImageDataURL); on load, applyPayload re-rasterizes for crispness.
+  'codeSnippet'
 ];
 
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the

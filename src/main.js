@@ -25,6 +25,7 @@ import { bindMockupUi } from './features/mockup-ui.js';
 import { bind3dMockupUi } from './features/mockup-3d-ui.js';
 import { bindSetUi } from './features/set-ui.js';
 import { bindSvgInput } from './features/svg-input.js';
+import { bindCodeSnippet } from './features/code-snippet.js';
 import { bindTemplates } from './features/templates.js';
 import { bindGradientEditor } from './features/gradient-editor.js';
 import { bindCustomFont } from './features/custom-font.js';
@@ -111,6 +112,7 @@ function init() {
   bind3dMockupUi();
   bindSetUi();
   bindSvgInput();
+  bindCodeSnippet();   // v24 — Code Snippet Studio
   bindTemplates();
   bindGradientEditor();
   bindCustomFont();

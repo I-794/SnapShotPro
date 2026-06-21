@@ -51,6 +51,9 @@ export function applyPayload(payload) {
     if (state.image) showCanvasUI(); else showUploadUI();
     render();
     if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
+    // v24 — if this design is a code snippet, re-rasterize crisply from its
+    // settings (the baked JPEG in the envelope is only a fallback).
+    if (typeof window.__reapplyCodeSnippet === 'function') window.__reapplyCodeSnippet();
   });
 }
 

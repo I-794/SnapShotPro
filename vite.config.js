@@ -80,6 +80,7 @@ function seoFiles() {
     ['/drop-shadow-generator/', '0.8', 'monthly'],
     ['/social-media-mockups/', '0.8', 'monthly'],
     ['/github-readme-screenshots/', '0.8', 'monthly'],
+    ['/code-screenshots/', '0.8', 'monthly'],
     ['/alternatives/', '0.7', 'monthly'],
     ['/faq/', '0.6', 'monthly'],
     ['/roadmap/', '0.5', 'monthly'],
@@ -129,6 +130,7 @@ export default defineConfig({
         dropShadowGenerator: resolve(__dirname, 'drop-shadow-generator/index.html'),
         socialMediaMockups: resolve(__dirname, 'social-media-mockups/index.html'),
         githubReadmeScreenshots: resolve(__dirname, 'github-readme-screenshots/index.html'),
+        codeScreenshots: resolve(__dirname, 'code-screenshots/index.html'),
         alternatives: resolve(__dirname, 'alternatives/index.html'),
         faq: resolve(__dirname, 'faq/index.html'),
         roadmap: resolve(__dirname, 'roadmap/index.html'),
@@ -139,7 +141,9 @@ export default defineConfig({
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-openai': ['openai'],
           'vendor-anthropic': ['@anthropic-ai/sdk'],
-          'vendor-three': ['three']
+          'vendor-three': ['three'],
+          // v24 — Code Snippet Studio's syntax highlighter, lazy-loaded on first use.
+          'vendor-hljs': ['highlight.js']
         }
       }
     }
