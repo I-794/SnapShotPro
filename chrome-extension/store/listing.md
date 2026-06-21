@@ -30,11 +30,11 @@ THREE WAYS TO CAPTURE
 • Select a region — drag a box around just the part you want and capture it crisp
   at the page's pixel density.
 
-STRAIGHT INTO THE STUDIO
-The capture lands on the SnapShotPro canvas, ready to edit. Add a gradient or mesh
-background, a macOS or Windows window frame, a 3D device mockup, a soft shadow,
-arrows and highlights, or redact a private line. Then export a pixel-perfect PNG,
-JPEG, or WebP. The full studio runs in your browser at snapshotpro.xyz.
+EDIT IT RIGHT AWAY
+Every capture opens a built-in quick editor: crop it, add padding and a background,
+drop in arrows and text, and download a clean PNG. Need more? One click sends the
+shot to the full SnapShotPro studio at snapshotpro.xyz for device frames, 3D
+mockups, shadows, redaction, and exports in PNG, JPEG, or WebP.
 
 PRIVATE BY DESIGN
 The extension only touches a tab when you click it (the activeTab permission).
@@ -62,10 +62,11 @@ Free. Open source. Just click and capture.
 https://snapshotpro.xyz/privacy/   (see the "Browser extension" section)
 
 ## Screenshots (1280×800 PNG, up to 5)
-Generated into ./screenshots/ by scripts/build-store-shots.mjs:
-  1. 01-modes.png     — the capture popup with the three modes
-  2. 02-region.png    — a region selection on a page
-  3. 03-studio.png    — the captured shot framed in the studio
+In ./screenshots/ (01-03 from scripts/build-store-shots.mjs):
+  1. 01-modes.png      — the capture popup with the three modes
+  2. 02-region.png     — a region selection on a page
+  3. 04-quickedit.png  — the built-in quick editor (crop, background, arrow/text)
+  4. 03-studio.png     — handing the shot off to the full studio
 
 ## Homepage / support
 https://snapshotpro.xyz/extension/

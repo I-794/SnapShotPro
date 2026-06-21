@@ -4,9 +4,10 @@
 // chrome.tabs.captureVisibleTab. Full-page and region capture inject
 // content/capture.js into the active tab (it scrolls/stitches or draws a region
 // overlay, calling back here for each viewport grab), then report the finished
-// PNG dataURL. Every result is stashed in chrome.storage.local under a one-time
-// nonce and the studio is opened at <editor>/?ext=<nonce>; the bridge content
-// script (content/bridge.js) hands the capture to the page from there.
+// PNG dataURL. Each result is stashed in chrome.storage.local under a one-time
+// nonce and opens the extension's own quick editor (editor/editor.html). From
+// there "Open in full studio" hands the (edited) image to snapshotpro.xyz via
+// the bridge content script.
 
 const DEFAULT_EDITOR = 'https://snapshotpro.xyz/editor/';
 
@@ -38,20 +39,30 @@ function captureVisible(windowId) {
   });
 }
 
-async function openEditorWith(dataUrl) {
+// Stash a capture under a one-time nonce; prune anything older than 2 minutes.
+async function stash(dataUrl) {
   const nonce = uid();
   const store = await chrome.storage.local.get('pending');
   const pending = store.pending || {};
-  // Prune anything older than a minute so storage can't grow unbounded.
   for (const k of Object.keys(pending)) {
-    if (Date.now() - (pending[k].ts || 0) > 60000) delete pending[k];
+    if (Date.now() - (pending[k].ts || 0) > 120000) delete pending[k];
   }
   pending[nonce] = { dataUrl, ts: Date.now() };
   await chrome.storage.local.set({ pending });
+  return nonce;
+}
 
+// Default: open the extension's own quick editor with the capture.
+async function openLocalEditor(dataUrl) {
+  const nonce = await stash(dataUrl);
+  await chrome.tabs.create({ url: chrome.runtime.getURL('editor/editor.html') + '?n=' + nonce });
+}
+
+// "Open in full studio": hand the (edited) image to snapshotpro.xyz via the bridge.
+async function openWebStudio(dataUrl) {
+  const nonce = await stash(dataUrl);
   const base = await editorBase();
-  const url = base + (base.includes('?') ? '&' : '?') + 'ext=' + nonce;
-  await chrome.tabs.create({ url });
+  await chrome.tabs.create({ url: base + (base.includes('?') ? '&' : '?') + 'ext=' + nonce });
 }
 
 async function activeTab() {
@@ -63,7 +74,7 @@ async function activeTab() {
 async function startCapture(mode) {
   const tab = await activeTab();
   if (mode === 'visible') {
-    await openEditorWith(await captureVisible(tab.windowId));
+    await openLocalEditor(await captureVisible(tab.windowId));
     return;
   }
   // full-page / region: inject the worker, then tell it to run.
@@ -89,9 +100,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
-  // From content/capture.js when stitching/region finishes.
+  // From content/capture.js when stitching/region finishes → open the quick editor.
   if (msg.cmd === 'captureResult') {
-    if (msg.dataUrl) openEditorWith(msg.dataUrl);
+    if (msg.dataUrl) openLocalEditor(msg.dataUrl);
+    return;
+  }
+
+  // From the quick editor's "Open in full studio" button.
+  if (msg.cmd === 'openStudio') {
+    if (msg.dataUrl) openWebStudio(msg.dataUrl);
     return;
   }
 

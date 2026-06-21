@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SnapShotPro Capture — Quick edit</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="dot"></span><strong>SnapShotPro</strong> Capture</div>
+    <div class="top-actions">
+      <button id="studio" class="btn ghost">Open in full studio</button>
+      <button id="download" class="btn primary">Download PNG</button>
+    </div>
+  </header>
+
+  <main class="work">
+    <aside class="rail">
+      <div class="tool-group">
+        <button class="tool active" data-tool="select" title="Move / view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 7-6 2-2 6-6-15z"/></svg><span>Select</span>
+        </button>
+        <button class="tool" data-tool="crop" title="Crop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg><span>Crop</span>
+        </button>
+        <button class="tool" data-tool="arrow" title="Arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M10 5h9v9"/></svg><span>Arrow</span>
+        </button>
+        <button class="tool" data-tool="text" title="Text">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg><span>Text</span>
+        </button>
+      </div>
+
+      <div class="opt">
+        <label>Annotation color</label>
+        <div class="swatches" id="anno-colors"></div>
+      </div>
+
+      <div class="opt">
+        <label>Padding <span id="pad-val">0</span></label>
+        <input type="range" id="padding" min="0" max="200" value="0">
+      </div>
+
+      <div class="opt">
+        <label>Background</label>
+        <div class="swatches" id="bg-swatches"></div>
+      </div>
+
+      <div class="opt crop-actions" id="crop-actions" style="display:none;">
+        <button id="crop-apply" class="btn primary sm">Apply crop</button>
+        <button id="crop-cancel" class="btn ghost sm">Cancel</button>
+      </div>
+
+      <p class="hint" id="hint">Drag on the image with a tool selected.</p>
+    </aside>
+
+    <section class="stage" id="stage">
+      <canvas id="c"></canvas>
+      <div id="empty" class="empty" style="display:none;">This capture expired. Take a new screenshot from the toolbar.</div>
+    </section>
+  </main>
+
+  <script src="editor.js"></script>
+</body>
+</html>
