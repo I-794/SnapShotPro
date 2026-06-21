@@ -1,11 +1,14 @@
 {
   "name": "snapshot-pro",
   "private": true,
-  "version": "23.0.0",
+  "version": "24.0.0",
   "type": "module",
   "license": "MIT",
   "homepage": "https://snapshotpro.xyz",
-  "repository": { "type": "git", "url": "https://github.com/I-794/SnapShotPro.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/I-794/SnapShotPro.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,6 +22,7 @@
     "@vercel/analytics": "^2.0.1",
     "fflate": "^0.8.3",
     "gif.js": "^0.2.0",
+    "highlight.js": "^11.11.1",
     "jspdf": "^4.2.1",
     "mp4-muxer": "^5.2.2",
     "openai": "^4.73.0",

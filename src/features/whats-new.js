@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '23.0';
+const CURRENT_VERSION = '24.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "Mobile Studio is here",
+  heading: "</> Code Snippet Studio",
   items: [
-    { title: 'A canvas-first layout built for phones',
-      desc: 'On a phone the editor now puts your design front and center: a full-width canvas with a thumb-reachable tab dock along the bottom for jumping between Import, Adjust, Background, Frame and the rest.' },
-    { title: 'A bottom sheet you can flick',
-      desc: 'Controls live in a sheet you drag between peek, half and full height — swipe sideways on the handle to flip between tool groups, with a subtle haptic tap on every snap.' },
-    { title: 'Share an image straight into the editor',
-      desc: 'Install SnapShot-Pro to your home screen and it shows up in your phone’s share sheet. Share a screenshot from any app and it opens here, ready to frame.' }
+    { title: 'Turn code into a beautiful screenshot',
+      desc: 'Paste a snippet and SnapShot-Pro renders it as a crisp, syntax-highlighted image — 13 languages with auto-detect, line numbers, and a macOS or Windows window. No more flat, ugly code grabs.' },
+    { title: 'Eight editor themes',
+      desc: 'Snazzy, Dracula, Nord, One Dark, Monokai, GitHub (dark & light) and Solarized — pick the look, tune the font, size, padding and tab width.' },
+    { title: 'Drops into the whole studio',
+      desc: 'A code card is just an image here: frame it, add a gradient or mesh background, drop a shadow, redact a secret line, then export a pixel-perfect PNG.' }
   ]
 };
 

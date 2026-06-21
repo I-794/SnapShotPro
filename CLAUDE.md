@@ -63,6 +63,14 @@ User data (templates, brand kits, projects, onboarding flags) is stored in `loca
 - `MIGRATION.md` — migration notes from the legacy single-file app.
 - `README.md` — project layout overview.
 
+## V25 idea backlog (net-new standalone features)
+These came out of the V24 brainstorm — "major features that don't add on to anything." **Code Snippet Studio shipped as v24** (paste code → a themed code screenshot rasterized into the canvas; see `src/features/code-snippet.js` + `src/render/code-render.js`). The rest are unbuilt; **the v25 slot is reserved for a bigger flagship** chosen from this list (most likely Interactive Tours):
+- **New creative outputs:** Interactive Tours (clickable, embeddable product demos with hotspots/branching — a new *output format* + player), AI Storyboard / multi-panel generator.
+- **New mockup classes:** physical product & print mockups (apparel, packaging, posters, billboards — surface-warp render beyond screens-only), print-ready PDF export (bleed / crop marks / CMYK).
+- **Automation & scale:** data-driven batch (CSV → N designs, Bannerbear-style placeholder merge — distinct from today's batch-export), public REST API + CLI (headless generation).
+- **New capture surfaces:** browser extension (one-click web capture), mobile camera capture.
+- **Collab & platform:** async review / approvals (pinned threaded comments, sign-off — distinct from live cursors), template marketplace + creator monetization, plugin / extension SDK.
+
 ## Things that look like project rules but aren't
 - `SKILL.md` and `Taste.md` at the repo root are **vendored copies of generic frontend design skills** (`design-taste-frontend`, `redesign-existing-projects`). They describe React/Tailwind/Next conventions and do **not** apply to this codebase (vanilla JS, no framework). Don't treat them as repo conventions.
 - `SnapShot-Pro-main/` is a legacy pre-Vite single-file version of the app, kept for reference. The live app is everything under `src/` + `editor/`. Don't edit the legacy copy.

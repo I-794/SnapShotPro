@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShot-Pro v23.0 · Pro Editor</title>
+    <title>SnapShot-Pro v24.0 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -58,10 +58,11 @@
     <div class="sidebar">
         <div class="sidebar-section" data-group="import">
             <h3 class="section-title">Image Upload</h3>
-            <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <button class="btn btn-primary" style="flex:1;" id="upload-btn"><span>📁</span> Choose Image</button>
                 <button class="btn btn-secondary" style="flex:1;" id="svg-btn"><span>&lt;/&gt;</span> SVG Code</button>
             </div>
+            <button class="btn btn-secondary" style="width:100%;margin-bottom:12px;" id="code-btn"><span>&lt;/&gt;</span> Code Snippet</button>
             <p class="info-text">Or paste (Ctrl+V) / drag &amp; drop an image</p>
             <div style="display:flex;gap:8px;margin-top:8px;">
                 <input type="text" class="control-input" id="url-load-input" placeholder="Paste image, video, or YouTube URL" style="flex:1;">
@@ -75,6 +76,48 @@
                 <label class="control-label">Paste SVG Code</label>
                 <textarea class="control-input" id="svg-code-input" placeholder="<svg>...</svg>" style="min-height:120px;font-family:monospace;font-size:12px;"></textarea>
                 <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="render-svg-btn">Render SVG</button>
+            </div>
+
+            <!-- v24 — Code Snippet Studio: paste code → a themed code screenshot
+                 rasterized into the canvas, then framed/shadowed/exported like any image. -->
+            <div id="code-snippet-panel" style="display:none;margin-top:16px;">
+                <label class="control-label">Paste Code</label>
+                <textarea class="control-input" id="code-input" placeholder="function hello() { ... }" style="min-height:140px;font-family:'JetBrains Mono',monospace;font-size:12px;"></textarea>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div><label class="control-label" style="font-size:11px;">Language</label><select class="control-input" id="code-language"></select></div>
+                    <div><label class="control-label" style="font-size:11px;">Theme</label><select class="control-input" id="code-theme"></select></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div><label class="control-label" style="font-size:11px;">Window</label>
+                        <select class="control-input" id="code-chrome">
+                            <option value="macos">macOS</option>
+                            <option value="windows">Windows</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div><label class="control-label" style="font-size:11px;">Font</label>
+                        <select class="control-input" id="code-font">
+                            <option value="jetbrains">JetBrains Mono</option>
+                            <option value="fira">Fira Code</option>
+                            <option value="mono">System Mono</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="control-label" style="font-size:11px;margin-top:8px;">Window Title</label>
+                <input type="text" class="control-input" id="code-window-title" placeholder="untitled" value="untitled">
+                <div class="control-group" style="margin-top:8px;"><label class="control-label" style="font-size:11px;">Font Size</label><div class="range-group"><input type="range" class="range-input" id="code-font-size" min="10" max="32" value="15"><span class="range-value" id="code-font-size-value">15px</span></div></div>
+                <div class="control-group"><label class="control-label" style="font-size:11px;">Padding</label><div class="range-group"><input type="range" class="range-input" id="code-pad" min="8" max="80" value="28"><span class="range-value" id="code-pad-value">28px</span></div></div>
+                <div style="display:flex;gap:14px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="code-line-numbers" checked> Line numbers</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="code-wrap"> Soft wrap</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;">Tab
+                        <select class="control-input" id="code-tab-size" style="width:54px;padding:2px 4px;">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn btn-primary" style="width:100%;margin-top:10px;" id="code-apply-btn">Render Code</button>
             </div>
         </div>
 

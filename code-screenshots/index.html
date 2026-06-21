@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Turn source code into a beautiful, syntax-highlighted image. 13 languages, 8 editor themes, a macOS or Windows window, then drop it on any background and export a crisp PNG. Free, in your browser.">
+    <title>Code to Image · Beautiful Code Screenshots · SnapShot-Pro</title>
+    <link rel="canonical" href="__OG_BASE__/code-screenshots/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Code Snippet Studio · SnapShot-Pro">
+    <meta property="og:description" content="Paste code, get a polished syntax-highlighted screenshot. Eight themes, a real window frame, any background, exported crisp.">
+    <meta property="og:image" content="__OG_BASE__/og.png?v=2">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SnapShot-Pro Code Snippet Studio",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web browser",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+    <style>
+        /* Terminal art direction, scoped to this page. The window chrome, prompt,
+           and code card echo what the editor actually produces. */
+        .actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; margin-top: 30px; }
+
+        .term-stage {
+            border-radius: var(--r-card);
+            padding: clamp(24px, 5vw, 64px);
+            background:
+                radial-gradient(60% 80% at 18% 0%, rgba(79,124,255,0.18), transparent 60%),
+                radial-gradient(50% 70% at 92% 110%, rgba(138,107,255,0.16), transparent 60%),
+                #060810;
+            border: 1px solid var(--line);
+            display: flex; justify-content: center;
+        }
+
+        /* A real code window: traffic lights, a title bar, syntax-highlighted code. */
+        .codewin {
+            width: min(640px, 100%);
+            border-radius: 12px; overflow: hidden;
+            background: #282a36;
+            box-shadow: 0 2px 8px rgba(4,8,24,0.5), 0 50px 90px -30px rgba(4,8,24,0.8);
+        }
+        .codewin-bar {
+            display: flex; align-items: center; gap: 8px;
+            height: 40px; padding: 0 14px;
+            background: linear-gradient(#2d2d2d, #1e1e1e);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .codewin-bar .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .codewin-bar .r { background: #ff5f57; }
+        .codewin-bar .y { background: #ffbd2e; }
+        .codewin-bar .g { background: #28ca42; }
+        .codewin-bar .title {
+            flex: 1; text-align: center; color: #cccccc;
+            font-family: var(--font-mono); font-size: 12.5px;
+            margin-right: 44px;
+        }
+        .codewin pre {
+            margin: 0; padding: 20px 22px;
+            font-family: var(--font-mono); font-size: 14px; line-height: 1.65;
+            color: #eff0eb; overflow-x: auto; tab-size: 2;
+        }
+        .codewin .ln { color: #6c6f7e; user-select: none; display: inline-block; width: 1.6em; }
+        .codewin .kw { color: #ff6ac1; }
+        .codewin .fn { color: #57c7ff; }
+        .codewin .st { color: #5af78e; }
+        .codewin .nu { color: #bd93f9; }
+        .codewin .cm { color: #686868; }
+        /* Blinking terminal cursor under the card. */
+        .prompt {
+            margin-top: 22px; text-align: center;
+            font-family: var(--font-mono); font-size: 13.5px; color: var(--ink-2);
+        }
+        .prompt .sig { color: var(--accent); }
+        .prompt .cur {
+            display: inline-block; width: 8px; height: 1.05em; transform: translateY(2px);
+            background: var(--accent); margin-left: 3px;
+            animation: blink 1.1s steps(1) infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) { .prompt .cur { animation: none; } }
+
+        /* Theme swatches row. */
+        .themes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+        .swatch {
+            border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+            width: 132px; background: var(--bg-raise);
+        }
+        .swatch .cap { height: 56px; display: flex; align-items: center; padding: 0 12px;
+            font-family: var(--font-mono); font-size: 12px; }
+        .swatch .name { padding: 8px 12px; font-size: 12.5px; color: var(--ink-2); border-top: 1px solid var(--line); }
+
+        /* Language pills. */
+        .langs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+        .lang {
+            font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-2);
+            border: 1px solid var(--line); border-radius: var(--r-pill); padding: 6px 13px;
+            background: var(--glass);
+        }
+
+        .ship-stage {
+            border-radius: var(--r-card);
+            padding: clamp(36px, 7vw, 92px);
+            background: linear-gradient(150deg, #4f7cff 0%, #2348ff 55%, #6a3cff 120%);
+            display: flex; justify-content: center;
+        }
+        .ship-stage .codewin { transform: rotate(-1.3deg); width: min(560px, 100%); }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <p class="mono-label" style="margin-bottom:16px;">Code Snippet Studio</p>
+        <h1>Turn code into a screenshot <span class="accent">worth shipping</span>.</h1>
+        <p class="lede">Paste a snippet, pick a theme, and get a crisp syntax-highlighted image, ready for your README, slides, or socials.</p>
+        <div class="actions">
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+            <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
+        </div>
+    </div>
+</header>
+
+<section class="section-pad" style="padding-top: clamp(8px,2vw,24px);">
+    <div class="wrap">
+        <div class="term-stage reveal">
+            <div>
+                <div class="codewin">
+                    <div class="codewin-bar">
+                        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                        <span class="title">greet.js</span>
+                    </div>
+<pre><span class="ln">1</span><span class="kw">function</span> <span class="fn">greet</span>(name) {
+<span class="ln">2</span>  <span class="kw">const</span> msg = <span class="st">`Hello, ${name}!`</span>;
+<span class="ln">3</span>  console.<span class="fn">log</span>(msg);
+<span class="ln">4</span>  <span class="kw">return</span> msg;
+<span class="ln">5</span>}
+<span class="ln">6</span>
+<span class="ln">7</span><span class="cm">// ship it</span>
+<span class="ln">8</span><span class="fn">greet</span>(<span class="st">'world'</span>);</pre>
+                </div>
+                <p class="prompt"><span class="sig">$</span> snapshot code greet.js --theme snazzy<span class="cur"></span></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" id="how" style="padding-top:0;background:var(--bg-sunken);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+        <div class="section-head reveal" style="padding-top:clamp(48px,7vw,80px);">
+            <h2>From clipboard to polished image.</h2>
+            <p>It is the same studio you already use for screenshots, so a code card is just another layer to frame, light, and export.</p>
+        </div>
+        <div class="points">
+            <div class="point reveal">
+                <h3>Real syntax highlighting</h3>
+                <p>Thirteen languages with auto-detect, from JavaScript and Python to Go, Rust, SQL and JSON. Line numbers and tab width are yours to set.</p>
+                <div class="langs" aria-hidden="true">
+                    <span class="lang">JavaScript</span><span class="lang">TypeScript</span><span class="lang">Python</span>
+                    <span class="lang">Go</span><span class="lang">Rust</span><span class="lang">JSON</span>
+                    <span class="lang">CSS</span><span class="lang">SQL</span><span class="lang">Bash</span>
+                </div>
+            </div>
+            <div class="point reveal">
+                <h3>Eight editor themes</h3>
+                <p>Match your terminal or your slide deck. Switch the look in one click and the whole card recolors instantly.</p>
+                <div class="themes" aria-hidden="true">
+                    <div class="swatch"><div class="cap" style="background:#282a36;color:#ff6ac1;">const</div><div class="name">Snazzy</div></div>
+                    <div class="swatch"><div class="cap" style="background:#282a36;color:#ff79c6;">const</div><div class="name">Dracula</div></div>
+                    <div class="swatch"><div class="cap" style="background:#2e3440;color:#81a1c1;">const</div><div class="name">Nord</div></div>
+                    <div class="swatch"><div class="cap" style="background:#ffffff;color:#cf222e;">const</div><div class="name">GitHub Light</div></div>
+                </div>
+            </div>
+            <div class="point reveal">
+                <h3>A window that looks the part</h3>
+                <p>Wrap the code in a macOS or Windows window with a title of your choosing, or drop the chrome entirely for a clean card.</p>
+            </div>
+            <div class="point reveal">
+                <h3>Then the whole studio opens up</h3>
+                <p>Drop it on a gradient or mesh background, add a soft shadow, round the corners, blur a secret line, then export a pixel-perfect PNG.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>A code card is just an image here.</h2>
+            <p>Background, shadow, frame and export all work on it exactly like a screenshot, because under the hood it is one.</p>
+        </div>
+        <div class="ship-stage reveal">
+            <div class="codewin">
+                <div class="codewin-bar">
+                    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                    <span class="title">query.sql</span>
+                </div>
+<pre><span class="ln">1</span><span class="kw">select</span> id, email, <span class="fn">count</span>(*) <span class="kw">as</span> orders
+<span class="ln">2</span><span class="kw">from</span> customers
+<span class="ln">3</span><span class="kw">join</span> purchases <span class="kw">using</span> (id)
+<span class="ln">4</span><span class="kw">where</span> created_at &gt; <span class="st">'2026-01-01'</span>
+<span class="ln">5</span><span class="kw">group by</span> id, email
+<span class="ln">6</span><span class="kw">order by</span> orders <span class="kw">desc</span>
+<span class="ln">7</span><span class="kw">limit</span> <span class="nu">10</span>;</pre>
+            </div>
+        </div>
+        <div class="actions" style="justify-content:center;margin-top:36px;">
+            <a href="/editor/" class="btn btn-primary btn-lg">Make a code screenshot <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>

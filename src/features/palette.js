@@ -20,6 +20,7 @@ import { exportSet, exportBatch } from './batch-export.js';
 import { replaceBackground, extendCanvas, openEraser } from './ai-image-edit.js';
 import { togglePlay } from './video.js';
 import { focusUrlLoad } from './url-load.js';
+import { openCodeStudio } from './code-snippet.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
@@ -50,7 +51,8 @@ function groupFor(id) {
   if (id.startsWith('video') || id.startsWith('anim') || id === 'export-gif' ||
       id === 'screen-record' || id === 'auto-zoom-toggle') return 'Motion';
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
-      id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-')) return 'File';
+      id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
+      id === 'code-studio') return 'File';
   if (id === 'undo' || id === 'redo') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
@@ -67,6 +69,7 @@ export function registerCommands() {
     { id: 'export-html',      label: 'Export as HTML Card',   icon: '🌐', run: exportAsHTML },
     { id: 'copy-clipboard',   label: 'Copy to Clipboard',     icon: '📋', run: copyToClipboard },
     { id: 'load-url',         label: 'Load from URL',         icon: '🔗', run: focusUrlLoad },
+    { id: 'code-studio',      label: 'Open Code Snippet Studio', icon: '</>', run: openCodeStudio },
     { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
     { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },

@@ -61,7 +61,11 @@ function snapshot() {
     // undoable. imageFilters (above) already carries temperature/tint. The
     // persisted palette library is localStorage-only, deliberately not snapshotted.
     colorPalettes: state.colorPalettes,
-    colorMap: state.colorMap
+    colorMap: state.colorMap,
+    // v24 — Code Snippet Studio settings are undoable. The raster (state.image)
+    // is rebuilt from these by code-snippet.js's onHistoryChange listener, since
+    // images are never snapshotted (same as the SVG/photo source).
+    codeSnippet: state.codeSnippet
   }));
 }
 
