@@ -14,6 +14,9 @@ import { bindUrlLoad } from './features/url-load.js';
 import { bindExtraImagesEvents } from './features/extra-images.js';
 import { exportImage, copyToClipboard, exportAsHTML } from './features/export.js';
 import { bindCanvasTools, setTool } from './features/canvas-tools.js';
+import { bindContextMenu } from './features/context-menu.js';
+import { bindAssetLibrary } from './features/asset-library.js';
+import { bindExportPresets } from './features/export-presets.js';
 import { bindLayersEvents, renderLayersPanel } from './features/layers.js';
 import { bindHistoryTimeline, renderHistoryTimeline } from './features/history-timeline.js';
 import { bindZoomPan, applyTransform } from './features/zoom-pan.js';
@@ -106,6 +109,9 @@ function init() {
   bindUrlLoad();
   bindExtraImagesEvents();
   bindCanvasTools();
+  bindContextMenu();    // v28 — right-click canvas object menu
+  bindAssetLibrary();   // v28 — reusable asset library (Import group)
+  bindExportPresets();  // v28 — export presets (Export group)
   bindLayersEvents();
   bindHistoryTimeline();
   bindZoomPan();

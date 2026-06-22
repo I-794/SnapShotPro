@@ -121,6 +121,15 @@
             </div>
         </div>
 
+        <!-- v28 — Asset Library: a persistent gallery of recently loaded images
+             to re-use. Click a thumb to add it as a layer, double-click to set it
+             as the main image. -->
+        <div class="sidebar-section" data-group="import">
+            <h3 class="section-title">Asset Library</h3>
+            <p class="info-text" id="asset-library-empty" style="margin-bottom:8px;">Images you load show up here to drop back in later. Click to add as a layer · double-click for main image.</p>
+            <div id="asset-library-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+        </div>
+
         <div class="sidebar-section" data-group="import">
             <h3 class="section-title">Auto Layout</h3>
             <div class="layout-picker-grid">
@@ -946,6 +955,22 @@
             <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="gif">GIF (Animated)</option></select></div>
             <div id="quality-controls" style="display:none;">
                 <div class="control-group"><label class="control-label">Quality</label><div class="range-group"><input type="range" class="range-input" id="export-quality" min="1" max="100" value="92"><span class="range-value" id="export-quality-value">92%</span></div></div>
+            </div>
+            <!-- v28 — Export presets: saved format + quality + pixel scale for one-click re-export. -->
+            <div class="control-group" style="margin-top:8px;">
+                <label class="control-label">Export Preset</label>
+                <div style="display:flex;gap:8px;">
+                    <select class="control-input" id="export-preset-select" style="flex:1;"></select>
+                    <button class="btn btn-primary" id="export-preset-apply" style="flex-shrink:0;">Export</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                <select class="control-input" id="export-preset-scale" style="width:90px;" title="Pixel scale for a saved preset">
+                    <option value="1">1×</option>
+                    <option value="2">2×</option>
+                    <option value="3">3×</option>
+                </select>
+                <button class="btn btn-secondary" id="export-preset-save" style="flex:1;">Save current as preset</button>
             </div>
             <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="copy-clipboard-btn">📋 Copy to Clipboard</button>
             <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="export-html-btn">🌐 Export as HTML Card</button>

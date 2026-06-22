@@ -36,6 +36,7 @@ export function resetToDefaults() {
   state.redactIntensity = 12;
   state.extraImages = [];
   state.selectedExtraImage = null;
+  state.canvasSelection = [];   // v28 — clear multi-select
   state.autoLayout = { pattern: 'free', gap: 40, align: 'center' };
   state.tilt3d = { rx: 0, ry: 0, rz: 0, perspective: 1200 };
   state.scene = { id: '' };

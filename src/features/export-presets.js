@@ -1,0 +1,121 @@
+// v28 — Studio Quality-of-Life: export presets.
+//
+// One-click export at a saved format + quality + pixel scale. Presets are global
+// (cross-project, in localStorage) and independent of the per-project
+// state.exportSettings. The "scale" multiplier re-exports the composed canvas at
+// N× resolution via an offscreen upscale, so a 2× retina or 3× print export is a
+// single click. (Fixed pixel-dimension targets like 1080×1080 are intentionally
+// out of scope — the canvas layout owns its own aspect ratio.)
+
+import { state } from '../state/state.js';
+import { el } from '../ui/elements.js';
+import { render } from '../render/render.js';
+import { showNotification } from '../ui/notification.js';
+import { clearSelection, setSelection } from './selection.js';
+
+const LS_KEY = 'snapshotpro_export_presets';
+
+const BUILTINS = [
+  { id: 'png-1x',  name: 'PNG · 1×',           format: 'png',  quality: 100, scale: 1 },
+  { id: 'png-2x',  name: 'PNG · 2× (Retina)',  format: 'png',  quality: 100, scale: 2 },
+  { id: 'jpg-1x',  name: 'JPEG · 1× (small)',  format: 'jpeg', quality: 85,  scale: 1 },
+  { id: 'webp-2x', name: 'WebP · 2×',          format: 'webp', quality: 90,  scale: 2 },
+  { id: 'print-3x', name: 'Print · 3×',        format: 'png',  quality: 100, scale: 3 },
+];
+
+function read() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEY));
+    if (Array.isArray(saved) && saved.length) return saved;
+  } catch (e) {}
+  return BUILTINS.slice();
+}
+
+function write(list) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch (e) {}
+}
+
+export function listExportPresets() { return read(); }
+
+// Clean export of the composed canvas at `scale`×, with selection chrome
+// suppressed for the export and restored afterward.
+function exportScaled(scale, format, quality) {
+  if (!state.image) { showNotification('Load an image first!', 'error'); return; }
+  const savedSel = state.canvasSelection.slice();
+  if (savedSel.length) clearSelection();
+  render();
+
+  const src = el.previewCanvas;
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(src.width * scale));
+  out.height = Math.max(1, Math.round(src.height * scale));
+  const octx = out.getContext('2d');
+  octx.imageSmoothingQuality = 'high';
+  octx.drawImage(src, 0, 0, out.width, out.height);
+
+  let mime = 'image/png', ext = 'png';
+  if (format === 'jpeg') { mime = 'image/jpeg'; ext = 'jpg'; }
+  else if (format === 'webp') { mime = 'image/webp'; ext = 'webp'; }
+
+  const done = (blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `screenshot-${Date.now()}.${ext}`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showNotification(`Exported ${ext.toUpperCase()} @${scale}×`, 'success');
+    if (savedSel.length) { setSelection(savedSel); render(); }
+  };
+  if (mime === 'image/png') out.toBlob(done, mime);
+  else out.toBlob(done, mime, (quality || 92) / 100);
+}
+
+export function applyExportPreset(id) {
+  const p = read().find((x) => x.id === id);
+  if (!p) return;
+  // Keep the editor's export settings + UI in sync with the preset.
+  state.exportSettings.format = p.format;
+  if (p.quality != null) state.exportSettings.quality = p.quality;
+  if (el.exportFormat) el.exportFormat.value = p.format;
+  exportScaled(p.scale || 1, p.format, p.quality);
+}
+
+function saveCurrentAsPreset(scale) {
+  const name = prompt('Name this export preset:', `${state.exportSettings.format.toUpperCase()} · ${scale}×`);
+  if (!name) return;
+  const list = read();
+  list.push({
+    id: 'p_' + Date.now(),
+    name: name.trim(),
+    format: state.exportSettings.format === 'gif' ? 'png' : state.exportSettings.format,
+    quality: state.exportSettings.quality,
+    scale,
+  });
+  write(list);
+  renderUi();
+  showNotification('Export preset saved', 'success');
+  // Surface the new preset in Cmd-K without a reload.
+  if (window.__refreshPaletteCommands) window.__refreshPaletteCommands();
+}
+
+function renderUi() {
+  const sel = el.exportPresetSelect;
+  if (!sel) return;
+  const list = read();
+  sel.innerHTML = list.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+export function bindExportPresets() {
+  renderUi();
+  if (el.exportPresetApply) {
+    el.exportPresetApply.addEventListener('click', () => {
+      if (el.exportPresetSelect && el.exportPresetSelect.value) applyExportPreset(el.exportPresetSelect.value);
+    });
+  }
+  if (el.exportPresetSave) {
+    el.exportPresetSave.addEventListener('click', () => {
+      const scale = el.exportPresetScale ? parseInt(el.exportPresetScale.value, 10) || 1 : 1;
+      saveCurrentAsPreset(scale);
+    });
+  }
+}

@@ -8,7 +8,7 @@
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v27, Surface Studio: wrap any image onto a t-shirt, mug, poster, framed print, card, or packaging box, then export it crisp.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v28, Studio quality-of-life: multi-select and group move, a right-click context menu, a reusable asset library, and one-click export presets.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -538,6 +538,41 @@
         .sf-tag { position: absolute; left: 10px; bottom: 9px; font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.7); }
         @media (max-width: 860px) { .sf-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v28 — Studio quality-of-life spotlight. Its own motif: a canvas with a
+           few objects caught in a dashed multi-select marquee (corner handles),
+           with a small right-click menu floating beside it — depicting the new
+           multi-select + context-menu workflow. Distinct from every prior
+           spotlight (surface, command palette, tour player, extension, …). */
+        .spotlight-qol {
+            background:
+                radial-gradient(64% 90% at 6% 2%, rgba(79,124,255,0.22), transparent 54%),
+                radial-gradient(58% 86% at 100% 100%, rgba(122,103,255,0.18), transparent 52%),
+                #06080f;
+        }
+        .spotlight-qol::after { display: none; }
+        .spotlight-qol .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-qol .spot-feat-ico { background: linear-gradient(135deg, rgba(79,124,255,0.34), rgba(122,103,255,0.24)); }
+        .qol-stage { position: relative; width: 100%; aspect-ratio: 5/4; border-radius: 18px; overflow: hidden;
+            background: radial-gradient(80% 70% at 50% 28%, #131a31, #0a0d18);
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 50px -22px rgba(0,0,0,0.6); }
+        .qol-obj { position: absolute; border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,0.4); }
+        .qol-obj.a { left: 13%; top: 20%; width: 30%; height: 22%; background: linear-gradient(135deg, #5b82ff, #8a6bff); }
+        .qol-obj.b { left: 47%; top: 31%; width: 25%; height: 30%; background: linear-gradient(135deg, #22c3a6, #2f8bff); }
+        .qol-obj.c { left: 22%; top: 55%; width: 22%; height: 17%; background: linear-gradient(135deg, #ff8a5b, #ff5b9e); }
+        .qol-marq { position: absolute; left: 8%; top: 14%; width: 68%; height: 65%; border: 1.5px dashed rgba(123,150,255,0.95);
+            border-radius: 8px; background: rgba(84,112,255,0.08); }
+        .qol-handle { position: absolute; width: 10px; height: 10px; background: #fff; border: 1.5px solid #5470ff; border-radius: 2px; }
+        .qol-handle.tl { left: -5px; top: -5px; } .qol-handle.tr { right: -5px; top: -5px; }
+        .qol-handle.bl { left: -5px; bottom: -5px; } .qol-handle.br { right: -5px; bottom: -5px; }
+        .qol-menu { position: absolute; right: 5%; top: 17%; width: 142px; padding: 6px;
+            border-radius: 10px; background: rgba(20,24,38,0.96); border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.5); }
+        .qol-menu .mi { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 11.5px; color: rgba(255,255,255,0.82); }
+        .qol-menu .mi.on { background: #5470ff; color: #fff; }
+        .qol-menu .mi .ic { width: 13px; text-align: center; opacity: 0.9; }
+        .qol-menu .sep { height: 1px; margin: 4px 3px; background: rgba(255,255,255,0.1); }
+        @media (max-width: 860px) { .qol-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -617,37 +652,48 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-surface reveal">
+        <div class="spotlight spotlight-qol reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v27 · June 2026</div>
-                <h2>Put your design on real things.</h2>
-                <p class="spot-lede">Surface Studio wraps your image onto physical and print surfaces, a t-shirt, mug, poster, framed print, business card, or packaging box, with real warp and lighting.</p>
+                <div class="spot-ver">v28 · June 2026</div>
+                <h2>The whole studio, but faster.</h2>
+                <p class="spot-lede">Select many objects at once, right-click for everything, re-use your images from a library, and export at 1×, 2×, or 3× in a single click. A pile of quality-of-life upgrades across the editor.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 5 6v4l2 1v8h10v-8l2-1V6l-3-2-2 2h-4z"/></svg></span>
-                        <div><strong>Six surfaces, beyond screens</strong><span>Apparel, mug, poster, framed print, business card, and packaging box. The art warps to each shape and the print sits in the material.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6M3 3v6M21 3h-6M21 3v6M3 21h6M3 21v-6M21 21h-6M21 21v-6"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg></span>
+                        <div><strong>Select many at once</strong><span>Drag a marquee or Shift-click to grab several objects, then move, nudge, align, or delete them together. Ctrl/⌘+A selects everything.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span>
-                        <div><strong>Place it exactly</strong><span>Pick a garment or material colour, then size, nudge, rotate, and shade the artwork. Quick presets land a hero shot in one click.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7.5 18 2.3-7.2L20 11.5 3 3z"/><path d="M13 13h8M13 17h6M13 21h4"/></svg></span>
+                        <div><strong>Right-click for everything</strong><span>Duplicate, delete, reorder, copy &amp; paste a style, and align — a context menu that acts on your whole selection.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M12 14V3m-4 4 4-4 4 4"/></svg></span>
-                        <div><strong>Bakes into the export</strong><span>Surfaces render into the same canvas as everything else, so they carry your grade, text, and logo, and download as a flat PNG.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
+                        <div><strong>Asset library + export presets</strong><span>Loaded images stay in a reusable library to drop back in, and one-click presets export PNG/JPEG/WebP at 1×/2×/3× — also from Cmd-K.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
-                    <a href="/product-mockups/" class="btn btn-primary btn-lg">See product mockups <span class="ar">→</span></a>
-                    <a href="/editor/" class="btn btn-ghost btn-lg">Open the studio</a>
+                    <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+                    <a href="#history" class="btn btn-ghost btn-lg">See the full log</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="sf-stage" aria-hidden="true">
-                    <div class="sf-card sf-tee"><div class="sf-print"></div><span class="sf-tag">Apparel</span></div>
-                    <div class="sf-card sf-mug"><div class="sf-print"></div><span class="sf-tag">Mug</span></div>
-                    <div class="sf-card sf-poster"><div class="sf-print"></div><span class="sf-tag">Framed print</span></div>
+                <div class="qol-stage" aria-hidden="true">
+                    <div class="qol-obj a"></div>
+                    <div class="qol-obj b"></div>
+                    <div class="qol-obj c"></div>
+                    <div class="qol-marq">
+                        <span class="qol-handle tl"></span><span class="qol-handle tr"></span>
+                        <span class="qol-handle bl"></span><span class="qol-handle br"></span>
+                    </div>
+                    <div class="qol-menu">
+                        <div class="mi on"><span class="ic">⧉</span>Duplicate</div>
+                        <div class="mi"><span class="ic">⤒</span>Bring to front</div>
+                        <div class="mi"><span class="ic">🎨</span>Copy style</div>
+                        <div class="sep"></div>
+                        <div class="mi"><span class="ic">⊞</span>Align</div>
+                    </div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -660,6 +706,18 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v28.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Studio quality-of-life</h2>
+                    <ul class="changes">
+                        <li><b>Multi-select and group move.</b> Drag a rubber-band marquee around objects, or Shift-click to add and remove them, then move, nudge with the arrow keys, align, or delete the whole group at once. Ctrl/⌘+A selects everything on the canvas, and a single Undo steps the whole group back.</li>
+                        <li><b>A right-click context menu.</b> Right-click any object for Duplicate, Delete, Bring to front, Send to back, Copy &amp; paste style, and Align — all acting on your full selection. Duplicate is also Ctrl/⌘+D.</li>
+                        <li><b>A reusable asset library.</b> Every image you load is kept in a small library in the Import tab; click a thumbnail to drop it back in as a layer, or double-click to make it the main image. No more re-uploading the same logo.</li>
+                        <li><b>Export presets.</b> Save a format + quality + pixel scale once, then re-export in a click — built-ins cover PNG/JPEG/WebP at 1×, 2×, and 3×, and your own presets show up in the Export panel and the Cmd-K command palette.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v27.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Physical &amp; print mockups</h2>

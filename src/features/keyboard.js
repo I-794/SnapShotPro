@@ -6,6 +6,7 @@ import { exportImage, copyToClipboard } from './export.js';
 import { openPalette, closePalette } from './palette.js';
 import { closeStickerDrawer } from './stickers.js';
 import { setTool, deleteSelected, nudgeSelected } from './canvas-tools.js';
+import { clearSelection, selectAll, duplicateSelection } from './selection.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { timelineActive, timelineStepFrame, timelineSetIn, timelineSetOut } from './timeline.js';
 import { matchEvent } from './shortcuts.js';
@@ -30,10 +31,8 @@ export function bindKeyboard() {
     if (e.key === 'Escape') {
       if (el.shortcutsOverlay && el.shortcutsOverlay.style.display === 'flex') { showShortcuts(false); return; }
       if (state.ui.stickerDrawerOpen) { closeStickerDrawer(); return; }
-      if (state.tool !== 'select') { setTool('select'); state.selectedAnnotation = null; state.selectedRedaction = null; state.selectedExtraImage = null; render(); return; }
-      state.selectedAnnotation = null;
-      state.selectedRedaction = null;
-      state.selectedExtraImage = null;
+      if (state.tool !== 'select') { setTool('select'); clearSelection(); render(); return; }
+      clearSelection();
       render();
       return;
     }
@@ -50,6 +49,8 @@ export function bindKeyboard() {
         case 'export': exportImage(); return;
         case 'copy':   copyToClipboard(); return;
         case 'help':   showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return;
+        case 'duplicate':  if (duplicateSelection()) render(); return;
+        case 'select-all': if (state.image && state.tool === 'select') { selectAll(); render(); } return;
       }
     }
 

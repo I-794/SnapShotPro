@@ -5,6 +5,8 @@ import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { withLayer } from '../render/blend.js';
 import { applyEntrance } from './animation.js';
+import { captureAsset } from './asset-library.js';
+import { selectOnly, clearSelection } from './selection.js';
 
 const ACCENT = '#5470ff';
 
@@ -81,7 +83,8 @@ export function renderExtraImages(ctx, canvas) {
     });
     if (entered) ctx.restore();
 
-    if (state.selectedExtraImage === ei.id) {
+    if (state.selectedExtraImage === ei.id ||
+        state.canvasSelection.some((s) => s.kind === 'extraImage' && s.id === ei.id)) {
       drawSelectionChrome(ctx, tx, ty, iw, ih, radius, cw);
     }
   });
@@ -103,22 +106,29 @@ export function hitTestExtraImageAtPoint(x, y, canvas) {
   return -1;
 }
 
+// v28 — add an extra image layer from any source (dataURL / object URL). Shared
+// by the file upload path and the reusable asset library ("add as layer").
+export function addExtraImageFromSrc(src) {
+  const img = new Image();
+  img.onload = () => {
+    const id = 'extra_' + Date.now();
+    imageRegistry[id] = img;
+    const maxSize = Math.min(el.previewCanvas.width, el.previewCanvas.height) * 0.4;
+    const scaleFrac = Math.min(1.0, maxSize / Math.max(img.width, img.height));
+    state.extraImages.push({ id, xFrac: 0.5, yFrac: 0.5, scaleFrac });
+    saveStateToHistory();
+    render();
+    updateExtraImagesList();
+    showNotification('Image added!', 'success');
+  };
+  img.src = src;
+}
+
 export function loadExtraImage(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const id = 'extra_' + Date.now();
-      imageRegistry[id] = img;
-      const maxSize = Math.min(el.previewCanvas.width, el.previewCanvas.height) * 0.4;
-      const scaleFrac = Math.min(1.0, maxSize / Math.max(img.width, img.height));
-      state.extraImages.push({ id, xFrac: 0.5, yFrac: 0.5, scaleFrac });
-      saveStateToHistory();
-      render();
-      updateExtraImagesList();
-      showNotification('Image added!', 'success');
-    };
-    img.src = e.target.result;
+    addExtraImageFromSrc(e.target.result);
+    captureAsset(e.target.result, file && file.name);   // v28 — remember for re-use
   };
   reader.readAsDataURL(file);
 }
@@ -133,7 +143,7 @@ export function updateExtraImagesList() {
     const item = document.createElement('div');
     item.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:var(--bg-tertiary);border-radius:6px;border:1px solid var(--border-color);cursor:pointer;';
     item.addEventListener('click', () => {
-      state.selectedExtraImage = ei.id;
+      selectOnly({ kind: 'extraImage', id: ei.id });   // v28 — keep canvasSelection in sync
       render();
     });
     if (img) {
@@ -158,7 +168,7 @@ export function updateExtraImagesList() {
       e.stopPropagation();
       saveStateToHistory();
       state.extraImages.splice(idx, 1);
-      if (state.selectedExtraImage === ei.id) state.selectedExtraImage = null;
+      if (state.selectedExtraImage === ei.id) clearSelection();   // v28
       render();
       updateExtraImagesList();
     });

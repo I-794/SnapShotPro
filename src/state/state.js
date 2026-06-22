@@ -141,6 +141,12 @@ export const state = {
   },
   ui: { layersCollapsed: false, paletteOpen: false, stickerDrawerOpen: false },
   selection: { layerIds: [] },
+  // v28 — unified canvas multi-select. An array of object refs
+  // ({ kind:'annotation'|'redaction'|'extraImage'|'text', id }) — the source of
+  // truth for what's selected on the canvas. Runtime-only (like selectedAnnotation),
+  // so it is NOT snapshotted for undo. selection.js keeps the legacy single-select
+  // fields (selectedAnnotation/Redaction/ExtraImage) in sync for one-object cases.
+  canvasSelection: [],
   lastImageRect: null,
 
   // v9 — App Store screenshot sets + batch.

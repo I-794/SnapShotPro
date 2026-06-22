@@ -4,24 +4,32 @@ import { showNotification } from '../ui/notification.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { loadVideoFile, clearVideo } from './video.js';
+import { captureAsset } from './asset-library.js';
+
+// v28 — load a still image from any source (dataURL / object URL). Shared by the
+// file upload path and the reusable asset library ("set as main image").
+export function loadImageFromSrc(src) {
+  const img = new Image();
+  img.onload = () => {
+    clearVideo();          // a still image takes over from any loaded clip
+    state.image = img;
+    state.svgCode = null;
+    el.uploadZone.style.display = 'none';
+    el.canvasWrapper.style.display = 'block';
+    el.annotationToolbar.style.display = 'flex';
+    if (el.zoomControls) el.zoomControls.style.display = 'flex';
+    saveStateToHistory();
+    render();
+    showNotification('Image loaded successfully!', 'success');
+  };
+  img.src = src;
+}
 
 export function loadImage(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      clearVideo();          // a still image takes over from any loaded clip
-      state.image = img;
-      state.svgCode = null;
-      el.uploadZone.style.display = 'none';
-      el.canvasWrapper.style.display = 'block';
-      el.annotationToolbar.style.display = 'flex';
-      if (el.zoomControls) el.zoomControls.style.display = 'flex';
-      saveStateToHistory();
-      render();
-      showNotification('Image loaded successfully!', 'success');
-    };
-    img.src = e.target.result;
+    loadImageFromSrc(e.target.result);
+    captureAsset(e.target.result, file && file.name);   // v28 — remember for re-use
   };
   reader.readAsDataURL(file);
 }

@@ -9,6 +9,8 @@ import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
 import { setTool } from './canvas-tools.js';
+import { selectAll, duplicateSelection } from './selection.js';
+import { listExportPresets, applyExportPreset } from './export-presets.js';
 import { toggleLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
 import { stickers } from '../state/presets.js';
@@ -56,7 +58,7 @@ function groupFor(id) {
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
       id.startsWith('tour-') || id === 'code-studio') return 'File';
-  if (id === 'undo' || id === 'redo') return 'Edit';
+  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
@@ -75,6 +77,8 @@ export function registerCommands() {
     { id: 'code-studio',      label: 'Open Code Snippet Studio', icon: '</>', run: openCodeStudio },
     { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
     { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
+    { id: 'duplicate-selection', label: 'Duplicate selection', icon: '⧉', run: () => { if (duplicateSelection()) render(); }, when: () => state.canvasSelection.length > 0 },
+    { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
     { id: 'theme-light',      label: 'Theme: Light',          icon: '☀️', run: () => applyTheme('light') },
     { id: 'zoom-in',          label: 'Zoom in',               icon: '🔍', run: () => setZoom(state.view.zoom * 1.2) },
@@ -152,6 +156,11 @@ export function registerCommands() {
     commands.push({ id: 'sticker-' + g, label: 'Add sticker ' + g, icon: g, run: () => addSticker(g) });
   });
 
+  // v28 — one command per export preset (built-in + user-saved).
+  listExportPresets().forEach((p) => {
+    commands.push({ id: 'export-preset-' + p.id, label: 'Export: ' + p.name, icon: '📐', run: () => applyExportPreset(p.id), when: () => !!state.image });
+  });
+
   // v22 — Command Center metadata: category, optional shortcut hint, and an
   // optional context predicate ('when'), applied in one pass so the command
   // definitions above stay readable.
@@ -170,12 +179,18 @@ export function registerCommands() {
     'copy-clipboard': 'mod+shift+c',
     'undo':           'mod+z',
     'redo':           'mod+shift+z',
+    'duplicate-selection': 'mod+d',
+    'select-all-objects':  'mod+a',
   };
   commands.forEach((c) => {
     c.group = groupFor(c.id);
-    if (WHEN[c.id]) c.when = WHEN[c.id];
+    // Per-command `when` defined inline takes precedence; the WHEN map fills the rest.
+    if (WHEN[c.id] && !c.when) c.when = WHEN[c.id];
     if (KEYS[c.id]) c.keys = KEYS[c.id];
   });
+
+  // v28 — let export-presets.js re-register so newly saved presets appear in Cmd-K.
+  window.__refreshPaletteCommands = registerCommands;
 }
 
 let activeIdx = 0;

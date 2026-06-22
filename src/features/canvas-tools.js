@@ -7,6 +7,10 @@ import { hitTestExtraImageAtPoint } from './extra-images.js';
 import { getCanvasCoords } from '../utils/geometry.js';
 import { activePointers, gesture } from './gesture.js';
 import { snapDragPosition, snapTextCenter, snapExtraImageCenter, clearGuides } from './snapping.js';
+import {
+  resolveRef, objectRefs, isRefSelected, selectOnly, toggleRef,
+  clearSelection, setSelection,
+} from './selection.js';
 
 let drawing = { active: false, startX: 0, startY: 0, points: [] };
 let dragOffset = { dx: 0, dy: 0 };
@@ -15,6 +19,9 @@ let isDraggingText = false;
 let textDragOffset = { dx: 0, dy: 0 };
 let isDraggingExtraImage = false;
 let capturedPointerId = null;
+// v28 — multi-select drag of 2+ objects, and rubber-band marquee selection.
+let groupDrag = { active: false, lastX: 0, lastY: 0, saved: false };
+let marquee = null;
 
 // Abandon any in-progress one-finger interaction (used when a 2nd finger lands,
 // so the viewport can take over for pinch/two-finger pan).
@@ -24,6 +31,8 @@ function cancelInteraction() {
   isDraggingText = false;
   isDraggingAnnotation = false;
   isDraggingExtraImage = false;
+  groupDrag.active = false;
+  marquee = null;
   gesture.canvasBusy = false;
   clearGuides();
   if (capturedPointerId !== null) {
@@ -72,16 +81,30 @@ export function hitTestRedactions(x, y) {
   return -1;
 }
 
+// v28 — resolve the top-most object under a point into a selection ref, using
+// the same priority the old single-select path used: text → annotation →
+// redaction → extra image.
+export function hitTopRef(x, y) {
+  const canvas = el.previewCanvas;
+  if (hitTestText(x, y)) return { kind: 'text' };
+  const a = hitTestAnnotations(x, y);
+  if (a !== -1) return { kind: 'annotation', id: state.annotations[a].id };
+  const r = hitTestRedactions(x, y);
+  if (r !== -1) return { kind: 'redaction', id: state.redactions[r].id };
+  const eIdx = hitTestExtraImageAtPoint(x, y, canvas);
+  if (eIdx !== -1) return { kind: 'extraImage', id: state.extraImages[eIdx].id };
+  return null;
+}
+
+// v28 — delete every object in the multi-selection (one history entry). Handles
+// fall back to the legacy single-select fields kept in sync by selection.js.
 export function deleteSelected() {
-  if (state.selectedAnnotation !== null && state.annotations[state.selectedAnnotation]) {
+  if (state.canvasSelection.length) {
     saveStateToHistory();
-    state.annotations.splice(state.selectedAnnotation, 1);
-    state.selectedAnnotation = null;
-    render();
-  } else if (state.selectedRedaction !== null && state.redactions[state.selectedRedaction]) {
-    saveStateToHistory();
-    state.redactions.splice(state.selectedRedaction, 1);
-    state.selectedRedaction = null;
+    // Resolve handles up front; each remove() recomputes its live index so the
+    // batch stays correct as the underlying arrays shrink.
+    state.canvasSelection.map(resolveRef).filter(Boolean).forEach((h) => h.remove());
+    clearSelection();
     render();
   }
 }
@@ -137,6 +160,13 @@ function selectedTarget() {
 // single history entry at the start of a key-repeat burst. Returns whether
 // anything moved (so the caller can decide to preventDefault).
 export function nudgeSelected(dx, dy, save) {
+  // v28 — nudge the whole multi-selection together.
+  if (state.canvasSelection.length > 1) {
+    if (save) saveStateToHistory();
+    state.canvasSelection.forEach((ref) => { const h = resolveRef(ref); if (h) h.moveBy(dx, dy); });
+    render();
+    return true;
+  }
   const t = selectedTarget();
   if (!t) return false;
   if (save) saveStateToHistory();
@@ -233,6 +263,9 @@ function drawPreviewAnnotation(startX, startY, curX, curY) {
 
 function canvasMouseDown(e) {
   if (!state.image) return;
+  // v28 — right-click is owned by the context menu (context-menu.js); don't let
+  // it start a draw/drag/marquee here.
+  if (e.button === 2) return;
   // A second touch/pen pointer landed → abandon the one-finger interaction and
   // let the viewport handle pinch-zoom / two-finger pan instead.
   if (e.pointerType !== 'mouse' && activePointers.size >= 1) {
@@ -242,7 +275,8 @@ function canvasMouseDown(e) {
   canvasDownLogic(e);
   // Claim the pointer only when we actually started drawing or dragging, so an
   // empty-canvas tap with the Select tool falls through to the viewport (pan).
-  gesture.canvasBusy = drawing.active || isDraggingText || isDraggingAnnotation || isDraggingExtraImage;
+  gesture.canvasBusy = drawing.active || isDraggingText || isDraggingAnnotation ||
+    isDraggingExtraImage || groupDrag.active || !!marquee;
   if (gesture.canvasBusy && e.pointerId != null) {
     try { el.previewCanvas.setPointerCapture(e.pointerId); capturedPointerId = e.pointerId; } catch (_) {}
   }
@@ -253,48 +287,27 @@ function canvasDownLogic(e) {
   const { x, y } = getCanvasCoords(e, canvas);
 
   if (state.tool === 'select') {
-    if (hitTestText(x, y)) {
-      isDraggingText = true;
-      textDragOffset = { dx: x - canvas.width * state.textOverlay.x, dy: y - canvas.height * state.textOverlay.y };
-      return;
+    // v28 — unified multi-select. Shift toggles; plain click selects/keeps; an
+    // empty click starts a rubber-band marquee. A click on an already-multi
+    // selection starts a group drag; otherwise the single-object drag path
+    // (with snapping) runs as before.
+    const ref = hitTopRef(x, y);
+    if (e.shiftKey) {
+      if (ref) { toggleRef(ref); render(); }
+      return;            // shift-click only toggles; never drags or marquees
     }
-    const annIdx = hitTestAnnotations(x, y);
-    const redIdx = hitTestRedactions(x, y);
-    if (annIdx !== -1) {
-      state.selectedAnnotation = annIdx;
-      state.selectedRedaction = null;
-      const ann = state.annotations[annIdx];
-      dragOffset = { dx: x - ann.x1, dy: y - ann.y1 };
-      isDraggingAnnotation = true;
-      isDraggingExtraImage = false;
-      render();
-    } else if (redIdx !== -1) {
-      state.selectedRedaction = redIdx;
-      state.selectedAnnotation = null;
-      const r = state.redactions[redIdx];
-      dragOffset = { dx: x - r.x, dy: y - r.y };
-      isDraggingAnnotation = true;
-      isDraggingExtraImage = false;
+    if (ref) {
+      if (!isRefSelected(ref)) selectOnly(ref);
+      if (state.canvasSelection.length > 1) {
+        groupDrag = { active: true, lastX: x, lastY: y, saved: false };
+      } else {
+        startSingleDrag(ref, x, y);
+      }
       render();
     } else {
-      const eiIdx = hitTestExtraImageAtPoint(x, y, canvas);
-      if (eiIdx !== -1) {
-        const ei = state.extraImages[eiIdx];
-        state.selectedExtraImage = ei.id;
-        state.selectedAnnotation = null;
-        state.selectedRedaction = null;
-        dragOffset = { dx: x - canvas.width * ei.xFrac, dy: y - canvas.height * ei.yFrac };
-        isDraggingExtraImage = true;
-        isDraggingAnnotation = false;
-        render();
-      } else {
-        state.selectedAnnotation = null;
-        state.selectedRedaction = null;
-        state.selectedExtraImage = null;
-        isDraggingAnnotation = false;
-        isDraggingExtraImage = false;
-        render();
-      }
+      clearSelection();
+      marquee = { x0: x, y0: y, x1: x, y1: y };
+      render();
     }
     return;
   }
@@ -305,10 +318,77 @@ function canvasDownLogic(e) {
   drawing.points = (state.tool === 'pen' || state.tool === 'highlighter') ? [{ x, y }] : [];
 }
 
+// v28 — set up the legacy single-object drag (with snapping) for the one
+// selected object. selection.js has already synced the legacy selected* fields.
+function startSingleDrag(ref, x, y) {
+  const canvas = el.previewCanvas;
+  if (ref.kind === 'text') {
+    isDraggingText = true;
+    textDragOffset = { dx: x - canvas.width * state.textOverlay.x, dy: y - canvas.height * state.textOverlay.y };
+  } else if (ref.kind === 'annotation') {
+    const ann = state.annotations[state.selectedAnnotation];
+    if (ann) { dragOffset = { dx: x - ann.x1, dy: y - ann.y1 }; isDraggingAnnotation = true; }
+  } else if (ref.kind === 'redaction') {
+    const r = state.redactions[state.selectedRedaction];
+    if (r) { dragOffset = { dx: x - r.x, dy: y - r.y }; isDraggingAnnotation = true; }
+  } else if (ref.kind === 'extraImage') {
+    const ei = state.extraImages.find((e) => e.id === ref.id);
+    if (ei) { dragOffset = { dx: x - canvas.width * ei.xFrac, dy: y - canvas.height * ei.yFrac }; isDraggingExtraImage = true; }
+  }
+}
+
+// v28 — transient rubber-band overlay (preview-only; never persisted/exported).
+function drawMarquee() {
+  render();
+  const ctx = el.previewCanvas.getContext('2d');
+  const rx = Math.min(marquee.x0, marquee.x1), ry = Math.min(marquee.y0, marquee.y1);
+  const rw = Math.abs(marquee.x1 - marquee.x0), rh = Math.abs(marquee.y1 - marquee.y0);
+  ctx.save();
+  ctx.fillStyle = 'rgba(84,112,255,0.12)';
+  ctx.strokeStyle = 'rgba(84,112,255,0.9)';
+  ctx.lineWidth = Math.max(1.5, el.previewCanvas.width * 0.0015);
+  ctx.setLineDash([5, 3]);
+  ctx.fillRect(rx, ry, rw, rh);
+  ctx.strokeRect(rx, ry, rw, rh);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// v28 — commit the marquee: select every object whose box intersects it. A
+// near-zero drag is treated as a click (selection was already cleared on down).
+function finalizeMarquee() {
+  const rx = Math.min(marquee.x0, marquee.x1), ry = Math.min(marquee.y0, marquee.y1);
+  const rw = Math.abs(marquee.x1 - marquee.x0), rh = Math.abs(marquee.y1 - marquee.y0);
+  if (rw < 4 && rh < 4) return;
+  const hits = objectRefs().filter((ref) => {
+    const h = resolveRef(ref);
+    if (!h) return false;
+    const b = h.box;
+    return !(b.x > rx + rw || b.x + b.w < rx || b.y > ry + rh || b.y + b.h < ry);
+  });
+  setSelection(hits);
+}
+
 function canvasMouseMove(e) {
   if (!state.image) return;
   const canvas = el.previewCanvas;
   const { x, y } = getCanvasCoords(e, canvas);
+
+  // v28 — group drag: move every selected object by the pointer delta.
+  if (groupDrag.active) {
+    if (!groupDrag.saved) { saveStateToHistory(); groupDrag.saved = true; }
+    const dx = x - groupDrag.lastX, dy = y - groupDrag.lastY;
+    state.canvasSelection.forEach((ref) => { const h = resolveRef(ref); if (h) h.moveBy(dx, dy); });
+    groupDrag.lastX = x; groupDrag.lastY = y;
+    render();
+    return;
+  }
+  // v28 — rubber-band marquee.
+  if (marquee) {
+    marquee.x1 = x; marquee.y1 = y;
+    drawMarquee();
+    return;
+  }
 
   if (isDraggingText) {
     const { cx, cy } = snapTextCenter(x - textDragOffset.dx, y - textDragOffset.dy, canvas);
@@ -388,6 +468,11 @@ function canvasMouseUp(e) {
 function canvasUpLogic(e) {
   if (!state.image) return;
   const canvas = el.previewCanvas;
+
+  // v28 — end a group drag (history already saved on first move).
+  if (groupDrag.active) { groupDrag.active = false; return; }
+  // v28 — commit the marquee selection.
+  if (marquee) { finalizeMarquee(); marquee = null; return; }
 
   if (isDraggingText) {
     saveStateToHistory();
@@ -528,8 +613,7 @@ export function bindCanvasTools() {
   document.querySelectorAll('.ann-tool-btn[data-tool]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.tool = btn.dataset.tool;
-      state.selectedAnnotation = null;
-      state.selectedRedaction = null;
+      clearSelection();
       setTool(btn.dataset.tool);
       render();
     });
@@ -556,7 +640,7 @@ export function bindCanvasTools() {
   if (annClearBtn) annClearBtn.addEventListener('click', () => {
     saveStateToHistory();
     state.annotations = [];
-    state.selectedAnnotation = null;
+    clearSelection();
     render();
   });
 
