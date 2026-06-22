@@ -29,6 +29,8 @@
     --accent-soft: rgba(79, 124, 255, 0.14);
     --accent-line: rgba(79, 124, 255, 0.40);
     --on-accent: #ffffff;
+    --nav-bg: rgba(8, 11, 20, 0.55);
+    --nav-bg-scrolled: rgba(8, 11, 20, 0.72);
 
     --r-card: 22px;
     --r-sm: 12px;
@@ -72,6 +74,8 @@ html[data-theme="light"] {
     --shadow-lift: 0 2px 6px rgba(17, 17, 17, 0.08), 0 28px 60px rgba(17, 17, 17, 0.14);
     --shadow-product: 0 2px 6px rgba(17, 17, 17, 0.10), 0 50px 100px -30px rgba(17, 17, 17, 0.22);
     --shadow-art: 0 2px 4px rgba(17, 17, 17, 0.06), 0 30px 60px -20px rgba(17, 17, 17, 0.22);
+    --nav-bg: rgba(246, 245, 241, 0.72);
+    --nav-bg-scrolled: rgba(246, 245, 241, 0.85);
 }
 html[data-theme="light"] body::before {
     background: radial-gradient(60% 50% at 12% 0%, var(--accent-soft), transparent 60%), var(--bg);
@@ -115,11 +119,11 @@ h1, h2, h3 { text-wrap: balance; }
 /* Nav (glass) */
 nav {
     position: sticky; top: 0; z-index: 100; height: 66px; display: flex; align-items: center;
-    background: rgba(8, 11, 20, 0.55); backdrop-filter: blur(18px) saturate(160%);
+    background: var(--nav-bg); backdrop-filter: blur(18px) saturate(160%);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
 }
-nav.scrolled { border-bottom-color: var(--glass-line); background: rgba(8, 11, 20, 0.72); }
+nav.scrolled { border-bottom-color: var(--line); background: var(--nav-bg-scrolled); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; color: var(--ink); }
 .brand-mark { width: 30px; height: 30px; flex-shrink: 0; }
