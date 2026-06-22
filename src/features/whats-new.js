@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '26.0';
+const CURRENT_VERSION = '27.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🧩 Browser extension",
+  heading: "🎨 A sharper studio",
   items: [
-    { title: 'Capture any page in one click',
-      desc: 'The new SnapShotPro Capture extension for Chrome grabs the visible area, the full scrolling page, or a region you drag, and opens it right here in the studio.' },
-    { title: 'No upload, no account',
-      desc: 'The extension only reads a tab when you click it, hands the capture straight to the editor, and nothing leaves your machine until you choose a cloud feature.' },
-    { title: 'Get it from the Chrome Web Store',
-      desc: 'Add it to your toolbar and the studio is one click away from every webpage. See the new Extension page for the download.' }
+    { title: 'A sharper, redesigned look',
+      desc: 'The site got a redesign. The dark look is still the default, now elevated with purposeful glass, higher contrast, and real product screenshots framed as art.' },
+    { title: 'A new light theme, your choice',
+      desc: 'A clean editorial-light theme sits behind a one-click toggle. It remembers your pick and loads with no flash, so you can work light or dark.' },
+    { title: 'Everything you use is unchanged',
+      desc: 'No tools moved and nothing was removed. Same canvas, same exports, the studio just looks sharper.' }
   ]
 };
 
