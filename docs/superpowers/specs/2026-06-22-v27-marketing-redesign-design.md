@@ -1,6 +1,10 @@
-# V27 — Marketing Site Redesign: Dual-Mode (Elevate Dark-Glass + Add "Gallery" Light)
+# Marketing Site Redesign (PARKED OPTION): Dual-Mode (Elevate Dark-Glass + Add "Gallery" Light)
 
-> Status: design approved (dual-mode). Prototype of the light "Gallery" mode signed off.
+> Status: **PARKED as a design option, not shipped.** Explored under the V27 slot, then deliberately
+> not released (the version number stays open). Saved for a future version. The full build lives on
+> branch `claude/snapshotpro-v27-brainstorm-rtnt9i` with a Vercel preview (draft PR #13). Reviving it
+> = bring in real, varied product imagery for the frames (the main thing that made it feel flat), then
+> run the Impeccable bolder/delight/overdrive/polish gates.
 > Impeccable installed in-repo and driving the workflow. Implementation plan: `docs/superpowers/plans/2026-06-22-v27-marketing-redesign.md`.
 > Reference prototype (light mode): `docs/superpowers/specs/assets/v27-prototype.html` (+ `v27-refined.png`).
 
