@@ -142,7 +142,7 @@ function buildPrintTexture(art, spec, surface, shadeKind) {
   if (!aw || !ah) return c;
   const base = spec.fit === 'cover'
     ? Math.max(pw / aw, ph / ah)
-    : Math.min(pw / aw, ph / ah) * 0.86;     // contain leaves a print margin
+    : Math.min(pw / aw, ph / ah) * 0.9;      // contain leaves a small print margin
   const s = base * (surface.scale || 1);
   const dw = aw * s, dh = ah * s;
   const cx = pw / 2 + (surface.offsetX || 0) * pw;
@@ -243,15 +243,13 @@ function drawTshirt(ctx, W, H, print, surface) {
   ctx.beginPath();
   ctx.moveTo(cx - neck, neckY);
   ctx.lineTo(cx - shoulderX, shoulderY);
-  ctx.lineTo(cx - sleeveX, sleeveTopY);
-  ctx.lineTo(cx - sleeveX * 0.9, sleeveBotY);
-  ctx.lineTo(cx - bodyX, underarmY);
+  ctx.quadraticCurveTo(cx - sleeveX, sleeveTopY, cx - sleeveX * 0.94, sleeveBotY);          // rounded sleeve cap + tip
+  ctx.quadraticCurveTo(cx - bodyX - sw * 0.04, underarmY + sh * 0.012, cx - bodyX, underarmY); // soft underarm
   ctx.lineTo(cx - hemX, hemY);
   ctx.quadraticCurveTo(cx, hemY + sh * 0.03, cx + hemX, hemY);
   ctx.lineTo(cx + bodyX, underarmY);
-  ctx.lineTo(cx + sleeveX * 0.9, sleeveBotY);
-  ctx.lineTo(cx + sleeveX, sleeveTopY);
-  ctx.lineTo(cx + shoulderX, shoulderY);
+  ctx.quadraticCurveTo(cx + bodyX + sw * 0.04, underarmY + sh * 0.012, cx + sleeveX * 0.94, sleeveBotY);
+  ctx.quadraticCurveTo(cx + sleeveX, sleeveTopY, cx + shoulderX, shoulderY);
   ctx.lineTo(cx + neck, neckY);
   ctx.quadraticCurveTo(cx, neckY + sh * 0.085, cx - neck, neckY); // collar dip
   ctx.closePath();
@@ -274,7 +272,7 @@ function drawTshirt(ctx, W, H, print, surface) {
   ctx.restore();
 
   // Chest print, gently bowed over the fabric.
-  const pw = sw * 0.40, ph = pw / (print.width / print.height);
+  const pw = sw * 0.50, ph = pw / (print.width / print.height);
   const pcx = cx, pcy = topY + sh * 0.46;
   const fold = (u, v) => {
     const x = pcx + (u - 0.5) * pw;
