@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" data-accent="cobalt">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SnapShotPro V27 — Gallery prototype</title>
+<style>
+  :root{
+    --bg:#F6F5F1; --bg-2:#FFFFFF; --bg-sunken:#EFEDE7;
+    --ink:#111111; --ink-2:#4B4B4B; --ink-3:#8A8A85;
+    --line:rgba(17,17,17,.10); --line-strong:rgba(17,17,17,.18);
+    --accent:#2348FF; --accent-press:#1a37cc; --on-accent:#fff;
+    --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.75); --glass-blur:18px;
+    --shadow-art:0 2px 4px rgba(17,17,17,.06), 0 30px 60px -20px rgba(17,17,17,.22);
+    --shadow-glass:inset 0 1px 0 rgba(255,255,255,.9), 0 12px 40px rgba(17,17,17,.12);
+    --r-card:14px; --r-sm:10px; --r-pill:999px;
+    --display:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --wrap:1180px;
+  }
+  html[data-accent="red"]{ --accent:#FF3B2F; --accent-press:#d92c22; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--display);
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink-3)}
+
+  /* NAV — liquid glass accent */
+  nav.bar{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(var(--glass-blur));
+    background:var(--glass);border-bottom:1px solid var(--line)}
+  @media (prefers-reduced-transparency: reduce){nav.bar{background:var(--bg-2);backdrop-filter:none}}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:18px}
+  .mark{width:26px;height:26px;border-radius:8px;background:var(--accent);
+    display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+  .nav-right{display:flex;align-items:center;gap:26px}
+  .nav-link{font-size:14.5px;color:var(--ink-2);font-weight:500}
+  .nav-link:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14.5px;
+    border-radius:var(--r-pill);padding:11px 18px;border:1px solid transparent;cursor:pointer;
+    transition:transform .15s ease, background .15s ease}
+  .btn:active{transform:translateY(1px)}
+  a:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
+  h1,h2,h3{text-wrap:balance}
+  .btn-primary{background:var(--accent);color:var(--on-accent)}
+  .btn-primary:hover{background:var(--accent-press)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+  .btn-link{color:var(--ink);font-weight:600;font-size:15px}
+  .btn-link .ar{color:var(--accent)}
+
+  /* HERO */
+  .hero{padding:78px 0 96px}
+  .hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:56px;align-items:center}
+  .hero h1{font-size:clamp(44px,6vw,78px);line-height:.98;letter-spacing:-.035em;
+    font-weight:800;margin:18px 0 22px}
+  .hero h1 em{font-style:italic;font-weight:800}
+  .hero p.sub{font-size:18px;color:var(--ink-2);max-width:30ch;margin-bottom:30px}
+  .hero-cta{display:flex;align-items:center;gap:18px}
+
+  /* The Frame — artwork wrapper */
+  .stage{position:relative}
+  .frame{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:12px;box-shadow:var(--shadow-art)}
+  .frame .art{border-radius:8px;overflow:hidden;aspect-ratio:4/3;display:block}
+  .hero .frame{transform:rotate(-1.4deg)}
+  /* sample artworks (representative SnapShotPro output, CSS-only) */
+  .art.grad{background:
+    radial-gradient(120% 120% at 15% 10%, #ff8a5c 0%, transparent 45%),
+    radial-gradient(120% 120% at 90% 30%, #c5318f 0%, transparent 50%),
+    linear-gradient(135deg,#5b2bd4,#1631a8)}
+  .art.grad .pill{position:absolute}
+  .art.teal{background:
+    radial-gradient(120% 120% at 80% 10%, #2bd4c4 0%, transparent 50%),
+    linear-gradient(135deg,#173a8a,#0b1b4a)}
+  .art.warm{background:linear-gradient(135deg,#ffb86b,#ff5d8f 60%,#7b2ff7)}
+  .art.code{background:#0d1117;position:relative}
+  .art.code .dots{position:absolute;top:12px;left:12px;display:flex;gap:6px}
+  .art.code .dots i{width:10px;height:10px;border-radius:50%;display:block}
+  .art.code .l{position:absolute;left:16px;height:8px;border-radius:4px;opacity:.9}
+  .art .insetshot{width:100%;height:100%;display:grid;place-items:center}
+  .art .device{width:46%;height:74%;background:#0e1120;border-radius:22px;
+    border:6px solid #20263b;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+
+  .chip{position:absolute;backdrop-filter:saturate(140%) blur(14px);background:var(--glass);
+    border:1px solid var(--glass-line);box-shadow:var(--shadow-glass);border-radius:12px;
+    padding:10px 13px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+  @media (prefers-reduced-transparency: reduce){.chip{background:var(--bg-2);backdrop-filter:none}}
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .chip.a{top:-18px;right:36px}
+  .chip.b{bottom:26px;left:-24px}
+
+  /* stats strip */
+  .stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stats .row{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat{padding:26px 0}
+  .stat + .stat{border-left:1px solid var(--line);padding-left:26px}
+  .stat b{display:block;font-size:26px;letter-spacing:-.02em}
+  .stat span{font-size:13.5px;color:var(--ink-3)}
+
+  /* Gallery section */
+  section.gal{padding:96px 0}
+  .gal h2{font-size:clamp(30px,3.6vw,46px);letter-spacing:-.03em;font-weight:800;max-width:16ch}
+  .gal .lead{color:var(--ink-2);font-size:17px;margin-top:12px;max-width:52ch}
+  .wall{margin-top:48px;display:grid;grid-template-columns:repeat(12,1fr);gap:26px;align-items:end}
+  .hang{position:relative}
+  .hang figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-3);
+    margin-top:12px;letter-spacing:.02em}
+  .hang.one{grid-column:1/6}
+  .hang.two{grid-column:6/10}
+  .hang.three{grid-column:10/13}
+  .hang.one .frame{transform:rotate(-1.6deg)}
+  .hang.two .frame{transform:rotate(1deg)}
+  .hang.three .frame{transform:rotate(-.6deg)}
+  .hang.two .frame .art{aspect-ratio:3/4}
+  .hang.three .frame .art{aspect-ratio:3/4}
+
+  /* how it works */
+  section.how{padding:40px 0 100px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:42px;margin-top:40px}
+  .step .n{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.1em}
+  .step h3{font-size:22px;letter-spacing:-.02em;margin:14px 0 8px}
+  .step p{color:var(--ink-2);font-size:15.5px}
+  .step{border-top:2px solid var(--ink);padding-top:18px}
+
+  /* closing CTA */
+  .closing{padding:0 0 110px}
+  .cta-card{background:var(--bg-2);border:1px solid var(--line);border-radius:24px;
+    box-shadow:var(--shadow-art);padding:64px;text-align:center}
+  .cta-card h2{font-size:clamp(32px,4vw,52px);letter-spacing:-.03em;font-weight:800;max-width:18ch;margin:0 auto 14px}
+  .cta-card p{color:var(--ink-2);font-size:17px;margin-bottom:28px}
+
+  footer{border-top:1px solid var(--line);padding:36px 0;color:var(--ink-3);font-size:13.5px;
+    display:flex;justify-content:space-between}
+  footer .fb{font-weight:800;color:var(--ink);letter-spacing:-.02em;font-family:var(--display)}
+</style>
+</head>
+<body>
+  <nav class="bar"><div class="wrap nav-inner">
+    <a class="brand" href="#"><span class="mark">S</span>SnapShotPro</a>
+    <div class="nav-right">
+      <a class="nav-link" href="#">Features</a>
+      <a class="nav-link" href="#">Tools</a>
+      <a class="nav-link" href="#">Gallery</a>
+      <a class="nav-link" href="#">AI</a>
+      <a class="nav-link" href="#">Pricing</a>
+      <a class="btn btn-primary" href="#">Open the studio <span>→</span></a>
+    </div>
+  </div></nav>
+
+  <header class="hero"><div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Free screenshot studio · runs in your browser</span>
+      <h1>Screenshots that&nbsp;carry <em>weight</em>.</h1>
+      <p class="sub">Backgrounds, device frames, App Store sets, generative AI edits, even video. All in your browser, no account.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#">Open the studio <span>→</span></a>
+        <a class="btn-link" href="#">Explore features <span class="ar">→</span></a>
+      </div>
+    </div>
+    <div class="stage">
+      <figure class="frame"><span class="art grad insetshot"></span></figure>
+      <div class="chip a">AI edits</div>
+      <div class="chip b">App Store sets</div>
+    </div>
+  </div></header>
+
+  <div class="stats"><div class="wrap row">
+    <div class="stat"><b>30+</b><span>tools in one canvas</span></div>
+    <div class="stat"><b>No account</b><span>nothing uploaded</span></div>
+    <div class="stat"><b>Offline</b><span>installable PWA</span></div>
+    <div class="stat"><b>PNG → MP4</b><span>one export pipeline</span></div>
+  </div></div>
+
+  <section class="gal"><div class="wrap">
+    <h2>One canvas, every output.</h2>
+    <p class="lead">Drop in a raw grab and walk out with a store set, a social post, a release GIF, or a multi-page PDF, all from the same project.</p>
+    <div class="wall">
+      <figure class="hang one"><div class="frame"><span class="art warm insetshot"></span></div><figcaption>Gradient backdrop</figcaption></figure>
+      <figure class="hang two"><div class="frame"><span class="art teal insetshot"><span class="device"></span></span></div><figcaption>Device mockup</figcaption></figure>
+      <figure class="hang three"><div class="frame"><span class="art code">
+        <span class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+        <span class="l" style="top:46px;width:55%;background:#79c0ff"></span>
+        <span class="l" style="top:66px;width:38%;background:#d2a8ff"></span>
+        <span class="l" style="top:86px;width:62%;background:#7ee787"></span>
+        <span class="l" style="top:106px;width:30%;background:#ffa657"></span>
+        <span class="l" style="top:126px;width:48%;background:#79c0ff"></span>
+      </span></div><figcaption>Code screenshot</figcaption></figure>
+    </div>
+  </div></section>
+
+  <section class="how"><div class="wrap">
+    <span class="eyebrow">How it works</span>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h3>Drop in a screenshot</h3><p>Upload, paste, drag, or capture with the browser extension. Nothing leaves your device.</p></div>
+      <div class="step"><div class="n">02</div><h3>Style it your way</h3><p>Frames, backgrounds, color grades, annotations, motion, or let the AI design agent do it.</p></div>
+      <div class="step"><div class="n">03</div><h3>Export anywhere</h3><p>PNG, store sets, social sizes, GIF, MP4, PDF, batch ZIPs — all from one project.</p></div>
+    </div>
+  </div></section>
+
+  <section class="closing"><div class="wrap">
+    <div class="cta-card">
+      <h2>Make your next screenshot carry weight.</h2>
+      <p>Free and open source. No signup. Runs in your browser.</p>
+      <a class="btn btn-primary" href="#">Open the studio <span>→</span></a>
+    </div>
+  </div></section>
+
+  <footer><div class="wrap" style="display:flex;justify-content:space-between;width:100%;max-width:var(--wrap)">
+    <span class="fb">SnapShotPro</span>
+    <span>Free &amp; open source · v27.0.0</span>
+  </div></footer>
+</body>
+</html>
