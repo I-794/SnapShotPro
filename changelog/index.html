@@ -8,7 +8,7 @@
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, from the first editor to v26, the browser extension: capture any webpage — visible, full-page, or a region — in one click and open it straight in the studio.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v27, Surface Studio: wrap any image onto a t-shirt, mug, poster, framed print, card, or packaging box, then export it crisp.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -506,6 +506,38 @@
         .ec-pop .r.on { border-color: #5b82ff; background: #18203a; }
         @media (prefers-reduced-motion: reduce) { .ec-marquee { animation: none; } }
 
+        /* v27 — Surface Studio spotlight. Its own motif: one design (the small
+           white print block) shown on three real surfaces at once — a tee, a mug,
+           a poster — to depict "beyond screens". Distinct from every prior
+           spotlight (glass, spectrum, variant grid, prompt->image, code window,
+           3D, command palette, mobile sheet, tour player, extension capture). */
+        .spotlight-surface {
+            background:
+                radial-gradient(64% 90% at 4% 4%, rgba(79,124,255,0.22), transparent 54%),
+                radial-gradient(58% 88% at 100% 100%, rgba(91,130,255,0.18), transparent 52%),
+                #06080f;
+        }
+        .spotlight-surface::after { display: none; }
+        .spotlight-surface .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-surface .spot-feat-ico { background: linear-gradient(135deg, rgba(79,124,255,0.34), rgba(91,130,255,0.24)); }
+        .spotlight-surface .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-surface .btn-primary:hover { background: #f0f0ee; }
+        /* the three surfaces, depicted as abstract shapes (not fake product UI). */
+        .sf-stage { width: 100%; display: grid; grid-template-columns: 1.1fr 0.95fr; grid-template-rows: 1fr 1fr; gap: 16px; align-items: stretch; }
+        .sf-card { position: relative; border-radius: 16px; overflow: hidden; background: #0e1120; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 50px -22px rgba(0,0,0,0.6); display: grid; place-items: center; }
+        .sf-print { width: 46%; aspect-ratio: 1; border-radius: 8px; background: linear-gradient(135deg, #5b82ff, #8a6bff); box-shadow: 0 8px 22px rgba(0,0,0,0.4); }
+        /* tee: tall card, left column spanning both rows */
+        .sf-tee { grid-row: span 2; background: radial-gradient(80% 70% at 50% 30%, #1d2542, #0c0f1c); }
+        .sf-tee .sf-print { width: 40%; border-radius: 6px; transform: translateY(6%); }
+        /* mug: round print on a curved field */
+        .sf-mug { background: radial-gradient(70% 90% at 35% 40%, #20283f, #0b0e1a); }
+        .sf-mug .sf-print { border-radius: 50%; width: 48%; }
+        /* poster: framed print */
+        .sf-poster { background: linear-gradient(160deg, #161b2e, #0b0e1a); }
+        .sf-poster .sf-print { width: 52%; aspect-ratio: 3/4; border-radius: 4px; border: 5px solid #f7f5f0; }
+        .sf-tag { position: absolute; left: 10px; bottom: 9px; font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.7); }
+        @media (max-width: 860px) { .sf-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -585,45 +617,37 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-ext reveal">
+        <div class="spotlight spotlight-surface reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v26 · June 2026</div>
-                <h2>Capture any page, edit it here.</h2>
-                <p class="spot-lede">The new SnapShotPro Capture extension for Chrome grabs the visible area, a full scrolling page, or a region you drag, and opens it straight in the studio.</p>
+                <div class="spot-ver">v27 · June 2026</div>
+                <h2>Put your design on real things.</h2>
+                <p class="spot-lede">Surface Studio wraps your image onto physical and print surfaces, a t-shirt, mug, poster, framed print, business card, or packaging box, with real warp and lighting.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/></svg></span>
-                        <div><strong>Visible, full page, or region</strong><span>Three captures from the toolbar. Full page scrolls and stitches into one tall image; region lets you drag an exact box.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 5 6v4l2 1v8h10v-8l2-1V6l-3-2-2 2h-4z"/></svg></span>
+                        <div><strong>Six surfaces, beyond screens</strong><span>Apparel, mug, poster, framed print, business card, and packaging box. The art warps to each shape and the print sits in the material.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-                        <div><strong>Quick editor, or the full studio</strong><span>Each capture opens a built-in quick editor to crop, add a background, and annotate. One click sends it to the full studio for device frames, mockups, and more.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span>
+                        <div><strong>Place it exactly</strong><span>Pick a garment or material colour, then size, nudge, rotate, and shade the artwork. Quick presets land a hero shot in one click.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
-                        <div><strong>It only captures on your click</strong><span>activeTab only, no background access, no tracking. The capture goes to the studio and nowhere else.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M12 14V3m-4 4 4-4 4 4"/></svg></span>
+                        <div><strong>Bakes into the export</strong><span>Surfaces render into the same canvas as everything else, so they carry your grade, text, and logo, and download as a flat PNG.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
-                    <a href="/extension/" class="btn btn-primary btn-lg">Get the extension <span class="ar">→</span></a>
+                    <a href="/product-mockups/" class="btn btn-primary btn-lg">See product mockups <span class="ar">→</span></a>
                     <a href="/editor/" class="btn btn-ghost btn-lg">Open the studio</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="ec-stage" aria-hidden="true">
-                    <div class="ec-win">
-                        <div class="ec-frame">
-                            <div class="ec-bar"><i></i><i></i><i></i><span class="u"></span></div>
-                            <div class="ec-shot"></div>
-                        </div>
-                        <div class="ec-marquee"><b>Region</b><s></s><s></s><s></s><s></s></div>
-                        <div class="ec-pop">
-                            <div class="h"><span class="d"></span><b>SnapShotPro</b> Capture</div>
-                            <div class="r"></div><div class="r"></div><div class="r on"></div>
-                        </div>
-                    </div>
+                <div class="sf-stage" aria-hidden="true">
+                    <div class="sf-card sf-tee"><div class="sf-print"></div><span class="sf-tag">Apparel</span></div>
+                    <div class="sf-card sf-mug"><div class="sf-print"></div><span class="sf-tag">Mug</span></div>
+                    <div class="sf-card sf-poster"><div class="sf-print"></div><span class="sf-tag">Framed print</span></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -636,6 +660,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v27.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Physical &amp; print mockups</h2>
+                    <ul class="changes">
+                        <li><b>Beyond screens, onto real things.</b> The new Surface Studio wraps your image onto a t-shirt, mug, poster, framed print, business card, or packaging box. Each surface warps the art to its real shape, with apparel following the fabric folds and the mug curving around a true cylinder.</li>
+                        <li><b>Place it exactly, then shade it.</b> Pick a garment or material colour, then size, nudge, rotate, and shade the artwork until it sits in the material instead of floating on top. Quick presets for a merch tee, a poster wall, and packaging get you a hero shot in one click.</li>
+                        <li><b>Bakes into the export.</b> Surfaces render into the same canvas as everything else, so they carry your colour grade, text, watermark, and logo, download as a flat PNG, and save with your project. Find it under the Frame tab, and on the new Product mockups page.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v26.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Browser extension</h2>

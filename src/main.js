@@ -23,6 +23,7 @@ import { bindStickerEvents } from './features/stickers.js';
 import { bindSceneEvents } from './features/scene-select.js';
 import { bindMockupUi } from './features/mockup-ui.js';
 import { bind3dMockupUi } from './features/mockup-3d-ui.js';
+import { bindSurfaceUi } from './features/surface-ui.js';
 import { bindSetUi } from './features/set-ui.js';
 import { bindSvgInput } from './features/svg-input.js';
 import { bindCodeSnippet } from './features/code-snippet.js';
@@ -113,6 +114,7 @@ function init() {
   bindSceneEvents();
   bindMockupUi();
   bind3dMockupUi();
+  bindSurfaceUi();     // v27 — Surface Studio (physical & print mockups)
   bindSetUi();
   bindSvgInput();
   bindCodeSnippet();   // v24 — Code Snippet Studio
