@@ -29,6 +29,8 @@
     --accent-soft: rgba(79, 124, 255, 0.14);
     --accent-line: rgba(79, 124, 255, 0.40);
     --on-accent: #ffffff;
+    --nav-bg: rgba(8, 11, 20, 0.55);
+    --nav-bg-scrolled: rgba(8, 11, 20, 0.72);
 
     --r-card: 22px;
     --r-sm: 12px;
@@ -39,10 +41,44 @@
     --shadow-product: 0 2px 6px rgba(0, 0, 0, 0.4), 0 50px 100px -30px rgba(0, 0, 0, 0.6);
     --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 24px 60px rgba(4, 8, 24, 0.55);
     --shadow-accent: 0 10px 30px rgba(35, 72, 255, 0.45);
+    --shadow-art: 0 2px 6px rgba(0,0,0,0.45), 0 30px 60px -20px rgba(0,0,0,0.6);
 
     --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: var(--font);
     --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Opt-in editorial "Gallery" light mode. Dark is the hard default; light applies
+   only when html[data-theme="light"] is set (no prefers-color-scheme switch). */
+html[data-theme="light"] {
+    --bg: #F6F5F1;
+    --bg-2: #FFFFFF;
+    --bg-raise: #FFFFFF;
+    --bg-sunken: #EFEDE7;
+    --ink: #111111;
+    --ink-2: #4B4B4B;
+    --ink-3: #8A8A85;
+    --line: rgba(17, 17, 17, 0.10);
+    --line-strong: rgba(17, 17, 17, 0.18);
+    --glass: rgba(255, 255, 255, 0.55);
+    --glass-2: rgba(255, 255, 255, 0.72);
+    --glass-line: rgba(255, 255, 255, 0.75);
+    --glass-hi: rgba(17, 17, 17, 0.20);
+    --accent: #2348ff;
+    --accent-deep: #2348ff;
+    --accent-press: #1a37cc;
+    --accent-soft: rgba(35, 72, 255, 0.10);
+    --accent-line: rgba(35, 72, 255, 0.30);
+    --shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.06), 0 8px 24px rgba(17, 17, 17, 0.08);
+    --shadow-lift: 0 2px 6px rgba(17, 17, 17, 0.08), 0 28px 60px rgba(17, 17, 17, 0.14);
+    --shadow-product: 0 2px 6px rgba(17, 17, 17, 0.10), 0 50px 100px -30px rgba(17, 17, 17, 0.22);
+    --shadow-art: 0 2px 4px rgba(17, 17, 17, 0.06), 0 30px 60px -20px rgba(17, 17, 17, 0.22);
+    --nav-bg: rgba(246, 245, 241, 0.72);
+    --nav-bg-scrolled: rgba(246, 245, 241, 0.85);
+}
+html[data-theme="light"] body::before {
+    background: radial-gradient(60% 50% at 12% 0%, var(--accent-soft), transparent 60%), var(--bg);
 }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -63,6 +99,11 @@ body::before {
 
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--accent); color: var(--on-accent); }
+a:focus-visible, .btn:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r-sm); }
+h1, h2, h3 { text-wrap: balance; }
+
+/* Theme toggle: inline icon button reusing .nav-link styling. */
+#theme-toggle { background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; }
 
 .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
 .wrap-narrow { max-width: 760px; }
@@ -78,11 +119,11 @@ a { color: inherit; text-decoration: none; }
 /* Nav (glass) */
 nav {
     position: sticky; top: 0; z-index: 100; height: 66px; display: flex; align-items: center;
-    background: rgba(8, 11, 20, 0.55); backdrop-filter: blur(18px) saturate(160%);
+    background: var(--nav-bg); backdrop-filter: blur(18px) saturate(160%);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
 }
-nav.scrolled { border-bottom-color: var(--glass-line); background: rgba(8, 11, 20, 0.72); }
+nav.scrolled { border-bottom-color: var(--line); background: var(--nav-bg-scrolled); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; color: var(--ink); }
 .brand-mark { width: 30px; height: 30px; flex-shrink: 0; }
@@ -96,7 +137,7 @@ nav.scrolled { border-bottom-color: var(--glass-line); background: rgba(8, 11, 2
     font-weight: 600; letter-spacing: -0.01em; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
 }
 .btn:active { transform: translateY(0) scale(0.985); }
-.btn-primary { background: var(--accent-deep); color: var(--on-accent); border-radius: var(--r-pill); padding: 11px 22px; font-size: 14.5px; box-shadow: var(--shadow-accent); }
+.btn-primary { background: var(--accent-deep); color: var(--on-accent); border-radius: var(--r-pill); padding: 11px 22px; font-size: 14.5px; box-shadow: var(--shadow-sm); }
 .btn-primary:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 14px 38px rgba(35, 72, 255, 0.6); }
 .btn-ghost {
     background: var(--glass); color: var(--ink); border: 1px solid var(--glass-line);
@@ -145,6 +186,7 @@ footer { border-top: 1px solid var(--glass-line); padding: clamp(40px, 5vw, 64px
 
 @media (max-width: 560px) {
     .nav-link { display: none; }
+    #theme-toggle { display: inline-flex !important; }
     .foot-inner { flex-direction: column; align-items: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -152,8 +194,8 @@ footer { border-top: 1px solid var(--glass-line); padding: clamp(40px, 5vw, 64px
     .reveal { opacity: 1; transform: none; transition: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
-    nav, .btn-ghost, .glass, .glass-card, .stat, .glass-interactive { backdrop-filter: none; -webkit-backdrop-filter: none; }
-    nav { background: var(--bg-2); }
+    nav, .btn-ghost, .glass, .glass-card, .stat, .glass-interactive, .chip { backdrop-filter: none; -webkit-backdrop-filter: none; }
+    nav, .chip { background: var(--bg-2); }
     .glass-card, .stat { background: var(--bg-raise); }
 }
 
@@ -176,9 +218,8 @@ body::before { animation: auroraDrift 34s ease-in-out infinite alternate; }
 /* 3D tilt: site.js writes --rx/--ry from the pointer; CSS does the transform. */
 [data-tilt] { transform: perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transition: transform .25s var(--ease); transform-style: preserve-3d; will-change: transform; }
 
-/* Animated gradient headline. */
-.grad-text { background: linear-gradient(110deg, #6d91ff, #8a6bff 45%, #4f7cff 80%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradShift 8s ease-in-out infinite alternate; }
-@keyframes gradShift { to { background-position: 100% 0; } }
+/* Headline emphasis: same-family italic, never gradient fill. */
+.grad-text { color: var(--ink); font-style: italic; background: none; -webkit-text-fill-color: currentColor; animation: none; }
 
 /* Eyebrow + section header */
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
@@ -187,7 +228,7 @@ body::before { animation: auroraDrift 34s ease-in-out infinite alternate; }
 .section-head p { font-size: 17px; color: var(--ink-2); line-height: 1.6; }
 
 /* Glass card */
-.glass-card { border-radius: var(--r-card); padding: 26px; background: linear-gradient(150deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); transition: transform .3s var(--ease), border-color .3s; }
+.glass-card { border-radius: var(--r-card); padding: 26px; background: var(--bg-raise); backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid var(--line); box-shadow: var(--shadow-sm); transition: transform .3s var(--ease), border-color .3s; }
 .glass-card:hover { transform: translateY(-4px); border-color: var(--glass-hi); }
 .glass-card h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--ink); }
 .glass-card p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
@@ -196,7 +237,7 @@ body::before { animation: auroraDrift 34s ease-in-out infinite alternate; }
 
 /* Stat row */
 .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.stat { border-radius: var(--r-card); padding: 22px 24px; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.stat { border-radius: var(--r-card); padding: 22px 24px; background: var(--bg-raise); backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
 .stat .n { font-size: clamp(26px, 3vw, 36px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
 .stat .l { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
 
@@ -306,3 +347,13 @@ body::before { animation: auroraDrift 34s ease-in-out infinite alternate; }
     .points { grid-template-columns: 1fr; }
     .road { grid-template-columns: 1fr; }
 }
+
+/* ─────────── v27 signature components (work in both modes via tokens) ─────────── */
+
+/* Framed art: a matted, gallery-style surface for screenshots. */
+.frame { background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--r-card); padding: 12px; box-shadow: var(--shadow-art); }
+.frame .art { display: block; border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; }
+.frame .art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Floating glass chip (purposeful glass: overlays only). */
+.chip { position: absolute; background: var(--glass); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); border-radius: 12px; padding: 10px 13px; font-size: 13px; font-weight: 600; backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); }

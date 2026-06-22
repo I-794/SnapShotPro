@@ -60,3 +60,17 @@
     }, { passive: true });
   }
 })();
+
+// Theme toggle (v27): flips html[data-theme] and persists the choice. Dark is
+// the default; the pre-paint inline script in the page <head> restores light.
+(function () {
+  var KEY = 'snapshotpro_theme';
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();

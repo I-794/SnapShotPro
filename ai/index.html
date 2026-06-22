@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>try{var t=localStorage.getItem('snapshotpro_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <link rel="stylesheet" href="/site.css">
     <style>
         /* AI hub. Design read: flagship product page for the AI suite, dark-tech
@@ -59,7 +60,7 @@
 
         /* the four pillars (bento) */
         .ai-bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
-        .ai-tile { border-radius: 18px; padding: clamp(22px, 2.2vw, 30px); border: 1px solid var(--glass-line); background: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
+        .ai-tile { border-radius: 18px; padding: clamp(22px, 2.2vw, 30px); border: 1px solid var(--glass-line); background: var(--bg-raise); display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
         .ai-tile .ico { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
         .ai-tile .ico svg { width: 21px; height: 21px; }
         .ai-tile h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; color: var(--ink); }
@@ -76,7 +77,7 @@
 
         /* hosted vs byo key band */
         .ai-keys { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 22px); }
-        .ai-key { border-radius: 18px; padding: clamp(22px, 2.4vw, 30px); border: 1px solid var(--glass-line); background: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); }
+        .ai-key { border-radius: 18px; padding: clamp(22px, 2.4vw, 30px); border: 1px solid var(--glass-line); background: var(--bg-raise); }
         .ai-key .tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
         .ai-key h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; color: var(--ink); margin: 10px 0 8px; }
         .ai-key p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }

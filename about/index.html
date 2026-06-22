@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>try{var t=localStorage.getItem('snapshotpro_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <link rel="stylesheet" href="/site.css">
     <style>
         /* About / manifesto. Design read: OSS product-manifesto page for makers
@@ -22,7 +23,7 @@
            density 3. One accent (cobalt), one theme (dark glass), one eyebrow on
            the whole page. No em-dashes anywhere. */
 
-        /* belief grid — 2x2 so it never reads as "three equal cards" */
+        /* belief grid - 2x2 so it never reads as "three equal cards" */
         .ab-beliefs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 22px); }
         .ab-belief { display: flex; flex-direction: column; gap: 10px; }
         .ab-belief .k { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
@@ -30,8 +31,8 @@
         .ab-belief h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; color: var(--ink); }
         .ab-belief p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
 
-        /* the story — one calm prose island */
-        .ab-story { border-radius: var(--r-card); padding: clamp(28px, 4vw, 52px); background: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); }
+        /* the story - one calm prose island */
+        .ab-story { border-radius: var(--r-card); padding: clamp(28px, 4vw, 52px); background: var(--bg-raise); border: 1px solid var(--glass-line); box-shadow: var(--shadow-glass); }
         .ab-story p { font-size: clamp(16px, 1.5vw, 18px); color: var(--ink-2); line-height: 1.7; max-width: 64ch; }
         .ab-story p + p { margin-top: 18px; }
         .ab-story b { color: var(--ink); font-weight: 600; }

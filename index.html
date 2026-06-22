@@ -22,10 +22,11 @@
     <meta name="twitter:title" content="SnapShotPro · Screenshot Studio">
     <meta name="twitter:description" content="Screenshots that carry weight. Backgrounds, device frames, App Store sets, generative AI edits, and video, all in your browser.">
     <meta name="twitter:image" content="__OG_BASE__/og.png?v=2">
-    <meta name="theme-color" content="#2348ff">
+    <meta name="theme-color" content="#080b14">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>try{var t=localStorage.getItem('snapshotpro_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <link rel="stylesheet" href="/site.css">
     <style>
         /* Landing-specific pieces only; the design system lives in /site.css. */
@@ -35,19 +36,17 @@
         .hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), 0 0 12px var(--accent); }
         .hero-eyebrow span { font-size: 13px; font-weight: 500; color: var(--ink-2); }
         .hero h1 { font-size: clamp(44px, 6.6vw, 84px); font-weight: 700; line-height: 0.98; letter-spacing: -0.035em; margin-bottom: 24px; color: var(--ink); }
+        .hero h1 em { font-style: italic; font-weight: 700; }
         .hero-sub { font-size: clamp(16.5px, 1.5vw, 19px); color: var(--ink-2); max-width: 32ch; line-height: 1.55; margin-bottom: 34px; }
         .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; }
+        .hero-link { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 15px; color: var(--ink); }
+        .hero-link .ar { color: var(--accent); transition: transform .2s var(--ease); }
+        .hero-link:hover .ar { transform: translateX(3px); }
 
-        .showpiece { position: relative; border-radius: 26px; overflow: hidden; padding: clamp(26px, 4vw, 50px); aspect-ratio: 4 / 3.4; display: flex; align-items: center; justify-content: center; }
-        .browser { width: 100%; border-radius: 13px; overflow: hidden; background: #0e1120; box-shadow: 0 40px 80px -24px rgba(0,0,0,0.7); transform: rotate(-1.4deg); border: 1px solid rgba(255,255,255,0.08); }
-        .browser-bar { height: 38px; background: #151a2b; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .browser-bar .tl { width: 11px; height: 11px; border-radius: 50%; }
-        .browser-bar .tl:nth-child(1){ background:#ff5f57; } .browser-bar .tl:nth-child(2){ background:#febc2e; } .browser-bar .tl:nth-child(3){ background:#28c840; }
-        .browser-bar .url { margin-left: 10px; height: 22px; flex: 1; border-radius: 6px; background: #0b0e1a; display: flex; align-items: center; padding: 0 11px; font-family: var(--font-mono); font-size: 10.5px; color: #6f7794; }
-        .browser-shot { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; background: #0b0e1a; }
-        .float-chip { position: absolute; z-index: 2; background: rgba(14,18,32,0.66); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border-radius: 13px; padding: 10px 14px; box-shadow: var(--shadow-lift); border: 1px solid var(--glass-line); display: flex; align-items: center; gap: 9px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
-        .float-chip svg { width: 16px; height: 16px; color: var(--accent); }
-        .float-chip.one { bottom: 11%; left: -4%; } .float-chip.two { top: 14%; right: -3%; }
+        /* Hero stage: the framed art is the showpiece. */
+        .stage { position: relative; }
+        .hero .frame { transform: rotate(-1.4deg); }
+        .hero .frame .art { aspect-ratio: 1200 / 630; }
 
         .fc-copy .eyebrow { margin-bottom: 12px; }
         .fc-copy h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 16px; color: var(--ink); }
@@ -58,16 +57,21 @@
         .fc-more .ar { transition: transform .2s var(--ease); } .fc-more:hover .ar { transform: translateX(3px); }
         .tri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: clamp(20px, 3vw, 28px); }
 
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        .gcard { border-radius: var(--r-card); overflow: hidden; position: relative; aspect-ratio: 3 / 3.6; padding: 22px; display: flex; align-items: flex-end; box-shadow: var(--shadow-lift); }
-        .gcard:nth-child(1){ background: linear-gradient(160deg, #ff8a5c, #ff5e7e 55%, #c5318f); }
-        .gcard:nth-child(2){ background: linear-gradient(160deg, #2bd4c4, #2348ff 60%, #1631a8); }
-        .gcard:nth-child(3){ background: linear-gradient(160deg, #3a2d6b, #15161a); }
-        .gcard-shot { position: absolute; inset: 22px 22px 76px; border-radius: 11px; overflow: hidden; box-shadow: 0 18px 40px -10px rgba(0,0,0,0.6); background: #0b0e1a; transform: rotate(-1.5deg); }
-        .gcard-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .gcard-cap { position: relative; z-index: 1; color: #fff; }
-        .gcard-cap strong { display: block; font-size: 15px; font-weight: 600; }
-        .gcard-cap span { font-size: 12.5px; opacity: 0.82; }
+        /* Gallery wall: framed art in an asymmetric arrangement. */
+        .wall { display: grid; grid-template-columns: repeat(12, 1fr); gap: clamp(18px, 3vw, 30px); align-items: end; }
+        .hang { position: relative; }
+        .hang .cap { margin-top: 14px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; color: var(--ink-3); }
+        .hang.one { grid-column: 1 / 6; }
+        .hang.two { grid-column: 6 / 10; }
+        .hang.three { grid-column: 10 / 13; }
+        .hang.one .frame { transform: rotate(-1.6deg); }
+        .hang.two .frame { transform: rotate(1deg); }
+        .hang.three .frame { transform: rotate(-0.6deg); }
+        .wall .frame .art { display: flex; align-items: center; justify-content: center; padding: 13%; }
+        .wall .frame .art img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 14px 34px rgba(0,0,0,0.28); }
+        .hang.one .frame .art { background: linear-gradient(135deg, #ff9a62, #c5318f); }
+        .hang.two .frame .art { aspect-ratio: 3 / 4; background: linear-gradient(135deg, #2bd4c4, #173a8a); }
+        .hang.three .frame .art { aspect-ratio: 3 / 4; background: linear-gradient(150deg, #6d5bff, #1631a8); }
 
         .use-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
         .use-chip { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: var(--r-card); background: var(--glass); border: 1px solid var(--glass-line); color: var(--ink); transition: transform .2s var(--ease), border-color .2s; }
@@ -87,17 +91,21 @@
         @media (max-width: 900px) {
             .hero-inner { grid-template-columns: 1fr; min-height: 0; gap: 44px; padding-top: 44px; padding-bottom: 64px; }
             .hero-sub { max-width: 44ch; }
-            .showpiece { aspect-ratio: 4 / 3; max-width: 540px; }
+            .stage { max-width: 540px; }
             .tri-grid { grid-template-columns: 1fr; }
-            .gallery { grid-template-columns: 1fr 1fr; }
             .use-grid { grid-template-columns: 1fr 1fr; }
             .steps { grid-template-columns: 1fr; }
+            .wall { grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+            .hang.one { grid-column: 1 / 3; }
+            .hang.two { grid-column: 1 / 2; }
+            .hang.three { grid-column: 2 / 3; }
+            .hang.two .frame .art, .hang.three .frame .art { aspect-ratio: 4 / 3; }
         }
         @media (max-width: 560px) {
             .hero h1 { font-size: clamp(40px, 12vw, 56px); }
-            .gallery { grid-template-columns: 1fr; }
             .use-grid { grid-template-columns: 1fr; }
-            .float-chip.one { left: 2%; } .float-chip.two { right: 2%; }
+            .wall { grid-template-columns: 1fr; }
+            .hang.one, .hang.two, .hang.three { grid-column: auto; }
         }
     </style>
 </head>
@@ -110,30 +118,18 @@
     <div class="wrap hero-inner">
         <div class="hero-copy">
             <div class="hero-eyebrow"><span class="dot"></span><span>Free screenshot studio, runs in your browser</span></div>
-            <h1>Screenshots that<br>carry <span class="grad-text">weight</span>.</h1>
-            <p class="hero-sub">Backgrounds, device frames, App Store sets, generative AI edits, even video. All in your browser, no account.</p>
+            <h1>Screenshots that<br>carry <em>weight</em>.</h1>
+            <p class="hero-sub">Backgrounds, device frames, App Store sets, AI edits, even video. All in your browser, no account.</p>
             <div class="hero-actions">
                 <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                <a href="/features/" class="btn btn-ghost btn-lg">Explore features</a>
+                <a href="/features/" class="hero-link">Explore features <span class="ar">→</span></a>
             </div>
         </div>
         <div class="hero-visual">
-            <div class="showpiece glass" data-tilt>
-                <div class="browser">
-                    <div class="browser-bar">
-                        <span class="tl"></span><span class="tl"></span><span class="tl"></span>
-                        <span class="url">snapshotpro.xyz/editor</span>
-                    </div>
-                    <img class="browser-shot" src="https://picsum.photos/seed/snapshot-hero-dash/1280/800" alt="A polished product screenshot composed in SnapShotPro" loading="eager" width="1280" height="800">
-                </div>
-                <div class="float-chip one">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-                    Generative AI edits
-                </div>
-                <div class="float-chip two">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="2"/><rect x="13" y="3" width="7" height="18" rx="2"/></svg>
-                    App Store sets
-                </div>
+            <div class="stage">
+                <figure class="frame" data-tilt>
+                    <span class="art"><img src="/og.png" alt="A polished product screenshot composed in SnapShotPro" loading="eager" width="1200" height="630"></span>
+                </figure>
             </div>
         </div>
     </div>
@@ -213,24 +209,24 @@
 <section class="section-pad" id="showcase" style="padding-top:0;">
     <div class="wrap">
         <div class="section-head reveal">
-            <h2>One screenshot, a dozen ways to make it land.</h2>
-            <p>Dial in the frame, background, and finish until it looks like it belongs in your deck.</p>
+            <h2>One canvas, every output.</h2>
+            <p>Drop in a raw grab and walk out with a store set, a social post, or a release clip, all from the same project.</p>
         </div>
-        <div class="gallery">
-            <div class="gcard reveal">
-                <div class="gcard-shot"><img src="https://picsum.photos/seed/snapshot-warm-ui/800/500" alt="Screenshot on a warm gradient" loading="lazy"></div>
-                <div class="gcard-cap"><strong>Warm gradient</strong><span>Soft shadow, rounded corners</span></div>
-            </div>
-            <div class="gcard reveal">
-                <div class="gcard-shot"><img src="https://picsum.photos/seed/snapshot-cobalt-ui/800/500" alt="Screenshot on a cobalt mesh background" loading="lazy"></div>
-                <div class="gcard-cap"><strong>Cobalt mesh</strong><span>Browser frame, 3D tilt</span></div>
-            </div>
-            <div class="gcard reveal">
-                <div class="gcard-shot"><img src="https://picsum.photos/seed/snapshot-ink-ui/800/500" alt="Screenshot with liquid glass and spotlight" loading="lazy"></div>
-                <div class="gcard-cap"><strong>Glass &amp; spotlight</strong><span>Liquid glass, annotations</span></div>
-            </div>
+        <div class="wall">
+            <figure class="hang one reveal">
+                <div class="frame"><span class="art"><img src="/og.png" alt="A screenshot on a warm sunset gradient backdrop" loading="lazy"></span></div>
+                <div class="cap">Sunset backdrop</div>
+            </figure>
+            <figure class="hang two reveal">
+                <div class="frame"><span class="art"><img src="/og.png" alt="A screenshot on an ocean gradient backdrop" loading="lazy"></span></div>
+                <div class="cap">Ocean backdrop</div>
+            </figure>
+            <figure class="hang three reveal">
+                <div class="frame"><span class="art"><img src="/og.png" alt="A screenshot on a violet duotone backdrop" loading="lazy"></span></div>
+                <div class="cap">Violet duotone</div>
+            </figure>
         </div>
-        <div style="margin-top:26px;">
+        <div style="margin-top:30px;">
             <a href="/gallery/" class="fc-more">Browse the gallery <span class="ar">→</span></a>
         </div>
     </div>
