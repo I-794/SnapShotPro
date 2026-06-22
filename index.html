@@ -47,9 +47,6 @@
         .stage { position: relative; }
         .hero .frame { transform: rotate(-1.4deg); }
         .hero .frame .art { aspect-ratio: 16 / 10; }
-        .stage .chip { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
-        .stage .chip svg { width: 15px; height: 15px; color: var(--accent); }
-        .stage .chip.hero-chip { bottom: 12%; left: -5%; z-index: 2; }
 
         .fc-copy .eyebrow { margin-bottom: 12px; }
         .fc-copy h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 16px; color: var(--ink); }
@@ -106,7 +103,6 @@
             .use-grid { grid-template-columns: 1fr; }
             .wall { grid-template-columns: 1fr; }
             .hang.one, .hang.two, .hang.three { grid-column: auto; }
-            .stage .chip.hero-chip { left: 3%; }
         }
     </style>
 </head>
@@ -131,10 +127,6 @@
                 <figure class="frame" data-tilt>
                     <span class="art"><img src="/og.png" alt="A polished product screenshot composed in SnapShotPro" loading="eager" width="1200" height="630"></span>
                 </figure>
-                <div class="chip hero-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-                    AI edits
-                </div>
             </div>
         </div>
     </div>
