@@ -21,7 +21,9 @@ export const SERIALIZED_FIELDS = [
   // v16.2 — pattern background (active only when bgMode === 'pattern').
   'pattern',
   // v21 — 3D / isometric device mockup (orbit/zoom/scene/material/spin).
-  'mockup3d'
+  'mockup3d',
+  // v27 — Surface Studio (physical & print mockup) settings.
+  'surface'
 ];
 
 // v21 — strip the runtime-only orbitProgress so a saved/shared/restored design

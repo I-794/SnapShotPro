@@ -203,7 +203,22 @@ export const state = {
   //   side: 'top'|'bottom'|'left'|'right' — which edge the callout pins to.
   //   action: 'next' (MVP) — schema reserves room for { goto: stepIndex } branching.
   //   autoAdvanceMs: 0 = manual advance; > 0 = auto-advance after that many ms.
-  tour: { hotspots: [], autoAdvanceMs: 0 }
+  tour: { hotspots: [], autoAdvanceMs: 0 },
+
+  // v27 — Surface Studio: physical & print mockups. When enabled and `type` is a
+  // surface, render/surfaces.js wraps the graded image onto the surface inside
+  // renderInto (so it bakes into export, like the device-mockup path). enabled:
+  // false is a full no-op, so pre-v27 designs are untouched. scale/offset/
+  // rotation place the artwork within the print region; variant is the garment/
+  // material colour; shadingOpacity controls the fold/curvature multiply.
+  surface: {
+    enabled: false,
+    type: 'tshirt',            // tshirt | mug | poster | framedprint | businesscard | box
+    variant: 'white',
+    scale: 1, offsetX: 0, offsetY: 0, rotation: 0,
+    shadow: true,
+    shadingOpacity: 0.85
+  }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).

@@ -557,6 +557,7 @@ export function updateUIFromState() {
   refreshPatternUI();           // reflect persisted pattern background controls
   refreshPalettesUI();          // reflect v17 palette library + editor
   refreshColorMapUI();          // reflect v17 color-map mode + controls
+  if (typeof window.__refreshSurfaceUi === 'function') window.__refreshSurfaceUi();  // v27 Surface Studio
   if (!state.exportMotion) state.exportMotion = { resolution: 1, quality: 'high', loop: 0 };
   syncMotionExportControls();   // reflect v15.1 motion-export prefs into their selects
 

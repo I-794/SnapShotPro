@@ -67,7 +67,9 @@ function snapshot() {
     // images are never snapshotted (same as the SVG/photo source).
     codeSnippet: state.codeSnippet,
     // v25 — Interactive Tour hotspots/callouts for the active step are undoable.
-    tour: state.tour
+    tour: state.tour,
+    // v27 — Surface Studio (physical & print mockup) settings are undoable.
+    surface: state.surface
   }));
 }
 

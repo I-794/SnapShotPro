@@ -18,6 +18,7 @@ import { drawEffects } from './effects.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { isDeviceMockup3d, render3dMockup } from './mockups-3d.js';
 import { bakePerspective } from './perspective.js';
+import { isSurfaceMockup, drawSurfaceMockup } from './surfaces.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
 import { drawGuides } from '../features/snapping.js';
 import { drawReflection } from './reflection.js';
@@ -89,6 +90,24 @@ export function renderInto(canvas, forExport) {
         ctx.globalAlpha = 1;
       }
     }
+    if (!forExport) drawGuides(ctx);
+    drawEffects(ctx, canvas);
+    drawTextOverlay(ctx, canvas);
+    drawWatermark(ctx, canvas);
+    drawLogo(ctx, canvas);
+    if (!forExport) renderMinimap();
+    return;
+  }
+
+  // v27 — Surface Studio: wrap the artwork onto a physical/print surface
+  // (t-shirt, mug, poster, framed print, business card, packaging box). Like the
+  // device path it composites onto an offscreen, then runs the shared tail so it
+  // bakes into export. Reachable independent of deviceFrame.type; the graded
+  // image is the print source so color filters/grades carry through.
+  if (state.surface?.enabled && isSurfaceMockup(state.surface.type)) {
+    const art = getGradedImage(state.image);
+    const out = drawSurfaceMockup(ctx, canvas, art, state.surface);
+    if (out && out.rect) state.lastImageRect = out.rect;
     if (!forExport) drawGuides(ctx);
     drawEffects(ctx, canvas);
     drawTextOverlay(ctx, canvas);

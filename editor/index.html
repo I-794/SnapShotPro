@@ -729,6 +729,37 @@
             </div>
         </div>
 
+        <!-- v27 — Surface Studio: physical & print mockups -->
+        <div class="sidebar-section" data-group="frame">
+            <h3 class="section-title">🧢 Physical &amp; Print</h3>
+            <p class="info-text" style="margin-bottom:10px;">Wrap your image onto a real-world surface. Bakes into export like any mockup.</p>
+            <div class="scenes-grid" id="surface-grid">
+                <div class="scene-tile" data-surface=""><div class="scene-thumb">🚫</div>None</div>
+                <div class="scene-tile" data-surface="tshirt"><div class="scene-thumb">👕</div>T-Shirt</div>
+                <div class="scene-tile" data-surface="mug"><div class="scene-thumb">☕</div>Mug</div>
+                <div class="scene-tile" data-surface="poster"><div class="scene-thumb">🖼️</div>Poster</div>
+                <div class="scene-tile" data-surface="framedprint"><div class="scene-thumb">🏞️</div>Framed</div>
+                <div class="scene-tile" data-surface="businesscard"><div class="scene-thumb">💳</div>Card</div>
+                <div class="scene-tile" data-surface="box"><div class="scene-thumb">📦</div>Box</div>
+            </div>
+            <div id="surface-controls" style="display:none;margin-top:12px;">
+                <label class="control-label">Colour / material</label>
+                <div id="surface-variants" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;"></div>
+                <div class="control-group"><label class="control-label">Artwork size <span id="surface-scale-value">100%</span></label><input type="range" id="surface-scale" min="0.3" max="2" step="0.02" value="1"></div>
+                <div class="control-group"><label class="control-label">Offset X <span id="surface-offset-x-value">0</span></label><input type="range" id="surface-offset-x" min="-0.4" max="0.4" step="0.01" value="0"></div>
+                <div class="control-group"><label class="control-label">Offset Y <span id="surface-offset-y-value">0</span></label><input type="range" id="surface-offset-y" min="-0.4" max="0.4" step="0.01" value="0"></div>
+                <div class="control-group"><label class="control-label">Rotation <span id="surface-rotation-value">0°</span></label><input type="range" id="surface-rotation" min="-45" max="45" step="1" value="0"></div>
+                <div class="control-group"><label class="control-label">Surface shading <span id="surface-shading-value">85%</span></label><input type="range" id="surface-shading" min="0" max="1" step="0.05" value="0.85"></div>
+                <div class="control-group"><label class="control-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="surface-shadow" checked style="width:auto;"> Contact shadow</label></div>
+            </div>
+            <label class="control-label" style="margin-top:6px;">Quick presets</label>
+            <div class="scenes-grid" style="margin-top:6px;">
+                <div class="scene-tile" data-surface-preset="merch"><div class="scene-thumb">👕</div>Merch tee</div>
+                <div class="scene-tile" data-surface-preset="posterwall"><div class="scene-thumb">🖼️</div>Poster wall</div>
+                <div class="scene-tile" data-surface-preset="packaging"><div class="scene-thumb">📦</div>Packaging</div>
+            </div>
+        </div>
+
         <div class="sidebar-section" data-group="export">
             <h3 class="section-title">📱 App Store Sets</h3>
             <div class="app-mode-toggle">
