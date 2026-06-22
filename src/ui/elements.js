@@ -111,6 +111,9 @@ const IDS = [
   // Export
   'export-format', 'quality-controls', 'export-quality', 'export-quality-value',
   'copy-clipboard-btn', 'export-html-btn',
+  // v28 — export presets + asset library
+  'export-preset-select', 'export-preset-apply', 'export-preset-save', 'export-preset-scale',
+  'asset-library-grid',
 
   // Templates
   'template-name', 'save-template-btn', 'clear-templates-btn', 'template-list',

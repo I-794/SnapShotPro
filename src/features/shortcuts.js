@@ -11,6 +11,8 @@ export const SHORTCUTS = [
   { id: 'copy',     keys: 'mod+shift+c', label: 'Copy to clipboard',              group: 'File',     match: (e, mod) => mod && e.shiftKey && k(e) === 'c' },
   { id: 'undo',     keys: 'mod+z',       label: 'Undo',                           group: 'Edit',     match: (e, mod) => mod && k(e) === 'z' && !e.shiftKey },
   { id: 'redo',     keys: 'mod+shift+z', label: 'Redo',                           group: 'Edit',     match: (e, mod) => mod && (k(e) === 'y' || (k(e) === 'z' && e.shiftKey)) },
+  { id: 'duplicate', keys: 'mod+d',      label: 'Duplicate selected',             group: 'Edit',     match: (e, mod) => mod && k(e) === 'd' },
+  { id: 'select-all', keys: 'mod+a',     label: 'Select all objects',             group: 'Edit',     match: (e, mod) => mod && k(e) === 'a' },
   { id: 'delete',   keys: 'Delete',      label: 'Delete selected',                group: 'Edit',     displayOnly: true },
   { id: 'deselect', keys: 'Escape',      label: 'Deselect / Select tool',         group: 'Edit',     displayOnly: true },
   { id: 'nudge',    keys: 'arrows',      label: 'Nudge selected (Shift = 10px)',  group: 'Edit',     displayOnly: true },

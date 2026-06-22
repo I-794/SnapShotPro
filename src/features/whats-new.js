@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '27.0';
+const CURRENT_VERSION = '28.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🧢 Physical & print mockups",
+  heading: "⚡ Studio quality-of-life",
   items: [
-    { title: 'Beyond screens',
-      desc: 'The new Surface Studio wraps your image onto real things — a t-shirt, mug, poster, framed print, business card, or packaging box — with proper warp, folds, and lighting.' },
-    { title: 'Place it exactly',
-      desc: 'Pick a garment or material colour, then size, nudge, rotate, and shade the artwork until it sits right. Quick presets get you a hero shot in one click.' },
-    { title: 'Bakes into export',
-      desc: 'Like every mockup, the surface renders straight onto the canvas, so it exports to PNG/JPEG and saves with your project. Find it under the Frame tab.' }
+    { title: 'Select many at once',
+      desc: 'Drag a box around objects (or Shift-click) to grab several at a time, then move, nudge, align, or delete them together. Ctrl/⌘+A selects everything on the canvas.' },
+    { title: 'Right-click for everything',
+      desc: 'A new context menu on the canvas: duplicate, delete, bring to front / send to back, copy & paste an annotation’s style, and align — all on your whole selection.' },
+    { title: 'Asset library + export presets',
+      desc: 'Loaded images now live in a reusable library to drop back in any time, and export presets give you one-click PNG/JPEG/WebP at 1×/2×/3× — including from Cmd-K.' }
   ]
 };
 
