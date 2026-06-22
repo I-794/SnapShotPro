@@ -1,140 +1,113 @@
-# V27 — Marketing Site Redesign: "Gallery" (Editorial Light + Liquid Glass)
+# V27 — Marketing Site Redesign: Dual-Mode (Elevate Dark-Glass + Add "Gallery" Light)
 
-> Status: design approved. Prototype signed off. Implementation plan to follow.
-> Reference prototype: `docs/superpowers/specs/assets/v27-prototype.html` (+ `v27-refined.png`).
+> Status: design approved (dual-mode). Prototype of the light "Gallery" mode signed off.
+> Impeccable installed in-repo and driving the workflow. Implementation plan: `docs/superpowers/plans/2026-06-22-v27-marketing-redesign.md`.
+> Reference prototype (light mode): `docs/superpowers/specs/assets/v27-prototype.html` (+ `v27-refined.png`).
 
 ## Context
 
-SnapShotPro has shipped 26 versions of *features*, but the marketing site has drifted into the
-default premium-SaaS look of 2022-23: dark glassmorphism (`#080b14` navy base, frosted blur on
-everything, an electric-cobalt *glow* accent, a 34s drifting aurora). It is cohesive but it does not
-**pop**, and frosted glass actively *mutes* contrast. That is the wrong choice for a product whose
-entire output is **colorful screenshots**: the chrome is currently louder than the work it should
-showcase.
+SnapShotPro has shipped 26 versions of features; the marketing site's complaint was that the
+dark-glassmorphism look "doesn't pop" — frosted glass on every surface mutes contrast, and the
+product (whose output is colorful screenshots) is quieter than its own chrome.
 
-V27 is a **marketing-site-only visual rebrand**. The editor studio UI is explicitly deferred to
-**V30** (noted in `CLAUDE.md`). The direction is **"Gallery" — Editorial Light, with a refined
-liquid-glass accent**: a calm warm-white "museum wall" where the colorful product screenshots become
-the only color and the visual hero, and glass is used sparingly as an accent (nav, floating chips)
-rather than as the wallpaper.
+**Direction pivot (stakeholder feedback):** the team likes the current dark-glass design. So V27 is
+**not** a replacement. It is **dual-mode**:
 
-Outcome: a higher-contrast, higher-taste site that reads as a design tool worth using, drives the
-"Open the studio" CTA, and propagates across all 24 marketing pages from one token system.
+1. **Keep dark-glass as the default brand** (identity preservation — committed navy + cobalt + glass)
+   and **elevate it so it pops**: glass becomes purposeful instead of all-over, contrast goes up,
+   real product screenshots become the hero ("The Frame"), the gradient-text headline becomes solid,
+   and type/spacing tighten. This directly answers "it doesn't pop" without changing what people like.
+2. **Add the "Gallery" editorial-light** look as the **light mode** of a new theme toggle — an
+   additive, opt-in alternative, not the default.
 
-## Design read (taste-skill)
+The editor studio UI remains deferred to **V30** (noted in `CLAUDE.md`).
 
-> *Reading this as: a design-conscious creator/developer landing for people who care about visual
-> craft, with an editorial / gallery language, leaning toward a grotesque display + mono captions on
-> warm white, dual-mode, with restrained motion and one locked accent.*
+Impeccable (`pbakaus/impeccable`, Apache-2.0) is installed in-repo (`.claude/skills/impeccable`,
+plus generated `PRODUCT.md` / `DESIGN.md`) and **drives the work**: its commands are baked into the
+plan as quality gates. Impeccable's own absolute bans independently justify the elevation
+(glassmorphism-as-default, gradient-text, eyebrow-on-every-section, identical card grids,
+hero-metric template) and its register guidance says **identity-preservation wins** when committed
+brand colors exist — exactly this case.
 
-Dials: **VARIANCE 7 · MOTION 4 · DENSITY 3.** Redesign mode: **overhaul** (new visual language,
-content + IA preserved).
+## Design read (Impeccable + taste-skill)
 
-## Locked decisions
+> *Reading this as: a brand/marketing surface (register = brand) for design-conscious creators and
+> developers, established dark-glass identity, elevated for contrast and product-forward impact, with
+> an opt-in editorial-light alternative.*
+
+Redesign mode: **preserve + evolve** (NOT overhaul). Per `PRODUCT.md`: assured, editorial,
+trustworthy; quiet confidence; show-don't-tell; "practice what you preach."
+
+## Locked decisions (updated for dual-mode)
 
 | Decision | Choice |
 |---|---|
-| Accent (single, locked) | **Cobalt `#2348FF`**, used solid — no glow |
-| Theme | **Light default + dark toggle** via shared CSS tokens (`prefers-color-scheme` + manual toggle) |
-| Display typeface | **Schibsted Grotesk** (OFL, self-hosted) for headlines |
-| Body / mono | Keep **Geist** (body) + **JetBrains Mono** (eyebrows, captions) |
-| Logo mark | **Redraw** as a simple solid-cobalt mark (retire the `#667eea→#764ba2` purple-gradient camera) |
+| Default theme | **Dark-glass (current), elevated.** `:root` keeps the navy/cobalt/glass tokens. |
+| Second theme | **Gallery editorial-light**, opt-in via toggle (`html[data-theme="light"]`). |
+| Theme default behavior | Dark is the hard default; light only when the user toggles (persisted). |
+| Accent | **Cobalt** — dark `#4f7cff`/`#2348ff` (unchanged), light `#2348FF`. Reduce glow. |
+| Logo mark | **Keep the existing mark** (identity preservation). No redraw. |
+| Display typeface | **Keep Geist** for display (preserve identity); tighten weight/tracking. Schibsted Grotesk is OPTIONAL for the light mode only, deferred unless desired. |
+| Body / mono | Geist (body) + JetBrains Mono (eyebrows, captions) — unchanged. |
 
-## Design system — tokens (`public/site.css` `:root`)
+## Elevation of the dark default (what makes it pop, per Impeccable)
 
-Re-skin is **token-first**; most change lives in `:root` + a few component classes, so all 24 pages
-update together. Light values below; dark values swap under `[data-theme="dark"]` /
-`@media (prefers-color-scheme: dark)`.
+All within the existing identity — these are elevations, not a rebrand:
 
-**Light:**
-- `--bg:#F6F5F1` (warm paper) · `--bg-2:#FFFFFF` (raised) · `--bg-sunken:#EFEDE7`
-- `--ink:#111111` · `--ink-2:#4B4B4B` · `--ink-3:#8A8A85`
-- `--line:rgba(17,17,17,.10)` · `--line-strong:rgba(17,17,17,.18)`
-- `--accent:#2348FF` · `--accent-press:#1a37cc` · `--on-accent:#fff`
+1. **The Frame (biggest lever):** real exported product screenshots presented as framed art (matte
+   padding + deep cast shadow) become the hero and gallery centerpieces. Show, don't tell. Works on
+   the dark canvas. NO `<div>`-fake screenshots.
+2. **Purposeful glass:** glass stays only where something floats over imagery (nav, overlays, hero
+   chips). Decorative `.glass-card`/`.stat` glass becomes solid raised surfaces (`--bg-raise`) with a
+   hairline — higher contrast, less mush. (Impeccable: glassmorphism-as-default is banned.)
+3. **Kill gradient-text:** the `.grad-text` animated-gradient headline becomes solid ink with
+   same-family italic emphasis. (Impeccable absolute ban: gradient text.)
+4. **Contrast pass:** raise body text off `--ink-3` where it carries copy; verify WCAG AA
+   (the `DESIGN.md` notes flag `--ink-3 #6f7794` on the darkest bg).
+5. **Solid accent:** reduce CTA glow to a restrained shadow; cobalt stays the single accent.
+6. **De-scaffold:** remove eyebrow-on-every-section and any numbered-section markers that are not a
+   real sequence; tighten display tracking to the ≥ -0.04em floor; `text-wrap: balance` on headings.
+7. **Keep the aurora** (a liked signature) but subtle + `prefers-reduced-motion` honored.
 
-**Dark (parity, brand-faithful, no pure black):**
-- `--bg:#0E1014` · `--bg-2:#15181F` · `--bg-sunken:#0A0C10`
-- `--ink:#F2F3F7` · `--ink-2:#AEB4C2` · `--ink-3:#727A8C`
-- `--accent:#5B82FF` (lifted cobalt for dark legibility) · `--on-accent:#fff`
+## Gallery light mode (the additive alternative)
 
-**Liquid glass (accent-only, both modes):** `--glass`, `--glass-line`, `--glass-blur:18px`,
-`--shadow-glass: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 40px rgba(17,17,17,.12)`. Every glass
-surface degrades to a solid `--bg-2` fill under `@media (prefers-reduced-transparency: reduce)`.
+The signed-off editorial-light system, scoped to `html[data-theme="light"]`: warm paper `#F6F5F1`,
+ink `#111`, solid cobalt, light "liquid glass" used only on nav/chips, the same `.frame` component,
+`--shadow-art` cast shadow. Tokens reuse the same NAMES so components work in both modes.
 
-**Signature shadow (tinted, never pure black on light):**
-`--shadow-art: 0 2px 4px rgba(17,17,17,.06), 0 30px 60px -20px rgba(17,17,17,.22)` — the "framed
-artwork" cast shadow, the load-bearing elevation of the whole site.
+## Theme system
 
-**Shape lock:** `--r-card:14px` (cards/frames) · `--r-sm:10px` (controls) · `--r-pill:999px`.
-**Type:** display tracking `-0.02em`, body max ~65ch.
+- `:root` = dark-glass (default). `html[data-theme="light"]` = Gallery light. `html[data-theme="dark"]`
+  is redundant but supported for explicit choice.
+- Toggle button in nav; choice persists in `localStorage['snapshotpro_theme']`; a tiny pre-paint
+  inline `<head>` script sets `data-theme` before first paint (no FOUC). Dark is the default when no
+  choice is stored.
+- Every glass surface degrades to a solid fill under `prefers-reduced-transparency: reduce`, in both
+  modes.
 
-## Signature components
+## Scope — pages
 
-1. **The Frame** — reusable "artwork" wrapper for every product screenshot: matte border + tiny
-   rotation + `--shadow-art`, optional scroll parallax. Replaces today's tilted browser-chrome
-   showpiece. The frames MUST hold **real exported SnapShotPro screenshots** (or generated assets),
-   never CSS/`<div>` fakes (taste-skill 9.E).
-2. **Liquid-glass chip / nav** — frosted overlay used ONLY where something floats over an image
-   (sticky nav, the 2 hero feature chips, gallery labels). Everywhere else = solid surfaces.
-3. **Hero** — left-aligned asymmetric split: mono eyebrow → big Schibsted Grotesk headline (≤2 lines,
-   italic emphasis on *weight* in the same family) → ≤20-word subtext → 1 primary CTA
-   (`Open the studio`) + 1 ghost link. Right: one Framed screenshot with one glass chip. `min-h:100dvh`.
+One token system drives all **24 marketing pages** (editor excluded, V30): home, the 4 nav hubs
+(`features`, `tools`, `ai`, `gallery`), `agent`, `pricing`, `guide`, `changelog`, `about`,
+`alternatives`, `faq`, `roadmap`, `extension`, `privacy`, `terms`, and the 8 SEO tool pages.
 
-## Skill audit applied (taste-skill + redesign-skill)
+## Impeccable workflow (baked into the plan)
 
-The prototype was run through the redesign-skill audit and the taste-skill 60-point pre-flight.
-Direction passes (light theme lock, single accent, asymmetric hero, framed-art over fake UI, tinted
-shadows, glass with inner highlight + reduced-transparency fallback). Fixes folded into this spec:
-
-- **Em-dash ban (9.G, non-negotiable):** zero `—`/`–` anywhere visible. Use periods, commas, or `-`.
-- **No decorative status dots** on chips/nav/badges (9.F).
-- **No section-number / fake-precise-spec captions** (e.g. `01 — Gradient backdrop · 1600×1200`);
-  plain functional captions only.
-- **a11y:** `:focus-visible` rings on all interactive elements; `text-wrap: balance` on headings;
-  WCAG AA contrast verified for CTA text and `--ink-2` body in **both** modes.
-- **Footer version stamp** (`v{{VERSION}}`) is normally a 9.F tell, but is an **intentional kept
-  exception** here: it is an established, functional pattern for this OSS project (drives the
-  what's-new toast) and is preserved per redesign-protocol 11.C.
-
-## Scope — pages & work order
-
-One token system drives all **24 marketing pages** (editor excluded, deferred to V30):
-home, the 4 nav hubs (`features`, `tools`, `ai`, `gallery`), `agent`, `pricing`, `guide`,
-`changelog`, `about`, `alternatives`, `faq`, `roadmap`, `extension`, `privacy`, `terms`, and the 8
-SEO tool pages (`app-store-screenshots`, `device-mockup-generator`, `og-image-generator`,
-`drop-shadow-generator`, `social-media-mockups`, `github-readme-screenshots`, `code-screenshots`,
-`use-cases`).
-
-1. **Tokens + fonts + partials first** — `public/site.css` `:root` (light + dark), self-host
-   Schibsted Grotesk via `@font-face`, `site/partials/nav.html` (+ theme toggle + active-link
-   state), `footer.html`, `mark.html` (new solid-cobalt mark). This alone reskins every page.
-2. **Home** (`index.html`) — rebuild to the Gallery layout (hero, stats strip, "one canvas, every
-   output" framed-art wall, how-it-works, closing CTA). The showcase page.
-3. **Hub pages** (`features`, `tools`, `ai`, `gallery`, `agent`, `pricing`, `guide`) — apply new
-   components; `gallery` becomes the literal centerpiece of the aesthetic.
-4. **Remaining** pages inherit tokens; light per-page polish.
-5. **OG/social + favicon** — regenerate `public/og.png`, `favicon.svg`, PWA icons, and `theme-color`
-   meta (currently `#2348ff` / `#080b14`) to match the light brand.
-
-## Implementation approach
-
-- Bump `package.json` version → `27.0.0` (drives footer `{{VERSION}}` + the what's-new toast).
-- Edits concentrate in `public/site.css` (token block + `.btn`, `.nav`, glass utilities, new
-  `.frame`/`.art` classes, theme-toggle styles) and the three `site/partials/*.html`.
-- Per-page HTML edits follow existing structure; reuse the partial-injection + `__OG_BASE__` /
-  `{{VERSION}}` build mechanics already in `vite.config.js` (no build-system changes).
-- Add a note to `CLAUDE.md` reserving the **editor studio UI rebrand for V30**.
-- Theme toggle: small inline script persisting choice to `localStorage` (`snapshotpro_theme`),
-  defaulting to `prefers-color-scheme`; set `data-theme` on `<html>` before paint to avoid FOUC.
+- `node .claude/skills/impeccable/scripts/context.mjs` to load `PRODUCT.md`/`DESIGN.md`; read
+  `reference/brand.md` (register = brand).
+- `/impeccable critique` + `/impeccable audit` to baseline the current site (scored P0–P3) and target
+  the real "doesn't pop" weaknesses.
+- `/impeccable bolder` + `/impeccable polish` to drive the dark-mode elevation.
+- `npx impeccable` anti-pattern **detector** during the page sweep.
+- `/impeccable document` to rewrite `DESIGN.md` for the dual-mode system at the end.
 
 ## Verification
 
-- `npm run dev` → QA home + 2-3 representative pages (a hub + an SEO tool page) at desktop **and**
-  mobile (`<768px` per-section collapse), in **both** light and dark.
-- Confirm glass degrades to solid under `prefers-reduced-transparency: reduce`; WCAG AA contrast
-  passes for CTA-on-cobalt and `--ink-2`-on-`--bg` in both modes; `:focus-visible` rings visible.
-- `npm run build && npm run preview` → footer `{{VERSION}}` = 27.0.0, partials inject on all pages,
-  OG/favicon updated, no console errors, no FOUC on theme.
-- Taste-skill pre-flight: zero em-dashes, ≤1 eyebrow per 3 sections, one accent locked across all
-  pages, ≥4 distinct section layout families on home, hero fits viewport, no div-fake screenshots in
-  frames (real exported images).
+- `npm run dev` → QA home + a hub + an SEO tool page at desktop and mobile, in **both** dark (default)
+  and light. Toggle persists, no FOUC, dark is default with no stored choice.
+- Glass degrades to solid under `prefers-reduced-transparency`; WCAG AA passes for CTA + body in both
+  modes; `:focus-visible` rings visible.
+- `npm run build && npm run preview` → footer `{{VERSION}}` = 27.0.0; partials on all pages; no
+  console errors.
+- Impeccable: `npx impeccable` detector clean (or triaged P0/P1 fixed); `/impeccable audit` score
+  improved vs the baseline; zero gradient-text, no glassmorphism-as-default, single accent.
