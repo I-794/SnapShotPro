@@ -125,7 +125,10 @@ function printCanvas(w, h) {
 // Build the flat print texture: the artwork placed into a print-region of the
 // given aspect ratio, honouring the user's scale/offset/rotation. `fit` is
 // 'cover' (paper goods) or 'contain' (apparel/mug, art floats on the surface).
-function buildPrintTexture(art, spec, surface) {
+// `shadeKind` ('fold' | 'cylinder' | null) bakes curvature/fold shading into the
+// art pixels via source-atop, so transparent margins stay clean (no grey box)
+// and reveal the garment behind them.
+function buildPrintTexture(art, spec, surface, shadeKind) {
   const RES = 1100;
   const pw = spec.printAR >= 1 ? RES : Math.round(RES * spec.printAR);
   const ph = spec.printAR >= 1 ? Math.round(RES / spec.printAR) : RES;
@@ -152,6 +155,38 @@ function buildPrintTexture(art, spec, surface) {
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(art, -dw / 2, -dh / 2, dw, dh);
   ctx.restore();
+
+  // Shade only the printed pixels so the print reads as part of the material;
+  // source-atop leaves the transparent margins untouched (garment shows through).
+  const op = surface.shadingOpacity ?? 0.85;
+  if (shadeKind && op > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.globalAlpha = op;
+    if (shadeKind === 'cylinder') {
+      const g = ctx.createLinearGradient(0, 0, pw, 0);
+      g.addColorStop(0, 'rgba(0,0,0,0.55)');
+      g.addColorStop(0.16, 'rgba(0,0,0,0.10)');
+      g.addColorStop(0.5, 'rgba(255,255,255,0.10)');
+      g.addColorStop(0.84, 'rgba(0,0,0,0.10)');
+      g.addColorStop(1, 'rgba(0,0,0,0.55)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, pw, ph);
+    } else {
+      for (let k = 0; k < 4; k++) {
+        const fx = (0.2 + k * 0.2) * pw;
+        const g = ctx.createLinearGradient(fx - pw * 0.08, 0, fx + pw * 0.08, 0);
+        g.addColorStop(0, 'rgba(0,0,0,0)');
+        g.addColorStop(0.5, `rgba(0,0,0,${0.10 + (k % 2) * 0.04})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.fillRect(fx - pw * 0.08, 0, pw * 0.16, ph);
+      }
+      const vg = ctx.createRadialGradient(pw / 2, ph / 2, pw * 0.28, pw / 2, ph / 2, pw * 0.66);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(1, 'rgba(0,0,0,0.18)');
+      ctx.fillStyle = vg; ctx.fillRect(0, 0, pw, ph);
+    }
+    ctx.restore();
+  }
   return c;
 }
 
@@ -182,112 +217,86 @@ function studioBackground(ctx, W, H, dark) {
 
 // ── surfaces ────────────────────────────────────────────────────────────────
 
-// T-shirt (front view). Procedural garment silhouette + the print warped over a
-// generated fold field so it bends with the fabric, then a fold/curvature
-// shading multiply so the print sits *in* the cloth rather than pasted on.
+// T-shirt (front view). Procedural garment silhouette sized to the canvas, the
+// print warped over a gentle fold field. Print shading is baked into the art in
+// buildPrintTexture (source-atop), so the transparent margins reveal the garment
+// cleanly instead of a grey box.
 function drawTshirt(ctx, W, H, print, surface) {
   const col = variantColor(surface.variant);
   const cx = W / 2;
-  const top = H * 0.14, bottom = H * 0.92;
-  const bodyH = bottom - top;
-  const shoulder = bodyH * 0.62;            // half-width at shoulders
-  const waist = bodyH * 0.5;
-  if (surface.shadow !== false) contactShadow(ctx, cx, bottom - 6, shoulder * 1.05, bodyH * 0.1);
+  // Shirt sized to the smaller canvas dimension so it never goes boxy/huge.
+  const sw = Math.min(W * 0.66, H * 0.60);   // shoulder-to-shoulder incl. sleeves
+  const sh = sw * 1.16;
+  const topY = (H - sh) / 2;
+  // x offsets from centre
+  const neck = sw * 0.13, shoulderX = sw * 0.30, sleeveX = sw * 0.50;
+  const bodyX = sw * 0.345, hemX = sw * 0.325;
+  // y positions
+  const neckY = topY + sh * 0.02, shoulderY = topY + sh * 0.05;
+  const sleeveTopY = topY + sh * 0.015, sleeveBotY = topY + sh * 0.30;
+  const underarmY = topY + sh * 0.25, hemY = topY + sh;
 
-  // Garment body path (rough tee silhouette: shoulders → sleeves → torso).
+  if (surface.shadow !== false) contactShadow(ctx, cx, hemY + 4, sw * 0.42, sh * 0.07);
+
+  // Tee silhouette: neck → shoulder → sleeve → underarm → side → hem (mirrored).
   ctx.save();
   ctx.beginPath();
-  const collarY = top + bodyH * 0.07, collarW = shoulder * 0.34;
-  ctx.moveTo(cx - collarW, collarY);
-  ctx.quadraticCurveTo(cx - shoulder * 0.7, top, cx - shoulder, top + bodyH * 0.08); // left shoulder
-  ctx.lineTo(cx - shoulder * 0.78, top + bodyH * 0.26);                              // sleeve hem
-  ctx.lineTo(cx - waist, top + bodyH * 0.32);                                        // underarm
-  ctx.lineTo(cx - waist * 0.92, bottom);                                             // side seam
-  ctx.quadraticCurveTo(cx, bottom + bodyH * 0.03, cx + waist * 0.92, bottom);
-  ctx.lineTo(cx + waist, top + bodyH * 0.32);
-  ctx.lineTo(cx + shoulder * 0.78, top + bodyH * 0.26);
-  ctx.lineTo(cx + shoulder, top + bodyH * 0.08);
-  ctx.quadraticCurveTo(cx + shoulder * 0.7, top, cx + collarW, collarY);
-  ctx.quadraticCurveTo(cx, collarY + bodyH * 0.06, cx - collarW, collarY); // collar dip
+  ctx.moveTo(cx - neck, neckY);
+  ctx.lineTo(cx - shoulderX, shoulderY);
+  ctx.lineTo(cx - sleeveX, sleeveTopY);
+  ctx.lineTo(cx - sleeveX * 0.9, sleeveBotY);
+  ctx.lineTo(cx - bodyX, underarmY);
+  ctx.lineTo(cx - hemX, hemY);
+  ctx.quadraticCurveTo(cx, hemY + sh * 0.03, cx + hemX, hemY);
+  ctx.lineTo(cx + bodyX, underarmY);
+  ctx.lineTo(cx + sleeveX * 0.9, sleeveBotY);
+  ctx.lineTo(cx + sleeveX, sleeveTopY);
+  ctx.lineTo(cx + shoulderX, shoulderY);
+  ctx.lineTo(cx + neck, neckY);
+  ctx.quadraticCurveTo(cx, neckY + sh * 0.085, cx - neck, neckY); // collar dip
   ctx.closePath();
 
-  const bodyGrad = ctx.createLinearGradient(cx - shoulder, 0, cx + shoulder, 0);
-  bodyGrad.addColorStop(0, shade(col, -0.18));
-  bodyGrad.addColorStop(0.5, shade(col, 0.05));
-  bodyGrad.addColorStop(1, shade(col, -0.18));
+  const bodyGrad = ctx.createLinearGradient(cx - sw * 0.5, 0, cx + sw * 0.5, 0);
+  bodyGrad.addColorStop(0, shade(col, -0.16));
+  bodyGrad.addColorStop(0.5, shade(col, 0.04));
+  bodyGrad.addColorStop(1, shade(col, -0.16));
   ctx.fillStyle = bodyGrad;
   ctx.fill();
-  // soft fabric folds across the torso
   ctx.clip();
-  fabricFolds(ctx, cx, top, shoulder, bodyH);
-  // collar rib
-  ctx.lineWidth = Math.max(3, bodyH * 0.014);
-  ctx.strokeStyle = shade(col, -0.28);
+  fabricFolds(ctx, cx, topY, sw, sh);
+  // ribbed collar
+  ctx.lineWidth = Math.max(3, sh * 0.012);
+  ctx.strokeStyle = shade(col, -0.26);
   ctx.beginPath();
-  ctx.moveTo(cx - collarW, collarY);
-  ctx.quadraticCurveTo(cx, collarY + bodyH * 0.075, cx + collarW, collarY);
+  ctx.moveTo(cx - neck, neckY);
+  ctx.quadraticCurveTo(cx, neckY + sh * 0.10, cx + neck, neckY);
   ctx.stroke();
   ctx.restore();
 
-  // Print region on the chest, warped over a fold field.
-  const pw = shoulder * 0.92, ph = pw / (print.width / print.height);
-  const pcx = cx, pcy = top + bodyH * 0.46;
+  // Chest print, gently bowed over the fabric.
+  const pw = sw * 0.40, ph = pw / (print.width / print.height);
+  const pcx = cx, pcy = topY + sh * 0.46;
   const fold = (u, v) => {
     const x = pcx + (u - 0.5) * pw;
-    // vertical billow + a gentle chest curvature so edges recede
-    const billow = Math.sin(u * Math.PI) * pw * 0.04;
-    const drape = Math.sin((u - 0.5) * Math.PI) * pw * 0.05 * v;
-    const y = pcy + (v - 0.5) * ph + billow * (v - 0.2) + Math.cos(u * Math.PI * 2) * ph * 0.012;
+    const drape = Math.sin((u - 0.5) * Math.PI) * pw * 0.04 * v;
+    const y = pcy + (v - 0.5) * ph + Math.cos(u * Math.PI * 2) * ph * 0.01;
     return { x: x + drape, y };
   };
-  warpGrid(ctx, print, fold, 24);
-
-  // Multiply the same fold shading over the print so it embeds in the cloth.
-  const shadeTex = foldShadeTexture(print.width, print.height);
-  ctx.save();
-  ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = (surface.shadingOpacity ?? 0.85);
-  warpGrid(ctx, shadeTex, fold, 24);
-  ctx.restore();
-
+  warpGrid(ctx, print, fold, 22);
   return { x: pcx - pw / 2, y: pcy - ph / 2, w: pw, h: ph };
 }
 
-// Grayscale fold lighting reused as a multiply texture over the print.
-let _foldShade = null;
-function foldShadeTexture(w, h) {
-  if (!_foldShade) _foldShade = document.createElement('canvas');
-  _foldShade.width = w; _foldShade.height = h;
-  const ctx = _foldShade.getContext('2d');
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
-  for (let k = 0; k < 5; k++) {
-    const fx = (0.18 + k * 0.16) * w;
-    const g = ctx.createLinearGradient(fx - w * 0.06, 0, fx + w * 0.06, 0);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(0.5, `rgba(0,0,0,${0.10 + (k % 2) * 0.05})`);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fillRect(fx - w * 0.06, 0, w * 0.12, h);
-  }
-  // edge vignette so the print curves away at the sides
-  const vg = ctx.createRadialGradient(w / 2, h / 2, w * 0.2, w / 2, h / 2, w * 0.62);
-  vg.addColorStop(0, 'rgba(0,0,0,0)');
-  vg.addColorStop(1, 'rgba(0,0,0,0.22)');
-  ctx.fillStyle = vg; ctx.fillRect(0, 0, w, h);
-  return _foldShade;
-}
-
-function fabricFolds(ctx, cx, top, shoulder, bodyH) {
+function fabricFolds(ctx, cx, top, sw, sh) {
   ctx.save();
-  ctx.globalAlpha = 0.18;
+  ctx.globalAlpha = 0.12;
   for (let k = -2; k <= 2; k++) {
-    const x = cx + k * shoulder * 0.32;
-    const g = ctx.createLinearGradient(x - shoulder * 0.08, 0, x + shoulder * 0.08, 0);
+    const x = cx + k * sw * 0.18;
+    const g = ctx.createLinearGradient(x - sw * 0.05, 0, x + sw * 0.05, 0);
     g.addColorStop(0, 'rgba(0,0,0,0)');
     g.addColorStop(0.5, 'rgba(0,0,0,0.5)');
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(x - shoulder * 0.08, top, shoulder * 0.16, bodyH);
+    ctx.fillRect(x - sw * 0.05, top, sw * 0.10, sh);
   }
   ctx.restore();
 }
@@ -332,13 +341,6 @@ function drawMug(ctx, W, H, print, surface) {
     return { x: cx + Math.sin(theta) * R * 0.96, y: printTop + v * printH };
   };
   warpGrid(ctx, print, wrap, 28);
-  // cylindrical multiply shading on the print
-  const sh = foldShadeTexture(print.width, print.height);
-  ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = (surface.shadingOpacity ?? 0.85) * 0.8;
-  warpGrid(ctx, sh, wrap, 28);
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 1;
 
   // Rim highlight + inner top ellipse.
   ctx.fillStyle = shade(col, 0.25);
@@ -516,7 +518,8 @@ export function drawSurfaceMockup(destCtx, canvas, art, surface) {
   studioBackground(destCtx, W, H, dark);
   if (!art || !art.width) return { rect: null };
 
-  const print = buildPrintTexture(art, spec, surface);
+  const shadeKind = type === 'tshirt' ? 'fold' : type === 'mug' ? 'cylinder' : null;
+  const print = buildPrintTexture(art, spec, surface, shadeKind);
   let rect;
   switch (type) {
     case 'tshirt': rect = drawTshirt(destCtx, W, H, print, surface); break;
