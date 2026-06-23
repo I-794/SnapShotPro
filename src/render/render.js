@@ -13,7 +13,7 @@ import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
-import { sampleKenBurns } from '../features/ken-burns.js';
+import { sampleKenBurns, getKenBurnsProgress } from '../features/ken-burns.js';
 import { drawEffects } from './effects.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { isDeviceMockup3d, render3dMockup } from './mockups-3d.js';
@@ -345,8 +345,9 @@ function drawImageContent(ctx, x, y, imgWidth, imgHeight) {
   // Returns state.image unchanged when no per-pixel grade is active.
   const img = getGradedImage(state.image);
   if (kb && kb.enabled && !state.video.loaded && img && img.width && img.height) {
-    const a = state.animation;
-    const p = (a && a.duration > 0) ? (a.currentTime || 0) / a.duration : 0;
+    // v29 — progress comes from getKenBurnsProgress(): the Motion Studio lane
+    // clock when it's driving, else the legacy animation playhead.
+    const p = getKenBurnsProgress();
     const s = sampleKenBurns(kb, p);
     const sw = img.width / s.scale;
     const sh = img.height / s.scale;

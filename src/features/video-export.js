@@ -45,6 +45,7 @@ export async function exportVideoMp4() {
     showNotification('MP4 export needs WebCodecs (Chrome/Edge). Try GIF instead.', 'error');
     return;
   }
+  state.timeline._driving = false;   // v29 — legacy clip export drives its own seek loop
   const { seekTo } = getVideoContext();
   const { resolution, quality } = motionOpts();
   const width = state.canvas.width * resolution, height = state.canvas.height * resolution;
@@ -84,6 +85,7 @@ export async function exportVideoMp4() {
 
 export async function exportVideoGif() {
   if (!state.video.loaded) { showNotification('Load a clip first.', 'error'); return; }
+  state.timeline._driving = false;   // v29 — legacy clip export drives its own seek loop
   const { seekTo } = getVideoContext();
   const { resolution, quality, loop } = motionOpts();
   // Render at design size; the encoder scales each frame to the target size.

@@ -1222,6 +1222,40 @@ kbd {
     display: flex; justify-content: space-between; gap: 8px; margin-top: 6px;
     font-size: 11px; color: var(--text-tertiary); font-variant-numeric: tabular-nums;
 }
+
+/* ─── v29 Motion Studio: unified multi-lane timeline ─── */
+.ms-transport { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.ms-tbtn { width: 38px; padding: 6px 0; flex: 0 0 auto; font-size: 13px; }
+.ms-readout {
+    flex: 1; text-align: right; font-size: 11px; color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+}
+.ms-ruler { height: 18px; cursor: ew-resize; margin-bottom: 6px; }
+.ms-lanes { display: flex; flex-direction: column; gap: 5px; }
+.mlane { display: flex; align-items: center; gap: 8px; }
+.mlane-name {
+    flex: 0 0 92px; width: 92px; display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--text-secondary); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.mlane-icon { flex: 0 0 auto; }
+.mlane-track {
+    position: relative; flex: 1; height: 26px; border-radius: var(--radius-sm);
+    background: var(--bg-tertiary); border: 1px solid var(--border-color);
+    overflow: hidden; touch-action: none;
+}
+.mclip {
+    position: absolute; top: 3px; bottom: 3px; min-width: 6px; border-radius: 4px;
+    cursor: grab; box-shadow: 0 1px 2px rgba(0,0,0,0.3); opacity: 0.92;
+    touch-action: none;
+}
+.mclip:active { cursor: grabbing; }
+.mclip-handle {
+    position: absolute; top: 0; bottom: 0; width: 8px; cursor: ew-resize;
+    background: rgba(255,255,255,0.35);
+}
+.mclip-handle-l { left: 0; border-radius: 4px 0 0 4px; }
+.mclip-handle-r { right: 0; border-radius: 0 4px 4px 0; }
 .control-group kbd {
     font-family: var(--font-mono, monospace); font-size: 10px;
     background: var(--bg-tertiary); border: 1px solid var(--border-color);

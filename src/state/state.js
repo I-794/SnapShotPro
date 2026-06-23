@@ -132,6 +132,24 @@ export const state = {
     toX: 0.5, toY: 0.5,
     easing: 'easeInOut'
   },
+  // v29 — Motion Studio. ONE playback clock + a multi-lane timeline that
+  // unifies the four motion sources (entrance / Ken Burns / video / turntable).
+  // `lanes` is the undoable + serialized config; currentTime/playing/_driving are
+  // RUNTIME-ONLY (stripped from snapshot + serialize). `_driving` true means the
+  // unified clock is the active preview driver (so the render getters in
+  // motion-clock.js take over from the legacy per-feature clocks).
+  timeline: {
+    enabled: false,        // gates the Motion Studio panel + unified export
+    currentTime: 0,        // ms — THE playback clock (runtime-only)
+    duration: 3000,        // ms — derived from lanes via deriveDuration()
+    playing: false,        // runtime-only
+    _driving: false,       // runtime-only — unified clock is driving the preview
+    fps: 30,               // playback + export frame rate
+    loop: true,            // preview loop
+    // lane: { id, kind:'entrance'|'kenburns'|'video'|'turntable', target, label,
+    //         clips:[{ start, duration, easing, ref }] }  (start/duration in ms)
+    lanes: []
+  },
   aiEnhance: {
     stylePreset: null,
     lastSuggestion: null

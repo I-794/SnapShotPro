@@ -64,6 +64,7 @@ import { bindGifExport } from './features/gif-export.js';
 import { bindVideo } from './features/video.js';
 import { bindVideoExport } from './features/video-export.js';
 import { bindTimeline } from './features/timeline.js';
+import { bindMotionStudio } from './features/motion-studio.js';
 import { bindScreenRecord } from './features/screen-record.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { renderShortcutsOverlay } from './features/shortcuts.js';
@@ -158,6 +159,7 @@ function init() {
   bindVideo();
   bindVideoExport();
   bindTimeline();
+  bindMotionStudio();   // v29 — unified motion timeline (after the motion editors bind)
   bindScreenRecord();
   registerCommands();
   bindPalette();

@@ -14,6 +14,18 @@ import { saveStateToHistory } from '../state/history.js';
 import { showNotification } from '../ui/notification.js';
 import { getEasing } from '../render/easing.js';
 import { kenBurnsPresets } from '../state/presets.js';
+import { localProgress } from '../state/motion-clock.js';
+
+// v29 — the Ken Burns crop progress (0..1). Decoupled from the shared animation
+// clock: when Motion Studio drives the preview, Ken Burns reads its own lane/clip
+// so a KB clip and an entrance clip with different durations no longer fight over
+// state.animation.{currentTime,duration}. Falls back to the legacy clock (the
+// animation playhead) for standalone playback and pre-v29 projects.
+export function getKenBurnsProgress() {
+  const a = state.animation;
+  const legacy = (a && a.duration > 0) ? (a.currentTime || 0) / a.duration : 0;
+  return localProgress('kenburns', null, legacy);
+}
 
 // Sample the focal point + scale at p in 0..1, eased by kb.easing. scale is
 // clamped to >=1 so the crop window never exceeds the source.
@@ -57,6 +69,7 @@ export function bindKenBurns() {
       state.kenBurns.enabled = el.kenBurnsEnabled.checked;
       updateKenBurnsControls();
       render();
+      if (window.__motionStudioRefresh) window.__motionStudioRefresh();
     });
   }
 
@@ -70,6 +83,7 @@ export function bindKenBurns() {
       if (el.kenBurnsEnabled) el.kenBurnsEnabled.checked = true;
       updateKenBurnsControls();
       render();
+      if (window.__motionStudioRefresh) window.__motionStudioRefresh();
       showNotification(`Ken Burns: ${btn.textContent.trim()} applied.`, 'success');
     });
   });
