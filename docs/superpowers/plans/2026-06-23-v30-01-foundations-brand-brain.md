@@ -1,6 +1,8 @@
 # V30 Studio Intelligence — Plan 01: Foundations + Brand Brain
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Part of the V30 plan series:** 01 (this file) → 02 AI Screenshot Editor → 03 Campaign Generator → 04 Producer → 05 Marketing/Changelog/What's-New. Build in order; each plan is independently shippable.
 
 **Goal:** Build the two shared primitives (`runVisionJson`, `renderAtSize`), the schema plumbing for `state.brand`, and the **Brand Brain** feature — extract a brand system from a URL or uploaded asset and apply/enforce it app-wide.
 
