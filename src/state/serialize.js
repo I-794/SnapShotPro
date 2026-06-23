@@ -23,7 +23,10 @@ export const SERIALIZED_FIELDS = [
   // v21 — 3D / isometric device mockup (orbit/zoom/scene/material/spin).
   'mockup3d',
   // v27 — Surface Studio (physical & print mockup) settings.
-  'surface'
+  'surface',
+  // v29 — Motion Studio unified timeline (lane/clip layout). Lightweight + design-
+  // defining, so shared/gallery designs carry their timeline arrangement too.
+  'timeline'
 ];
 
 // v21 — strip the runtime-only orbitProgress so a saved/shared/restored design
@@ -45,10 +48,24 @@ export function sanitizeAnimationRuntime(design) {
   return design;
 }
 
+// v29 — strip the Motion Studio playback runtime (currentTime / playing /
+// _driving) so a saved/shared/restored design never arrives mid-playback. The
+// lane/clip layout is kept. Mirrors sanitizeAnimationRuntime.
+export function sanitizeTimelineRuntime(design) {
+  if (design && design.timeline) {
+    design.timeline = { ...design.timeline, currentTime: 0, playing: false, _driving: false };
+  }
+  return design;
+}
+
+function sanitizeMotionRuntime(design) {
+  return sanitizeTimelineRuntime(sanitizeMockup3dRuntime(sanitizeAnimationRuntime(design)));
+}
+
 export function snapshotProject() {
   const out = {};
   for (const k of SERIALIZED_FIELDS) out[k] = state[k];
-  return sanitizeMockup3dRuntime(sanitizeAnimationRuntime(JSON.parse(JSON.stringify(out))));
+  return sanitizeMotionRuntime(JSON.parse(JSON.stringify(out)));
 }
 
 // ── v12 — Projects & Version History ──────────────────────────────────────
@@ -57,7 +74,7 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 17;
+export const SCHEMA_VERSION = 18;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
@@ -111,10 +128,41 @@ export function serializeFull() {
   for (const k of PROJECT_FIELDS) design[k] = state[k];
   return {
     schemaVersion: SCHEMA_VERSION,
-    design: sanitizeMockup3dRuntime(sanitizeAnimationRuntime(JSON.parse(JSON.stringify(design)))),
+    design: sanitizeMotionRuntime(JSON.parse(JSON.stringify(design))),
     image: getImageDataURL(),
     svgCode: state.svgCode || null
   };
+}
+
+// v29 — schema 18 migration: build default Motion Studio lanes from a pre-v29
+// design's existing motion (entrance tracks, Ken Burns, turntable spin) so old
+// projects open with a populated, playable timeline. The video lane is created
+// on clip load (video isn't serialized), so it's intentionally absent here.
+export function migrateTimelineV18(design) {
+  if (!design || (design.timeline && Array.isArray(design.timeline.lanes))) return design;
+  const a = design.animation || {};
+  const baseDur = a.duration || 3000;
+  const lanes = [];
+  if (a.enabled && Array.isArray(a.tracks)) {
+    for (const tr of a.tracks) {
+      const target = tr.target || 'image';
+      lanes.push({ id: 'ent:' + target, kind: 'entrance', target,
+        clips: [{ start: tr.startTime || 0, duration: baseDur, easing: tr.easing, ref: { preset: tr.preset } }] });
+    }
+  }
+  if (design.kenBurns && design.kenBurns.enabled) {
+    lanes.push({ id: 'kenburns', kind: 'kenburns', target: null,
+      clips: [{ start: 0, duration: baseDur, easing: design.kenBurns.easing, ref: {} }] });
+  }
+  if (design.mockup3d && design.mockup3d.spin && design.mockup3d.spin.enabled) {
+    lanes.push({ id: 'turntable', kind: 'turntable', target: null,
+      clips: [{ start: 0, duration: 3000, ref: { turns: design.mockup3d.spin.turns || 1 } }] });
+  }
+  design.timeline = {
+    enabled: lanes.length > 0, currentTime: 0, duration: baseDur,
+    playing: false, _driving: false, fps: 30, loop: true, lanes
+  };
+  return design;
 }
 
 // Accept both the v12 envelope ({schemaVersion, design, image, svgCode}) and
@@ -127,11 +175,11 @@ export function normalizeProject(payload) {
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: ensureTourDefaults(sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload.design))),
+      design: migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload.design))),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: ensureTourDefaults(sanitizeMockup3dRuntime(sanitizeAnimationRuntime(payload))), image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload))), image: null, svgCode: payload.svgCode || null };
 }

@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '28.0';
+const CURRENT_VERSION = '29.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version's highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "⚡ Studio quality-of-life",
+  heading: "🎞 Motion Studio",
   items: [
-    { title: 'Select many at once',
-      desc: 'Drag a box around objects (or Shift-click) to grab several at a time, then move, nudge, align, or delete them together. Ctrl/⌘+A selects everything on the canvas.' },
-    { title: 'Right-click for everything',
-      desc: 'A new context menu on the canvas: duplicate, delete, bring to front / send to back, copy & paste an annotation’s style, and align — all on your whole selection.' },
-    { title: 'Asset library + export presets',
-      desc: 'Loaded images now live in a reusable library to drop back in any time, and export presets give you one-click PNG/JPEG/WebP at 1×/2×/3× — including from Cmd-K.' }
+    { title: 'One timeline for every kind of motion',
+      desc: 'Entrance animations, Ken Burns pan/zoom, video clips, and 3D turntable spin now share a single playhead. Each becomes a lane you can scrub together — watch the whole thing play as one.' },
+    { title: 'Combine motion that never mixed before',
+      desc: 'Drag clips to retime them: stagger each element’s entrance, start a Ken Burns after a fade, and preview a turntable spin live. Pairings that used to be mutually exclusive now layer freely.' },
+    { title: 'Export the whole composition at once',
+      desc: 'One click renders the entire timeline — every layer, combined — to MP4 or GIF through the same studio-quality encoder.' }
   ]
 };
 

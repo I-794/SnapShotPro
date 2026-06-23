@@ -304,6 +304,33 @@
             </div>
         </div>
 
+        <div class="sidebar-section" data-group="export" id="motion-studio-section">
+            <h3 class="section-title">🎞 Motion Studio</h3>
+            <p class="info-text" id="ms-empty" style="margin-bottom:6px;">Add an entrance animation, Ken Burns, a video clip, or turntable spin — they each become a lane here. Arrange them on one timeline and export the whole thing as MP4 or GIF.</p>
+            <div id="ms-body" style="display:none;">
+                <div class="ms-transport">
+                    <button class="btn btn-primary ms-tbtn" id="ms-play-btn" title="Play / pause">▶</button>
+                    <button class="btn btn-secondary ms-tbtn" id="ms-stop-btn" title="Stop (rewind)">⏹</button>
+                    <span id="ms-time-readout" class="ms-readout">0.00s · f0 / 0.00s · f0</span>
+                </div>
+                <div class="vtimeline ms-ruler" id="ms-track" title="Drag to scrub">
+                    <div class="vtimeline-playhead" id="ms-playhead"></div>
+                </div>
+                <div id="ms-lanes" class="ms-lanes"></div>
+                <p class="info-text" style="margin-top:6px;">Drag a clip to move it; drag its edges to retime. Scrub the ruler to preview every layer together.</p>
+                <div class="control-row" style="display:flex;gap:8px;margin-top:8px;">
+                    <div class="control-group" style="flex:1;"><label class="control-label">Frame rate</label><select class="control-input" id="ms-fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
+                    <label class="control-label" style="display:flex;align-items:center;gap:6px;align-self:flex-end;padding-bottom:8px;"><input type="checkbox" id="ms-loop" checked style="width:auto;"> Loop</label>
+                </div>
+                <p class="info-text" style="margin:4px 0 6px;">Export uses the Resolution / Quality / GIF-loop controls in Video / Clip below.</p>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-success" style="flex:1;" id="ms-export-mp4">⬇ MP4</button>
+                    <button class="btn btn-success" style="flex:1;" id="ms-export-gif">⬇ GIF</button>
+                </div>
+                <p class="info-text" id="ms-progress" style="margin-top:8px;"></p>
+            </div>
+        </div>
+
         <div class="sidebar-section" data-group="export">
             <h3 class="section-title">🎬 Video / Clip</h3>
             <p class="info-text" id="video-empty-hint" style="margin-bottom:8px;">Drop a video on the canvas, or add one — then frame it in any device mockup and export MP4/GIF.</p>

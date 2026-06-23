@@ -4,6 +4,7 @@ import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
 import { saveStateToHistory } from '../state/history.js';
 import { getEasing, EASING_OPTIONS } from '../render/easing.js';
+import { localProgress } from '../state/motion-clock.js';
 
 const ANIMATION_PRESETS = {
   'fade-in':   { from: { opacity: 0 }, to: { opacity: 1 } },
@@ -46,6 +47,9 @@ function playAnimation() {
   }
 
   saveStateToHistory();
+  // v29 — hand the preview back to the legacy animation clock (the Motion Studio
+  // unified clock stands down) so this Play button drives the frame.
+  state.timeline._driving = false;
   state.animation.playing = true;
   startTime = performance.now();
 
@@ -115,6 +119,7 @@ export function addAnimationTrack(preset) {
 
   updateTrackDisplay();
   render();
+  if (window.__motionStudioRefresh) window.__motionStudioRefresh();
   showNotification(`${targetLabel(target)}: "${preset}" added.`, 'success');
 }
 
@@ -127,6 +132,7 @@ export function removeAnimationTrack(target) {
   if (state.animation.tracks.length === 0) state.animation.enabled = false;
   updateTrackDisplay();
   render();
+  if (window.__motionStudioRefresh) window.__motionStudioRefresh();
 }
 
 // The entrance track currently targeting `target`, or null.
@@ -165,6 +171,7 @@ function updateTrackDisplay() {
       if (state.animation.tracks.length === 0) state.animation.enabled = false;
       updateTrackDisplay();
       render();
+      if (window.__motionStudioRefresh) window.__motionStudioRefresh();
     });
   });
   trackList.querySelectorAll('[data-track-easing]').forEach(sel => {
@@ -191,7 +198,10 @@ export function getElementAnimState(targetId) {
   if (!anim || !anim.enabled || !anim.tracks || anim.tracks.length === 0) return null;
   const track = anim.tracks.find(tr => (tr.target || 'image') === targetId);
   if (!track) return null;
-  const t = anim.currentTime / anim.duration;
+  // v29 — when Motion Studio drives the preview, each entrance derives its own
+  // local progress from its lane/clip (respecting per-element start → staggered
+  // entrances). Otherwise fall back to the legacy shared animation clock.
+  const t = localProgress('entrance', targetId, anim.currentTime / anim.duration);
   return interpolateFrame(track, t);
 }
 
@@ -256,6 +266,7 @@ export function bindAnimation() {
       // Duration), so disabling entrance animation doesn't hide them.
       if (controls) controls.style.display =
         (toggle.checked || (state.kenBurns && state.kenBurns.enabled)) ? 'block' : 'none';
+      if (window.__motionStudioRefresh) window.__motionStudioRefresh();
     });
   }
 

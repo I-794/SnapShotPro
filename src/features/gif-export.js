@@ -34,6 +34,7 @@ export async function exportGif() {
     const originalTime = state.animation.currentTime;
     const originalPlaying = state.animation.playing;
     state.animation.playing = false;
+    state.timeline._driving = false;   // v29 — legacy export uses the animation clock
 
     const blob = await encodeGif(async (i) => {
       if (spin) {
@@ -119,6 +120,7 @@ export async function exportStillMp4() {
   const originalTime = state.animation.currentTime;
   const originalPlaying = state.animation.playing;
   state.animation.playing = false;
+  state.timeline._driving = false;   // v29 — legacy export uses the animation clock
 
   try {
     const blob = await encodeMp4(async (i) => {

@@ -156,6 +156,7 @@ export function bind3dMockupUi() {
       saveStateToHistory();
       if (!m().spin) m().spin = { enabled: false, turns: 1 };
       m().spin.enabled = e.target.checked;
+      if (window.__motionStudioRefresh) window.__motionStudioRefresh();
     });
   }
 

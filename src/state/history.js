@@ -52,6 +52,10 @@ function snapshot() {
     // Snapshot a runtime-stripped copy so undo never restores mid-playback.
     animation: { ...state.animation, playing: false, currentTime: 0 },
     kenBurns: state.kenBurns,
+    // v29 — Motion Studio lane/clip config is undoable (drag a clip → undo). The
+    // playback runtime (currentTime/playing/_driving) is stripped, mirroring how
+    // animation playing/currentTime are stripped above.
+    timeline: { ...state.timeline, currentTime: 0, playing: false, _driving: false },
     // v16.1 — Studio Effects overlays.
     glass: state.glass,
     grain: state.grain,

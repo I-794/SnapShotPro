@@ -8,7 +8,7 @@
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v28, Studio quality-of-life: multi-select and group move, a right-click context menu, a reusable asset library, and one-click export presets.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v29, Motion Studio: one timeline that unifies entrance animations, Ken Burns, video clips, and 3D turntable spin, with combined MP4 and GIF export.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -573,6 +573,54 @@
         .qol-menu .sep { height: 1px; margin: 4px 3px; background: rgba(255,255,255,0.1); }
         @media (max-width: 860px) { .qol-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v29 — Motion Studio spotlight. Its own motif: a mini multi-lane timeline
+           with one playhead sweeping across every lane at once — entrance, Ken
+           Burns, video, and turntable clips staggered on their own tracks. It
+           depicts the release's core idea (one clock unifying every kind of
+           motion). Distinct from every prior spotlight (qol marquee, surface,
+           extension, tour player, command palette, code window, …). */
+        .spotlight-motion {
+            background:
+                radial-gradient(64% 90% at 5% 2%, rgba(79,124,255,0.22), transparent 54%),
+                radial-gradient(58% 86% at 100% 100%, rgba(139,92,246,0.16), transparent 52%),
+                #06080f;
+        }
+        .spotlight-motion::after { display: none; }
+        .spotlight-motion .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-motion .spot-feat-ico { background: linear-gradient(135deg, rgba(79,124,255,0.34), rgba(139,92,246,0.24)); }
+        .spotlight-motion .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-motion .btn-primary:hover { background: #f0f0ee; }
+        /* the timeline, depicted with abstract shapes (lanes + clips), not fake UI. */
+        .mo-stage { position: relative; container-type: inline-size; width: 100%; aspect-ratio: 5/4;
+            border-radius: 18px; overflow: hidden; padding: 22px 20px;
+            display: flex; flex-direction: column; gap: 11px;
+            background: radial-gradient(80% 70% at 50% 22%, #131a31, #0a0d18);
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 50px -22px rgba(0,0,0,0.6); }
+        .mo-ruler { position: relative; height: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.07);
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 26px); }
+        .mo-lanes { position: relative; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .mo-lane { position: relative; flex: 1; border-radius: 8px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+        .mo-clip { position: absolute; top: 50%; transform: translateY(-50%); height: 62%; border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+        .mo-clip.l1 { left: 6%;  width: 44%; background: linear-gradient(135deg, #5b82ff, #8a6bff); }
+        .mo-clip.l2 { left: 30%; width: 40%; background: linear-gradient(135deg, #22c3a6, #2f8bff); }
+        .mo-clip.l3 { left: 12%; width: 74%; background: linear-gradient(135deg, #f59e0b, #ff7a5b); }
+        .mo-clip.l4 { left: 54%; width: 30%; background: linear-gradient(135deg, #8b5cf6, #c06bff); }
+        /* one playhead, full height, crossing the ruler and every lane — the
+           "single clock" metaphor. Animated with transform (container-query
+           units) so only the compositor works; parks static under reduced motion. */
+        .mo-head { position: absolute; top: 14px; bottom: 14px; left: 0; width: 2px; z-index: 4;
+            background: #fff; box-shadow: 0 0 9px rgba(255,255,255,0.55); transform: translateX(5cqw); }
+        .mo-head::before { content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+            width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 9px rgba(123,150,255,0.95); }
+        @media (prefers-reduced-motion: no-preference) {
+            .mo-head { animation: mo-sweep 4.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+        }
+        @keyframes mo-sweep { 0%, 100% { transform: translateX(5cqw); } 50% { transform: translateX(86cqw); } }
+        @media (prefers-reduced-motion: reduce) { .mo-head { transform: translateX(44cqw); } }
+        @media (max-width: 860px) { .mo-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -652,25 +700,25 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-qol reveal">
+        <div class="spotlight spotlight-motion reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v28 · June 2026</div>
-                <h2>The whole studio, but faster.</h2>
-                <p class="spot-lede">Select many objects at once, right-click for everything, re-use your images from a library, and export at 1×, 2×, or 3× in a single click. A pile of quality-of-life upgrades across the editor.</p>
+                <div class="spot-ver">v29 · June 2026</div>
+                <h2>Every kind of motion, one timeline.</h2>
+                <p class="spot-lede">Entrance animations, Ken Burns, video clips, and 3D turntable spin used to live apart. Motion Studio puts them on one playhead, so you can stagger them, scrub them together, and export the whole composition at once.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6M3 3v6M21 3h-6M21 3v6M3 21h6M3 21v-6M21 21h-6M21 21v-6"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg></span>
-                        <div><strong>Select many at once</strong><span>Drag a marquee or Shift-click to grab several objects, then move, nudge, align, or delete them together. Ctrl/⌘+A selects everything.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h16M4 18h8"/><path d="M16 4v16"/></svg></span>
+                        <div><strong>One playhead for everything</strong><span>Each motion source becomes a lane. Scrub once and watch every layer play together, in sync.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7.5 18 2.3-7.2L20 11.5 3 3z"/><path d="M13 13h8M13 17h6M13 21h4"/></svg></span>
-                        <div><strong>Right-click for everything</strong><span>Duplicate, delete, reorder, copy &amp; paste a style, and align — a context menu that acts on your whole selection.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="9" height="5" rx="1.4"/><rect x="9" y="14" width="11" height="5" rx="1.4"/></svg></span>
+                        <div><strong>Combine what never mixed</strong><span>Drag clips to retime them. Stagger each element, start a Ken Burns after a fade, preview a turntable spin live.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
-                        <div><strong>Asset library + export presets</strong><span>Loaded images stay in a reusable library to drop back in, and one-click presets export PNG/JPEG/WebP at 1×/2×/3× — also from Cmd-K.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg></span>
+                        <div><strong>Export it as one piece</strong><span>One click renders the entire timeline, every layer combined, to MP4 or GIF.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
@@ -679,21 +727,15 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="qol-stage" aria-hidden="true">
-                    <div class="qol-obj a"></div>
-                    <div class="qol-obj b"></div>
-                    <div class="qol-obj c"></div>
-                    <div class="qol-marq">
-                        <span class="qol-handle tl"></span><span class="qol-handle tr"></span>
-                        <span class="qol-handle bl"></span><span class="qol-handle br"></span>
+                <div class="mo-stage" aria-hidden="true">
+                    <div class="mo-ruler"></div>
+                    <div class="mo-lanes">
+                        <div class="mo-lane"><span class="mo-clip l1"></span></div>
+                        <div class="mo-lane"><span class="mo-clip l2"></span></div>
+                        <div class="mo-lane"><span class="mo-clip l3"></span></div>
+                        <div class="mo-lane"><span class="mo-clip l4"></span></div>
                     </div>
-                    <div class="qol-menu">
-                        <div class="mi on"><span class="ic">⧉</span>Duplicate</div>
-                        <div class="mi"><span class="ic">⤒</span>Bring to front</div>
-                        <div class="mi"><span class="ic">🎨</span>Copy style</div>
-                        <div class="sep"></div>
-                        <div class="mi"><span class="ic">⊞</span>Align</div>
-                    </div>
+                    <div class="mo-head"></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -706,6 +748,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v29.0</span><span class="entry-date">June 2026</span></div>
+                <div>
+                    <h2>Motion Studio</h2>
+                    <ul class="changes">
+                        <li><b>One timeline for every kind of motion.</b> Entrance animations, Ken Burns pan and zoom, video clips, and 3D turntable spin now share a single playback clock. Each one shows up as its own lane in a new Motion Studio panel, so you can scrub the whole composition on one playhead and watch every layer play together.</li>
+                        <li><b>Combine motion that used to be mutually exclusive.</b> Drag a clip along its lane to set when it starts, or drag its edges to retime it. Stagger each element's entrance, kick off a Ken Burns after a fade lands, and preview a turntable spin live in the editor instead of only on export.</li>
+                        <li><b>Export the whole thing in one click.</b> Motion Studio renders the entire timeline, every layer combined, to MP4 or GIF through the same studio-quality encoder. Your existing per-feature controls still work exactly as before, and old projects open with their motion already laid out on the new timeline.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v28.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Studio quality-of-life</h2>

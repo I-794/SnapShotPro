@@ -111,6 +111,7 @@ export function loadVideoFile(file) {
     seekTo(0).then(() => { render(); fitZoom(); });
     showVideoControls(true);
     if (vhooks.loaded) vhooks.loaded();
+    if (window.__motionStudioRefresh) window.__motionStudioRefresh();
     if (state.video.duration > MAX_DURATION) {
       showNotification(`Clip is ${Math.round(state.video.duration)}s — exports are capped to ${MAX_DURATION}s for performance.`, 'info');
     } else {
@@ -126,6 +127,7 @@ export function clearVideo() {
   state.video.loaded = false;
   state.video.playing = false;
   showVideoControls(false);
+  if (window.__motionStudioRefresh) window.__motionStudioRefresh();
 }
 
 // ---- playback -------------------------------------------------------------
@@ -144,6 +146,8 @@ export function play() {
   if (videoEl.currentTime < state.video.in || videoEl.currentTime >= state.video.out) {
     videoEl.currentTime = state.video.in;
   }
+  // v29 — legacy clip playback drives its own clock; release the unified one.
+  state.timeline._driving = false;
   state.video.playing = true;
   videoEl.play().catch(() => {});
   rafId = requestAnimationFrame(tick);
