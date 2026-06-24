@@ -120,12 +120,44 @@
         .ag-head { font-size: clamp(24px, 3vw, 34px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; color: var(--ink, #0b0d14); }
         .ag-sub { font-size: 16px; color: var(--ink-2, #41485a); margin-bottom: clamp(24px, 3vw, 36px); max-width: 60ch; }
 
+        /* ---- "see it work" showcase: before -> after, built in CSS so it stays
+           crisp at any size and needs no asset pack. Each card shows real
+           input -> output for one feature. ---- */
+        .sw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .sw-card { border-radius: 16px; border: 1px solid var(--line, rgba(10,16,40,0.10)); background: var(--bg-raise, #fff); padding: 18px; display: flex; flex-direction: column; gap: 13px; }
+        .sw-card h3 { font-size: 16px; font-weight: 650; letter-spacing: -0.015em; color: var(--ink, #0b0d14); }
+        .sw-card .cap { font-size: 13px; color: var(--ink-2, #41485a); line-height: 1.5; }
+        .sw-stage { flex: 1; min-height: 132px; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+            border-radius: 12px; padding: 18px 16px;
+            background:
+                radial-gradient(70% 90% at 12% 0%, rgba(74,168,255,0.16), transparent 60%),
+                radial-gradient(70% 90% at 100% 100%, rgba(138,107,255,0.18), transparent 60%), #0b0d14; }
+        .sw-row { display: grid; grid-template-columns: 1fr 16px 1fr; align-items: center; gap: 9px; }
+        .sw-arrow { color: rgba(255,255,255,0.45); text-align: center; font-size: 14px; }
+        .sw-chip { font-family: var(--font-mono, monospace); font-size: 11.5px; color: rgba(255,255,255,0.86);
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); border-radius: 8px;
+            padding: 7px 9px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .sw-chip.bad { color: #ffd9d9; border-color: rgba(255,90,90,0.45); text-decoration: underline wavy rgba(255,90,90,0.85); text-underline-offset: 3px; }
+        .sw-chip.good { color: #c7f3d8; border-color: rgba(87,227,155,0.42); }
+        .sw-redact b { display: inline-block; width: 8px; height: 11px; background: rgba(255,255,255,0.6); border-radius: 2px; vertical-align: -1px; margin: 0 1px; }
+        .sw-swatches { display: flex; gap: 7px; align-items: center; }
+        .sw-sw { width: 26px; height: 26px; border-radius: 7px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+        .sw-type { font-size: 22px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+        .sw-fan { display: flex; gap: 10px; align-items: flex-end; justify-content: center; }
+        .sw-fi { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .sw-fi em { font-family: var(--font-mono, monospace); font-style: normal; font-size: 8.5px; color: rgba(255,255,255,0.5); }
+        .sw-frame { border-radius: 5px; background: linear-gradient(135deg, #2348ff, #6f4bd8); box-shadow: 0 6px 16px rgba(0,0,0,0.35); }
+        .sw-frame.wide { width: 54px; height: 32px; } .sw-frame.sq { width: 34px; height: 34px; } .sw-frame.tall { width: 24px; height: 40px; }
+        .sw-one { width: 46px; height: 30px; border-radius: 6px; background: #1b2233; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; }
+        .sw-one svg { width: 18px; height: 18px; color: rgba(255,255,255,0.5); }
+
         @media (max-width: 900px) {
             .ag-hero, .ag-convo { grid-template-columns: 1fr; }
             .ag-flow { grid-template-columns: 1fr; }
             .ag-step:not(:last-child) { border-right: none; border-bottom: 1px solid var(--line, rgba(10,16,40,0.10)); }
             .ag-bento { grid-template-columns: 1fr 1fr; }
             .ag-c6, .ag-c4, .ag-c3, .ag-c2 { grid-column: span 2; }
+            .sw-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 560px) {
             .ag-bento { grid-template-columns: 1fr; }
@@ -233,6 +265,63 @@
                 <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></div>
                 <h3>Generation, vision, and memory</h3>
                 <p>Generate on-brand backgrounds at canvas size, let the AI see the result to fix its own work, and have it remember your brand and recurring choices across sessions. Hosted, or with your own API key.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEE IT WORK (before -> after visuals) -------------------------------- -->
+<section class="section-pad" style="padding-top: clamp(8px,2vw,20px);">
+    <div class="wrap">
+        <h2 class="ag-head reveal">See it work</h2>
+        <p class="ag-sub reveal">Real input, real output. Here is what the AI actually does to a shot.</p>
+        <div class="sw-grid reveal">
+            <div class="sw-card">
+                <h3>AI Screenshot Editor</h3>
+                <div class="sw-stage" aria-hidden="true">
+                    <div class="sw-row">
+                        <span class="sw-chip bad">Dashbord</span>
+                        <span class="sw-arrow">→</span>
+                        <span class="sw-chip good">Dashboard</span>
+                    </div>
+                    <div class="sw-row">
+                        <span class="sw-chip">jane@acme.com</span>
+                        <span class="sw-arrow">→</span>
+                        <span class="sw-chip sw-redact"><b></b><b></b><b></b><b></b>@<b></b><b></b><b></b></span>
+                    </div>
+                </div>
+                <p class="cap">Fix a typo, recolor an element, or auto-redact a name. The pixels change, and it bakes into export.</p>
+            </div>
+            <div class="sw-card">
+                <h3>Brand Brain</h3>
+                <div class="sw-stage" aria-hidden="true">
+                    <div class="sw-row" style="grid-template-columns: 1fr 16px 1.25fr;">
+                        <span class="sw-chip">acme.com</span>
+                        <span class="sw-arrow">→</span>
+                        <span class="sw-swatches">
+                            <span class="sw-sw" style="background:#f5c440;"></span>
+                            <span class="sw-sw" style="background:#8b5cf6;"></span>
+                            <span class="sw-sw" style="background:#1e3a8a;"></span>
+                            <span class="sw-type" style="color:#f5c440;">Aa</span>
+                        </span>
+                    </div>
+                </div>
+                <p class="cap">Paste a URL and it extracts the palette, type, and logo, then enforces it everywhere.</p>
+            </div>
+            <div class="sw-card">
+                <h3>Campaign Generator</h3>
+                <div class="sw-stage" aria-hidden="true">
+                    <div class="sw-row" style="grid-template-columns: auto 16px 1fr;">
+                        <span class="sw-one"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M4 16l5-4 4 3 3-2.5 4 3.5"/></svg></span>
+                        <span class="sw-arrow">→</span>
+                        <span class="sw-fan">
+                            <span class="sw-fi"><span class="sw-frame wide"></span><em>hero</em></span>
+                            <span class="sw-fi"><span class="sw-frame sq"></span><em>social</em></span>
+                            <span class="sw-fi"><span class="sw-frame tall"></span><em>store</em></span>
+                        </span>
+                    </div>
+                </div>
+                <p class="cap">One screenshot fans out into a hero, social posts, an App Store set, and a teaser.</p>
             </div>
         </div>
     </div>
