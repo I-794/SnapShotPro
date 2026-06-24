@@ -1,4 +1,6 @@
-export const DEFAULT_VISION_MODEL = 'gpt-4o-mini';
+// v30 model policy: gpt-5.5 for all non-image OpenAI calls (vision/text/enhance).
+// Overridable per-route via OPENAI_VISION_MODEL / OPENAI_ENHANCE_MODEL env vars.
+export const DEFAULT_VISION_MODEL = 'gpt-5.5';
 
 export class ApiError extends Error {
   constructor(status, message) {
