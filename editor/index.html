@@ -721,6 +721,38 @@
             </div>
         </div>
 
+        <div class="sidebar-section" data-group="background">
+            <h3 class="section-title">Brand Brain <span style="font-size:10px;font-weight:700;background:#6c63ff;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle;letter-spacing:0.04em;">AI</span></h3>
+            <div class="section-body" style="padding:0;">
+                <p class="info-text">Extract a full brand system once, then apply or enforce it everywhere.</p>
+
+                <label class="control-label">From a website URL</label>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <input type="url" class="control-input" id="brand-brain-url" placeholder="https://yourbrand.com" style="flex:1;" />
+                    <button id="brand-brain-extract-url" class="btn btn-secondary">Extract</button>
+                </div>
+
+                <label class="control-label">…or from a logo / brand image</label>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button id="brand-brain-asset-btn" class="btn btn-secondary" style="flex:1;">Upload asset</button>
+                    <input type="file" id="brand-brain-asset-input" accept="image/*" style="display:none;" />
+                </div>
+
+                <div id="brand-brain-preview" style="display:none;margin-bottom:8px;">
+                    <div id="brand-brain-swatches" class="palette-swatches"></div>
+                    <p id="brand-brain-name" class="info-text" style="margin-top:4px;"></p>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button id="brand-brain-apply" class="btn btn-primary" style="flex:1;">Apply to design</button>
+                </div>
+                <div class="toggle-switch">
+                    <span class="toggle-label">Enforce on new pages &amp; projects</span>
+                    <label class="switch"><input type="checkbox" id="brand-brain-enforce"><span class="slider"></span></label>
+                </div>
+            </div>
+        </div>
+
         <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">Device &amp; Window Frame</h3>
             <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><optgroup label="Devices"><option value="iphone16pro">iPhone 16 Pro</option><option value="ipadpro">iPad Pro</option><option value="macbookpro">MacBook Pro</option><option value="watch">Apple Watch</option><option value="studiodisplay">Studio Display</option><option value="pixel">Pixel (Android)</option></optgroup><optgroup label="Windows"><option value="macos">macOS Window</option><option value="windows">Windows Window</option><option value="winlaptop">Windows Laptop</option></optgroup><optgroup label="Browsers"><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></optgroup></select></div>

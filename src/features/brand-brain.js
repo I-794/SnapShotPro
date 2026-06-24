@@ -165,3 +165,54 @@ export function applyBrand() {
   if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
   showNotification('Brand applied to design.', 'success');
 }
+
+// ── Sidebar UI (v30) ──────────────────────────────────────────────────────────
+
+const $ = (id) => document.getElementById(id);
+
+function fileToImage(file) {
+  return new Promise((resolve) => {
+    const r = new FileReader();
+    r.onload = () => { const img = new Image(); img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = r.result; };
+    r.onerror = () => resolve(null);
+    r.readAsDataURL(file);
+  });
+}
+
+// Reflect state.brand into the panel preview (swatches + name + enforce check).
+export function refreshBrandBrainUI() {
+  const wrap = $('brand-brain-preview');
+  const sw = $('brand-brain-swatches');
+  const nm = $('brand-brain-name');
+  const enf = $('brand-brain-enforce');
+  if (enf) enf.checked = !!state.brand.enforce;
+  if (!state.brand.enabled) { if (wrap) wrap.style.display = 'none'; return; }
+  if (wrap) wrap.style.display = 'block';
+  if (sw) sw.innerHTML = (state.brand.palette || [])
+    .map(c => `<div class="palette-swatch" style="background:${c};" title="${c}"></div>`).join('');
+  if (nm) nm.textContent = state.brand.name ? `"${state.brand.name}"` : '';
+}
+
+export function bindBrandBrain() {
+  $('brand-brain-extract-url')?.addEventListener('click', async () => {
+    const url = $('brand-brain-url')?.value?.trim();
+    const ok = await extractBrandFromUrl(url);
+    if (ok) refreshBrandBrainUI();
+  });
+
+  const assetInput = $('brand-brain-asset-input');
+  $('brand-brain-asset-btn')?.addEventListener('click', () => assetInput?.click());
+  assetInput?.addEventListener('change', async (e) => {
+    const f = e.target.files?.[0];
+    if (f) { const img = await fileToImage(f); if (img) { await extractBrandFromImage(img, f.name.replace(/\.[^.]+$/, '')); refreshBrandBrainUI(); } }
+    assetInput.value = '';
+  });
+
+  $('brand-brain-apply')?.addEventListener('click', () => applyBrand());
+
+  $('brand-brain-enforce')?.addEventListener('change', (e) => {
+    state.brand.enforce = e.target.checked;
+  });
+
+  refreshBrandBrainUI();
+}

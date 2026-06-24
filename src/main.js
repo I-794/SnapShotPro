@@ -38,6 +38,7 @@ import { bindPalettes } from './features/palettes.js';
 import { bindColorMap } from './features/color-map.js';
 import { bindCompose } from './features/compose.js';
 import { bindBrandKit } from './features/brand-kit.js';
+import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
@@ -133,6 +134,7 @@ function init() {
   bindColorMap();      // v17 — palette-driven color mapping
   bindCompose();       // v18 — design variations generator
   bindBrandKit();
+  bindBrandBrain();
   bindBgRemove();
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
