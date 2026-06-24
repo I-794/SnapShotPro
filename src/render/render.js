@@ -245,6 +245,20 @@ export function renderInto(canvas, forExport) {
   if (!forExport) renderMinimap();
 }
 
+// v30 — render the current design into an arbitrary canvas at an arbitrary
+// pixel size, then restore the working canvas size. Used by the Campaign
+// Generator and the Producer to emit the same design at many target sizes.
+// forExport=true so preview-only chrome (minimap/CSS-transform sync) is skipped.
+export function renderAtSize(canvas, { width, height }) {
+  const prev = state.canvas;
+  try {
+    state.canvas = { width: Math.max(1, Math.round(width)), height: Math.max(1, Math.round(height)) };
+    renderInto(canvas, true);
+  } finally {
+    state.canvas = prev;
+  }
+}
+
 // Reusable offscreen canvas for compositing a device mockup before warping.
 let _mockOff = null;
 function mockCanvas(w, h) {
