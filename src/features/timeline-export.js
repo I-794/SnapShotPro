@@ -75,6 +75,9 @@ export async function renderTimelineBlob(format /* 'mp4' | 'gif' */, onProgress)
   };
 
   const p = onProgress || (() => {});
+  // Surface the deterministic frame count once before encoding so callers can
+  // read the true total even if no encoder progress callback fires.
+  p({ phase: 'init', t: total });
   try {
     return format === 'mp4'
       ? await encodeMp4(frameProvider, {
