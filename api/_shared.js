@@ -47,13 +47,22 @@ export async function openAIChat(payload) {
   const key = serverOpenAIKey();
   if (!key) throw new ApiError(501, 'No server key configured');
 
+  // v30 — gpt-5.x / reasoning models reject `max_tokens` and require
+  // `max_completion_tokens`. Normalize here so every route (which still passes
+  // the familiar `max_tokens`) works without per-route changes.
+  const body = { ...payload };
+  if (body.max_tokens != null && body.max_completion_tokens == null) {
+    body.max_completion_tokens = body.max_tokens;
+    delete body.max_tokens;
+  }
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(body)
   });
 
   const data = await response.json().catch(() => ({}));

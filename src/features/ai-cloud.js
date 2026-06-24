@@ -90,7 +90,7 @@ async function callOpenAIVision(key, prompt, dataUrl) {
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const res = await client.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
-    max_tokens: 1024,
+    max_completion_tokens: 1024,
     messages: [{
       role: 'user',
       content: [
@@ -171,7 +171,7 @@ async function callOpenAIText(key, prompt, json) {
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const res = await client.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
-    max_tokens: 1024,
+    max_completion_tokens: 1024,
     ...(json ? { response_format: { type: 'json_object' } } : {}),
     messages: [{ role: 'user', content: prompt }]
   });
@@ -255,7 +255,7 @@ async function callOpenAIVisionJson(key, prompt, dataUrl) {
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const res = await client.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
-    max_tokens: 1500,
+    max_completion_tokens: 1500,
     response_format: { type: 'json_object' },
     messages: [{
       role: 'user',
@@ -436,7 +436,7 @@ async function openAIAgentTurn(key, system, messages, tools, onText) {
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const stream = await client.chat.completions.create({
     model: AGENT_MODELS.openai,
-    max_tokens: AGENT_MAX_TOKENS,
+    max_completion_tokens: AGENT_MAX_TOKENS,
     messages: toOpenAIMessages(system, messages),
     tools: tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } })),
     stream: true
