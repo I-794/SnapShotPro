@@ -1110,6 +1110,17 @@
         </div>
 
         <div class="sidebar-section" data-group="project">
+            <h3 class="section-title">📦 Campaigns</h3>
+            <p class="info-text" style="margin-bottom:8px;">One design → a full set of assets. Generate, revisit, re-download.</p>
+            <input type="text" class="control-input" id="campaign-name" placeholder="Campaign name" style="margin-bottom:8px;">
+            <input type="text" class="control-input" id="campaign-prompt" placeholder="Art direction (optional)" style="margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="campaign-appstore" checked> Include App Store set</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:8px;"><input type="checkbox" id="campaign-teaser"> Include teaser video (needs motion)</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="campaign-generate">Generate campaign</button>
+            <div id="campaign-list"></div>
+        </div>
+
+        <div class="sidebar-section" data-group="project">
             <h3 class="section-title">🗂 Pages &amp; Deck</h3>
             <p class="info-text" style="margin-bottom:8px;">Build a multi-page document. Each page keeps its own size and design. Switch pages from the filmstrip under the canvas.</p>
             <div style="display:flex;gap:8px;margin-bottom:8px;">

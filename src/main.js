@@ -51,6 +51,7 @@ import { bindScreenshotEditor } from './features/ai-screenshot-editor.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
+import { bindCampaigns } from './features/campaigns.js';
 import { bindPages } from './features/pages.js';
 import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
@@ -150,6 +151,7 @@ function init() {
   bindPages();
   bindTours();
   bindProjects();
+  bindCampaigns();
   bindGallery();
   bindCrop();
   bindResetButton();
