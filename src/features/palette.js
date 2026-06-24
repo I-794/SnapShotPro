@@ -148,6 +148,7 @@ export function registerCommands() {
     { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() },
     { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
     { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
+    { id: 'brand-brain-apply', label: 'Apply Brand',          icon: '🎨', run: () => import('./brand-brain.js').then(m => m.applyBrand()), when: () => !!state.brand?.enabled },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 
