@@ -8,6 +8,11 @@ import { showNotification } from '../ui/notification.js';
 import { extractPalette } from './palette-extract.js';
 import { generateHarmony } from '../utils/color.js';
 import { runVisionJsonOnDataUrl } from './ai-cloud.js';
+import { applySpec } from '../state/spec.js';
+import { saveSwatchesAsPalette } from './palettes.js';
+import { loadLogoImage } from './brand-kit.js';
+import { saveStateToHistory } from '../state/history.js';
+import { render } from '../render/render.js';
 
 // Load an http(s) image into an HTMLImageElement (CORS-anonymous so we can read
 // pixels for palette extraction). Resolves null on failure rather than throwing.
@@ -117,4 +122,46 @@ export async function extractBrandFromUrl(url) {
   writeBrand({ name: signals.title || new URL(url).hostname, sourceUrl: url, palette, logoDataUrl: null, headlineFont });
   showNotification('Brand system extracted from URL.', 'success');
   return true;
+}
+
+// Apply the active brand system onto the current design. One undo step. Routes
+// presentation through the validated applySpec(), then sets the brand-specific
+// extras (font, logo, watermark) the spec doesn't cover — mirroring how
+// brand-kit.js applyKitObject() works, but driven by the extracted system.
+export function applyBrand() {
+  const b = state.brand;
+  if (!b || !b.enabled) { showNotification('Extract a brand first.', 'error'); return; }
+  saveStateToHistory();
+
+  // 1) Register the brand palette so the color-map can reference it by id.
+  let paletteId = null;
+  if (b.palette && b.palette.length >= 2) {
+    paletteId = saveSwatchesAsPalette(b.palette.slice(), (b.name || 'Brand') + ' palette');
+  }
+
+  // 2) Presentation via the validated spec applier (bg / frame / filter / color).
+  applySpec({
+    bg: b.background,
+    frame: b.frame,
+    filter: b.filter,
+    color: paletteId ? { mode: b.colorMap.mode, paletteId, intensity: b.colorMap.intensity, steps: b.colorMap.steps } : null
+  });
+
+  // 3) Brand extras the spec deliberately doesn't touch.
+  if (b.typography?.headlineFont) state.textOverlay.font = b.typography.headlineFont;
+  if (b.logo?.dataUrl) {
+    state.logo = {
+      enabled: true, src: b.logo.dataUrl,
+      position: b.logo.position || 'bottom-right',
+      scale: b.logo.scale ?? 0.12, opacity: b.logo.opacity ?? 90
+    };
+    loadLogoImage();
+  }
+  if (b.watermark?.text) {
+    state.watermark = { ...state.watermark, ...b.watermark, enabled: true };
+  }
+
+  render();
+  if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
+  showNotification('Brand applied to design.', 'success');
 }
