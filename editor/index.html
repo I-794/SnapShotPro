@@ -581,6 +581,36 @@
             <button class="btn btn-secondary" style="width:100%;" id="style-reset-btn">Reset Filters</button>
         </div>
 
+        <!-- v30 — Magic Edit: AI-powered semantic edits to screenshot pixels -->
+        <div class="sidebar-section" data-group="ai">
+            <h3 class="section-title">Magic Edit</h3>
+            <p class="info-text" style="margin-bottom:8px;">Edit the screenshot's own content with AI.</p>
+
+            <label class="control-label">Fix / replace text</label>
+            <div style="margin-bottom:4px;"><input type="text" class="control-input" id="medit-find" placeholder="Find text…"></div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-replace" placeholder="Replace with…" style="flex:1;">
+                <button class="btn btn-secondary" id="medit-fixtext">Replace</button>
+            </div>
+
+            <label class="control-label">Recolor an element</label>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-recolor-desc" placeholder="e.g. the primary button" style="flex:1;">
+                <input type="color" id="medit-recolor-hex" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
+                <button class="btn btn-secondary" id="medit-recolor">Recolor</button>
+            </div>
+
+            <label class="control-label">Remove clutter</label>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-remove-desc" placeholder="e.g. the mouse cursor" style="flex:1;">
+                <button class="btn btn-secondary" id="medit-remove">Remove</button>
+            </div>
+
+            <label class="control-label">Redact PII</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:6px;" id="medit-redact">Auto-redact emails &amp; names</button>
+            <p class="info-text" id="medit-status" style="min-height:14px;"></p>
+        </div>
+
         <div class="sidebar-section" data-group="adjust">
             <h3 class="section-title">Smart Palette</h3>
             <p class="info-text" style="margin-bottom:8px;">Extract a 5-color palette from your image.</p>

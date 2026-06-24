@@ -175,3 +175,19 @@ export async function redact({ autoPII = true, manualBoxes = [] } = {}) {
   showNotification(`Redacted ${boxes.length} region${boxes.length === 1 ? '' : 's'}.`, 'success');
   return true;
 }
+
+// v30 — Sidebar panel wiring. Connects the Magic Edit DOM controls to the ops above.
+const $ = (id) => document.getElementById(id);
+
+export function bindScreenshotEditor() {
+  $('medit-fixtext')?.addEventListener('click', () => {
+    fixText($('medit-find')?.value?.trim(), $('medit-replace')?.value ?? '');
+  });
+  $('medit-recolor')?.addEventListener('click', () => {
+    recolorElement($('medit-recolor-desc')?.value?.trim(), $('medit-recolor-hex')?.value || '#4f46e5');
+  });
+  $('medit-remove')?.addEventListener('click', () => {
+    removeClutter($('medit-remove-desc')?.value?.trim());
+  });
+  $('medit-redact')?.addEventListener('click', () => redact({ autoPII: true }));
+}

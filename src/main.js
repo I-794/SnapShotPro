@@ -47,6 +47,7 @@ import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
 import { bindAiArtDirector } from './features/ai-art-director.js';
 import { bindAiImageEdit } from './features/ai-image-edit.js';
+import { bindScreenshotEditor } from './features/ai-screenshot-editor.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
@@ -143,6 +144,7 @@ function init() {
   bindAiCloud();
   bindAiArtDirector();
   bindAiImageEdit();
+  bindScreenshotEditor();   // v30 — Magic Edit panel
   bindAuth();
   bindCloudSync();
   bindPages();
