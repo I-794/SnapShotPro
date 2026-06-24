@@ -207,6 +207,23 @@ export const state = {
   // below. `scale`/`opacity` are fractions/percent; position mirrors watermark.
   logo: { enabled: false, src: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
 
+  // v30 — Brand Brain: an extracted, enforceable brand system. Applied via
+  // brand-brain.js applyBrand() which routes through applySpec() + state setters.
+  // Carries a logo dataUrl, so it rides PROJECT_FIELDS (full fidelity), not the
+  // lean SERIALIZED_FIELDS — mirroring how `logo` is handled.
+  brand: {
+    enabled: false, name: '', sourceUrl: '',
+    palette: [],
+    background: { mode: 'gradient', gradient: { colors: [], type: 'linear', angle: 135 } },
+    frame: { type: null, color: 'dark' },
+    typography: { headlineFont: 'Arial', captionFont: 'Arial' },
+    colorMap: { mode: 'off', intensity: 100, steps: 6 },
+    filter: 'none',
+    logo: { dataUrl: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
+    watermark: { text: '', color: '#ffffff', position: 'bottom-right', size: 16, opacity: 50 },
+    enforce: false
+  },
+
   // v17 — Color release.
   // colorPalettes: the active palette id + an in-memory mirror of the saved
   // library. The durable copy lives in localStorage (snapshotpro_colorpalettes,

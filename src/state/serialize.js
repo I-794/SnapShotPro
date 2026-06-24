@@ -74,7 +74,7 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 18;
+export const SCHEMA_VERSION = 19;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
@@ -90,7 +90,10 @@ export const PROJECT_FIELDS = [
   'codeSnippet',
   // v25 — Interactive Tour. Per-step hotspots/callouts ride the page payload, so
   // a tour's steps persist with the project (each page is a tour step).
-  'tour'
+  'tour',
+  // v30 — Brand Brain system (carries logo dataUrl; full-fidelity project field
+  // only, deliberately not in the lean SERIALIZED_FIELDS, mirroring `logo`).
+  'brand'
 ];
 
 // v25 — guarantee every applied design carries a `tour` block. Because
@@ -165,6 +168,27 @@ export function migrateTimelineV18(design) {
   return design;
 }
 
+// v30 — schema 19 migration: guarantee every applied design carries a default
+// `brand` block so pre-v30 projects open without an undefined brand (and so
+// Object.assign-based applyPayload never leaks a previous page's brand). Mutates
+// + returns the design. Mirrors ensureTourDefaults.
+export function ensureBrandDefaults(design) {
+  if (design && !design.brand) {
+    design.brand = {
+      enabled: false, name: '', sourceUrl: '', palette: [],
+      background: { mode: 'gradient', gradient: { colors: [], type: 'linear', angle: 135 } },
+      frame: { type: null, color: 'dark' },
+      typography: { headlineFont: 'Arial', captionFont: 'Arial' },
+      colorMap: { mode: 'off', intensity: 100, steps: 6 },
+      filter: 'none',
+      logo: { dataUrl: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
+      watermark: { text: '', color: '#ffffff', position: 'bottom-right', size: 16, opacity: 50 },
+      enforce: false
+    };
+  }
+  return design;
+}
+
 // Accept both the v12 envelope ({schemaVersion, design, image, svgCode}) and
 // the legacy flat payload written by the old cloud-sync saveProject() (raw
 // design fields, no image), returning a normalized v12 envelope either way.
@@ -175,11 +199,11 @@ export function normalizeProject(payload) {
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload.design))),
+      design: ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload.design)))),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload))), image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload)))), image: null, svgCode: payload.svgCode || null };
 }
