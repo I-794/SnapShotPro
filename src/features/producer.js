@@ -97,3 +97,31 @@ export async function runProducer(goal, onLog) {
   log(`✓ Done — campaign “${cfg.name}” is in the Campaigns folder.`);
   return res;
 }
+
+// v30 — Producer UI bindings (separate autopilot surface, own element ids).
+
+const $ = (id) => document.getElementById(id);
+
+function logLine(text) {
+  const log = $('producer-log');
+  if (!log) return;
+  const div = document.createElement('div');
+  div.className = 'producer-line';
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+let running = false;
+
+export function bindProducer() {
+  $('producer-run')?.addEventListener('click', async () => {
+    if (running) return;
+    running = true;
+    const log = $('producer-log'); if (log) log.innerHTML = '';
+    const goal = ($('producer-goal')?.value?.trim()) || ($('producer-preset')?.value) || 'Launch kit';
+    try { await runProducer(goal, logLine); }
+    finally { running = false; if (typeof window.__refreshCampaigns === 'function') window.__refreshCampaigns(); }
+  });
+  $('producer-stop')?.addEventListener('click', () => { stopProducer(); logLine('■ Stopping after the current step…'); });
+}

@@ -42,6 +42,7 @@ import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
+import { bindProducer } from './features/producer.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
@@ -140,6 +141,7 @@ function init() {
   bindBgRemove();
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
+  bindProducer();      // v30 — Producer autopilot (separate surface)
   bindOcr();
   bindApiKeysPanel();
   bindAiCloud();
