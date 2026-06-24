@@ -118,3 +118,60 @@ export async function removeClutter(description) {
     return true;
   } catch (e) { showNotification(`Edit failed: ${e.message || e}`, 'error'); return false; }
 }
+
+// Pixelate a region in-place (mosaic) — privacy-grade, irreversible in the
+// output. Used for redaction; no AI involved.
+function pixelate(ctx, x, y, w, h, block = 12) {
+  const sx = Math.max(1, Math.floor(w / block));
+  const sy = Math.max(1, Math.floor(h / block));
+  const tmp = document.createElement('canvas');
+  tmp.width = sx; tmp.height = sy;
+  const t = tmp.getContext('2d');
+  t.drawImage(ctx.canvas, x, y, w, h, 0, 0, sx, sy);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tmp, 0, 0, sx, sy, x, y, w, h);
+  ctx.imageSmoothingEnabled = true;
+}
+
+// Redact PII. Auto-detection uses OCR (email-like tokens) plus an optional
+// vision pass for names/cards; manualBoxes are always redacted. Commits the
+// pixelated image as the new state.image (one undo step). No model regeneration.
+export async function redact({ autoPII = true, manualBoxes = [] } = {}) {
+  if (!state.image) { showNotification('Load a screenshot first.', 'error'); return false; }
+  const canvas = sourceCanvas();
+  const ctx = canvas.getContext('2d');
+  let boxes = [...manualBoxes];
+
+  if (autoPII) {
+    // OCR: email-like tokens.
+    try {
+      const words = await recognizeWords(state.image);
+      for (const w of words) {
+        if (/@|\d{4,}/.test(w.text) && w.bbox) {
+          boxes.push({ x: w.bbox.x0, y: w.bbox.y0, w: w.bbox.x1 - w.bbox.x0, h: w.bbox.y1 - w.bbox.y0 });
+        }
+      }
+    } catch (_) {}
+    // Vision: names / card numbers / addresses (best-effort; tolerated on fail).
+    let v = null;
+    try {
+      v = await runVisionJsonOnDataUrl(
+        `The image is ${canvas.width}px wide and ${canvas.height}px tall (top-left origin). ` +
+        `Return JSON {"regions":[{"x":int,"y":int,"w":int,"h":int}]} for every region containing personally identifiable information (full names, emails, phone numbers, card numbers, street addresses). Empty array if none.`,
+        canvas.toDataURL('image/png')
+      );
+    } catch (_) {}
+    if (v && Array.isArray(v.regions)) {
+      for (const r of v.regions) boxes.push({ x: r.x | 0, y: r.y | 0, w: r.w | 0, h: r.h | 0 });
+    }
+  }
+
+  boxes = boxes.filter(b => b.w > 1 && b.h > 1);
+  if (!boxes.length) { showNotification('No PII detected to redact.', 'success'); return false; }
+  for (const b of boxes) pixelate(ctx, Math.max(0, b.x), Math.max(0, b.y), b.w, b.h);
+
+  // Commit via the shared image-replace path (bare b64).
+  await applyResultAsImage(canvas.toDataURL('image/png').split(',')[1]);
+  showNotification(`Redacted ${boxes.length} region${boxes.length === 1 ? '' : 's'}.`, 'success');
+  return true;
+}
