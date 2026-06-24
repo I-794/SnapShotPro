@@ -7,7 +7,7 @@
 
 import { state } from '../state/state.js';
 import { showNotification } from '../ui/notification.js';
-import { canvasToBlob, nearestGptImageSize, imageToDataUrl } from './ai-shared.js';
+import { canvasToBlob, nearestGptImageSize } from './ai-shared.js';
 import { edit, applyResultAsImage } from './ai-image-edit.js';
 import { runVisionJsonOnDataUrl } from './ai-cloud.js';
 import { recognizeWords } from './ocr.js';

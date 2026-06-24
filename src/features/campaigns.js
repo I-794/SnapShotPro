@@ -192,6 +192,15 @@ export async function pullCampaigns() {
   }
 }
 
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export function refreshCampaigns() {
   const list = $('campaign-list');
   if (!list) return;
@@ -200,11 +209,11 @@ export function refreshCampaigns() {
   list.innerHTML = all.map(c => `
     <div class="campaign-card" data-id="${c.id}" style="border:1px solid var(--border,#2a2a2a);border-radius:8px;padding:8px;margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
-        <strong style="font-size:13px;">${c.name}</strong>
+        <strong style="font-size:13px;">${escapeHtml(c.name)}</strong>
         <span class="info-text">${(c.thumbs || []).length} assets${c.hasTeaser ? ' + video' : ''}</span>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-        ${(c.thumbs || []).map(t => `<img src="${t.dataUrl}" title="${t.role}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />`).join('')}
+        ${(c.thumbs || []).map(t => `<img src="${t.dataUrl}" title="${escapeHtml(t.role)}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />`).join('')}
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-primary campaign-download" style="flex:1;">Download ZIP</button>
