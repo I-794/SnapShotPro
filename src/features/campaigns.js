@@ -50,17 +50,21 @@ const $ = (id) => document.getElementById(id);
 // is exactly what serializeFull() returns, applied through document.js's
 // applyPayload (the real page-payload applier; it decodes the image + renders).
 async function regenerateFiles(record) {
-  const { applyPayload } = await import('./document.js');
+  const { applyDesignToState } = await import('./document.js');
   const { renderTargetsToFiles } = await import('./campaign-targets.js');
   const { renderSetPanels } = await import('./screenshot-set.js');
+  const { render } = await import('../render/render.js');
   const { state } = await import('../state/state.js');
-  const { saveStateToHistory } = await import('../state/history.js');
+  const { serializeFull } = await import('../state/serialize.js');
 
-  saveStateToHistory();
-  applyPayload(record.payload); // restores image + design from the saved envelope (async render inside)
-  // Give applyPayload's async image-decode + render a tick to settle before we
-  // render targets off the live state.
-  await new Promise((r) => setTimeout(r, 0));
+  // Capture the user's current design so we can restore it after regenerating —
+  // downloading a campaign must not silently swap what the editor is showing.
+  const prevPayload = serializeFull();
+
+  // applyDesignToState returns a promise that resolves on image decode (img.onload),
+  // so awaiting it avoids rendering targets against a stale/blank state.image.
+  await applyDesignToState(record.payload);
+  render();
 
   const files = {};
   const t = await renderTargetsToFiles();
@@ -69,6 +73,13 @@ async function regenerateFiles(record) {
     const panels = await renderSetPanels();
     for (const p of panels) files[`appstore/${p.name}`] = new Uint8Array(await p.blob.arrayBuffer());
   }
+
+  // Restore the user's original design. A restore failure must not lose `files`.
+  try {
+    await applyDesignToState(prevPayload);
+    render();
+  } catch (e) { /* keep the generated files even if restore fails */ }
+
   return files;
 }
 
