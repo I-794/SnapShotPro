@@ -75,6 +75,10 @@ function newProject(name) {
   localStorage.setItem(ACTIVE_KEY, id);
   writeStore(store);
   pushProjectToCloud(store[id]);
+  // v30 — Brand Brain enforcement: a new project starts on-brand.
+  if (state.brand && state.brand.enforce && state.brand.enabled) {
+    import('./brand-brain.js').then(m => m.applyBrand());
+  }
   return store[id];
 }
 

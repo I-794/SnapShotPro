@@ -75,6 +75,9 @@ export function registerCommands() {
     { id: 'copy-clipboard',   label: 'Copy to Clipboard',     icon: '📋', run: copyToClipboard },
     { id: 'load-url',         label: 'Load from URL',         icon: '🔗', run: focusUrlLoad },
     { id: 'code-studio',      label: 'Open Code Snippet Studio', icon: '</>', run: openCodeStudio },
+    { id: 'campaign-generate', label: 'Generate Campaign',     icon: '📦', group: groupFor('campaign-generate'),
+      run: () => import('./campaign-generator.js').then(m => m.generateCampaign({ name: 'Campaign', includeAppStore: true })),
+      when: () => !!state.image },
     { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
     { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
     { id: 'duplicate-selection', label: 'Duplicate selection', icon: '⧉', run: () => { if (duplicateSelection()) render(); }, when: () => state.canvasSelection.length > 0 },
@@ -139,6 +142,12 @@ export function registerCommands() {
     { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
     { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },
     { id: 'ai-eraser',        label: 'AI: Magic Eraser',     icon: '🧽', run: openEraser },
+    { id: 'medit-redact',    label: 'Redact PII (auto)',    icon: '🛡️', group: groupFor('medit-redact'),
+      run: () => import('./ai-screenshot-editor.js').then(m => m.redact({ autoPII: true })),
+      when: () => !!state.image },
+    { id: 'producer-launch-kit', label: 'Producer: Launch Kit', icon: '🤖', group: groupFor('producer-launch-kit'),
+      run: () => import('./producer.js').then(m => m.runProducer('Launch kit', (l) => console.log(l))),
+      when: () => !!state.image },
     { id: 'screen-record',    label: 'Record screen',        icon: '⏺', run: () => document.getElementById('screen-record-btn')?.click() },
     { id: 'auto-zoom-toggle', label: 'Toggle auto-zoom',     icon: '🔎', run: () => { const t = document.getElementById('auto-zoom-enabled'); if (t) { t.checked = !t.checked; t.dispatchEvent(new Event('change')); } } },
     { id: 'video-play',       label: 'Video: Play/Pause clip', icon: '🎬', run: togglePlay },
@@ -148,6 +157,7 @@ export function registerCommands() {
     { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() },
     { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
     { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
+    { id: 'brand-brain-apply', label: 'Apply Brand',          icon: '🎨', run: () => import('./brand-brain.js').then(m => m.applyBrand()), when: () => !!state.brand?.enabled },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 

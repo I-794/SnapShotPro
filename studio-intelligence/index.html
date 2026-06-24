@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="SnapShotPro Studio Intelligence: extract a brand system from any URL, edit screenshot content with AI, and generate a whole campaign of assets — on autopilot. Free, in your browser.">
+    <title>Studio Intelligence · SnapShotPro</title>
+    <link rel="canonical" href="__OG_BASE__/studio-intelligence/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Studio Intelligence · SnapShotPro">
+    <meta property="og:description" content="One screenshot in. A whole campaign out. The AI studio that learns your brand, edits your pixels, and ships the rest — on autopilot.">
+    <meta property="og:image" content="__OG_BASE__/og.png?v=2">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SnapShotPro Studio Intelligence",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Web browser",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+    <style>
+        /* taste-skill-directed, page-scoped layout. Vanilla CSS, dark theme locked,
+           single blue accent inherited from site.css. No new JS — reveals reuse the
+           shared IntersectionObserver in /site.js. */
+
+        .actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; margin-top: 30px; }
+
+        /* Hero flow strip: input → output, the page's whole thesis in one line.
+           Not a decorative agency strip — each token names a real stage. */
+        .flow {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
+            margin-top: 34px; font-family: var(--font-mono); font-size: 13px;
+            color: var(--ink-2);
+        }
+        .flow .node {
+            padding: 8px 15px; border-radius: var(--r-pill);
+            border: 1px solid var(--glass-line); background: var(--glass);
+            color: var(--ink); white-space: nowrap;
+        }
+        .flow .node.dest { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+        .flow .arr { color: var(--accent); font-size: 15px; }
+
+        /* Pipeline rail: a single numbered spine the four features hang off, so the
+           page reads as one autopilot flow instead of four equal cards. */
+        .pillar { position: relative; }
+        .pillar .tag {
+            font-family: var(--font-mono); font-size: 12.5px; font-weight: 500;
+            letter-spacing: 0.04em; color: var(--accent); margin-bottom: 14px;
+            display: flex; align-items: baseline; gap: 12px;
+        }
+        .pillar .tag .ix { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
+        .pillar h2 { font-size: clamp(28px, 3.8vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.04; margin-bottom: 16px; color: var(--ink); }
+        .pillar .benefit { font-size: 17.5px; color: var(--ink-2); line-height: 1.6; max-width: 46ch; }
+
+        /* Brand Brain: a swatch board so "it learns your brand" is shown, not asserted. */
+        .brand-board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+        .brand-board .sw { aspect-ratio: 1; border-radius: 14px; border: 1px solid var(--glass-line); position: relative; }
+        .brand-board .sw span {
+            position: absolute; left: 9px; bottom: 8px; font-family: var(--font-mono);
+            font-size: 10px; color: rgba(255,255,255,0.78);
+        }
+        .brand-board .type {
+            grid-column: span 3; aspect-ratio: auto; display: flex; flex-direction: column; justify-content: center;
+            padding: 16px 18px; background: var(--bg-raise);
+        }
+        .brand-board .type b { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+        .brand-board .type small { font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); margin-top: 6px; }
+
+        /* Campaign Generator outputs: a real bento with mixed cell sizes (4 deliverables,
+           4 cells, no empties), each a different aspect to feel like a real asset set. */
+        .out-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-auto-rows: 1fr; gap: 14px; }
+        .out {
+            position: relative; border-radius: var(--r-card); overflow: hidden;
+            border: 1px solid var(--glass-line); background: var(--bg-raise);
+            min-height: 150px; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .out img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .out .lab {
+            position: relative; z-index: 1; padding: 13px 15px;
+            background: linear-gradient(180deg, transparent, rgba(6,8,15,0.9));
+            font-size: 13.5px; font-weight: 600; color: #fff;
+        }
+        .out .lab span { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 11px; color: rgba(255,255,255,0.72); margin-top: 2px; }
+        .out.hero-cell { grid-row: span 2; }
+
+        /* Producer: the autopilot run, shown as a checklist of steps the studio does itself. */
+        .run { display: grid; gap: 0; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--glass-line); background: var(--bg-raise); }
+        .run .row { display: flex; align-items: flex-start; gap: 14px; padding: 17px 20px; border-bottom: 1px solid var(--line); }
+        .run .row:last-child { border-bottom: 0; }
+        .run .row .ck {
+            flex: none; width: 22px; height: 22px; border-radius: 50%; margin-top: 1px;
+            background: var(--accent-soft); border: 1px solid var(--accent-line); color: var(--accent);
+            display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+        }
+        .run .row .t b { display: block; font-size: 15px; font-weight: 600; color: var(--ink); }
+        .run .row .t span { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+        .run .row.done { background: var(--accent-soft); }
+        .run .row.done .t b { color: var(--accent); }
+
+        @media (max-width: 820px) {
+            .out-grid { grid-template-columns: 1fr 1fr; }
+            .out.hero-cell { grid-column: span 2; grid-row: span 1; }
+        }
+        @media (max-width: 560px) {
+            .brand-board { grid-template-columns: repeat(4, 1fr); }
+            .brand-board .type { grid-column: span 4; }
+            .out-grid { grid-template-columns: 1fr; }
+            .out.hero-cell { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <p class="mono-label" style="margin-bottom:16px;">Studio Intelligence</p>
+        <h1>One screenshot in. <span class="accent">A whole campaign out.</span></h1>
+        <p class="lede">The AI studio that learns your brand, edits your pixels, and ships the rest — on autopilot.</p>
+        <div class="actions">
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+            <a href="#brand-brain" class="btn btn-ghost btn-lg">See how it works</a>
+        </div>
+        <div class="flow">
+            <span class="node">Screenshot</span>
+            <span class="arr">→</span>
+            <span class="node">Brand Brain</span>
+            <span class="arr">→</span>
+            <span class="node">AI edits</span>
+            <span class="arr">→</span>
+            <span class="node dest">Campaign folder</span>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <section id="brand-brain" class="section-pad">
+        <div class="wrap">
+            <div class="feature-cat reveal">
+                <div class="pillar">
+                    <div class="tag"><span class="ix">01</span> Brand Brain</div>
+                    <h2>It learns your brand once, then enforces it.</h2>
+                    <p class="benefit">Point it at any URL or drop in your assets, and Brand Brain extracts a working system: colors, type, logo, and voice. Every asset you make after that snaps to it automatically.</p>
+                    <div class="actions">
+                        <a href="/editor/" class="btn btn-primary">Build my brand <span class="ar">→</span></a>
+                    </div>
+                </div>
+                <div class="fc-visual" style="aspect-ratio:auto;padding:18px;background:var(--bg-sunken);">
+                    <div class="brand-board">
+                        <div class="sw" style="background:#4f7cff;"><span>#4F7CFF</span></div>
+                        <div class="sw" style="background:#0c1020;"><span>#0C1020</span></div>
+                        <div class="sw" style="background:#7a5cff;"><span>#7A5CFF</span></div>
+                        <div class="sw type"><b>Geist</b><small>Display / Body · Mono numerals</small></div>
+                        <div class="sw" style="background:#e7ecff;"><span style="color:#0c1020;">#E7ECFF</span></div>
+                        <div class="sw" style="background:#1a2440;"><span>#1A2440</span></div>
+                        <div class="sw" style="background:#2ec4b6;"><span>#2EC4B6</span></div>
+                        <div class="sw" style="background:#ff7a59;"><span>#FF7A59</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="screenshot-editor" class="section-pad" style="padding-top:0;">
+        <div class="wrap">
+            <div class="feature-cat flip reveal">
+                <div class="pillar">
+                    <div class="tag"><span class="ix">02</span> AI Screenshot Editor</div>
+                    <h2>Edit the pixels, not just the frame.</h2>
+                    <p class="benefit">Rewrite the text inside a screenshot, recolor a button to match your brand, redact a name, or wipe clutter from the background. The editor changes what is in the image, then keeps it sharp.</p>
+                    <div class="actions">
+                        <a href="/editor/" class="btn btn-primary">Edit a screenshot <span class="ar">→</span></a>
+                    </div>
+                </div>
+                <div class="fc-visual">
+                    <img src="https://picsum.photos/seed/snapsi-editor/900/680" alt="A screenshot being edited with AI inside SnapShotPro" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="campaign-generator" class="section-pad" style="padding-top:0;">
+        <div class="wrap">
+            <div class="section-head reveal" style="max-width:52ch;">
+                <div class="tag" style="font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:0.04em;color:var(--accent);margin-bottom:14px;display:flex;align-items:baseline;gap:12px;"><span style="font-size:26px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);line-height:1;">03</span> Campaign Generator</div>
+                <h2>One design becomes a full set of assets.</h2>
+                <p>Approve a single composition and the generator reformats it into every channel you need at once, each one already on-brand and correctly sized.</p>
+            </div>
+            <div class="out-grid reveal">
+                <div class="out hero-cell">
+                    <img src="https://picsum.photos/seed/snapsi-hero/720/900" alt="Generated hero banner asset">
+                    <div class="lab">Hero banner<span>1600 × 900</span></div>
+                </div>
+                <div class="out">
+                    <img src="https://picsum.photos/seed/snapsi-social/520/360" alt="Generated social post asset">
+                    <div class="lab">Social post<span>1080 × 1080</span></div>
+                </div>
+                <div class="out">
+                    <img src="https://picsum.photos/seed/snapsi-appstore/520/360" alt="Generated App Store screenshot asset">
+                    <div class="lab">App Store shot<span>1290 × 2796</span></div>
+                </div>
+                <div class="out" style="grid-column:span 2;">
+                    <img src="https://picsum.photos/seed/snapsi-teaser/900/360" alt="Generated launch teaser asset">
+                    <div class="lab">Launch teaser<span>1280 × 640</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="producer" class="section-pad" style="padding-top:0;">
+        <div class="wrap">
+            <div class="feature-cat reveal">
+                <div class="pillar">
+                    <div class="tag"><span class="ix">04</span> Producer</div>
+                    <h2>Pick a goal, walk away, get a folder.</h2>
+                    <p class="benefit">Tell the Producer what you are shipping and it runs the whole studio for you: brand applied, pixels edited, every format generated, then handed back as one deliverable folder ready to post.</p>
+                    <div class="actions">
+                        <a href="/editor/" class="btn btn-primary">Run the Producer <span class="ar">→</span></a>
+                    </div>
+                </div>
+                <div class="run">
+                    <div class="row done">
+                        <div class="ck">✓</div>
+                        <div class="t"><b>Brand applied</b><span>Pulled the system from Brand Brain and locked it across the run.</span></div>
+                    </div>
+                    <div class="row done">
+                        <div class="ck">✓</div>
+                        <div class="t"><b>Pixels edited</b><span>Cleaned the source screenshot and matched its accents to your palette.</span></div>
+                    </div>
+                    <div class="row done">
+                        <div class="ck">✓</div>
+                        <div class="t"><b>Formats generated</b><span>Built the hero, social, App Store, and teaser variants in one pass.</span></div>
+                    </div>
+                    <div class="row">
+                        <div class="ck">↓</div>
+                        <div class="t"><b>Folder delivered</b><span>Packaged everything, named and sized, ready to download and post.</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+        <div class="wrap">
+            <div class="cta-band reveal">
+                <h2>Drop in one screenshot. Leave with the campaign.</h2>
+                <p>No sign-up. It opens straight into the studio with Studio Intelligence ready to run.</p>
+                <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>

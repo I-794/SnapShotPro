@@ -15,7 +15,7 @@ async function blobToU8(blob) {
   return new Uint8Array(await blob.arrayBuffer());
 }
 
-async function downloadZip(files, filename) {
+export async function downloadZip(files, filename) {
   // Lazy-load fflate so it never weighs on the still-image path.
   const { zipSync } = await import('fflate');
   const entries = {};

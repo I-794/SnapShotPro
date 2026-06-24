@@ -73,7 +73,9 @@ function snapshot() {
     // v25 — Interactive Tour hotspots/callouts for the active step are undoable.
     tour: state.tour,
     // v27 — Surface Studio (physical & print mockup) settings are undoable.
-    surface: state.surface
+    surface: state.surface,
+    // v30 — Brand Brain system is undoable (Apply / Extract are one undo step).
+    brand: state.brand
   }));
 }
 

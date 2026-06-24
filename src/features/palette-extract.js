@@ -83,6 +83,17 @@ function kmeans(points, k, iters = 12) {
     .map(x => x.color);
 }
 
+// v30 — reusable palette extraction for Brand Brain (and anything needing
+// dominant colors from an image). Mirrors what the in-panel extract() does:
+// sample the image small, k-means cluster, return hex sorted by cluster weight.
+// kmeans() already returns string[] of hex colors (sorted by cluster size desc),
+// so we return its result directly — no secondary .map needed.
+export function extractPalette(img, k = K) {
+  if (!img || !img.width || !img.height) return [];
+  const pts = sampleImagePixels(img);
+  return kmeans(pts, k);
+}
+
 let lastPalette = [];
 
 function renderSwatches() {

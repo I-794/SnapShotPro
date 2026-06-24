@@ -10,20 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '29.0';
+const CURRENT_VERSION = '30.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
-// Latest release only — the newest version's highlights, not an accumulation.
+// Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🎞 Motion Studio",
+  heading: "✨ Studio Intelligence",
   items: [
-    { title: 'One timeline for every kind of motion',
-      desc: 'Entrance animations, Ken Burns pan/zoom, video clips, and 3D turntable spin now share a single playhead. Each becomes a lane you can scrub together — watch the whole thing play as one.' },
-    { title: 'Combine motion that never mixed before',
-      desc: 'Drag clips to retime them: stagger each element’s entrance, start a Ken Burns after a fade, and preview a turntable spin live. Pairings that used to be mutually exclusive now layer freely.' },
-    { title: 'Export the whole composition at once',
-      desc: 'One click renders the entire timeline — every layer, combined — to MP4 or GIF through the same studio-quality encoder.' }
+    { title: 'Brand Brain',
+      desc: 'Extract a full brand system from any URL or logo — palette, type, frame, watermark — then enforce it across every design.' },
+    { title: 'AI Screenshot Editor',
+      desc: 'Edit the content inside a screenshot: fix text, recolor an element, auto-redact PII, or remove clutter. It bakes into export.' },
+    { title: 'Campaign Generator',
+      desc: 'One screenshot becomes a whole set — hero, social, an App Store set, and a teaser video — saved in a Campaign folder.' },
+    { title: 'Producer',
+      desc: 'Pick a goal, walk away. The Producer builds a finished, brand-consistent campaign folder on autopilot.' }
   ]
 };
 

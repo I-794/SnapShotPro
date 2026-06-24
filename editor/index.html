@@ -581,6 +581,55 @@
             <button class="btn btn-secondary" style="width:100%;" id="style-reset-btn">Reset Filters</button>
         </div>
 
+        <!-- v30 — Magic Edit: AI-powered semantic edits to screenshot pixels -->
+        <div class="sidebar-section" data-group="ai">
+            <h3 class="section-title">Magic Edit</h3>
+            <p class="info-text" style="margin-bottom:8px;">Edit the screenshot's own content with AI.</p>
+
+            <label class="control-label">Fix / replace text</label>
+            <div style="margin-bottom:4px;"><input type="text" class="control-input" id="medit-find" placeholder="Find text…"></div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-replace" placeholder="Replace with…" style="flex:1;">
+                <button class="btn btn-secondary" id="medit-fixtext">Replace</button>
+            </div>
+
+            <label class="control-label">Recolor an element</label>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-recolor-desc" placeholder="e.g. the primary button" style="flex:1;">
+                <input type="color" id="medit-recolor-hex" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
+                <button class="btn btn-secondary" id="medit-recolor">Recolor</button>
+            </div>
+
+            <label class="control-label">Remove clutter</label>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <input type="text" class="control-input" id="medit-remove-desc" placeholder="e.g. the mouse cursor" style="flex:1;">
+                <button class="btn btn-secondary" id="medit-remove">Remove</button>
+            </div>
+
+            <label class="control-label">Redact PII</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:6px;" id="medit-redact">Auto-redact emails &amp; names</button>
+            <p class="info-text" id="medit-status" style="min-height:14px;"></p>
+        </div>
+
+        <!-- v30 — Producer: autonomous campaign autopilot (separate from Design Agent) -->
+        <div class="sidebar-section" data-group="ai">
+            <h3 class="section-title">Producer <span style="font-size:10px;font-weight:700;background:#6c63ff;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle;letter-spacing:0.04em;">Autopilot</span></h3>
+            <p class="info-text" style="margin-bottom:8px;">Pick a goal, walk away. The Producer builds a full campaign for you.</p>
+            <label class="control-label">Preset goal</label>
+            <select class="control-input" id="producer-preset" style="margin-bottom:8px;">
+                <option value="Launch kit">Launch kit</option>
+                <option value="App Store pack">App Store pack</option>
+                <option value="Social pack">Social pack</option>
+            </select>
+            <label class="control-label">…or describe a goal</label>
+            <input type="text" class="control-input" id="producer-goal" placeholder="e.g. product launch kit" style="margin-bottom:8px;">
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+                <button class="btn btn-primary" id="producer-run" style="flex:1;">Run</button>
+                <button class="btn btn-secondary" id="producer-stop" style="flex:1;">Stop</button>
+            </div>
+            <div id="producer-log" class="agent-log" style="min-height:0;max-height:160px;overflow-y:auto;margin-top:4px;"></div>
+        </div>
+
         <div class="sidebar-section" data-group="adjust">
             <h3 class="section-title">Smart Palette</h3>
             <p class="info-text" style="margin-bottom:8px;">Extract a 5-color palette from your image.</p>
@@ -718,6 +767,38 @@
                 <div class="scene-tile" data-scene="tablet"><div class="scene-thumb">📺</div>Tablet</div>
                 <div class="scene-tile" data-scene="blurred"><div class="scene-thumb">🌫</div>Blurred</div>
                 <div class="scene-tile" data-scene="float"><div class="scene-thumb">🪟</div>Floating</div>
+            </div>
+        </div>
+
+        <div class="sidebar-section" data-group="background">
+            <h3 class="section-title">Brand Brain <span style="font-size:10px;font-weight:700;background:#6c63ff;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle;letter-spacing:0.04em;">AI</span></h3>
+            <div class="section-body" style="padding:0;">
+                <p class="info-text">Extract a full brand system once, then apply or enforce it everywhere.</p>
+
+                <label class="control-label">From a website URL</label>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <input type="url" class="control-input" id="brand-brain-url" placeholder="https://yourbrand.com" style="flex:1;" />
+                    <button id="brand-brain-extract-url" class="btn btn-secondary">Extract</button>
+                </div>
+
+                <label class="control-label">…or from a logo / brand image</label>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button id="brand-brain-asset-btn" class="btn btn-secondary" style="flex:1;">Upload asset</button>
+                    <input type="file" id="brand-brain-asset-input" accept="image/*" style="display:none;" />
+                </div>
+
+                <div id="brand-brain-preview" style="display:none;margin-bottom:8px;">
+                    <div id="brand-brain-swatches" class="palette-swatches"></div>
+                    <p id="brand-brain-name" class="info-text" style="margin-top:4px;"></p>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button id="brand-brain-apply" class="btn btn-primary" style="flex:1;">Apply to design</button>
+                </div>
+                <div class="toggle-switch">
+                    <span class="toggle-label">Enforce on new pages &amp; projects</span>
+                    <label class="switch"><input type="checkbox" id="brand-brain-enforce"><span class="slider"></span></label>
+                </div>
             </div>
         </div>
 
@@ -1045,6 +1126,17 @@
                 <button class="btn btn-secondary" style="flex:1;" id="projects-history-btn">🕘 History</button>
             </div>
             <div id="projects-list"></div>
+        </div>
+
+        <div class="sidebar-section" data-group="project">
+            <h3 class="section-title">📦 Campaigns</h3>
+            <p class="info-text" style="margin-bottom:8px;">One design → a full set of assets. Generate, revisit, re-download.</p>
+            <input type="text" class="control-input" id="campaign-name" placeholder="Campaign name" style="margin-bottom:8px;">
+            <input type="text" class="control-input" id="campaign-prompt" placeholder="Art direction (optional)" style="margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="campaign-appstore" checked> Include App Store set</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:8px;"><input type="checkbox" id="campaign-teaser"> Include teaser video (needs motion)</label>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="campaign-generate">Generate campaign</button>
+            <div id="campaign-list"></div>
         </div>
 
         <div class="sidebar-section" data-group="project">

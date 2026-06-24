@@ -38,17 +38,21 @@ import { bindPalettes } from './features/palettes.js';
 import { bindColorMap } from './features/color-map.js';
 import { bindCompose } from './features/compose.js';
 import { bindBrandKit } from './features/brand-kit.js';
+import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
+import { bindProducer } from './features/producer.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
 import { bindAiArtDirector } from './features/ai-art-director.js';
 import { bindAiImageEdit } from './features/ai-image-edit.js';
+import { bindScreenshotEditor } from './features/ai-screenshot-editor.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
+import { bindCampaigns } from './features/campaigns.js';
 import { bindPages } from './features/pages.js';
 import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
@@ -133,19 +137,23 @@ function init() {
   bindColorMap();      // v17 — palette-driven color mapping
   bindCompose();       // v18 — design variations generator
   bindBrandKit();
+  bindBrandBrain();
   bindBgRemove();
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
+  bindProducer();      // v30 — Producer autopilot (separate surface)
   bindOcr();
   bindApiKeysPanel();
   bindAiCloud();
   bindAiArtDirector();
   bindAiImageEdit();
+  bindScreenshotEditor();   // v30 — Magic Edit panel
   bindAuth();
   bindCloudSync();
   bindPages();
   bindTours();
   bindProjects();
+  bindCampaigns();
   bindGallery();
   bindCrop();
   bindResetButton();

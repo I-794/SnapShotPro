@@ -216,6 +216,88 @@ export function parseJsonLoose(text) {
   try { return JSON.parse(t); } catch (_) { return null; }
 }
 
+// v30 — structured-vision sibling of runVisionPrompt. Asks the model for a JSON
+// object and returns it parsed (or null). Reused by Brand Brain (URL→system),
+// the AI Screenshot Editor (locate regions), and the Producer (goal→plan).
+// OpenAI's json_object mode requires the literal word "JSON" in the prompt, so
+// callers MUST include it (the wrappers below append a reminder defensively).
+async function callAnthropicVisionJson(key, prompt, dataUrl) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+  const res = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
+    system: 'Respond with ONLY valid minified JSON — no markdown fences, no commentary.',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/png', data: dataUrlToBase64(dataUrl) } },
+        { type: 'text', text: prompt }
+      ]
+    }]
+  });
+  return res.content?.[0]?.text || '';
+}
+
+async function callOpenAIVisionJson(key, prompt, dataUrl) {
+  const OpenAI = (await import('openai')).default;
+  const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+  const res = await client.chat.completions.create({
+    model: 'gpt-4o-mini',
+    max_tokens: 1500,
+    response_format: { type: 'json_object' },
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt + '\n\nRespond with a single JSON object.' },
+        { type: 'image_url', image_url: { url: dataUrl } }
+      ]
+    }]
+  });
+  return res.choices?.[0]?.message?.content || '';
+}
+
+// Run a vision prompt against an explicit dataURL and parse the JSON reply.
+export async function runVisionJsonOnDataUrl(prompt, dataUrl) {
+  if (!dataUrl) return null;
+  // Hosted proxy first (text response carrying JSON), then BYO-key.
+  setAiStatus('Checking hosted AI…');
+  try {
+    const hosted = await callHostedVision(prompt + '\n\nRespond with a single JSON object.', dataUrl);
+    if (hosted?.text) {
+      const parsed = parseJsonLoose(hosted.text);
+      if (parsed) { setAiStatus(`Done via hosted ${hosted.provider || 'AI'}.`); return parsed; }
+    }
+  } catch (e) {
+    console.warn('Hosted vision (json) failed; falling back to browser key.', e);
+  }
+  const choice = await chooseProvider(true);
+  if (!choice) {
+    showNotification('Add a Claude or OpenAI key below to use this feature.', 'error');
+    promptForKey();
+    return null;
+  }
+  setAiStatus(`Calling ${choice.provider}…`);
+  try {
+    const raw = choice.provider === 'anthropic'
+      ? await callAnthropicVisionJson(choice.key, prompt, dataUrl)
+      : await callOpenAIVisionJson(choice.key, prompt, dataUrl);
+    setAiStatus(`Done via ${choice.provider}.`);
+    return parseJsonLoose(raw);
+  } catch (e) {
+    console.error(e);
+    setAiStatus('Failed.');
+    showNotification(`AI call failed: ${e.message || e}`, 'error');
+    return null;
+  }
+}
+
+// Convenience: run against the currently loaded screenshot.
+export async function runVisionJson(prompt) {
+  if (!state.image) { showNotification('Load an image first.', 'error'); return null; }
+  return runVisionJsonOnDataUrl(prompt, imageToDataUrl(state.image));
+}
+
 export async function aiAltText() {
   const out = await runVisionPrompt(
     'Write concise, accessible alt text for this image (1-2 sentences, no preamble). Describe the most important visible content.'
