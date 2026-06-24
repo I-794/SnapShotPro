@@ -60,7 +60,7 @@ async function generate(prompt, size) {
   return b64;
 }
 
-async function edit(imageBlob, maskBlob, prompt, size) {
+export async function edit(imageBlob, maskBlob, prompt, size) {
   const imageB64 = await blobToBase64(imageBlob);
   const maskB64 = maskBlob ? await blobToBase64(maskBlob) : null;
   const viaProxy = await tryProxy('/api/image-edit', { image: imageB64, mask: maskB64, prompt, size });
@@ -81,7 +81,7 @@ async function edit(imageBlob, maskBlob, prompt, size) {
   return b64;
 }
 
-async function applyResultAsImage(b64) {
+export async function applyResultAsImage(b64) {
   const img = await loadImage('data:image/png;base64,' + b64);
   saveStateToHistory();
   state.image = img;
