@@ -29,12 +29,13 @@ function setProgress(msg) {
   if (node) node.textContent = msg || '';
 }
 
-export async function exportTimeline(format /* 'mp4' | 'gif' */) {
-  if (!timelineActive()) { showNotification('Add some motion to the timeline first.', 'error'); return; }
-  if (format === 'mp4' && !mp4Supported()) {
-    showNotification('MP4 export needs WebCodecs (Chrome/Edge). Try GIF instead.', 'error');
-    return;
-  }
+// v30 — render the active timeline to an encoded blob (no download). Extracted
+// from exportTimeline so the Campaign Generator can embed a teaser video. Silent:
+// no notifications/download — those stay in exportTimeline. An optional `onProgress`
+// hook lets a caller surface encode progress without coupling to the UI.
+export async function renderTimelineBlob(format /* 'mp4' | 'gif' */, onProgress) {
+  if (!timelineActive()) return null;
+  if (format === 'mp4' && !mp4Supported()) return null;
 
   const durationMs = Math.min(deriveDuration(), MAX_DURATION_MS);
   const fps = format === 'gif' ? Math.min(20, state.timeline.fps || 20) : (state.timeline.fps || 30);
@@ -73,29 +74,53 @@ export async function exportTimeline(format /* 'mp4' | 'gif' */) {
     render();
   };
 
-  setProgress('Preparing…');
-  showNotification(`Generating ${format.toUpperCase()}…`, 'success');
+  const p = onProgress || (() => {});
   try {
-    const blob = format === 'mp4'
+    return format === 'mp4'
       ? await encodeMp4(frameProvider, {
           width, height, fps, count: total, quality,
-          onProgress: (n, t) => setProgress(`Encoding ${n}/${t}…`),
+          onProgress: (n, t) => p({ phase: 'encode', n, t }),
           onCaptured: restore
         })
       : await encodeGif(frameProvider, {
           width, height, fps, count: total, quality, loop,
-          onCapture: (n, t) => setProgress(`Capturing ${n}/${t}…`),
-          onProgress: (p) => setProgress(`Encoding ${Math.round(p * 100)}%…`),
+          onCapture: (n, t) => p({ phase: 'capture', n, t }),
+          onProgress: (frac) => p({ phase: 'encode', frac }),
           onCaptured: restore
         });
+  } catch (err) {
+    restore();
+    err.__exportDims = { width, height };
+    throw err;
+  }
+}
+
+export async function exportTimeline(format /* 'mp4' | 'gif' */) {
+  if (!timelineActive()) { showNotification('Add some motion to the timeline first.', 'error'); return; }
+  if (format === 'mp4' && !mp4Supported()) {
+    showNotification('MP4 export needs WebCodecs (Chrome/Edge). Try GIF instead.', 'error');
+    return;
+  }
+
+  setProgress('Preparing…');
+  showNotification(`Generating ${format.toUpperCase()}…`, 'success');
+  let total = 0;
+  try {
+    const blob = await renderTimelineBlob(format, (info) => {
+      if (info.t != null) total = info.t;
+      if (info.phase === 'capture') setProgress(`Capturing ${info.n}/${info.t}…`);
+      else if (info.frac != null) setProgress(`Encoding ${Math.round(info.frac * 100)}%…`);
+      else setProgress(`Encoding ${info.n}/${info.t}…`);
+    });
+    if (!blob) { showNotification('Nothing to export.', 'error'); return; }
     download(blob, `motion-${Date.now()}.${format}`);
     setProgress(`Exported ${total} frames.`);
     showNotification(`${format.toUpperCase()} exported!`, 'success');
   } catch (err) {
-    restore();
     setProgress('Failed.');
     if (String(err && err.message).startsWith('NO_CODEC')) {
-      showNotification(`No supported H.264 config for ${evenDim(width)}x${evenDim(height)}. Try GIF, or a smaller canvas.`, 'error');
+      const dims = err.__exportDims || {};
+      showNotification(`No supported H.264 config for ${evenDim(dims.width)}x${evenDim(dims.height)}. Try GIF, or a smaller canvas.`, 'error');
       return;
     }
     showNotification(`${format.toUpperCase()} export failed: ` + (err.message || err), 'error');
