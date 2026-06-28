@@ -25,7 +25,9 @@ function drawAnnotation(ctx, ann, idx) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    const isSelected = state.selectedAnnotation === idx;
+    // v28 — selected via the legacy single field OR the multi-select set.
+    const isSelected = state.selectedAnnotation === idx ||
+      state.canvasSelection.some((r) => r.kind === 'annotation' && r.id === ann.id);
 
     if (ann.type === 'arrow') {
       drawArrow(ctx, ann.x1, ann.y1, ann.x2, ann.y2, ann.color, ann.strokeWidth);

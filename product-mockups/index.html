@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Free product and print mockup generator. Wrap any image onto a t-shirt, mug, poster, framed print, business card, or packaging box, then export a crisp PNG. Runs in your browser, no account.">
+    <title>Product &amp; Print Mockups · SnapShotPro</title>
+    <link rel="canonical" href="__OG_BASE__/product-mockups/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Product &amp; Print Mockups · SnapShotPro">
+    <meta property="og:description" content="Put your design on real things. Wrap any image onto apparel, mugs, posters, prints, cards, and packaging, then export it crisp. Free, in your browser.">
+    <meta property="og:image" content="__OG_BASE__/og.png?v=2">
+    <meta name="theme-color" content="#080b14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SnapShotPro Product & Print Mockups",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Web browser",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+    <style>
+        .actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; margin-top: 30px; }
+        /* Surface grid: a varied tile set so it does not read as repeated cards. */
+        .surf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .surf-tile {
+            position: relative; border-radius: var(--r-card, 18px); overflow: hidden;
+            background: var(--bg-raise, #11141d); border: 1px solid var(--line, rgba(255,255,255,0.08));
+            min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .surf-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .surf-tile .cap {
+            position: relative; z-index: 1; padding: 16px 18px;
+            background: linear-gradient(180deg, transparent, rgba(6,8,15,0.86));
+        }
+        .surf-tile .cap b { display: block; font-size: 16px; font-weight: 600; color: #fff; }
+        .surf-tile .cap span { font-size: 13.5px; color: rgba(255,255,255,0.74); line-height: 1.45; }
+        .surf-tile.tall { grid-row: span 2; min-height: 0; }
+        @media (max-width: 760px) {
+            .surf-grid { grid-template-columns: 1fr 1fr; }
+            .surf-tile.tall { grid-row: span 1; }
+        }
+        @media (max-width: 480px) { .surf-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!--PARTIAL:mark-->
+<!--PARTIAL:nav-->
+
+<header class="page-head">
+    <div class="glow"></div>
+    <div class="wrap">
+        <p class="mono-label" style="margin-bottom:16px;">Product &amp; print mockups</p>
+        <h1>Put your design on <span class="accent">real things</span>.</h1>
+        <p class="lede">Drop in an image, pick a surface, and wrap it onto a t-shirt, mug, poster, framed print, card, or box. Real warp, folds, and lighting, all drawn on canvas so the export stays sharp.</p>
+        <div class="actions">
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+            <a href="#surfaces" class="btn btn-ghost btn-lg">See the surfaces</a>
+        </div>
+    </div>
+</header>
+
+<section class="section-pad" style="padding-top: clamp(8px,2vw,24px);">
+    <div class="wrap">
+        <div class="lp-shots reveal">
+            <div class="shot"><img src="https://picsum.photos/seed/snapsurf-tee/360/470" alt="A logo wrapped onto a t-shirt mockup" loading="eager"></div>
+            <div class="shot"><img src="https://picsum.photos/seed/snapsurf-mug/360/470" alt="Artwork wrapped around a mug mockup" loading="eager"></div>
+            <div class="shot"><img src="https://picsum.photos/seed/snapsurf-poster/360/470" alt="A design shown as a framed poster mockup" loading="eager"></div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" id="how" style="padding-top:0;background:var(--bg-sunken);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+        <div class="section-head reveal" style="padding-top:clamp(48px,7vw,80px);">
+            <h2>Three steps to a finished mockup.</h2>
+            <p>No template to download, no layers to fight. Drop an image and you are most of the way there.</p>
+        </div>
+        <div class="steps">
+            <div class="step reveal">
+                <div class="num">01</div>
+                <h3>Drop your art</h3>
+                <p>Paste, drag, or upload a logo, screenshot, or graphic. It loads straight onto the canvas.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num">02</div>
+                <h3>Pick a surface</h3>
+                <p>Choose apparel, a mug, a poster, a framed print, a card, or a box, then set the colour or material.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num">03</div>
+                <h3>Place and export</h3>
+                <p>Size, nudge, and rotate the artwork, then download a crisp PNG. What you see is what saves.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" id="surfaces">
+    <div class="wrap">
+        <div class="section-head reveal">
+            <h2>Six surfaces, one canvas.</h2>
+            <p>Each surface warps your art to its real shape, then shades it so the print sits in the material instead of floating on top.</p>
+        </div>
+        <div class="surf-grid reveal">
+            <div class="surf-tile tall">
+                <img src="https://picsum.photos/seed/snapsurf-apparel/520/700" alt="Apparel mockup with a chest print">
+                <div class="cap"><b>Apparel</b><span>Front-print tees in seven garment colours. The print follows the fabric folds.</span></div>
+            </div>
+            <div class="surf-tile">
+                <img src="https://picsum.photos/seed/snapsurf-mug2/520/360" alt="Mug mockup">
+                <div class="cap"><b>Mug</b><span>Artwork wraps around the ceramic with a real cylinder curve.</span></div>
+            </div>
+            <div class="surf-tile">
+                <img src="https://picsum.photos/seed/snapsurf-box/520/360" alt="Packaging box mockup">
+                <div class="cap"><b>Packaging box</b><span>Three faces in perspective for product and unboxing shots.</span></div>
+            </div>
+            <div class="surf-tile">
+                <img src="https://picsum.photos/seed/snapsurf-poster2/520/360" alt="Poster mockup">
+                <div class="cap"><b>Poster</b><span>A clean wall print with a soft contact shadow.</span></div>
+            </div>
+            <div class="surf-tile">
+                <img src="https://picsum.photos/seed/snapsurf-frame/520/360" alt="Framed print mockup">
+                <div class="cap"><b>Framed print</b><span>A matted frame with a subtle glass highlight.</span></div>
+            </div>
+            <div class="surf-tile">
+                <img src="https://picsum.photos/seed/snapsurf-card/520/360" alt="Business card mockup">
+                <div class="cap"><b>Business card</b><span>A paired layout that shows both sides at an angle.</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" style="padding-top:0;">
+    <div class="wrap">
+        <div class="feature-cat reveal">
+            <div>
+                <div class="section-head" style="margin-bottom:24px;">
+                    <h2>It bakes into the export.</h2>
+                    <p>Surfaces render into the same canvas as everything else in SnapShotPro, so they carry your color grade, text, watermark, and logo, and download as a flat PNG. Save it with your project and the surface comes back exactly as you left it.</p>
+                </div>
+                <a href="/editor/" class="btn btn-primary">Open the studio <span class="ar">→</span></a>
+            </div>
+            <div class="fc-visual">
+                <img src="https://picsum.photos/seed/snapsurf-export/900/680" alt="A product mockup exported as a flat image" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad" style="padding-top:0;">
+    <div class="wrap">
+        <div class="section-head reveal" style="margin-bottom:20px;">
+            <h2>Keep going.</h2>
+        </div>
+        <div class="related reveal">
+            <a href="/device-mockup-generator/">Device mockups <span class="ar">→</span></a>
+            <a href="/social-media-mockups/">Social media mockups <span class="ar">→</span></a>
+            <a href="/app-store-screenshots/">App Store screenshots <span class="ar">→</span></a>
+            <a href="/og-image-generator/">Open Graph images <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 0 0 clamp(48px, 7vw, 88px);">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Put your work on something real.</h2>
+            <p>No sign-up. It opens straight into the studio with the surfaces ready.</p>
+            <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
+        </div>
+    </div>
+</section>
+
+<!--PARTIAL:footer-->
+<script src="/site.js"></script>
+</body>
+</html>

@@ -81,6 +81,10 @@ export function addPage({ duplicate = false } = {}) {
   renderFilmstrip();
   emitChange();
   showNotification(duplicate ? 'Page duplicated.' : 'Page added.', 'success');
+  // v30 — Brand Brain enforcement: a freshly added page inherits the brand.
+  if (state.brand && state.brand.enforce && state.brand.enabled) {
+    import('./brand-brain.js').then(m => m.applyBrand());
+  }
 }
 
 export function deletePage(index) {

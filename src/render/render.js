@@ -13,11 +13,12 @@ import { drawSceneBackground } from './scenes.js';
 import { renderExtraImages } from '../features/extra-images.js';
 import { renderMinimap, applyTransform } from '../features/zoom-pan.js';
 import { getAnimationState } from '../features/animation.js';
-import { sampleKenBurns } from '../features/ken-burns.js';
+import { sampleKenBurns, getKenBurnsProgress } from '../features/ken-burns.js';
 import { drawEffects } from './effects.js';
 import { isDeviceMockup, drawDeviceMockup, drawScreenImage } from './mockups.js';
 import { isDeviceMockup3d, render3dMockup } from './mockups-3d.js';
 import { bakePerspective } from './perspective.js';
+import { isSurfaceMockup, drawSurfaceMockup } from './surfaces.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
 import { drawGuides } from '../features/snapping.js';
 import { drawReflection } from './reflection.js';
@@ -89,6 +90,24 @@ export function renderInto(canvas, forExport) {
         ctx.globalAlpha = 1;
       }
     }
+    if (!forExport) drawGuides(ctx);
+    drawEffects(ctx, canvas);
+    drawTextOverlay(ctx, canvas);
+    drawWatermark(ctx, canvas);
+    drawLogo(ctx, canvas);
+    if (!forExport) renderMinimap();
+    return;
+  }
+
+  // v27 — Surface Studio: wrap the artwork onto a physical/print surface
+  // (t-shirt, mug, poster, framed print, business card, packaging box). Like the
+  // device path it composites onto an offscreen, then runs the shared tail so it
+  // bakes into export. Reachable independent of deviceFrame.type; the graded
+  // image is the print source so color filters/grades carry through.
+  if (state.surface?.enabled && isSurfaceMockup(state.surface.type)) {
+    const art = getGradedImage(state.image);
+    const out = drawSurfaceMockup(ctx, canvas, art, state.surface);
+    if (out && out.rect) state.lastImageRect = out.rect;
     if (!forExport) drawGuides(ctx);
     drawEffects(ctx, canvas);
     drawTextOverlay(ctx, canvas);
@@ -226,6 +245,20 @@ export function renderInto(canvas, forExport) {
   if (!forExport) renderMinimap();
 }
 
+// v30 — render the current design into an arbitrary canvas at an arbitrary
+// pixel size, then restore the working canvas size. Used by the Campaign
+// Generator and the Producer to emit the same design at many target sizes.
+// forExport=true so preview-only chrome (minimap/CSS-transform sync) is skipped.
+export function renderAtSize(canvas, { width, height }) {
+  const prev = state.canvas;
+  try {
+    state.canvas = { width: Math.max(1, Math.round(width)), height: Math.max(1, Math.round(height)) };
+    renderInto(canvas, true);
+  } finally {
+    state.canvas = prev;
+  }
+}
+
 // Reusable offscreen canvas for compositing a device mockup before warping.
 let _mockOff = null;
 function mockCanvas(w, h) {
@@ -326,8 +359,9 @@ function drawImageContent(ctx, x, y, imgWidth, imgHeight) {
   // Returns state.image unchanged when no per-pixel grade is active.
   const img = getGradedImage(state.image);
   if (kb && kb.enabled && !state.video.loaded && img && img.width && img.height) {
-    const a = state.animation;
-    const p = (a && a.duration > 0) ? (a.currentTime || 0) / a.duration : 0;
+    // v29 — progress comes from getKenBurnsProgress(): the Motion Studio lane
+    // clock when it's driving, else the legacy animation playhead.
+    const p = getKenBurnsProgress();
     const s = sampleKenBurns(kb, p);
     const sw = img.width / s.scale;
     const sh = img.height / s.scale;

@@ -1,4 +1,6 @@
-export const DEFAULT_VISION_MODEL = 'gpt-4o-mini';
+// v30 model policy: gpt-5.5 for all non-image OpenAI calls (vision/text/enhance).
+// Overridable per-route via OPENAI_VISION_MODEL / OPENAI_ENHANCE_MODEL env vars.
+export const DEFAULT_VISION_MODEL = 'gpt-5.5';
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -45,13 +47,22 @@ export async function openAIChat(payload) {
   const key = serverOpenAIKey();
   if (!key) throw new ApiError(501, 'No server key configured');
 
+  // v30 — gpt-5.x / reasoning models reject `max_tokens` and require
+  // `max_completion_tokens`. Normalize here so every route (which still passes
+  // the familiar `max_tokens`) works without per-route changes.
+  const body = { ...payload };
+  if (body.max_tokens != null && body.max_completion_tokens == null) {
+    body.max_completion_tokens = body.max_tokens;
+    delete body.max_tokens;
+  }
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(body)
   });
 
   const data = await response.json().catch(() => ({}));

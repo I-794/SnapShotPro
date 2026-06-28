@@ -9,6 +9,8 @@ import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
 import { setTool } from './canvas-tools.js';
+import { selectAll, duplicateSelection } from './selection.js';
+import { listExportPresets, applyExportPreset } from './export-presets.js';
 import { toggleLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
 import { stickers } from '../state/presets.js';
@@ -56,7 +58,7 @@ function groupFor(id) {
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
       id.startsWith('tour-') || id === 'code-studio') return 'File';
-  if (id === 'undo' || id === 'redo') return 'Edit';
+  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
@@ -73,8 +75,13 @@ export function registerCommands() {
     { id: 'copy-clipboard',   label: 'Copy to Clipboard',     icon: '📋', run: copyToClipboard },
     { id: 'load-url',         label: 'Load from URL',         icon: '🔗', run: focusUrlLoad },
     { id: 'code-studio',      label: 'Open Code Snippet Studio', icon: '</>', run: openCodeStudio },
+    { id: 'campaign-generate', label: 'Generate Campaign',     icon: '📦', group: groupFor('campaign-generate'),
+      run: () => import('./campaign-generator.js').then(m => m.generateCampaign({ name: 'Campaign', includeAppStore: true })),
+      when: () => !!state.image },
     { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
     { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
+    { id: 'duplicate-selection', label: 'Duplicate selection', icon: '⧉', run: () => { if (duplicateSelection()) render(); }, when: () => state.canvasSelection.length > 0 },
+    { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
     { id: 'theme-light',      label: 'Theme: Light',          icon: '☀️', run: () => applyTheme('light') },
     { id: 'zoom-in',          label: 'Zoom in',               icon: '🔍', run: () => setZoom(state.view.zoom * 1.2) },
@@ -135,6 +142,12 @@ export function registerCommands() {
     { id: 'ai-replace-bg',    label: 'AI: Replace background', icon: '🪄', run: replaceBackground },
     { id: 'ai-extend',        label: 'AI: Extend canvas (outpaint)', icon: '↔', run: extendCanvas },
     { id: 'ai-eraser',        label: 'AI: Magic Eraser',     icon: '🧽', run: openEraser },
+    { id: 'medit-redact',    label: 'Redact PII (auto)',    icon: '🛡️', group: groupFor('medit-redact'),
+      run: () => import('./ai-screenshot-editor.js').then(m => m.redact({ autoPII: true })),
+      when: () => !!state.image },
+    { id: 'producer-launch-kit', label: 'Producer: Launch Kit', icon: '🤖', group: groupFor('producer-launch-kit'),
+      run: () => import('./producer.js').then(m => m.runProducer('Launch kit', (l) => console.log(l))),
+      when: () => !!state.image },
     { id: 'screen-record',    label: 'Record screen',        icon: '⏺', run: () => document.getElementById('screen-record-btn')?.click() },
     { id: 'auto-zoom-toggle', label: 'Toggle auto-zoom',     icon: '🔎', run: () => { const t = document.getElementById('auto-zoom-enabled'); if (t) { t.checked = !t.checked; t.dispatchEvent(new Event('change')); } } },
     { id: 'video-play',       label: 'Video: Play/Pause clip', icon: '🎬', run: togglePlay },
@@ -144,12 +157,18 @@ export function registerCommands() {
     { id: 'gallery-publish',  label: 'Publish design to gallery', icon: '⬆', run: () => document.getElementById('gallery-publish-template')?.click() },
     { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
     { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
+    { id: 'brand-brain-apply', label: 'Apply Brand',          icon: '🎨', run: () => import('./brand-brain.js').then(m => m.applyBrand()), when: () => !!state.brand?.enabled },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 
   // Quick-add stickers as commands
   Object.values(stickers).flat().slice(0, 24).forEach(g => {
     commands.push({ id: 'sticker-' + g, label: 'Add sticker ' + g, icon: g, run: () => addSticker(g) });
+  });
+
+  // v28 — one command per export preset (built-in + user-saved).
+  listExportPresets().forEach((p) => {
+    commands.push({ id: 'export-preset-' + p.id, label: 'Export: ' + p.name, icon: '📐', run: () => applyExportPreset(p.id), when: () => !!state.image });
   });
 
   // v22 — Command Center metadata: category, optional shortcut hint, and an
@@ -170,12 +189,18 @@ export function registerCommands() {
     'copy-clipboard': 'mod+shift+c',
     'undo':           'mod+z',
     'redo':           'mod+shift+z',
+    'duplicate-selection': 'mod+d',
+    'select-all-objects':  'mod+a',
   };
   commands.forEach((c) => {
     c.group = groupFor(c.id);
-    if (WHEN[c.id]) c.when = WHEN[c.id];
+    // Per-command `when` defined inline takes precedence; the WHEN map fills the rest.
+    if (WHEN[c.id] && !c.when) c.when = WHEN[c.id];
     if (KEYS[c.id]) c.keys = KEYS[c.id];
   });
+
+  // v28 — let export-presets.js re-register so newly saved presets appear in Cmd-K.
+  window.__refreshPaletteCommands = registerCommands;
 }
 
 let activeIdx = 0;

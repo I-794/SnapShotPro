@@ -89,8 +89,8 @@ async function callOpenAIVision(key, prompt, dataUrl) {
   const OpenAI = (await import('openai')).default;
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const res = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
-    max_tokens: 1024,
+    model: OPENAI_TEXT_MODEL,
+    max_completion_tokens: 1024,
     messages: [{
       role: 'user',
       content: [
@@ -170,8 +170,8 @@ async function callOpenAIText(key, prompt, json) {
   const OpenAI = (await import('openai')).default;
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const res = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
-    max_tokens: 1024,
+    model: OPENAI_TEXT_MODEL,
+    max_completion_tokens: 1024,
     ...(json ? { response_format: { type: 'json_object' } } : {}),
     messages: [{ role: 'user', content: prompt }]
   });
@@ -183,8 +183,19 @@ async function callOpenAIText(key, prompt, json) {
 // callers building JSON prompts should include it.) Returns the raw string or
 // null (after prompting for a key) when no provider is configured.
 export async function runTextPrompt(prompt, { json = false } = {}) {
+  // BYO key wins if the user set one ("BYOK if you want"); otherwise fall back to
+  // the hosted proxy (server OPENAI_API_KEY) before prompting for a key.
   const choice = await chooseProvider(false);
   if (!choice) {
+    try {
+      const hosted = await tryHostedJson('/api/ai-text', { prompt, json });
+      if (!hosted.fellThrough && typeof hosted.text === 'string') {
+        setAiStatus('Done via hosted AI.');
+        return hosted.text;
+      }
+    } catch (e) {
+      console.warn('Hosted text failed; prompting for a key.', e);
+    }
     showNotification('Add a Claude or OpenAI key below to use AI features.', 'error');
     promptForKey();
     return null;
@@ -214,6 +225,88 @@ export function parseJsonLoose(text) {
   const span = t.match(/[{[][\s\S]*[}\]]/);
   if (span) t = span[0];
   try { return JSON.parse(t); } catch (_) { return null; }
+}
+
+// v30 — structured-vision sibling of runVisionPrompt. Asks the model for a JSON
+// object and returns it parsed (or null). Reused by Brand Brain (URL→system),
+// the AI Screenshot Editor (locate regions), and the Producer (goal→plan).
+// OpenAI's json_object mode requires the literal word "JSON" in the prompt, so
+// callers MUST include it (the wrappers below append a reminder defensively).
+async function callAnthropicVisionJson(key, prompt, dataUrl) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+  const res = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
+    system: 'Respond with ONLY valid minified JSON — no markdown fences, no commentary.',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/png', data: dataUrlToBase64(dataUrl) } },
+        { type: 'text', text: prompt }
+      ]
+    }]
+  });
+  return res.content?.[0]?.text || '';
+}
+
+async function callOpenAIVisionJson(key, prompt, dataUrl) {
+  const OpenAI = (await import('openai')).default;
+  const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+  const res = await client.chat.completions.create({
+    model: OPENAI_TEXT_MODEL,
+    max_completion_tokens: 1500,
+    response_format: { type: 'json_object' },
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt + '\n\nRespond with a single JSON object.' },
+        { type: 'image_url', image_url: { url: dataUrl } }
+      ]
+    }]
+  });
+  return res.choices?.[0]?.message?.content || '';
+}
+
+// Run a vision prompt against an explicit dataURL and parse the JSON reply.
+export async function runVisionJsonOnDataUrl(prompt, dataUrl) {
+  if (!dataUrl) return null;
+  // Hosted proxy first (text response carrying JSON), then BYO-key.
+  setAiStatus('Checking hosted AI…');
+  try {
+    const hosted = await callHostedVision(prompt + '\n\nRespond with a single JSON object.', dataUrl);
+    if (hosted?.text) {
+      const parsed = parseJsonLoose(hosted.text);
+      if (parsed) { setAiStatus(`Done via hosted ${hosted.provider || 'AI'}.`); return parsed; }
+    }
+  } catch (e) {
+    console.warn('Hosted vision (json) failed; falling back to browser key.', e);
+  }
+  const choice = await chooseProvider(true);
+  if (!choice) {
+    showNotification('Add a Claude or OpenAI key below to use this feature.', 'error');
+    promptForKey();
+    return null;
+  }
+  setAiStatus(`Calling ${choice.provider}…`);
+  try {
+    const raw = choice.provider === 'anthropic'
+      ? await callAnthropicVisionJson(choice.key, prompt, dataUrl)
+      : await callOpenAIVisionJson(choice.key, prompt, dataUrl);
+    setAiStatus(`Done via ${choice.provider}.`);
+    return parseJsonLoose(raw);
+  } catch (e) {
+    console.error(e);
+    setAiStatus('Failed.');
+    showNotification(`AI call failed: ${e.message || e}`, 'error');
+    return null;
+  }
+}
+
+// Convenience: run against the currently loaded screenshot.
+export async function runVisionJson(prompt) {
+  if (!state.image) { showNotification('Load an image first.', 'error'); return null; }
+  return runVisionJsonOnDataUrl(prompt, imageToDataUrl(state.image));
 }
 
 export async function aiAltText() {
@@ -255,7 +348,7 @@ export async function generateBackgroundImage(prompt, size) {
     if (!key) { const e = new Error('No AI key'); e.code = 'NO_KEY'; throw e; }
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
-    const res = await client.images.generate({ model: 'gpt-image-2', prompt, size, n: 1 });
+    const res = await client.images.generate({ model: OPENAI_IMAGE_MODEL, prompt, size, n: 1 });
     b64 = res.data?.[0]?.b64_json;
     if (!b64) throw new Error('No image returned');
   }
@@ -287,7 +380,15 @@ export function bindAiCloud() {
 
 // v20 — AI Design Agent provider layer. Configurable model per provider (bump
 // these as stronger models ship; defaults are known-good ids in this codebase).
-export const AGENT_MODELS = { openai: 'gpt-4o', anthropic: 'claude-sonnet-4-6' };
+// v30 — OpenAI model policy (product decision): gpt-image-2 for image
+// generation/editing, gpt-5.5 for ALL text / vision / agent reasoning. Single
+// source of truth — flip OPENAI_TEXT_MODEL if OpenAI's exact id differs (e.g. a
+// dated snapshot). The hosted routes mirror this and also honor the
+// OPENAI_VISION_MODEL / OPENAI_ENHANCE_MODEL env overrides. The Anthropic BYO
+// path keeps its own model.
+export const OPENAI_TEXT_MODEL = 'gpt-5.5';
+export const OPENAI_IMAGE_MODEL = 'gpt-image-2';
+export const AGENT_MODELS = { openai: OPENAI_TEXT_MODEL, anthropic: 'claude-sonnet-4-6' };
 const AGENT_MAX_TOKENS = 1500;
 
 // Convert neutral history → OpenAI chat messages.
@@ -335,7 +436,7 @@ async function openAIAgentTurn(key, system, messages, tools, onText) {
   const client = new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
   const stream = await client.chat.completions.create({
     model: AGENT_MODELS.openai,
-    max_tokens: AGENT_MAX_TOKENS,
+    max_completion_tokens: AGENT_MAX_TOKENS,
     messages: toOpenAIMessages(system, messages),
     tools: tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } })),
     stream: true
@@ -380,14 +481,38 @@ async function anthropicAgentTurn(key, system, messages, tools, onText) {
 
 function safeJson(s) { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } }
 
-// One normalized, streaming tool-calling turn. Returns { text, toolCalls:[{id,name,args}] }.
-// Throws { code:'NO_KEY' } when no provider configured.
+// One normalized tool-calling turn. Returns { text, toolCalls:[{id,name,args}] }.
+// BYO key streams (onText); the hosted fallback is non-streaming.
+// Throws { code:'NO_KEY' } only when neither a BYO key nor the hosted proxy works.
 export async function runAgentTurn(messages, tools, { system = '', onText = null } = {}) {
+  // BYO key wins if the user set one ("BYOK if you want"); else hosted server key.
   const choice = await chooseProvider(false);
-  if (!choice) { const e = new Error('No AI key'); e.code = 'NO_KEY'; throw e; }
+  if (!choice) {
+    const hosted = await tryHostedAgentTurn(system, messages, tools);
+    if (hosted) return hosted;
+    const e = new Error('No AI key'); e.code = 'NO_KEY'; throw e;
+  }
   return choice.provider === 'anthropic'
     ? anthropicAgentTurn(choice.key, system, messages, tools, onText)
     : openAIAgentTurn(choice.key, system, messages, tools, onText);
+}
+
+// Hosted (server-key) tool-calling turn via /api/ai-agent. The client pre-converts
+// to OpenAI shape so the route stays a thin forwarder. Non-streaming. Returns the
+// normalized { text, toolCalls } or null when the proxy isn't available (BYO path).
+async function tryHostedAgentTurn(system, messages, tools) {
+  try {
+    const out = await tryHostedJson('/api/ai-agent', {
+      messages: toOpenAIMessages(system, messages),
+      tools: tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } })),
+      model: AGENT_MODELS.openai
+    });
+    if (out.fellThrough) return null;
+    return { text: out.text || '', toolCalls: Array.isArray(out.toolCalls) ? out.toolCalls : [] };
+  } catch (e) {
+    console.warn('Hosted agent turn failed; falling back.', e);
+    return null;
+  }
 }
 
 // Vision critique of an arbitrary rendered dataURL (the agent's look_at_canvas).

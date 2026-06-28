@@ -23,7 +23,8 @@ export function drawRedactions(ctx, canvas) {
       ctx.drawImage(offscreen, 0, 0, smallW, smallH, r.x, r.y, r.w, r.h);
       ctx.imageSmoothingEnabled = true;
     }
-    if (state.selectedRedaction === idx) {
+    if (state.selectedRedaction === idx ||
+        state.canvasSelection.some((s) => s.kind === 'redaction' && s.id === r.id)) {
       ctx.filter = 'none';
       ctx.strokeStyle = '#0af';
       ctx.lineWidth = 2;

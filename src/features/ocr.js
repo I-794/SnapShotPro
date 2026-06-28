@@ -80,3 +80,17 @@ export function bindOcr() {
   if (btn) btn.addEventListener('click', runOcr);
   if (copyBtn) copyBtn.addEventListener('click', copyOcr);
 }
+
+// v30 — expose per-word bounding boxes (Tesseract returns these in data.words;
+// the in-panel OCR path only uses data.text). Used by the AI Screenshot Editor
+// to locate text regions for targeted inpainting. Coordinates are in the source
+// image's pixel space (bbox: {x0,y0,x1,y1}).
+export async function recognizeWords(source) {
+  const w = await getWorker();
+  const { data } = await w.recognize(source);
+  return (data.words || []).map(word => ({
+    text: word.text || '',
+    bbox: word.bbox || { x0: 0, y0: 0, x1: 0, y1: 0 },
+    confidence: word.confidence || 0
+  }));
+}

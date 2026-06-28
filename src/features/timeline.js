@@ -98,12 +98,14 @@ function bindTrackInteractions() {
   const applyIn = (t) => {
     state.video.in = clamp(quant(t), 0, state.video.out - 1 / fps());
     syncTimeline();
+    if (window.__motionStudioRefresh) window.__motionStudioRefresh();   // v29 — video clip width follows the trim
     const { seekTo } = getVideoContext();
     seekTo(state.video.in).then(() => { updatePlayhead(state.video.in); render(); });
   };
   const applyOut = (t) => {
     state.video.out = clamp(quant(t), state.video.in + 1 / fps(), state.video.duration || 0);
     syncTimeline();
+    if (window.__motionStudioRefresh) window.__motionStudioRefresh();   // v29
     const { seekTo } = getVideoContext();
     seekTo(state.video.out).then(() => { updatePlayhead(state.video.out); render(); });
   };

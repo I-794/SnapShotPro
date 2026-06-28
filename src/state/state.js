@@ -132,6 +132,24 @@ export const state = {
     toX: 0.5, toY: 0.5,
     easing: 'easeInOut'
   },
+  // v29 — Motion Studio. ONE playback clock + a multi-lane timeline that
+  // unifies the four motion sources (entrance / Ken Burns / video / turntable).
+  // `lanes` is the undoable + serialized config; currentTime/playing/_driving are
+  // RUNTIME-ONLY (stripped from snapshot + serialize). `_driving` true means the
+  // unified clock is the active preview driver (so the render getters in
+  // motion-clock.js take over from the legacy per-feature clocks).
+  timeline: {
+    enabled: false,        // gates the Motion Studio panel + unified export
+    currentTime: 0,        // ms — THE playback clock (runtime-only)
+    duration: 3000,        // ms — derived from lanes via deriveDuration()
+    playing: false,        // runtime-only
+    _driving: false,       // runtime-only — unified clock is driving the preview
+    fps: 30,               // playback + export frame rate
+    loop: true,            // preview loop
+    // lane: { id, kind:'entrance'|'kenburns'|'video'|'turntable', target, label,
+    //         clips:[{ start, duration, easing, ref }] }  (start/duration in ms)
+    lanes: []
+  },
   aiEnhance: {
     stylePreset: null,
     lastSuggestion: null
@@ -141,6 +159,12 @@ export const state = {
   },
   ui: { layersCollapsed: false, paletteOpen: false, stickerDrawerOpen: false },
   selection: { layerIds: [] },
+  // v28 — unified canvas multi-select. An array of object refs
+  // ({ kind:'annotation'|'redaction'|'extraImage'|'text', id }) — the source of
+  // truth for what's selected on the canvas. Runtime-only (like selectedAnnotation),
+  // so it is NOT snapshotted for undo. selection.js keeps the legacy single-select
+  // fields (selectedAnnotation/Redaction/ExtraImage) in sync for one-object cases.
+  canvasSelection: [],
   lastImageRect: null,
 
   // v9 — App Store screenshot sets + batch.
@@ -183,6 +207,23 @@ export const state = {
   // below. `scale`/`opacity` are fractions/percent; position mirrors watermark.
   logo: { enabled: false, src: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
 
+  // v30 — Brand Brain: an extracted, enforceable brand system. Applied via
+  // brand-brain.js applyBrand() which routes through applySpec() + state setters.
+  // Carries a logo dataUrl, so it rides PROJECT_FIELDS (full fidelity), not the
+  // lean SERIALIZED_FIELDS — mirroring how `logo` is handled.
+  brand: {
+    enabled: false, name: '', sourceUrl: '',
+    palette: [],
+    background: { mode: 'gradient', gradient: { colors: [], type: 'linear', angle: 135 } },
+    frame: { type: null, color: 'dark' },
+    typography: { headlineFont: 'Arial', captionFont: 'Arial' },
+    colorMap: { mode: 'off', intensity: 100, steps: 6 },
+    filter: 'none',
+    logo: { dataUrl: null, position: 'bottom-right', scale: 0.12, opacity: 90 },
+    watermark: { text: '', color: '#ffffff', position: 'bottom-right', size: 16, opacity: 50 },
+    enforce: false
+  },
+
   // v17 — Color release.
   // colorPalettes: the active palette id + an in-memory mirror of the saved
   // library. The durable copy lives in localStorage (snapshotpro_colorpalettes,
@@ -203,7 +244,22 @@ export const state = {
   //   side: 'top'|'bottom'|'left'|'right' — which edge the callout pins to.
   //   action: 'next' (MVP) — schema reserves room for { goto: stepIndex } branching.
   //   autoAdvanceMs: 0 = manual advance; > 0 = auto-advance after that many ms.
-  tour: { hotspots: [], autoAdvanceMs: 0 }
+  tour: { hotspots: [], autoAdvanceMs: 0 },
+
+  // v27 — Surface Studio: physical & print mockups. When enabled and `type` is a
+  // surface, render/surfaces.js wraps the graded image onto the surface inside
+  // renderInto (so it bakes into export, like the device-mockup path). enabled:
+  // false is a full no-op, so pre-v27 designs are untouched. scale/offset/
+  // rotation place the artwork within the print region; variant is the garment/
+  // material colour; shadingOpacity controls the fold/curvature multiply.
+  surface: {
+    enabled: false,
+    type: 'tshirt',            // tshirt | mug | poster | framedprint | businesscard | box
+    variant: 'white',
+    scale: 1, offsetX: 0, offsetY: 0, rotation: 0,
+    shadow: true,
+    shadingOpacity: 0.85
+  }
 };
 
 // Extra-image Image objects live outside state (not JSON-serializable).

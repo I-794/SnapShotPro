@@ -202,8 +202,8 @@ async function autoEnhanceWithOpenAI(apiKey) {
     const client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
 
     const response = await client.chat.completions.create({
-      model: 'gpt-4o',
-      max_tokens: 200,
+      model: 'gpt-5.5', // v30 model policy: gpt-5.5 for all non-image OpenAI calls
+      max_completion_tokens: 200, // gpt-5.x requires max_completion_tokens, not max_tokens
       messages: [{
         role: 'user',
         content: [

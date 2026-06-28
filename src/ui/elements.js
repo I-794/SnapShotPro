@@ -111,6 +111,9 @@ const IDS = [
   // Export
   'export-format', 'quality-controls', 'export-quality', 'export-quality-value',
   'copy-clipboard-btn', 'export-html-btn',
+  // v28 — export presets + asset library
+  'export-preset-select', 'export-preset-apply', 'export-preset-save', 'export-preset-scale',
+  'asset-library-grid',
 
   // Templates
   'template-name', 'save-template-btn', 'clear-templates-btn', 'template-list',
@@ -139,6 +142,10 @@ const IDS = [
   'animation-play-btn', 'animation-track-list', 'gif-export-btn', 'gif-progress',
   // v15.2 — Ken Burns + still MP4 export
   'ken-burns-enabled', 'ken-burns-controls', 'mp4-export-btn',
+  // v29 — Motion Studio unified timeline
+  'motion-studio-section', 'ms-empty', 'ms-body', 'ms-track', 'ms-playhead',
+  'ms-lanes', 'ms-play-btn', 'ms-stop-btn', 'ms-time-readout', 'ms-fps',
+  'ms-loop', 'ms-export-mp4', 'ms-export-gif', 'ms-progress',
 
   // v7 — AI enhance
   'ai-enhance-btn', 'style-reset-btn',

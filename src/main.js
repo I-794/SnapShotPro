@@ -14,6 +14,9 @@ import { bindUrlLoad } from './features/url-load.js';
 import { bindExtraImagesEvents } from './features/extra-images.js';
 import { exportImage, copyToClipboard, exportAsHTML } from './features/export.js';
 import { bindCanvasTools, setTool } from './features/canvas-tools.js';
+import { bindContextMenu } from './features/context-menu.js';
+import { bindAssetLibrary } from './features/asset-library.js';
+import { bindExportPresets } from './features/export-presets.js';
 import { bindLayersEvents, renderLayersPanel } from './features/layers.js';
 import { bindHistoryTimeline, renderHistoryTimeline } from './features/history-timeline.js';
 import { bindZoomPan, applyTransform } from './features/zoom-pan.js';
@@ -23,6 +26,7 @@ import { bindStickerEvents } from './features/stickers.js';
 import { bindSceneEvents } from './features/scene-select.js';
 import { bindMockupUi } from './features/mockup-ui.js';
 import { bind3dMockupUi } from './features/mockup-3d-ui.js';
+import { bindSurfaceUi } from './features/surface-ui.js';
 import { bindSetUi } from './features/set-ui.js';
 import { bindSvgInput } from './features/svg-input.js';
 import { bindCodeSnippet } from './features/code-snippet.js';
@@ -34,17 +38,21 @@ import { bindPalettes } from './features/palettes.js';
 import { bindColorMap } from './features/color-map.js';
 import { bindCompose } from './features/compose.js';
 import { bindBrandKit } from './features/brand-kit.js';
+import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
+import { bindProducer } from './features/producer.js';
 import { bindOcr } from './features/ocr.js';
 import { bindApiKeysPanel } from './features/api-keys.js';
 import { bindAiCloud } from './features/ai-cloud.js';
 import { bindAiArtDirector } from './features/ai-art-director.js';
 import { bindAiImageEdit } from './features/ai-image-edit.js';
+import { bindScreenshotEditor } from './features/ai-screenshot-editor.js';
 import { bindAuth } from './features/auth.js';
 import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
+import { bindCampaigns } from './features/campaigns.js';
 import { bindPages } from './features/pages.js';
 import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
@@ -60,6 +68,7 @@ import { bindGifExport } from './features/gif-export.js';
 import { bindVideo } from './features/video.js';
 import { bindVideoExport } from './features/video-export.js';
 import { bindTimeline } from './features/timeline.js';
+import { bindMotionStudio } from './features/motion-studio.js';
 import { bindScreenRecord } from './features/screen-record.js';
 import { registerCommands, bindPalette } from './features/palette.js';
 import { renderShortcutsOverlay } from './features/shortcuts.js';
@@ -105,6 +114,9 @@ function init() {
   bindUrlLoad();
   bindExtraImagesEvents();
   bindCanvasTools();
+  bindContextMenu();    // v28 — right-click canvas object menu
+  bindAssetLibrary();   // v28 — reusable asset library (Import group)
+  bindExportPresets();  // v28 — export presets (Export group)
   bindLayersEvents();
   bindHistoryTimeline();
   bindZoomPan();
@@ -113,6 +125,7 @@ function init() {
   bindSceneEvents();
   bindMockupUi();
   bind3dMockupUi();
+  bindSurfaceUi();     // v27 — Surface Studio (physical & print mockups)
   bindSetUi();
   bindSvgInput();
   bindCodeSnippet();   // v24 — Code Snippet Studio
@@ -124,19 +137,23 @@ function init() {
   bindColorMap();      // v17 — palette-driven color mapping
   bindCompose();       // v18 — design variations generator
   bindBrandKit();
+  bindBrandBrain();
   bindBgRemove();
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
+  bindProducer();      // v30 — Producer autopilot (separate surface)
   bindOcr();
   bindApiKeysPanel();
   bindAiCloud();
   bindAiArtDirector();
   bindAiImageEdit();
+  bindScreenshotEditor();   // v30 — Magic Edit panel
   bindAuth();
   bindCloudSync();
   bindPages();
   bindTours();
   bindProjects();
+  bindCampaigns();
   bindGallery();
   bindCrop();
   bindResetButton();
@@ -150,6 +167,7 @@ function init() {
   bindVideo();
   bindVideoExport();
   bindTimeline();
+  bindMotionStudio();   // v29 — unified motion timeline (after the motion editors bind)
   bindScreenRecord();
   registerCommands();
   bindPalette();
