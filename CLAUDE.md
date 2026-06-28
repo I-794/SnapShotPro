@@ -75,3 +75,8 @@ These came out of the V24 brainstorm — "major features that don't add on to an
 ## Things that look like project rules but aren't
 - `SKILL.md` and `Taste.md` at the repo root are **vendored copies of generic frontend design skills** (`design-taste-frontend`, `redesign-existing-projects`). They describe React/Tailwind/Next conventions and do **not** apply to this codebase (vanilla JS, no framework). Don't treat them as repo conventions.
 - `SnapShot-Pro-main/` is a legacy pre-Vite single-file version of the app, kept for reference. The live app is everything under `src/` + `editor/`. Don't edit the legacy copy.
+
+Add under a ## Models / Preferences section near the top of CLAUDE.md\n\nAlways use Opus for all work, including subagents — do not fall back to Sonnet or Haiku.
+Add under a ## Planning & Feature Ideation section\n\nWhen planning features, deliver concrete suggestions/lists directly first; only ask clarifying questions if truly blocked, rather than leading with AskUserQuestion prompts.
+Add under a ## Git & Deployment section\n\n'deploy' means commit and push to git unless I explicitly say to push to Vercel/production.
+Add under a ## Environment / Dev Server section\n\nOn Windows/PowerShell, avoid heredoc syntax for commit messages (it leaves stray '@' characters); use a single -m flag or a temp file instead. When testing on a phone, bind the dev server to the LAN (e.g., --host 0.0.0.0).
