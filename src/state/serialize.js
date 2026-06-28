@@ -20,6 +20,8 @@ export const SERIALIZED_FIELDS = [
   'glass', 'grain',
   // v16.2 — pattern background (active only when bgMode === 'pattern').
   'pattern',
+  // v17 - Color Map palette selection and map settings.
+  'colorPalettes', 'colorMap',
   // v21 — 3D / isometric device mockup (orbit/zoom/scene/material/spin).
   'mockup3d',
   // v27 — Surface Studio (physical & print mockup) settings.

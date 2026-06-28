@@ -22,7 +22,7 @@ export function applyDesignToState(payload) {
     if (norm.image) {
       const img = new Image();
       img.onload = () => { state.image = img; resolve(); };
-      img.onerror = () => { resolve(); };
+      img.onerror = () => { state.image = null; resolve(); };
       img.src = norm.image;
     } else {
       state.image = null;

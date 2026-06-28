@@ -16,6 +16,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
+import { saveStateToHistory } from '../state/history.js';
 import { getClient, getUser } from './auth.js';
 import { snapshotProject } from '../state/serialize.js';
 import { applyKitObject, captureKitObject } from './brand-kit.js';
@@ -126,6 +127,7 @@ async function applyItem(id) {
   if ((data.kind || meta?.kind) === 'brandkit') {
     applyKitObject(data.payload);
   } else {
+    saveStateToHistory();
     Object.assign(state, data.payload);
     render();
     if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
