@@ -922,6 +922,46 @@
             </div>
         </div>
 
+        <div class="sidebar-section" data-group="export" id="merge-studio-section">
+            <h3 class="section-title">🗂 Merge Studio <span class="merge-badge">CSV → N</span></h3>
+            <p class="info-text" style="margin-bottom:10px;">Turn this design into a template. Type <code>{{tokens}}</code> into your text overlay, watermark, or browser title/URL — then upload a CSV and export one design per row as a ZIP.</p>
+
+            <label class="control-label">Placeholders in this design</label>
+            <div id="merge-tokens" class="merge-tokens"></div>
+
+            <div class="control-group" style="margin-top:12px;">
+                <label class="control-label">Background color template</label>
+                <input type="text" class="control-input" id="merge-color-bg" placeholder="#1a1a2e or {{brand}}">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Text color template</label>
+                <input type="text" class="control-input" id="merge-color-text" placeholder="#ffffff or {{accent}}">
+            </div>
+            <p class="info-text" style="margin:-4px 0 12px;">Color pickers can't hold a token, so set per-row colors here. A CSV value like <code>#0af</code> fills the token.</p>
+
+            <div class="divider"></div>
+
+            <label class="control-label">Data (CSV)</label>
+            <div id="merge-csv-drop" class="batch-drop">Drop a CSV here or click to select</div>
+            <input type="file" id="merge-csv-input" accept=".csv,text/csv" style="display:none;">
+            <p class="info-text" id="merge-summary" style="margin-top:8px;"></p>
+            <button class="btn btn-secondary" id="merge-sample-btn" style="width:100%;margin-top:4px;">⬇ Download sample CSV</button>
+            <p class="info-text" style="margin-top:8px;">Optional columns: <code>image</code> (a URL swaps the screenshot per row) and <code>filename</code> (names each export).</p>
+
+            <div class="divider"></div>
+
+            <label class="control-label">Preview rows</label>
+            <div class="merge-preview-bar">
+                <button class="btn btn-secondary merge-step" id="merge-preview-prev" title="Previous row">‹</button>
+                <span class="info-text" id="merge-preview-label" style="flex:1;text-align:center;">No rows loaded</span>
+                <button class="btn btn-secondary merge-step" id="merge-preview-next" title="Next row">›</button>
+            </div>
+            <button class="btn btn-secondary" id="merge-preview-stop" style="width:100%;margin-top:6px;display:none;">Stop preview (restore template)</button>
+
+            <button class="btn btn-primary" id="merge-export-btn" style="width:100%;margin-top:14px;">📦 Export all rows (ZIP)</button>
+            <p class="info-text" id="merge-progress" style="margin-top:8px;"></p>
+        </div>
+
         <div class="sidebar-section" data-group="frame">
             <h3 class="section-title">Shadow Settings</h3>
             <div class="shadow-preset-grid">

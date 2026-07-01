@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '30.0';
+const CURRENT_VERSION = '31.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "✨ Studio Intelligence",
+  heading: "🗂 Merge Studio",
   items: [
-    { title: 'Brand Brain',
-      desc: 'Extract a full brand system from any URL or logo — palette, type, frame, watermark — then enforce it across every design.' },
-    { title: 'AI Screenshot Editor',
-      desc: 'Edit the content inside a screenshot: fix text, recolor an element, auto-redact PII, or remove clutter. It bakes into export.' },
-    { title: 'Campaign Generator',
-      desc: 'One screenshot becomes a whole set — hero, social, an App Store set, and a teaser video — saved in a Campaign folder.' },
-    { title: 'Producer',
-      desc: 'Pick a goal, walk away. The Producer builds a finished, brand-consistent campaign folder on autopilot.' }
+    { title: 'Placeholders',
+      desc: 'Type {{tokens}} into your text, watermark, browser title, or brand colors. They save with your project as a reusable template.' },
+    { title: 'CSV → N designs',
+      desc: 'Upload a spreadsheet and export one on-brand image per row, each named from your data and bundled into a single ZIP.' },
+    { title: 'Per-row screenshots',
+      desc: 'An image column swaps the screenshot itself for every row, loaded safely through the proxy so exports stay sharp.' },
+    { title: 'Live row preview',
+      desc: 'Step through rows on the real canvas before you export. Your template restores untouched afterward.' }
   ]
 };
 

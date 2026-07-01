@@ -32,6 +32,48 @@ async function proxyFetch(target) {
   return fetch(`/api/fetch-url?url=${encodeURIComponent(target)}`);
 }
 
+// v31 — Merge Studio's per-row image loader. Unlike loadImageFromSrc (which
+// mutates state.image, pushes history, and toggles the upload UI), this is a
+// pure helper: it just resolves to a decoded <img>. Remote http(s) URLs go
+// through the CORS proxy so the export canvas stays untainted; data:/blob:
+// sources load directly. Results are cached by src so a CSV that reuses the
+// same image URL across rows fetches it once.
+const imgElCache = new Map();
+
+export function loadImageEl(src) {
+  const key = (src || '').trim();
+  if (!key) return Promise.reject(new Error('empty image source'));
+  if (imgElCache.has(key)) return imgElCache.get(key);
+
+  const p = (async () => {
+    let objectUrl = null;
+    let finalSrc = key;
+    if (/^https?:/i.test(key)) {
+      const res = await proxyFetch(key);
+      if (!res.ok) throw new Error(`fetch failed (${res.status})`);
+      const blob = await res.blob();
+      objectUrl = URL.createObjectURL(blob);
+      finalSrc = objectUrl;
+    }
+    try {
+      return await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('image decode failed'));
+        img.src = finalSrc;
+      });
+    } finally {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    }
+  })();
+
+  // Don't cache failures permanently — a transient network error shouldn't
+  // poison every later row that references the same URL.
+  p.catch(() => imgElCache.delete(key));
+  imgElCache.set(key, p);
+  return p;
+}
+
 export async function loadFromUrl(rawUrl) {
   const url = (rawUrl || '').trim();
   if (!url) return;
