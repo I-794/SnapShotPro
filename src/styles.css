@@ -1552,6 +1552,23 @@ kbd {
     border-radius: var(--radius-sm); background: var(--bg-tertiary);
     margin-bottom: 6px;
 }
+/* v31 — Merge Studio */
+.merge-badge {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: var(--radius-pill, 999px);
+    background: var(--accent-light); color: var(--accent-primary);
+    vertical-align: middle; margin-left: 6px;
+}
+.merge-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.merge-chip {
+    font-size: 12px; font-family: var(--font-mono, monospace);
+    padding: 3px 9px; border-radius: var(--radius-pill, 999px);
+    border: 1px solid var(--border-color); white-space: nowrap;
+}
+.merge-chip.ok { border-color: #16a34a; color: #16a34a; background: rgba(22,163,74,0.08); }
+.merge-chip.warn { border-color: #d97706; color: #d97706; background: rgba(217,119,6,0.08); }
+.merge-preview-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.merge-step { flex: 0 0 auto; min-width: 40px; font-size: 18px; line-height: 1; padding: 6px 10px; }
 .batch-thumb {
     width: 36px; height: 36px; border-radius: var(--radius-sm); overflow: hidden;
     background: var(--bg-primary); flex: 0 0 auto;

@@ -114,6 +114,11 @@ const IDS = [
   // v28 — export presets + asset library
   'export-preset-select', 'export-preset-apply', 'export-preset-save', 'export-preset-scale',
   'asset-library-grid',
+  // v31 — Merge Studio (data-driven batch: CSV → N designs)
+  'merge-studio-section', 'merge-tokens', 'merge-color-bg', 'merge-color-text',
+  'merge-csv-drop', 'merge-csv-input', 'merge-sample-btn', 'merge-summary',
+  'merge-preview-prev', 'merge-preview-next', 'merge-preview-stop', 'merge-preview-label',
+  'merge-export-btn', 'merge-progress',
 
   // Templates
   'template-name', 'save-template-btn', 'clear-templates-btn', 'template-list',

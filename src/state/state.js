@@ -167,6 +167,14 @@ export const state = {
   canvasSelection: [],
   lastImageRect: null,
 
+  // v31 — Merge Studio (data-driven batch). Runtime-only: the CSV columns/rows
+  // are re-uploaded per session and are NOT snapshotted or serialized. The
+  // template itself lives in the already-serialized text/color fields
+  // (textOverlay.content, watermark.text, deviceFrame.title/url, bgColor,
+  // textOverlay.color) via {{token}} markers, so it travels with the project
+  // for free. See src/features/merge-studio.js.
+  mergeStudio: { columns: [], rows: [] },
+
   // v9 — App Store screenshot sets + batch.
   // mode: 'single' (normal editor) | 'set' (one design → N captioned store
   // panels) | 'batch' (one template → N uploaded images → ZIP) | 'tour' (v25 —

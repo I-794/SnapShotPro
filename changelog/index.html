@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShotPro changelog. What shipped in each release, from the first single-file editor to v20 with the AI Design Agent (a conversational copilot that designs, generates, sees the canvas, and remembers your style), on top of v19 AI Assets, v18 one-click Design Variations, v17 color filters, custom palettes, harmonies, and palette-driven color mapping, vector shape tools, motion on stills, the timeline scrubber, layer blend modes and per-layer opacity, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v31 Merge Studio: turn one design into hundreds with {{placeholders}} and a CSV, on top of v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v30, Studio Intelligence: Brand Brain, AI Screenshot Editor, Campaign Generator, and Producer — AI-native tools that design, edit, and ship full campaigns.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v31 Merge Studio: mark a design with placeholders, upload a CSV, and export one on-brand image per row as a ZIP. On top of v30 Studio Intelligence and the full trail back to a single HTML file.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -663,6 +663,41 @@
         .bi-logo-text b { color: #fff; font-weight: 600; display: block; font-size: 13px; }
         @media (max-width: 860px) { .bi-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v31 — Merge Studio spotlight. Its own motif: a CSV of rows fanning out
+           into a stack of rendered designs (the data-driven merge, depicted).
+           Cyan-into-indigo, distinct from the v30 gold/violet Brand Brain panel
+           and every prior spotlight. */
+        .spotlight-merge {
+            background:
+                radial-gradient(58% 88% at 4% 4%, rgba(34,211,238,0.20), transparent 54%),
+                radial-gradient(56% 86% at 100% 100%, rgba(99,102,241,0.20), transparent 52%),
+                #06080f;
+        }
+        .spotlight-merge::after { display: none; }
+        .spotlight-merge .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-merge .spot-feat-ico { background: linear-gradient(135deg, rgba(34,211,238,0.32), rgba(99,102,241,0.28)); }
+        .spotlight-merge .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-merge .btn-primary:hover { background: #f0f0ee; }
+        /* Merge motif, depicted: a data table whose rows fan into rendered cards. */
+        .mg-stage { width: 100%; display: flex; flex-direction: column; gap: 18px; }
+        .mg-csv { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.13); font-family: var(--font-mono); font-size: 11.5px; }
+        .mg-csv .mg-r { display: grid; grid-template-columns: 1.1fr 1fr 0.8fr; }
+        .mg-csv .mg-r > span { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.66); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mg-csv .mg-r.h > span { color: #22d3ee; background: rgba(34,211,238,0.12); }
+        .mg-csv .mg-r:last-child > span { border-bottom: 0; }
+        .mg-fan { position: relative; height: 96px; }
+        .mg-card {
+            position: absolute; top: 0; width: 60%; height: 86px; border-radius: 12px;
+            padding: 13px 15px; color: #fff; box-shadow: 0 14px 30px rgba(4,7,18,0.5);
+            border: 1px solid rgba(255,255,255,0.16);
+        }
+        .mg-card b { display: block; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+        .mg-card span { font-size: 11px; opacity: 0.82; }
+        .mg-card.c1 { left: 0; transform: rotate(-5deg); background: linear-gradient(150deg, #22d3ee, #0e7490); }
+        .mg-card.c2 { left: 20%; transform: rotate(1deg); background: linear-gradient(150deg, #6366f1, #3730a3); }
+        .mg-card.c3 { left: 40%; transform: rotate(6deg); background: linear-gradient(150deg, #f59e0b, #b45309); }
+        @media (max-width: 860px) { .mg-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -742,54 +777,44 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-intelligence reveal">
+        <div class="spotlight spotlight-merge reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v30 · June 2026</div>
-                <h2>Studio Intelligence.</h2>
-                <p class="spot-lede">The Campaign Generator turns one screenshot into a coordinated set, and Producer ships the whole thing on autopilot. The AI Screenshot Editor edits the pixels inside the frame. Brand Brain extracts your full identity from a URL.</p>
+                <div class="spot-ver">v31 · July 2026</div>
+                <h2>Merge Studio.</h2>
+                <p class="spot-lede">Design once, then ship a thousand. Mark your design with placeholders like <code>{{name}}</code>, upload a spreadsheet, and Merge Studio renders one on-brand image per row. Text, colors, and even the screenshot swap automatically, all bundled into a ZIP.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 9h10M4 13h7"/><rect x="10" y="11" width="11" height="10" rx="2"/></svg></span>
-                        <div><strong>Campaign Generator &amp; Producer</strong><span>One screenshot becomes a hero, social set, App Store set, and teaser video. Pick a goal and Producer builds the whole thing on autopilot.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6M4 12h6M4 17h6"/><path d="M14 5v14"/><path d="M17 8l3 4-3 4"/></svg></span>
+                        <div><strong>Placeholders that travel with your design</strong><span>Type tokens straight into your headline, watermark, browser title, or brand colors. They save with the project, so the template is there next time.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h3"/></svg></span>
-                        <div><strong>AI Screenshot Editor</strong><span>Fix a typo, recolor a button, or auto-redact names and emails — the pixels change and it bakes into every export.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M9 4v16"/></svg></span>
+                        <div><strong>A CSV becomes a folder of designs</strong><span>Preview any row live on the canvas, then export the whole sheet at once. Each PNG is named from your data and bundled into one ZIP.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 12h2M19 12h2M12 3v2M12 19v2"/><path d="M5.64 5.64l1.42 1.42M16.95 16.95l1.41 1.41"/></svg></span>
-                        <div><strong>Brand Brain</strong><span>Paste a URL or drop a logo and SnapShotPro extracts a full brand system — palette, type, frame — then applies and enforces it across every design.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 15 4-4 4 4 3-3 5 5"/><circle cx="8.5" cy="9.5" r="1.5"/></svg></span>
+                        <div><strong>Swap the screenshot too</strong><span>An <code>image</code> column gives every row its own capture. URLs load safely through the proxy, so exports stay sharp and untainted.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
                     <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                    <a href="#history" class="btn btn-ghost btn-lg">See the full log</a>
+                    <a href="/merge/" class="btn btn-ghost btn-lg">How Merge Studio works</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="bi-stage" aria-hidden="true">
-                    <div class="bi-url">
-                        <svg class="bi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                        acme.com<span class="bi-caret"></span>
+                <div class="mg-stage" aria-hidden="true">
+                    <div class="mg-csv">
+                        <div class="mg-r h"><span>name</span><span>role</span><span>image</span></div>
+                        <div class="mg-r"><span>Ada Lovelace</span><span>Engineer</span><span>ada.png</span></div>
+                        <div class="mg-r"><span>Grace Hopper</span><span>Admiral</span><span>grace.png</span></div>
+                        <div class="mg-r"><span>Alan Turing</span><span>Founder</span><span>alan.png</span></div>
                     </div>
-                    <div class="bi-out">
-                        <div class="bi-swatches">
-                            <span class="bi-swatch s1"></span>
-                            <span class="bi-swatch s2"></span>
-                            <span class="bi-swatch s3"></span>
-                            <span class="bi-swatch s4"></span>
-                            <span class="bi-swatch-label">Brand palette</span>
-                        </div>
-                        <div class="bi-type-row">
-                            <span class="t1">Ag</span>
-                            <span class="t2">Display / Body</span>
-                        </div>
-                        <div class="bi-logo-row">
-                            <span class="bi-logo"></span>
-                            <span class="bi-logo-text"><b>Acme Corp</b>Logo extracted</span>
-                        </div>
+                    <div class="mg-fan">
+                        <div class="mg-card c1"><b>Ada Lovelace</b><span>Engineer</span></div>
+                        <div class="mg-card c2"><b>Grace Hopper</b><span>Admiral</span></div>
+                        <div class="mg-card c3"><b>Alan Turing</b><span>Founder</span></div>
                     </div>
                 </div>
             </div>
@@ -803,6 +828,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v31.0</span><span class="entry-date">July 2026</span></div>
+                <div>
+                    <h2>Merge Studio</h2>
+                    <ul class="changes">
+                        <li><b>Placeholders turn a design into a template.</b> Type tokens like <code>{{name}}</code> into your text overlay, watermark, browser title or URL, or your background and text colors. Merge Studio finds them automatically and shows which ones a column will fill. The tokens save with your project, so the template travels with it.</li>
+                        <li><b>One CSV becomes a whole folder.</b> Upload a spreadsheet and get one on-brand PNG per row, each named from your data and bundled into a single ZIP. Step through rows live on the canvas before you export, and your template restores untouched afterward.</li>
+                        <li><b>Per-row screenshots.</b> An optional <code>image</code> column swaps the screenshot itself for each row, loading through the same proxy the URL importer uses, so every export stays sharp and untainted. Product shots, avatars, or localized captures, all from one design.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v30.0</span><span class="entry-date">June 2026</span></div>
                 <div>
                     <h2>Studio Intelligence</h2>
