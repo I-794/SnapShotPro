@@ -1721,3 +1721,11 @@ kbd {
   background: var(--accent-primary, #4f7cff); border: 2px solid #fff; border-radius: 50%;
   cursor: nwse-resize; z-index: 5;
 }
+
+/* v32 — "Back to board" return pill (editor -> board after editing a card) */
+.board-return-pill {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 30;
+  background: var(--accent-primary, #4f7cff); color: #fff; border: none;
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}

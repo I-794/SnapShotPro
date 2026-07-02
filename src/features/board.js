@@ -11,7 +11,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
 import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
-import { getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
+import { getPageMeta, indexOfPage, onDocumentChange, switchTo } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -65,6 +65,21 @@ export function toggleBoardMode() {
   else enterBoardMode();
 }
 
+let _returnPill = null;
+
+export function returnToBoard() {
+  // Coming back from editing a card: switchTo already synced the active page's
+  // payload+thumb (pages.js switchTo -> syncActive). Just flip the view back.
+  if (state.mode === 'board') return;
+  state.mode = 'board';
+  ensureCards();
+  showBoardChrome(true);
+  if (el.canvasWrapper) el.canvasWrapper.style.display = 'none';
+  if (el.uploadZone) el.uploadZone.style.display = 'none';
+  if (_returnPill) _returnPill.style.display = 'none';
+  renderBoard();
+}
+
 function showBoardChrome(on) {
   if (surface) surface.style.display = on ? 'block' : 'none';
   if (toolbar) toolbar.style.display = on ? 'flex' : 'none';
@@ -94,6 +109,15 @@ function ensureSurface() {
 
   viewport.appendChild(toolbar);
   viewport.appendChild(surface);
+
+  if (!_returnPill) {
+    _returnPill = document.createElement('button');
+    _returnPill.className = 'board-return-pill';
+    _returnPill.textContent = '← Back to board';
+    _returnPill.style.display = 'none';
+    _returnPill.addEventListener('click', returnToBoard);
+    viewport.appendChild(_returnPill);
+  }
 }
 
 function applyCamera() {
@@ -264,7 +288,21 @@ function onResizeStart(e, node) {
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
 }
-function onCardDoubleClick(e, node) { /* Task 5 */ }
+function onCardDoubleClick(e, node) {
+  const pageId = Number(node.dataset.pageId);
+  const idx = indexOfPage(pageId);
+  if (idx < 0) return;
+  // Remember which card we came from so returning to the board can refresh it.
+  _lastEditedPageId = pageId;
+  switchTo(idx);
+  state.mode = 'single';
+  showBoardChrome(false);
+  if (el.canvasWrapper) el.canvasWrapper.style.display = '';
+  if (el.uploadZone) el.uploadZone.style.display = '';
+  if (_returnPill) _returnPill.style.display = '';
+  import('../render/render.js').then(({ render }) => render());
+}
+let _lastEditedPageId = null;
 function updateSelectionChrome() {
   surface.querySelectorAll('.board-card').forEach(n => {
     const sel = state.boardSelection.some(r => r.id === Number(n.dataset.id));
