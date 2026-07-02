@@ -10,14 +10,38 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
+import { pageCount, getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
 let toolbar = null;     // .board-toolbar
 
+function nextId() { return Date.now() * 1000 + Math.floor(Math.random() * 1000); }
+
+function ensureCards() {
+  // Only seed when the board has no card objects yet. (Existing cards survive
+  // page add/delete via the sync in Step 4, which adds/removes by id.)
+  const existing = new Set(state.board.objects.filter(o => o.kind === 'card').map(o => o.pageId));
+  const meta = getPageMeta();
+  const colW = 280, gap = 24, cols = 4;
+  let row = 0, col = 0;
+  for (const p of meta) {
+    if (existing.has(p.id)) { col = (col + 1) % cols; if (col === 0) row++; continue; }
+    const ar = p.w && p.h ? p.h / p.w : 0.625;
+    const w = colW, h = Math.round(colW * ar);
+    state.board.objects.push({
+      id: nextId(), kind: 'card', pageId: p.id,
+      x: 60 + col * (colW + gap), y: 60 + row * (h + gap + 28),
+      w, h, z: state.board.objects.length
+    });
+    col = (col + 1) % cols; if (col === 0) row++;
+  }
+}
+
 export function enterBoardMode() {
   state.mode = 'board';
   ensureSurface();
+  ensureCards();
   showBoardChrome(true);
   // Hide the single-canvas wrapper + upload zone while on the board.
   if (el.canvasWrapper) el.canvasWrapper.style.display = 'none';
@@ -119,20 +143,67 @@ export function fitBoard() {
 }
 export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); }
 
-// Task 1 stub: show an empty-state hint. Task 3 replaces this with card layout.
+// v32 — render cards from state.board.objects (text/arrows come in Task 7).
 export function renderBoard() {
   if (state.mode !== 'board') return;
   ensureSurface();
   if (!surface) return;
   applyCamera();
-  if (!surface.querySelector('.board-empty')) {
-    const empty = document.createElement('div');
-    empty.className = 'board-empty';
-    empty.textContent = state.image
-      ? 'Board mode — cards arrive in Task 3.'
-      : 'Upload a screenshot, then open the Board.';
-    surface.appendChild(empty);
+
+  // Build/reconcile card nodes by id.
+  const cards = state.board.objects.filter(o => o.kind === 'card');
+  const seen = new Set();
+  for (const o of cards) {
+    seen.add(o.id);
+    let node = surface.querySelector(`.board-card[data-id="${o.id}"]`);
+    const meta = getPageMeta().find(m => m.id === o.pageId);
+    const imgSrc = (meta && meta.thumb) || '';
+    if (!node) {
+      node = document.createElement('div');
+      node.className = 'board-card';
+      node.dataset.id = String(o.id);
+      node.dataset.pageId = String(o.pageId);
+      node.innerHTML = `<img class="board-card-img" alt="">` +
+        `<div class="board-card-label"></div>`;
+      surface.appendChild(node);
+      bindCardEvents(node);
+    }
+    node.style.left = o.x + 'px';
+    node.style.top = o.y + 'px';
+    node.style.width = o.w + 'px';
+    node.style.height = o.h + 'px';
+    node.style.zIndex = o.z;
+    const img = node.querySelector('.board-card-img');
+    if (imgSrc && img.src !== imgSrc) img.src = imgSrc;
+    node.querySelector('.board-card-label').textContent = 'Page';
   }
+  // Remove DOM cards whose object was deleted.
+  surface.querySelectorAll('.board-card').forEach(n => {
+    if (!seen.has(Number(n.dataset.id))) n.remove();
+  });
+
+  // Empty-state hint only when there are no cards at all.
+  let empty = surface.querySelector('.board-empty');
+  if (!cards.length) {
+    if (!empty) { empty = document.createElement('div'); empty.className = 'board-empty'; surface.appendChild(empty); }
+    empty.textContent = state.image
+      ? 'Board is empty.'
+      : 'Upload a screenshot, then open the Board.';
+  } else if (empty) { empty.remove(); }
+
+  updateSelectionChrome();
+}
+
+function bindCardEvents(node) {
+  node.addEventListener('mousedown', (e) => { onCardMouseDown(e, node); });
+  node.addEventListener('dblclick', (e) => { onCardDoubleClick(e, node); });
+}
+function onCardMouseDown(e, node) { /* Task 4 */ }
+function onCardDoubleClick(e, node) { /* Task 5 */ }
+function updateSelectionChrome() {
+  surface.querySelectorAll('.board-card').forEach(n => {
+    n.classList.toggle('selected', state.boardSelection.some(r => r.id === Number(n.dataset.id)));
+  });
 }
 
 export function bindBoard() {
@@ -174,4 +245,29 @@ export function bindBoard() {
     applyCamera();
   });
   window.addEventListener('mouseup', () => { panning = false; });
+
+  // Add/remove board cards when pages are added/deleted (keep cards whose page
+  // still exists; drop cards whose page is gone; new pages get a card on next
+  // board entry or here).
+  let syncTimer = null;
+  onDocumentChange(() => {
+    if (state.mode !== 'board') return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      const liveIds = new Set(getPageMeta().map(m => m.id));
+      // Remove cards whose page was deleted.
+      state.board.objects = state.board.objects.filter(o => o.kind !== 'card' || liveIds.has(o.pageId));
+      // Add a card for any new page that lacks one.
+      const have = new Set(state.board.objects.filter(o => o.kind === 'card').map(o => o.pageId));
+      let row = 0, col = 0;
+      for (const p of getPageMeta()) {
+        if (have.has(p.id)) continue;
+        const ar = p.w && p.h ? p.h / p.w : 0.625;
+        state.board.objects.push({ id: nextId(), kind: 'card', pageId: p.id,
+          x: 60 + col * 304, y: 60 + row * (280 * ar + 52), w: 280, h: Math.round(280 * ar), z: state.board.objects.length });
+        col = (col + 1) % 4; if (col === 0) row++;
+      }
+      renderBoard();
+    }, 200);
+  });
 }

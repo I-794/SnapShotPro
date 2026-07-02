@@ -30,6 +30,19 @@ function emitChange() { changeListeners.forEach(fn => { try { fn(); } catch (e) 
 
 export function pageCount() { return pages.length; }
 
+// v32 — board accessors. The board enumerates pages as cards and resolves a
+// card's pageId back to an index for switchTo().
+export function getPageMeta() {
+  return pages.map(p => {
+    const c = (p.payload && p.payload.design && p.payload.design.canvas) || { width: 1280, height: 720 };
+    return { id: p.id, thumb: p.thumb, w: c.width, h: c.height };
+  });
+}
+
+export function indexOfPage(id) {
+  return pages.findIndex(p => p.id === id);
+}
+
 function syncActive() {
   pages[active].payload = serializeFull();
   pages[active].thumb = makeThumb() || pages[active].thumb;

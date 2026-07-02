@@ -1703,3 +1703,14 @@ kbd {
 .canvas-viewport.board-panning { cursor: grab; }
 .canvas-viewport.board-panning:active { cursor: grabbing; }
 .board-surface { will-change: transform; }
+
+/* v32 — board cards (pages laid out on the canvas) */
+.board-card {
+  position: absolute; background: var(--bg-elevated, #15151a);
+  border: 1px solid var(--border-color, #2a2a32); border-radius: 10px;
+  overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.board-card-img { width: 100%; height: calc(100% - 22px); object-fit: contain; background: #000; display: block; }
+.board-card-label { height: 22px; font-size: 11px; color: var(--text-secondary, #8a8a92);
+  display: flex; align-items: center; padding: 0 8px; border-top: 1px solid var(--border-color, #2a2a32); }
+.board-card.selected { outline: 2px solid var(--accent-primary, #4f7cff); outline-offset: 2px; }
