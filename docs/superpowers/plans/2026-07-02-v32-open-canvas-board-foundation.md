@@ -387,8 +387,12 @@ export function fitBoard() {
   const pad = 80;
   const zoom = clampZoom(Math.min((vp.width - pad * 2) / b.w, (vp.height - pad * 2) / b.h));
   state.board.camera.zoom = zoom;
-  state.board.camera.x = (vp.width - b.w * zoom) / 2 - b.x * zoom + pad;
-  state.board.camera.y = (vp.height - b.h * zoom) / 2 - b.y * zoom + pad;
+  // Center the content: since `zoom` already fits it inside (vp - 2*pad),
+  // centering gives exactly `pad` on the constraining axis and >= pad on the
+  // other. Do NOT add `+ pad` here — that over-corrects and pins the trailing
+  // edge to ~0 padding.
+  state.board.camera.x = (vp.width - b.w * zoom) / 2 - b.x * zoom;
+  state.board.camera.y = (vp.height - b.h * zoom) / 2 - b.y * zoom;
   applyCamera();
 }
 export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); }
