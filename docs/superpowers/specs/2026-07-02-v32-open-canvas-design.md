@@ -138,6 +138,7 @@ Scope is enforced honestly (the skill's own Section 13 excludes dense product UI
 
 - **Marketing page** (`/open-canvas/`, a new Vite input): full taste-skill machinery. Hero fit, no em-dashes, one accent, shape/color/theme locks, real images (the hero shows one screenshot re-skinned and arranged several ways), motion motivated and reduced-motion honored. Dials: VARIANCE 7, MOTION 6, DENSITY 4.
 - **Exported board aesthetics**: any "arrange" or "aesthetic" the agent applies to *exported* cards is taste-curated.
+- **Changelog page** (`changelog/index.html`): a taste-skill deliverable. Per the project convention (v16 used glassmorphism), each version's changelog gets a **unique** treatment, never a repeat. v32 must pick a *different* direction from v16's glass, chosen at build time, with the same pre-flight discipline as the marketing page (no em-dashes, one accent, shape/color/theme locks, real imagery, reduced-motion honored).
 - **The dense editor/board UI itself**: product-IA principles (clear single-purpose units, consistent selection, predictable affordances), not the marketing-page pre-flight checklist. The parked "Calm Pro" editor restyle is **not** assumed by this spec; it remains a separate, optional effort.
 
 ## 8. Non-goals (scope locks)
@@ -164,7 +165,7 @@ Scope is enforced honestly (the skill's own Section 13 excludes dense product UI
 2. Persistence: `serializeDocument`/`applyDocument` board key, `DOC_VERSION` 13 to 14, `migrateBoardV14`.
 3. Seed v1: `api/scrape-page.js`, client drop-and-arrange, Brand Brain apply.
 4. Control: board-aware agent tools, Cmd-K chat surface.
-5. Taste-skill marketing page `/open-canvas/`, changelog, What's-New toast, version bump to 32.0.0.
+5. Taste-skill marketing page `/open-canvas/` and changelog page (unique treatment, distinct from v16's glass), plus the What's-New toast and version bump to 32.0.0.
 6. CLAUDE.md update (State registry, Shipped-features v32 row, an Open Canvas architecture note, checklist if needed).
 7. Verify in `npm run dev` (no tests/linter exist).
 
