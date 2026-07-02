@@ -10,7 +10,7 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
-import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
+import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef } from './board-tools.js';
 import { pageCount, getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
 import { isTypingTarget } from '../utils/dom.js';
 
@@ -100,12 +100,18 @@ function ensureSurface() {
   toolbar.className = 'board-toolbar';
   toolbar.innerHTML = `
     <button class="board-back" title="Back to editor (Esc)">← Editor</button>
+    <button class="board-text-add" title="Add text">Text</button>
+    <button class="board-connect" title="Connect two cards (click from → to)">Connect</button>
+    <button class="board-group" title="Group selected">Group</button>
     <button class="board-fit" title="Fit board to screen">Fit</button>
     <button class="board-reset" title="Reset zoom">Reset</button>
     <span class="board-zoom-label">100%</span>`;
   toolbar.querySelector('.board-back').addEventListener('click', exitBoardMode);
   toolbar.querySelector('.board-fit').addEventListener('click', fitBoard);
   toolbar.querySelector('.board-reset').addEventListener('click', resetBoard);
+  toolbar.querySelector('.board-text-add').addEventListener('click', addBoardText);
+  toolbar.querySelector('.board-connect').addEventListener('click', startConnectMode);
+  toolbar.querySelector('.board-group').addEventListener('click', groupSelected);
 
   surface = document.createElement('div');
   surface.className = 'board-surface';
@@ -173,6 +179,97 @@ export function fitBoard() {
 }
 export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); }
 
+// v32 Task 7 — add a text node, selected ready to drag/edit.
+export function addBoardText() {
+  const o = { id: nextId(), kind: 'text', x: 120, y: 120, w: 240, h: 40,
+    text: 'Label', fontSize: 24, color: '#ffffff', z: state.board.objects.length };
+  state.board.objects.push(o);
+  selectBoardOnly({ kind: 'boardObject', id: o.id });
+  renderBoard();
+}
+
+// v32 Task 7 — two-click connect mode. Click a card (from), then another (to);
+// an arrow is pushed. The first click is captured in onCardMouseDown via
+// maybeConnect(); the zoom label doubles as the mode hint.
+let connectMode = false;
+let connectFrom = null;
+function startConnectMode() {
+  connectMode = true;
+  connectFrom = null;
+  const label = toolbar.querySelector('.board-zoom-label');
+  if (label) label.textContent = 'click from → to';
+}
+// Two-click connect: triggered from onCardMouseDown.
+function maybeConnect(id) {
+  if (!connectMode) return false;
+  if (connectFrom == null) { connectFrom = id; return true; }
+  if (connectFrom !== id) {
+    state.board.objects.push({ id: nextId(), kind: 'arrow', from: connectFrom, to: id, color: '#4f7cff', z: state.board.objects.length });
+  }
+  connectFrom = null; connectMode = false;
+  const label = toolbar.querySelector('.board-zoom-label');
+  if (label) label.textContent = Math.round(state.board.camera.zoom * 100) + '%';
+  renderBoard();
+  return true;
+}
+
+// v32 Task 7 — group the current selection into one group object. The group's
+// children keep their own ids/positions; the group is just a membership record
+// (its box is derived in board-tools.groupBounds).
+function groupSelected() {
+  if (state.boardSelection.length < 2) return;
+  const childIds = state.boardSelection.map(r => r.id);
+  const g = { id: nextId(), kind: 'group', children: childIds, x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
+  state.board.objects.push(g);
+  selectBoardOnly({ kind: 'boardObject', id: g.id });
+  renderBoard();
+}
+
+// v32 Task 7 — reusable drag-move of the whole selection via the uniform
+// resolveBoardRef(...).moveBy handle, so cards, text, AND groups all drag (a
+// group's moveBy translates its children). Extracted from onCardMouseDown.
+function dragSelection(e) {
+  const start = screenToBoard(e.clientX, e.clientY);
+  const origs = state.boardSelection.map(r => {
+    const h = resolveBoardRef(r);
+    return { ref: r, box: h ? { ...h.box } : null };
+  });
+  let moved = false;
+  const onMove = (ev) => {
+    const cur = screenToBoard(ev.clientX, ev.clientY);
+    const dx = cur.x - start.x, dy = cur.y - start.y;
+    if (!dx && !dy) return;
+    moved = true;
+    for (const or of origs) {
+      if (!or.box) continue;
+      const h = resolveBoardRef(or.ref);          // live handle (re-read each move)
+      if (!h) continue;
+      h.moveBy((or.box.x + dx) - h.box.x, (or.box.y + dy) - h.box.y);
+    }
+    renderBoard();
+  };
+  const onUp = () => {
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    if (moved) raiseLatestToTop();
+  };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+}
+
+// v32 Task 7 — the SVG connector overlay (one <svg> over the surface; arrows
+// are redrawn from state.board.objects on every renderBoard).
+function ensureOverlay() {
+  if (!surface) return null;
+  let svg = surface.querySelector('.board-connectors');
+  if (!svg) {
+    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'board-connectors');
+    surface.appendChild(svg);
+  }
+  return svg;
+}
+
 // v32 — render cards from state.board.objects (text/arrows come in Task 7).
 export function renderBoard() {
   if (state.mode !== 'board') return;
@@ -213,6 +310,56 @@ export function renderBoard() {
     if (!seen.has(Number(n.dataset.id))) n.remove();
   });
 
+  // Text nodes.
+  const texts = state.board.objects.filter(o => o.kind === 'text');
+  const textSeen = new Set();
+  for (const o of texts) {
+    textSeen.add(o.id);
+    let n = surface.querySelector(`.board-text[data-id="${o.id}"]`);
+    if (!n) {
+      n = document.createElement('div');
+      n.className = 'board-text';
+      n.dataset.id = String(o.id);
+      surface.appendChild(n);
+    }
+    n.style.left = o.x + 'px'; n.style.top = o.y + 'px';
+    n.style.width = o.w + 'px'; n.style.fontSize = (o.fontSize || 24) + 'px';
+    n.style.color = o.color || '#fff';
+    n.textContent = o.text || '';
+    n.style.zIndex = o.z;
+  }
+  surface.querySelectorAll('.board-text').forEach(n => {
+    if (!textSeen.has(Number(n.dataset.id))) n.remove();
+  });
+
+  // Arrows (SVG overlay).
+  const svg = ensureOverlay();
+  if (svg) {
+    const arrows = state.board.objects.filter(o => o.kind === 'arrow');
+    svg.innerHTML = '';
+    for (const a of arrows) {
+      const f = state.board.objects.find(o => o.id === a.from);
+      const t = state.board.objects.find(o => o.id === a.to);
+      if (!f || !t) continue;
+      const x1 = f.x + f.w / 2, y1 = f.y + f.h / 2, x2 = t.x + t.w / 2, y2 = t.y + t.h / 2;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke', a.color || '#4f7cff');
+      line.setAttribute('stroke-width', '2');
+      line.setAttribute('marker-end', 'url(#board-arrowhead)');
+      svg.appendChild(line);
+    }
+    if (!svg.querySelector('#board-arrowhead')) {
+      const m = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+      m.id = 'board-arrowhead'; m.setAttribute('markerWidth', '8'); m.setAttribute('markerHeight', '8');
+      m.setAttribute('refX', '6'); m.setAttribute('refY', '4'); m.setAttribute('orient', 'auto');
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', 'M0,0 L8,4 L0,8 z'); p.setAttribute('fill', '#4f7cff');
+      m.appendChild(p); svg.appendChild(m);
+    }
+  }
+
   // Empty-state hint only when there are no cards at all.
   let empty = surface.querySelector('.board-empty');
   if (!cards.length) {
@@ -235,35 +382,15 @@ function onCardMouseDown(e, node) {
   if (spaceDown) return;
   if (e.button !== 0) return;
   const id = Number(node.dataset.id);
+  // v32 Task 7 — two-click connect mode: this click just records from/to.
+  if (connectMode) { maybeConnect(id); return; }
   const ref = { kind: 'boardObject', id };
   if (e.shiftKey) toggleBoardRef(ref);
   else if (!state.boardSelection.some(r => r.id === id)) selectBoardOnly(ref);
   // If this card isn't in the (possibly shift-toggled) selection, don't move.
   if (!state.boardSelection.some(r => r.id === id)) { updateSelectionChrome(); return; }
   updateSelectionChrome();
-
-  // Drag-move the whole selection (board-px deltas). Task 7 extracts this into
-  // a reusable dragSelection() that works for text + groups too.
-  const start = screenToBoard(e.clientX, e.clientY);
-  const origs = state.boardSelection.map(r => {
-    const o = state.board.objects.find(x => x.id === r.id);
-    return { id: r.id, x: o.x, y: o.y };
-  });
-  let moved = false;
-  const onMove = (ev) => {
-    const cur = screenToBoard(ev.clientX, ev.clientY);
-    const dx = cur.x - start.x, dy = cur.y - start.y;
-    moved = true;
-    for (const or of origs) { const o = state.board.objects.find(x => x.id === or.id); if (o) { o.x = or.x + dx; o.y = or.y + dy; } }
-    renderBoard();
-  };
-  const onUp = () => {
-    window.removeEventListener('mousemove', onMove);
-    window.removeEventListener('mouseup', onUp);
-    if (moved) raiseLatestToTop();
-  };
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
+  dragSelection(e);
   e.stopPropagation();
 }
 
@@ -305,12 +432,13 @@ function onCardDoubleClick(e, node) {
   import('../render/render.js').then(({ render }) => render());
 }
 function updateSelectionChrome() {
-  surface.querySelectorAll('.board-card').forEach(n => {
+  surface.querySelectorAll('.board-card, .board-text').forEach(n => {
     const sel = state.boardSelection.some(r => r.id === Number(n.dataset.id));
     n.classList.toggle('selected', sel);
-    // Resize handle only on the SOLE-selected card. Reconciled here (not just
-    // in renderBoard) so a plain click that changes selection (which doesn't
-    // re-render) still adds/removes the handle.
+  });
+  // Resize handle only on the SOLE-selected CARD (text wraps to width; no handle in v1).
+  surface.querySelectorAll('.board-card').forEach(n => {
+    const sel = state.boardSelection.some(r => r.id === Number(n.dataset.id));
     const sole = sel && state.boardSelection.length === 1;
     let h = n.querySelector('.board-resize');
     if (sole && !h) {
@@ -429,6 +557,43 @@ export function bindBoard() {
     if (e.target.closest('.board-card') || e.target.closest('.board-toolbar')) return;
     clearBoardSelection(); updateSelectionChrome();
     startMarquee(e);
+  });
+
+  // v32 Task 7 — text nodes are created dynamically, so drag them via
+  // delegation on the surface. Also hit-tests GROUPS (which have no DOM node):
+  // a click inside a group's bbox but outside every child selects the group.
+  // stopPropagation keeps the viewport marquee/clear handler from also firing.
+  surface.addEventListener('mousedown', (e) => {
+    if (state.mode !== 'board') return;
+    if (spaceDown) return;        // defer to the viewport camera-pan handler
+    if (e.button !== 0) return;   // only left button selects/drags
+    const textNode = e.target.closest('.board-text');
+    if (textNode) {
+      e.stopPropagation();
+      const id = Number(textNode.dataset.id);
+      const ref = { kind: 'boardObject', id };
+      if (e.shiftKey) toggleBoardRef(ref); else selectBoardOnly(ref);
+      updateSelectionChrome();
+      dragSelection(e);
+      return;
+    }
+    // No card/text DOM node under the cursor (their own handlers stopPropagation
+    // on a normal left-click). Use the point hit-test to find a group whose bbox
+    // contains the click but no child does — select + drag it. Acting on groups
+    // ONLY avoids re-selecting a card that the card handler just shift-deselected
+    // (that path returns without stopPropagation) and avoids interfering with
+    // connect-mode card clicks (maybeConnect handles those).
+    const gref = hitTopBoardRef(e.clientX, e.clientY);
+    if (gref) {
+      const obj = state.board.objects.find(o => o.id === gref.id);
+      if (obj && obj.kind === 'group') {
+        e.stopPropagation();
+        if (e.shiftKey) toggleBoardRef(gref); else selectBoardOnly(gref);
+        updateSelectionChrome();
+        dragSelection(e);
+      }
+    }
+    // else: truly empty surface — let it bubble to the viewport marquee/clear handler.
   });
 
   // Add/remove board cards when pages are added/deleted (keep cards whose page

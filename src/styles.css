@@ -1736,3 +1736,10 @@ kbd {
   position: absolute; border: 1px solid var(--accent-primary, #4f7cff);
   background: rgba(79,124,255,0.12); pointer-events: none;
 }
+
+/* v32 Task 7 — board text nodes + SVG connector overlay */
+.board-text { position: absolute; pointer-events: auto; cursor: move; white-space: pre-wrap;
+  font-family: Geist, system-ui, sans-serif; line-height: 1.2; }
+.board-text.selected { outline: 1px dashed var(--accent-primary, #4f7cff); outline-offset: 2px; }
+.board-connectors { position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: visible; pointer-events: none; }

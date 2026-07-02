@@ -64,7 +64,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight' || id === 'toggleBoard') return 'View';
+      id === 'toggle-spotlight' || id === 'toggleBoard' || id === 'boardAddText') return 'View';
   return 'More';
 }
 
@@ -92,6 +92,9 @@ export function registerCommands() {
     { id: 'toggle-layers',    label: 'Toggle Layers Panel',   icon: '☰',  run: toggleLayersPanel },
     { id: 'toggleBoard', label: 'Toggle Board view', icon: '⊞', group: 'View',
       run: toggleBoardMode },
+    { id: 'boardAddText', label: 'Board: add text', icon: 'type', group: 'View',
+      run: () => { import('./board.js').then(m => { if (state.mode !== 'board') m.enterBoardMode(); m.addBoardText(); }); },
+      when: () => state.mode === 'board' },
     { id: 'reset-tilt',       label: 'Reset 3D Tilt',         icon: '⟲',  run: resetTilt },
     { id: 'tilt-iso',         label: 'Tilt: Isometric',       icon: '◆',  run: () => applyTiltPreset('iso') },
     { id: 'tilt-lean',        label: 'Tilt: Lean',            icon: '◆',  run: () => applyTiltPreset('lean') },
