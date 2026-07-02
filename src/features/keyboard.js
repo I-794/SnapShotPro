@@ -29,6 +29,8 @@ export function bindKeyboard() {
     if (state.ui.paletteOpen) return;
 
     if (e.key === 'Escape') {
+      // v32 — Esc exits board mode (the toolbar promises it).
+      if (state.mode === 'board' && typeof window.__exitBoardMode === 'function') { window.__exitBoardMode(); return; }
       if (el.shortcutsOverlay && el.shortcutsOverlay.style.display === 'flex') { showShortcuts(false); return; }
       if (state.ui.stickerDrawerOpen) { closeStickerDrawer(); return; }
       if (state.tool !== 'select') { setTool('select'); clearSelection(); render(); return; }

@@ -43,6 +43,10 @@ export function setMode(mode) {
   // v25 — leaving an active Tour for Set/Batch must tear down the hotspot overlay
   // (it covers the whole canvas), or it would strand and intercept every click.
   if (prev === 'tour' && mode !== 'tour' && typeof window.__exitTourMode === 'function') window.__exitTourMode();
+  // v32 — leaving the Board for Single/Set/Batch must tear down the board surface
+  // + toolbar and un-hide #canvas-wrapper (which enterBoardMode hid), or the board
+  // cards would strand over a hidden set preview. Mirrors the v25 tour guard.
+  if (prev === 'board' && mode !== 'board' && typeof window.__teardownBoardChrome === 'function') window.__teardownBoardChrome();
   if (mode === 'set' && prev !== 'set') savedCanvas = { ...state.canvas };
   state.mode = mode;
   document.querySelectorAll('[data-app-mode]').forEach((b) =>

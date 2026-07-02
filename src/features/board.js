@@ -43,6 +43,9 @@ function ensureCards() {
 }
 
 export function enterBoardMode() {
+  // Refresh the active page's thumb if entering from single mode (where edits
+  // happen), so the card isn't stale. Skipped for set/batch origins.
+  if (state.mode === 'single') syncActivePage();
   state.mode = 'board';
   ensureSurface();
   ensureCards();
@@ -61,6 +64,16 @@ export function exitBoardMode() {
   if (el.uploadZone) el.uploadZone.style.display = '';
   // Re-render the single-canvas scene.
   import('../render/render.js').then(({ render }) => render());
+}
+
+// v32 — visual teardown of the board surface/toolbar/pill + restore the hidden
+// single-canvas wrapper/upload-zone, WITHOUT changing state.mode (the caller —
+// set-ui.js setMode — sets the new mode). Mirrors the v25 tour teardown.
+export function teardownBoardChrome() {
+  showBoardChrome(false);
+  if (el.canvasWrapper) el.canvasWrapper.style.display = '';
+  if (el.uploadZone) el.uploadZone.style.display = '';
+  if (_returnPill) _returnPill.style.display = 'none';
 }
 
 export function toggleBoardMode() {
@@ -766,4 +779,10 @@ export function bindBoard() {
       deleteBoardSelection();
     }
   });
+
+  // v32 — expose board teardown/exit to set-ui.js (setMode) and keyboard.js (Esc)
+  // via globals, mirroring the v25 window.__exitTourMode pattern, to avoid import
+  // cycles (board.js dynamic-imports render.js).
+  window.__teardownBoardChrome = teardownBoardChrome;
+  window.__exitBoardMode = exitBoardMode;
 }

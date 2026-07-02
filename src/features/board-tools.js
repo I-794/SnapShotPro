@@ -11,12 +11,6 @@ export function screenToBoard(clientX, clientY) {
   return { x: (clientX - vp.left - x) / zoom, y: (clientY - vp.top - y) / zoom };
 }
 
-export function boardToScreen(x, y) {
-  const vp = el.canvasViewport.getBoundingClientRect();
-  const { x: cx, y: cy, zoom } = state.board.camera;
-  return { x: x * zoom + cx + vp.left, y: y * zoom + cy + vp.top };
-}
-
 export function clampZoom(z) { return Math.max(0.1, Math.min(4, z)); }
 
 // v32 Task 7 — bounding box of a group's children (union of child rects).
