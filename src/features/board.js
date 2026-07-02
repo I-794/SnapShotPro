@@ -13,6 +13,7 @@ import { screenToBoard, clampZoom } from './board-tools.js';
 import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef, groupBounds } from './board-tools.js';
 import { pageCount, getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
 import { isTypingTarget } from '../utils/dom.js';
+import { showNotification } from '../ui/notification.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -570,7 +571,7 @@ export async function exportBoard() {
   ctx.fillStyle = '#0b0b0d'; ctx.fillRect(0, 0, W, H);
 
   const { renderInto } = await import('../render/render.js');
-  const { applyDesignToState, applyPayload } = await import('./document.js');
+  const { applyDesignToState } = await import('./document.js');
   const { serializeFull } = await import('../state/serialize.js');
   const saved = serializeFull();
   const savedMode = state.mode;
@@ -597,21 +598,41 @@ export async function exportBoard() {
       if (a.kind !== 'arrow') continue;
       const f = objs.find(o => o.id === a.from), t = objs.find(o => o.id === a.to);
       if (!f || !t) continue;
-      ctx.strokeStyle = a.color || '#4f7cff'; ctx.lineWidth = 2;
+      const fx = f.x + f.w / 2 - minX + pad, fy = f.y + f.h / 2 - minY + pad;
+      const tx = t.x + t.w / 2 - minX + pad, ty = t.y + t.h / 2 - minY + pad;
+      const color = a.color || '#4f7cff';
+      ctx.strokeStyle = color; ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(f.x + f.w / 2 - minX + pad, f.y + f.h / 2 - minY + pad);
-      ctx.lineTo(t.x + t.w / 2 - minX + pad, t.y + t.h / 2 - minY + pad);
-      ctx.stroke();
+      ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
+      // Filled arrowhead at the 'to' end (matches the live SVG marker).
+      const ang = Math.atan2(ty - fy, tx - fx);
+      const head = 9;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - head * Math.cos(ang - Math.PI / 6), ty - head * Math.sin(ang - Math.PI / 6));
+      ctx.lineTo(tx - head * Math.cos(ang + Math.PI / 6), ty - head * Math.sin(ang + Math.PI / 6));
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
     }
+    const blob = await new Promise(res => out.toBlob(res, 'image/png'));
+    if (!blob) throw new Error('Export produced no image (canvas too large).');
+    const url = URL.createObjectURL(blob);
+    const dl = document.createElement('a'); dl.href = url; dl.download = 'board.png';
+    document.body.appendChild(dl); dl.click(); dl.remove(); URL.revokeObjectURL(url);
+    showNotification('Board exported as PNG.', 'success');
+  } catch (e) {
+    console.error(e);
+    showNotification(`Board export failed: ${e.message || e}`, 'error');
   } finally {
     state.mode = savedMode;
-    applyPayload(saved);   // restore the live editor (decodes image, re-renders)
+    // Restore with applyDesignToState (NOT applyPayload): applyPayload calls
+    // showCanvasUI()/showUploadUI(), which would un-hide #canvas-wrapper in
+    // board mode and let the stale preview canvas show through the board.
+    // applyDesignToState only restores state design + image (no DOM toggle);
+    // renderBoard() then repaints the board surface.
+    await applyDesignToState(saved);
     if (state.mode === 'board') renderBoard();
   }
-  const blob = await new Promise(res => out.toBlob(res, 'image/png'));
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'board.png';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
 export function bindBoard() {
