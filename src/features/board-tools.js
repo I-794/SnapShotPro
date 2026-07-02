@@ -4,7 +4,6 @@
 
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
-import { isTypingTarget } from '../utils/dom.js';
 
 export function screenToBoard(clientX, clientY) {
   const vp = el.canvasViewport.getBoundingClientRect();

@@ -10,12 +10,13 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
-import { hitTopBoardRef, resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
+import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
 import { getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
 let toolbar = null;     // .board-toolbar
+let spaceDown = false;   // true while Space is held (board pan). Hoisted to module scope so the card/empty-surface mousedown handlers can early-return and let the pan handler run.
 
 function nextId() { return Date.now() * 1000 + Math.floor(Math.random() * 1000); }
 
@@ -179,15 +180,6 @@ export function renderBoard() {
     if (imgSrc && img.src !== imgSrc) img.src = imgSrc;
     node.querySelector('.board-card-label').textContent = 'Page';
   }
-  // Resize handle on the sole-selected card.
-  surface.querySelectorAll('.board-card').forEach(n => {
-    const sel = state.boardSelection.length === 1 && state.boardSelection[0].id === Number(n.dataset.id);
-    let h = n.querySelector('.board-resize');
-    if (sel && !h) {
-      h = document.createElement('div'); h.className = 'board-resize'; n.appendChild(h);
-      h.addEventListener('mousedown', (e) => onResizeStart(e, n));
-    } else if (!sel && h) { h.remove(); }
-  });
   // Remove DOM cards whose object was deleted.
   surface.querySelectorAll('.board-card').forEach(n => {
     if (!seen.has(Number(n.dataset.id))) n.remove();
@@ -210,6 +202,9 @@ function bindCardEvents(node) {
   node.addEventListener('dblclick', (e) => { onCardDoubleClick(e, node); });
 }
 function onCardMouseDown(e, node) {
+  // Space is held: defer entirely to the viewport camera-pan handler (don't
+  // select/drag the card; don't stopPropagation, so the event bubbles up).
+  if (spaceDown) return;
   if (e.button !== 0) return;
   const id = Number(node.dataset.id);
   const ref = { kind: 'boardObject', id };
@@ -272,7 +267,17 @@ function onResizeStart(e, node) {
 function onCardDoubleClick(e, node) { /* Task 5 */ }
 function updateSelectionChrome() {
   surface.querySelectorAll('.board-card').forEach(n => {
-    n.classList.toggle('selected', state.boardSelection.some(r => r.id === Number(n.dataset.id)));
+    const sel = state.boardSelection.some(r => r.id === Number(n.dataset.id));
+    n.classList.toggle('selected', sel);
+    // Resize handle only on the SOLE-selected card. Reconciled here (not just
+    // in renderBoard) so a plain click that changes selection (which doesn't
+    // re-render) still adds/removes the handle.
+    const sole = sel && state.boardSelection.length === 1;
+    let h = n.querySelector('.board-resize');
+    if (sole && !h) {
+      h = document.createElement('div'); h.className = 'board-resize'; n.appendChild(h);
+      h.addEventListener('mousedown', (e) => onResizeStart(e, n));
+    } else if (!sole && h) { h.remove(); }
   });
 }
 
@@ -301,7 +306,7 @@ export function bindBoard() {
   }, { passive: false });
 
   // Space + drag, or middle-mouse, to pan. Track via module state.
-  let panning = false, sx = 0, sy = 0, ox = 0, oy = 0, spaceDown = false;
+  let panning = false, sx = 0, sy = 0, ox = 0, oy = 0;
 
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && state.mode === 'board' && !e.repeat) { spaceDown = true; viewport.classList.add('board-panning'); }
@@ -332,6 +337,7 @@ export function bindBoard() {
   // path where it does not).
   viewport.addEventListener('mousedown', (e) => {
     if (state.mode !== 'board' || e.button !== 0) return;
+    if (spaceDown) return;   // space-pan: don't clear selection, let the camera pan
     if (e.target.closest('.board-card') || e.target.closest('.board-toolbar')) return;
     clearBoardSelection(); updateSelectionChrome();
     startMarquee(e);

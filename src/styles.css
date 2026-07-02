@@ -1717,7 +1717,7 @@ kbd {
 
 /* v32 — board card resize handle (sole selection) */
 .board-resize {
-  position: absolute; right: -5px; bottom: -5px; width: 12px; height: 12px;
+  position: absolute; right: 4px; bottom: 4px; width: 12px; height: 12px;
   background: var(--accent-primary, #4f7cff); border: 2px solid #fff; border-radius: 50%;
-  cursor: nwse-resize;
+  cursor: nwse-resize; z-index: 5;
 }
