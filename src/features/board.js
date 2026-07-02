@@ -10,8 +10,8 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
-import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef } from './board-tools.js';
-import { getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
+import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
+import { pageCount, getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
 import { isTypingTarget } from '../utils/dom.js';
 
 let surface = null;     // .board-surface (camera-transformed)
@@ -366,9 +366,10 @@ function deleteBoardSelection() {
     if (!o) continue;
     if (o.kind === 'card') {
       const idx = indexOfPage(o.pageId);
-      // Remove the board object now (instant); deletePage removes the page and
-      // the onDocumentChange sync would also drop it, but this avoids a wait.
-      resolveBoardRef(ref)?.remove();
+      // Remove the board object now (instant) ONLY if the page is actually
+      // deletable (pages.js keeps >= 1 page). Otherwise deletePage no-ops and
+      // the card must stay, else it would vanish then pop back 200ms later.
+      if (pageCount() > 1) resolveBoardRef(ref)?.remove();
       if (idx >= 0) deletePage(idx);
     } else {
       resolveBoardRef(ref)?.remove();
