@@ -10,8 +10,9 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
-import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
-import { getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage } from './pages.js';
+import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef } from './board-tools.js';
+import { getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
+import { isTypingTarget } from '../utils/dom.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -319,14 +320,62 @@ function updateSelectionChrome() {
   });
 }
 
-// Minimal marquee stub: swallow the drag so it doesn't bubble. Full rubber-band
-// selection lands in Task 6.
+// v32 Task 6 — marquee rubber-band multi-select. The marquee box lives inside
+// the camera-transformed surface, so its left/top/width/height are in BOARD px;
+// we read them back with parseFloat (no getBoundingClientRect needed).
 function startMarquee(e) {
   const start = screenToBoard(e.clientX, e.clientY);
-  const onMove = () => {};
-  const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  const box = document.createElement('div');
+  box.className = 'board-marquee';
+  surface.appendChild(box);
+  const onMove = (ev) => {
+    const cur = screenToBoard(ev.clientX, ev.clientY);
+    const x = Math.min(start.x, cur.x), y = Math.min(start.y, cur.y);
+    const w = Math.abs(cur.x - start.x), h = Math.abs(cur.y - start.y);
+    box.style.left = x + 'px'; box.style.top = y + 'px';
+    box.style.width = w + 'px'; box.style.height = h + 'px';
+  };
+  const onUp = () => {
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    // Compute the marquee rect in board px from the DOM box (already in board
+    // coords because .board-marquee lives inside the camera-transformed surface).
+    const bx = parseFloat(box.style.left) || 0;
+    const by = parseFloat(box.style.top) || 0;
+    const bw = parseFloat(box.style.width) || 0;
+    const bh = parseFloat(box.style.height) || 0;
+    box.remove();
+    if (bw < 3 && bh < 3) { return; }   // a click, not a drag — keep the clear from the handler
+    const hits = state.board.objects.filter(o =>
+      (o.kind === 'card' || o.kind === 'text') &&
+      o.x < bx + bw && o.x + o.w > bx && o.y < by + bh && o.y + o.h > by
+    ).map(o => ({ kind: 'boardObject', id: o.id }));
+    state.boardSelection = hits;
+    updateSelectionChrome();
+  };
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
+}
+
+// v32 Task 6 — delete the current board selection. Cards remove their board
+// object now (instant) AND delete the underlying page; the onDocumentChange sync
+// would drop the card too, but resolving+removing first avoids the 200ms wait.
+function deleteBoardSelection() {
+  for (const ref of [...state.boardSelection]) {
+    const o = state.board.objects.find(x => x.id === ref.id);
+    if (!o) continue;
+    if (o.kind === 'card') {
+      const idx = indexOfPage(o.pageId);
+      // Remove the board object now (instant); deletePage removes the page and
+      // the onDocumentChange sync would also drop it, but this avoids a wait.
+      resolveBoardRef(ref)?.remove();
+      if (idx >= 0) deletePage(idx);
+    } else {
+      resolveBoardRef(ref)?.remove();
+    }
+  }
+  state.boardSelection = [];
+  renderBoard();
 }
 
 export function bindBoard() {
@@ -398,5 +447,14 @@ export function bindBoard() {
       ensureCards();
       renderBoard();
     }, 200);
+  });
+
+  // Delete/Backspace removes selected board objects (cards delete their page too).
+  window.addEventListener('keydown', (e) => {
+    if (state.mode !== 'board') return;
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !isTypingTarget(e.target) && state.boardSelection.length) {
+      e.preventDefault();
+      deleteBoardSelection();
+    }
   });
 }
