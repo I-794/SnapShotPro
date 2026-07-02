@@ -35,7 +35,7 @@ export function pageCount() { return pages.length; }
 export function getPageMeta() {
   return pages.map(p => {
     const c = (p.payload && p.payload.design && p.payload.design.canvas) || { width: 1280, height: 720 };
-    return { id: p.id, thumb: p.thumb, w: c.width, h: c.height };
+    return { id: p.id, thumb: p.thumb, w: c.width, h: c.height, payload: p.payload };
   });
 }
 

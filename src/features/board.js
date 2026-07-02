@@ -541,6 +541,79 @@ function deleteBoardSelection() {
   renderBoard();
 }
 
+// v32 Task 8 — composite board export to PNG. Re-renders every card's page
+// offscreen (applyDesignToState + renderInto, exactly as pages.js renderAllPages
+// does) at its board rect, plus text and arrows (NOT group bboxes — those are
+// editor chrome), onto one canvas, then downloads board.png. The live editor
+// state is saved (serializeFull) and restored (applyPayload) so the board is
+// unchanged after export. Dynamic imports avoid a static cycle with render.js
+// (board.js already dynamic-imports render elsewhere); board/mode are not in
+// PROJECT_FIELDS, so the per-card applyDesignToState leaves state.board/mode
+// untouched while the captured objs/cards refs stay valid.
+export async function exportBoard() {
+  if (state.mode !== 'board') return;
+  const objs = state.board.objects;
+  const cards = objs.filter(o => o.kind === 'card');
+  if (!cards.length) return;
+  // Composite bounds in board px.
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const o of objs) {
+    if (o.kind === 'card' || o.kind === 'text') {
+      minX = Math.min(minX, o.x); minY = Math.min(minY, o.y);
+      maxX = Math.max(maxX, o.x + o.w); maxY = Math.max(maxY, o.y + o.h);
+    }
+  }
+  const pad = 32;
+  const W = Math.ceil(maxX - minX) + pad * 2, H = Math.ceil(maxY - minY) + pad * 2;
+  const out = document.createElement('canvas'); out.width = W; out.height = H;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = '#0b0b0d'; ctx.fillRect(0, 0, W, H);
+
+  const { renderInto } = await import('../render/render.js');
+  const { applyDesignToState, applyPayload } = await import('./document.js');
+  const { serializeFull } = await import('../state/serialize.js');
+  const saved = serializeFull();
+  const savedMode = state.mode;
+  try {
+    const meta = getPageMeta();
+    for (const c of cards) {
+      const m = meta.find(p => p.id === c.pageId);
+      if (!m || !m.payload) continue;
+      await applyDesignToState(m.payload);
+      if (!state.image) continue;
+      const scene = document.createElement('canvas');
+      renderInto(scene, true);                 // renders at state.canvas size
+      ctx.drawImage(scene, c.x - minX + pad, c.y - minY + pad, c.w, c.h);
+      await new Promise(r => setTimeout(r, 0)); // yield so large boards don't freeze
+    }
+    for (const o of objs) {                     // text overlays
+      if (o.kind !== 'text') continue;
+      ctx.fillStyle = o.color || '#fff';
+      ctx.font = `${o.fontSize || 24}px Geist, system-ui, sans-serif`;
+      ctx.textBaseline = 'top';
+      ctx.fillText(o.text || '', o.x - minX + pad, o.y - minY + pad);
+    }
+    for (const a of objs) {                     // arrows
+      if (a.kind !== 'arrow') continue;
+      const f = objs.find(o => o.id === a.from), t = objs.find(o => o.id === a.to);
+      if (!f || !t) continue;
+      ctx.strokeStyle = a.color || '#4f7cff'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(f.x + f.w / 2 - minX + pad, f.y + f.h / 2 - minY + pad);
+      ctx.lineTo(t.x + t.w / 2 - minX + pad, t.y + t.h / 2 - minY + pad);
+      ctx.stroke();
+    }
+  } finally {
+    state.mode = savedMode;
+    applyPayload(saved);   // restore the live editor (decodes image, re-renders)
+    if (state.mode === 'board') renderBoard();
+  }
+  const blob = await new Promise(res => out.toBlob(res, 'image/png'));
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'board.png';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
 export function bindBoard() {
   ensureSurface();
   if (!viewport) return;
