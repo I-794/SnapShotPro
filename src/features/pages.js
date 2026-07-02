@@ -48,6 +48,12 @@ function syncActive() {
   pages[active].thumb = makeThumb() || pages[active].thumb;
 }
 
+// v32 — force-refresh the active page's payload + thumb now (no debounce), so
+// returning to the board sees the latest edits. Used by board.js returnToBoard.
+export function syncActivePage() {
+  syncActive();
+}
+
 // ── Document (de)serialization — what projects.js persists ───────────────────
 export function serializeDocument() {
   syncActive();

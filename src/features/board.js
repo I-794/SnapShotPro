@@ -11,7 +11,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
 import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
-import { getPageMeta, indexOfPage, onDocumentChange, switchTo } from './pages.js';
+import { getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -45,6 +45,7 @@ export function enterBoardMode() {
   ensureSurface();
   ensureCards();
   showBoardChrome(true);
+  if (_returnPill) _returnPill.style.display = 'none';
   // Hide the single-canvas wrapper + upload zone while on the board.
   if (el.canvasWrapper) el.canvasWrapper.style.display = 'none';
   if (el.uploadZone) el.uploadZone.style.display = 'none';
@@ -68,9 +69,11 @@ export function toggleBoardMode() {
 let _returnPill = null;
 
 export function returnToBoard() {
-  // Coming back from editing a card: switchTo already synced the active page's
-  // payload+thumb (pages.js switchTo -> syncActive). Just flip the view back.
+  // Coming back from editing a card: force-refresh the active page's thumb now
+  // (the onHistoryChange->renderFilmstrip->makeThumb chain is debounced 600ms,
+  // so without this a fast edit-then-return would show a stale card thumb).
   if (state.mode === 'board') return;
+  syncActivePage();
   state.mode = 'board';
   ensureCards();
   showBoardChrome(true);
@@ -292,8 +295,6 @@ function onCardDoubleClick(e, node) {
   const pageId = Number(node.dataset.pageId);
   const idx = indexOfPage(pageId);
   if (idx < 0) return;
-  // Remember which card we came from so returning to the board can refresh it.
-  _lastEditedPageId = pageId;
   switchTo(idx);
   state.mode = 'single';
   showBoardChrome(false);
@@ -302,7 +303,6 @@ function onCardDoubleClick(e, node) {
   if (_returnPill) _returnPill.style.display = '';
   import('../render/render.js').then(({ render }) => render());
 }
-let _lastEditedPageId = null;
 function updateSelectionChrome() {
   surface.querySelectorAll('.board-card').forEach(n => {
     const sel = state.boardSelection.some(r => r.id === Number(n.dataset.id));
