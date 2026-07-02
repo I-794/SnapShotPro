@@ -676,6 +676,12 @@ git commit -m "feat(v32): render pages as board cards with sync" -m "Co-Authored
 
 ## Task 4: Card selection, move, resize, raise/lower
 
+> **As-built (post-review, commits `41e67d5` + `813e371`):** this task shipped with four deviations from the snippets below, all forced by code review — later tasks must build on the *as-built* shape, not the snippets:
+> - `spaceDown` is a **module-scope** `let` (board.js ~line 19), not a `bindBoard()` closure. `onCardMouseDown` and the empty-surface mousedown handler each `if (spaceDown) return;` as their first guard so Space pans over cards (no select/drag, no `stopPropagation`).
+> - Resize-handle reconciliation lives in **`updateSelectionChrome()`** (adds to the sole selection, removes otherwise), NOT inline in `renderBoard()`. `renderBoard()` still calls `updateSelectionChrome()` at its end. So a plain click (no re-render) syncs the handle.
+> - `.board-resize` CSS is `right:4px; bottom:4px; z-index:5;` (fully inside the card) — NOT `right:-5px; bottom:-5px` (which `overflow:hidden` + `border-radius` clipped to a sliver).
+> - `hitTopBoardRef` is exported from `board-tools.js` for Task 6 but NOT imported into `board.js` yet; `isTypingTarget` is not imported into `board-tools.js`.
+
 **Files:**
 - Modify: `src/features/board.js` (`onCardMouseDown`, marquee on empty, `resolveBoardRef` usage)
 - Modify: `src/features/board-tools.js` (`hitTopBoardRef`, `resolveBoardRef`)
