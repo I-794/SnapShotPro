@@ -9,6 +9,7 @@
 
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
+import { screenToBoard, clampZoom } from './board-tools.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -69,7 +70,6 @@ function ensureSurface() {
   viewport.appendChild(surface);
 }
 
-// Camera (Task 2 fills pan/zoom; here just a stub transform + label).
 function applyCamera() {
   if (!surface) return;
   const { x, y, zoom } = state.board.camera;
@@ -78,11 +78,45 @@ function applyCamera() {
   if (label) label.textContent = Math.round(zoom * 100) + '%';
 }
 
-export function fitBoard() {
-  state.board.camera = { x: 0, y: 0, zoom: 1 };
+// Zoom keeping the world point under the cursor fixed.
+function zoomAt(clientX, clientY, factor) {
+  const vp = el.canvasViewport.getBoundingClientRect();
+  const { x, y, zoom } = state.board.camera;
+  const newZoom = clampZoom(zoom * factor);
+  const ax = clientX - vp.left, ay = clientY - vp.top;
+  // World point under cursor: (ax - x)/zoom. Keep it fixed after zoom.
+  const wx = (ax - x) / zoom, wy = (ay - y) / zoom;
+  state.board.camera.zoom = newZoom;
+  state.board.camera.x = ax - wx * newZoom;
+  state.board.camera.y = ay - wy * newZoom;
   applyCamera();
 }
-export function resetBoard() { fitBoard(); }
+
+// fitBoard() fits to content bounds; Task 3 sets contentBounds(). Until cards
+// exist, fit = reset to origin/100%.
+function contentBounds() {
+  const objs = state.board.objects.filter(o => o.kind === 'card' || o.kind === 'text');
+  if (!objs.length) return null;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const o of objs) {
+    minX = Math.min(minX, o.x); minY = Math.min(minY, o.y);
+    maxX = Math.max(maxX, o.x + o.w); maxY = Math.max(maxY, o.y + o.h);
+  }
+  return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+}
+
+export function fitBoard() {
+  const vp = el.canvasViewport.getBoundingClientRect();
+  const b = contentBounds();
+  if (!b || !b.w || !b.h) { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); return; }
+  const pad = 80;
+  const zoom = clampZoom(Math.min((vp.width - pad * 2) / b.w, (vp.height - pad * 2) / b.h));
+  state.board.camera.zoom = zoom;
+  state.board.camera.x = (vp.width - b.w * zoom) / 2 - b.x * zoom + pad;
+  state.board.camera.y = (vp.height - b.h * zoom) / 2 - b.y * zoom + pad;
+  applyCamera();
+}
+export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); }
 
 // Task 1 stub: show an empty-state hint. Task 3 replaces this with card layout.
 export function renderBoard() {
@@ -101,7 +135,42 @@ export function renderBoard() {
 }
 
 export function bindBoard() {
-  // Task 2 wires camera input here. Task 1 only ensures the surface exists and
-  // the toggle command (added in palette.js) can reach enterBoardMode.
   ensureSurface();
+  if (!viewport) return;
+
+  // Wheel zoom (no modifier needed on the board; Cmd/Ctrl also works).
+  // Board-mode only: in single mode, defer to zoom-pan.js (Ctrl/Cmd+wheel) and
+  // leave plain wheel/page-scroll untouched.
+  viewport.addEventListener('wheel', (e) => {
+    if (state.mode !== 'board') return;
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+    zoomAt(e.clientX, e.clientY, factor);
+  }, { passive: false });
+
+  // Space + drag, or middle-mouse, to pan. Track via module state.
+  let panning = false, sx = 0, sy = 0, ox = 0, oy = 0, spaceDown = false;
+
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && state.mode === 'board' && !e.repeat) { spaceDown = true; viewport.classList.add('board-panning'); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') { spaceDown = false; viewport.classList.remove('board-panning'); }
+  });
+
+  viewport.addEventListener('mousedown', (e) => {
+    if (state.mode !== 'board') return;
+    const pan = spaceDown || e.button === 1;
+    if (!pan) return;
+    e.preventDefault();
+    panning = true; sx = e.clientX; sy = e.clientY;
+    ox = state.board.camera.x; oy = state.board.camera.y;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!panning) return;
+    state.board.camera.x = ox + (e.clientX - sx);
+    state.board.camera.y = oy + (e.clientY - sy);
+    applyCamera();
+  });
+  window.addEventListener('mouseup', () => { panning = false; });
 }

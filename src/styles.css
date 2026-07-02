@@ -1698,3 +1698,8 @@ kbd {
 }
 .board-toolbar button:hover { background: var(--border-color, #2a2a32); }
 .board-zoom-label { color: var(--text-secondary, #8a8a92); font-size: 12px; padding: 0 4px; }
+
+/* v32 — board camera panning cursor + compositor hint */
+.canvas-viewport.board-panning { cursor: grab; }
+.canvas-viewport.board-panning:active { cursor: grabbing; }
+.board-surface { will-change: transform; }
