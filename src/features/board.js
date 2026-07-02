@@ -546,7 +546,9 @@ function deleteBoardSelection() {
 // offscreen (applyDesignToState + renderInto, exactly as pages.js renderAllPages
 // does) at its board rect, plus text and arrows (NOT group bboxes — those are
 // editor chrome), onto one canvas, then downloads board.png. The live editor
-// state is saved (serializeFull) and restored (applyPayload) so the board is
+// state is saved (serializeFull) and restored (applyDesignToState, NOT
+// applyPayload — that calls showCanvasUI and would un-hide #canvas-wrapper in
+// board mode) so the board is
 // unchanged after export. Dynamic imports avoid a static cycle with render.js
 // (board.js already dynamic-imports render elsewhere); board/mode are not in
 // PROJECT_FIELDS, so the per-card applyDesignToState leaves state.board/mode
