@@ -502,8 +502,7 @@ export function indexOfPage(id) {
 In `src/features/board.js`, add a helper that seeds `state.board.objects` from the current pages if the board is empty. Add near the top (after imports):
 
 ```js
-import { pageCount, getPageMeta, indexOfPage } from './pages.js';
-import { onDocumentChange } from './pages.js';
+import { getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
 ```
 
 Add the seeder + a default-grid layout:
@@ -633,16 +632,10 @@ In `bindBoard()`, subscribe to document changes (debounced, like the filmstrip d
       const liveIds = new Set(getPageMeta().map(m => m.id));
       // Remove cards whose page was deleted.
       state.board.objects = state.board.objects.filter(o => o.kind !== 'card' || liveIds.has(o.pageId));
-      // Add a card for any new page that lacks one.
-      const have = new Set(state.board.objects.filter(o => o.kind === 'card').map(o => o.pageId));
-      let row = 0, col = 0;
-      for (const p of getPageMeta()) {
-        if (have.has(p.id)) continue;
-        const ar = p.w && p.h ? p.h / p.w : 0.625;
-        state.board.objects.push({ id: nextId(), kind: 'card', pageId: p.id,
-          x: 60 + col * 304, y: 60 + row * (280 * ar + 52), w: 280, h: Math.round(280 * ar), z: state.board.objects.length });
-        col = (col + 1) % 4; if (col === 0) row++;
-      }
+      // Add a card for any new page that lacks one. ensureCards() skips pages
+      // that already have a card (advancing the grid cursor) and places new
+      // cards at the next free cell, instead of stacking them on (60,60).
+      ensureCards();
       renderBoard();
     }, 200);
   });
