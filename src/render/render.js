@@ -20,6 +20,7 @@ import { isDeviceMockup3d, render3dMockup } from './mockups-3d.js';
 import { bakePerspective } from './perspective.js';
 import { isSurfaceMockup, drawSurfaceMockup } from './surfaces.js';
 import { renderSetPreview } from '../features/screenshot-set.js';
+import { renderBoard } from '../features/board.js';
 import { drawGuides } from '../features/snapping.js';
 import { drawReflection } from './reflection.js';
 import { withLayer } from './blend.js';
@@ -37,6 +38,13 @@ export function render(forExport) {
   // (background + caption band) previews even before a screenshot is loaded.
   if (!forExport && state.mode === 'set' && state.screenshotSet && state.screenshotSet.panels.length) {
     renderSetPreview();
+    return;
+  }
+  // v32 — Board mode owns the preview: it lays out page cards on a pan/zoom
+  // surface instead of rendering one scene. Routed before the no-image guard so
+  // the board (and its empty state) previews even with no image loaded.
+  if (!forExport && state.mode === 'board') {
+    renderBoard();
     return;
   }
   renderInto(el.previewCanvas, forExport);

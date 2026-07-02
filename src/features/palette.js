@@ -27,6 +27,7 @@ import { openCodeStudio } from './code-snippet.js';
 import { toggleTourMode } from './tours.js';
 import { previewTour, exportTour } from './tour-export.js';
 import { addPage } from './pages.js';
+import { toggleBoardMode } from './board.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
@@ -63,7 +64,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight') return 'View';
+      id === 'toggle-spotlight' || id === 'toggleBoard') return 'View';
   return 'More';
 }
 
@@ -89,6 +90,9 @@ export function registerCommands() {
     { id: 'zoom-out',         label: 'Zoom out',              icon: '🔍', run: () => setZoom(state.view.zoom / 1.2) },
     { id: 'zoom-fit',         label: 'Fit to screen',         icon: '⌧',  run: fitZoom },
     { id: 'toggle-layers',    label: 'Toggle Layers Panel',   icon: '☰',  run: toggleLayersPanel },
+    { id: 'toggleBoard', label: 'Toggle Board view', icon: 'grid', group: 'View',
+      run: toggleBoardMode, keys: 'Shift+B',
+      when: () => true },
     { id: 'reset-tilt',       label: 'Reset 3D Tilt',         icon: '⟲',  run: resetTilt },
     { id: 'tilt-iso',         label: 'Tilt: Isometric',       icon: '◆',  run: () => applyTiltPreset('iso') },
     { id: 'tilt-lean',        label: 'Tilt: Lean',            icon: '◆',  run: () => applyTiltPreset('lean') },

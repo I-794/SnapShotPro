@@ -55,6 +55,7 @@ import { bindCloudSync } from './features/cloud-sync.js';
 import { bindProjects } from './features/projects.js';
 import { bindCampaigns } from './features/campaigns.js';
 import { bindPages } from './features/pages.js';
+import { bindBoard } from './features/board.js';
 import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
 import { bindCrop } from './features/crop.js';
@@ -153,6 +154,7 @@ function init() {
   bindAuth();
   bindCloudSync();
   bindPages();
+  bindBoard();     // v32 — Open Canvas board surface
   bindTours();
   bindProjects();
   bindCampaigns();

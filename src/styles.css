@@ -1674,3 +1674,28 @@ kbd {
 .sidebar-section.collapsed .section-title::after { transform: rotate(-45deg); }
 .sidebar-section.collapsed > *:not(.section-title) { display: none; }
 @media (prefers-reduced-motion: reduce) { .section-title::after { transition: none; } }
+
+/* v32 — Open Canvas board surface */
+.board-surface {
+  position: absolute; inset: 0; transform-origin: 0 0;
+  pointer-events: none;            /* children re-enable pointer events */
+}
+.board-surface .board-card,
+.board-surface .board-text,
+.board-surface .board-empty { pointer-events: auto; }
+.board-empty {
+  position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
+  color: var(--text-muted, #8a8a92); font-size: 14px; pointer-events: none;
+}
+.board-toolbar {
+  position: absolute; top: 12px; left: 12px; z-index: 20; display: none;
+  gap: 6px; align-items: center;
+  background: var(--panel, #15151a); border: 1px solid var(--border, #2a2a32);
+  border-radius: 8px; padding: 6px;
+}
+.board-toolbar button {
+  background: transparent; color: var(--text, #e6e6ec); border: none;
+  padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+.board-toolbar button:hover { background: var(--border, #2a2a32); }
+.board-zoom-label { color: var(--text-muted, #8a8a92); font-size: 12px; padding: 0 4px; }

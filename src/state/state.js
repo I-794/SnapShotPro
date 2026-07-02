@@ -175,12 +175,21 @@ export const state = {
   // for free. See src/features/merge-studio.js.
   mergeStudio: { columns: [], rows: [] },
 
+  // v32 — Open Canvas: the infinite board. Document-level (one layout for the
+  // whole document, sibling to pages/active). NOT snapshotted: board spatial
+  // edits are document ops like addPage/deletePage, not per-design undo. A
+  // `card` object refs a pages[i].id; the scene payload still lives in
+  // pages[i].payload (unchanged). `camera` is runtime-only pan/zoom.
+  board: {
+    objects: [],   // { id, kind:'card'|'text'|'arrow'|'group', x, y, w, h, z, ... }
+    camera: { x: 0, y: 0, zoom: 1 }
+  },
+  boardSelection: [],   // runtime-only array of { kind:'boardObject', id }
+
   // v9 — App Store screenshot sets + batch.
-  // mode: 'single' (normal editor) | 'set' (one design → N captioned store
-  // panels) | 'batch' (one template → N uploaded images → ZIP) | 'tour' (v25 —
-  // Interactive Tour authoring: the page sequence becomes clickable steps and a
-  // hotspot-authoring overlay appears on the canvas). 'tour' is a transient UI
-  // mode, not serialized; the per-step hotspots live in `tour` below.
+  // mode: 'single' | 'set' | 'batch' | 'tour' | 'board' (v32 — Open Canvas:
+  // pages laid out as cards on a pan/zoom surface). 'board' is a view mode; the
+  // board layout is document-level (state.board), not serialized per-design.
   mode: 'single',
   screenshotSet: {
     preset: 'ios-6.7',
