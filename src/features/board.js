@@ -9,7 +9,6 @@
 
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
-import { pageCount } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
 let viewport = null;    // #canvas-viewport
@@ -21,8 +20,7 @@ export function enterBoardMode() {
   showBoardChrome(true);
   // Hide the single-canvas wrapper + upload zone while on the board.
   if (el.canvasWrapper) el.canvasWrapper.style.display = 'none';
-  const uz = document.getElementById('upload-zone');
-  if (uz) uz.style.display = 'none';
+  if (el.uploadZone) el.uploadZone.style.display = 'none';
   renderBoard();
 }
 
@@ -30,7 +28,7 @@ export function exitBoardMode() {
   state.mode = 'single';
   showBoardChrome(false);
   if (el.canvasWrapper) el.canvasWrapper.style.display = '';
-  renderBoard();   // no-op when not in board mode; re-render single below
+  if (el.uploadZone) el.uploadZone.style.display = '';
   // Re-render the single-canvas scene.
   import('../render/render.js').then(({ render }) => render());
 }
@@ -41,8 +39,8 @@ export function toggleBoardMode() {
 }
 
 function showBoardChrome(on) {
-  if (surface) surface.style.display = on ? '' : 'none';
-  if (toolbar) toolbar.style.display = on ? '' : 'none';
+  if (surface) surface.style.display = on ? 'block' : 'none';
+  if (toolbar) toolbar.style.display = on ? 'flex' : 'none';
 }
 
 // Build the board DOM once (surface + SVG overlay + toolbar). Mounted inside
@@ -95,7 +93,7 @@ export function renderBoard() {
   if (!surface.querySelector('.board-empty')) {
     const empty = document.createElement('div');
     empty.className = 'board-empty';
-    empty.textContent = pageCount()
+    empty.textContent = state.image
       ? 'Board mode — cards arrive in Task 3.'
       : 'Upload a screenshot, then open the Board.';
     surface.appendChild(empty);

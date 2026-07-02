@@ -187,9 +187,13 @@ export const state = {
   boardSelection: [],   // runtime-only array of { kind:'boardObject', id }
 
   // v9 — App Store screenshot sets + batch.
-  // mode: 'single' | 'set' | 'batch' | 'tour' | 'board' (v32 — Open Canvas:
-  // pages laid out as cards on a pan/zoom surface). 'board' is a view mode; the
-  // board layout is document-level (state.board), not serialized per-design.
+  // mode: 'single' (normal editor) | 'set' (one design → N captioned store
+  // panels) | 'batch' (one template → N uploaded images → ZIP) | 'tour' (v25 —
+  // Interactive Tour authoring: the page sequence becomes clickable steps and a
+  // hotspot-authoring overlay appears on the canvas; 'tour' is a transient UI
+  // mode, not serialized; the per-step hotspots live in `tour` below) | 'board'
+  // (v32 — Open Canvas: pages laid out as cards on a pan/zoom surface; the
+  // board layout is document-level state.board, not serialized per-design).
   mode: 'single',
   screenshotSet: {
     preset: 'ios-6.7',
