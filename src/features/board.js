@@ -10,6 +10,7 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
+import { hitTopBoardRef, resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef } from './board-tools.js';
 import { getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
 
 let surface = null;     // .board-surface (camera-transformed)
@@ -178,6 +179,15 @@ export function renderBoard() {
     if (imgSrc && img.src !== imgSrc) img.src = imgSrc;
     node.querySelector('.board-card-label').textContent = 'Page';
   }
+  // Resize handle on the sole-selected card.
+  surface.querySelectorAll('.board-card').forEach(n => {
+    const sel = state.boardSelection.length === 1 && state.boardSelection[0].id === Number(n.dataset.id);
+    let h = n.querySelector('.board-resize');
+    if (sel && !h) {
+      h = document.createElement('div'); h.className = 'board-resize'; n.appendChild(h);
+      h.addEventListener('mousedown', (e) => onResizeStart(e, n));
+    } else if (!sel && h) { h.remove(); }
+  });
   // Remove DOM cards whose object was deleted.
   surface.querySelectorAll('.board-card').forEach(n => {
     if (!seen.has(Number(n.dataset.id))) n.remove();
@@ -199,12 +209,81 @@ function bindCardEvents(node) {
   node.addEventListener('mousedown', (e) => { onCardMouseDown(e, node); });
   node.addEventListener('dblclick', (e) => { onCardDoubleClick(e, node); });
 }
-function onCardMouseDown(e, node) { /* Task 4 */ }
+function onCardMouseDown(e, node) {
+  if (e.button !== 0) return;
+  const id = Number(node.dataset.id);
+  const ref = { kind: 'boardObject', id };
+  if (e.shiftKey) toggleBoardRef(ref);
+  else if (!state.boardSelection.some(r => r.id === id)) selectBoardOnly(ref);
+  // If this card isn't in the (possibly shift-toggled) selection, don't move.
+  if (!state.boardSelection.some(r => r.id === id)) { updateSelectionChrome(); return; }
+  updateSelectionChrome();
+
+  // Drag-move the whole selection (board-px deltas). Task 7 extracts this into
+  // a reusable dragSelection() that works for text + groups too.
+  const start = screenToBoard(e.clientX, e.clientY);
+  const origs = state.boardSelection.map(r => {
+    const o = state.board.objects.find(x => x.id === r.id);
+    return { id: r.id, x: o.x, y: o.y };
+  });
+  let moved = false;
+  const onMove = (ev) => {
+    const cur = screenToBoard(ev.clientX, ev.clientY);
+    const dx = cur.x - start.x, dy = cur.y - start.y;
+    moved = true;
+    for (const or of origs) { const o = state.board.objects.find(x => x.id === or.id); if (o) { o.x = or.x + dx; o.y = or.y + dy; } }
+    renderBoard();
+  };
+  const onUp = () => {
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    if (moved) raiseLatestToTop();
+  };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  e.stopPropagation();
+}
+
+function raiseLatestToTop() {
+  const sel = state.boardSelection;
+  if (!sel.length) return;
+  resolveBoardRef(sel[sel.length - 1])?.raiseToFront();
+  renderBoard();
+}
+
+function onResizeStart(e, node) {
+  e.stopPropagation(); e.preventDefault();
+  const id = Number(node.dataset.id);
+  const o = state.board.objects.find(x => x.id === id);
+  if (!o) return;
+  const start = screenToBoard(e.clientX, e.clientY);
+  const ow = o.w, oh = o.h, oar = ow / oh;
+  const onMove = (ev) => {
+    const cur = screenToBoard(ev.clientX, ev.clientY);
+    // Bottom-right handle: width follows cursor, height preserves aspect.
+    o.w = Math.max(80, ow + (cur.x - start.x));
+    o.h = Math.round(o.w / oar);
+    renderBoard();
+  };
+  const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+}
 function onCardDoubleClick(e, node) { /* Task 5 */ }
 function updateSelectionChrome() {
   surface.querySelectorAll('.board-card').forEach(n => {
     n.classList.toggle('selected', state.boardSelection.some(r => r.id === Number(n.dataset.id)));
   });
+}
+
+// Minimal marquee stub: swallow the drag so it doesn't bubble. Full rubber-band
+// selection lands in Task 6.
+function startMarquee(e) {
+  const start = screenToBoard(e.clientX, e.clientY);
+  const onMove = () => {};
+  const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
 }
 
 export function bindBoard() {
@@ -246,6 +325,17 @@ export function bindBoard() {
     applyCamera();
   });
   window.addEventListener('mouseup', () => { panning = false; });
+
+  // Empty-surface click: clear selection + (Task 6) marquee. Cards/toolbar are
+  // excluded so clicks on them keep their own handlers (the card handler calls
+  // stopPropagation, but this guard is belt-and-suspenders for the early-return
+  // path where it does not).
+  viewport.addEventListener('mousedown', (e) => {
+    if (state.mode !== 'board' || e.button !== 0) return;
+    if (e.target.closest('.board-card') || e.target.closest('.board-toolbar')) return;
+    clearBoardSelection(); updateSelectionChrome();
+    startMarquee(e);
+  });
 
   // Add/remove board cards when pages are added/deleted (keep cards whose page
   // still exists; drop cards whose page is gone; new pages get a card on next

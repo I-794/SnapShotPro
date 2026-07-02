@@ -1714,3 +1714,10 @@ kbd {
 .board-card-label { height: 22px; font-size: 11px; color: var(--text-secondary, #8a8a92);
   display: flex; align-items: center; padding: 0 8px; border-top: 1px solid var(--border-color, #2a2a32); }
 .board-card.selected { outline: 2px solid var(--accent-primary, #4f7cff); outline-offset: 2px; }
+
+/* v32 — board card resize handle (sole selection) */
+.board-resize {
+  position: absolute; right: -5px; bottom: -5px; width: 12px; height: 12px;
+  background: var(--accent-primary, #4f7cff); border: 2px solid #fff; border-radius: 50%;
+  cursor: nwse-resize;
+}
