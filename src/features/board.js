@@ -10,7 +10,7 @@
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
-import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef } from './board-tools.js';
+import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef, groupBounds } from './board-tools.js';
 import { pageCount, getPageMeta, indexOfPage, onDocumentChange, switchTo, syncActivePage, deletePage } from './pages.js';
 import { isTypingTarget } from '../utils/dom.js';
 
@@ -181,7 +181,10 @@ export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; app
 
 // v32 Task 7 — add a text node, selected ready to drag/edit.
 export function addBoardText() {
-  const o = { id: nextId(), kind: 'text', x: 120, y: 120, w: 240, h: 40,
+  const vp = el.canvasViewport.getBoundingClientRect();
+  const center = screenToBoard(vp.left + vp.width / 2, vp.top + vp.height / 2);
+  const o = { id: nextId(), kind: 'text',
+    x: Math.round(center.x - 120), y: Math.round(center.y - 20), w: 240, h: 40,
     text: 'Label', fontSize: 24, color: '#ffffff', z: state.board.objects.length };
   state.board.objects.push(o);
   selectBoardOnly({ kind: 'boardObject', id: o.id });
@@ -230,7 +233,14 @@ function groupSelected() {
 // group's moveBy translates its children). Extracted from onCardMouseDown.
 function dragSelection(e) {
   const start = screenToBoard(e.clientX, e.clientY);
-  const origs = state.boardSelection.map(r => {
+  // Drop refs that are children of a selected group — the group's moveBy already
+  // translates them, so including them would double-move the child.
+  const groupIds = new Set(state.boardSelection.map(r => r.id));
+  const childOfSelectedGroup = (id) => state.board.objects.some(
+    o => o.kind === 'group' && groupIds.has(o.id) && o.children.includes(id)
+  );
+  const refs = state.boardSelection.filter(r => !childOfSelectedGroup(r.id));
+  const origs = refs.map(r => {
     const h = resolveBoardRef(r);
     return { ref: r, box: h ? { ...h.box } : null };
   });
@@ -357,6 +367,22 @@ export function renderBoard() {
       const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       p.setAttribute('d', 'M0,0 L8,4 L0,8 z'); p.setAttribute('fill', '#4f7cff');
       m.appendChild(p); svg.appendChild(m);
+    }
+    // Group bounding boxes (drawn always so groups are findable; brighter when selected).
+    const groups = state.board.objects.filter(o => o.kind === 'group');
+    for (const g of groups) {
+      const b = groupBounds(g);
+      if (!b.w || !b.h) continue;
+      const isSel = state.boardSelection.some(r => r.id === g.id);
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', b.x); rect.setAttribute('y', b.y);
+      rect.setAttribute('width', b.w); rect.setAttribute('height', b.h);
+      rect.setAttribute('fill', 'none');
+      rect.setAttribute('stroke', isSel ? 'var(--accent-primary, #4f7cff)' : 'rgba(154,156,168,0.5)');
+      rect.setAttribute('stroke-width', isSel ? '2' : '1.5');
+      rect.setAttribute('stroke-dasharray', '6 4');
+      rect.setAttribute('rx', '8');
+      svg.appendChild(rect);
     }
   }
 
@@ -503,6 +529,14 @@ function deleteBoardSelection() {
       resolveBoardRef(ref)?.remove();
     }
   }
+  // Prune stale ids left in groups' children and arrows' from/to by the deletions above.
+  const liveIds = new Set(state.board.objects.map(o => o.id));
+  for (const o of state.board.objects) {
+    if (o.kind === 'group') o.children = o.children.filter(cid => liveIds.has(cid));
+  }
+  state.board.objects = state.board.objects.filter(o =>
+    o.kind !== 'arrow' || (liveIds.has(o.from) && liveIds.has(o.to))
+  );
   state.boardSelection = [];
   renderBoard();
 }
@@ -594,6 +628,19 @@ export function bindBoard() {
       }
     }
     // else: truly empty surface — let it bubble to the viewport marquee/clear handler.
+  });
+
+  // Double-click a text node to edit its content (delegated, since text nodes are
+  // created dynamically and have no per-node listener).
+  surface.addEventListener('dblclick', (e) => {
+    if (state.mode !== 'board') return;
+    const textNode = e.target.closest('.board-text');
+    if (!textNode) return;
+    const id = Number(textNode.dataset.id);
+    const o = state.board.objects.find(x => x.id === id);
+    if (!o || o.kind !== 'text') return;
+    const next = window.prompt('Text', o.text || '');
+    if (next != null) { o.text = next; renderBoard(); }
   });
 
   // Add/remove board cards when pages are added/deleted (keep cards whose page
