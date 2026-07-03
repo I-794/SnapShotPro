@@ -16,7 +16,7 @@ import { onHistoryChange } from '../state/history.js';
 import { serializeFull } from '../state/serialize.js';
 import { applyPayload, applyDesignToState, makeThumb, uid } from './document.js';
 
-const DOC_VERSION = 13;
+const DOC_VERSION = 14;
 
 // pages: [{ id, payload, thumb }]. `active` indexes the live page; its payload
 // is refreshed lazily (on switch / serialize / export) from global state.
@@ -30,31 +30,80 @@ function emitChange() { changeListeners.forEach(fn => { try { fn(); } catch (e) 
 
 export function pageCount() { return pages.length; }
 
+// v32 — board accessors. The board enumerates pages as cards and resolves a
+// card's pageId back to an index for switchTo().
+export function getPageMeta() {
+  return pages.map(p => {
+    const c = (p.payload && p.payload.design && p.payload.design.canvas) || { width: 1280, height: 720 };
+    return { id: p.id, thumb: p.thumb, w: c.width, h: c.height, payload: p.payload };
+  });
+}
+
+export function indexOfPage(id) {
+  return pages.findIndex(p => p.id === id);
+}
+
 function syncActive() {
   pages[active].payload = serializeFull();
   pages[active].thumb = makeThumb() || pages[active].thumb;
 }
 
+// v32 — force-refresh the active page's payload + thumb now (no debounce), so
+// returning to the board sees the latest edits. Used by board.js returnToBoard.
+export function syncActivePage() {
+  syncActive();
+}
+
 // ── Document (de)serialization — what projects.js persists ───────────────────
+// v32 — schema 14 migration: wrap a pre-v32 document (no board) with a default
+// board layout. One page -> one centered card; many pages -> a default grid.
+// `card` objects ref pages[i].id. Camera reset to origin/100%.
+export function migrateBoardV14(doc) {
+  if (!doc) return doc;
+  if (doc.board && Array.isArray(doc.board.objects)) {
+    // ensure camera exists
+    if (!doc.board.camera) doc.board.camera = { x: 0, y: 0, zoom: 1 };
+    return doc;
+  }
+  const ps = doc.pages || [];
+  const colW = 280, gap = 24, cols = 4;
+  const objects = [];
+  let row = 0, col = 0;
+  for (const p of ps) {
+    const c = (p.payload && p.payload.design && p.payload.design.canvas) || { width: 1280, height: 720 };
+    const ar = c.h / c.w;
+    const w = colW, h = Math.round(colW * ar);
+    objects.push({ id: uid(), kind: 'card', pageId: p.id, x: 60 + col * (colW + gap), y: 60 + row * (h + gap + 28), w, h, z: objects.length });
+    col = (col + 1) % cols; if (col === 0) row++;
+  }
+  doc.board = { objects, camera: { x: 0, y: 0, zoom: 1 } };
+  return doc;
+}
+
 export function serializeDocument() {
   syncActive();
   return {
     docVersion: DOC_VERSION,
     active,
-    pages: pages.map(p => ({ id: p.id, payload: p.payload, thumb: p.thumb }))
+    pages: pages.map(p => ({ id: p.id, payload: p.payload, thumb: p.thumb })),
+    board: { objects: JSON.parse(JSON.stringify(state.board.objects)), camera: { ...state.board.camera } }
   };
 }
 
-// Accept a v13 document, or a bare v12 single-page payload, and load it.
+// Accept a v14 document (or a bare v12 single-page payload) and load it.
 export function applyDocument(doc) {
   let d = doc;
   if (!d || !Array.isArray(d.pages)) {
     // Legacy v12 project payload (a single serializeFull envelope).
     d = { docVersion: DOC_VERSION, active: 0, pages: [{ id: uid(), payload: doc, thumb: null }] };
   }
+  d = migrateBoardV14(d);
   pages = d.pages.map(p => ({ id: p.id || uid(), payload: p.payload, thumb: p.thumb || null }));
   if (!pages.length) pages = [{ id: uid(), payload: serializeFull(), thumb: null }];
   active = Math.min(Math.max(0, d.active | 0), pages.length - 1);
+  state.board = d.board || { objects: [], camera: { x: 0, y: 0, zoom: 1 } };
+  if (!state.board.camera) state.board.camera = { x: 0, y: 0, zoom: 1 };
+  state.boardSelection = [];
   applyPayload(pages[active].payload);
   renderFilmstrip();
 }

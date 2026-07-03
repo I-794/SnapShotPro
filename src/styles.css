@@ -1674,3 +1674,72 @@ kbd {
 .sidebar-section.collapsed .section-title::after { transform: rotate(-45deg); }
 .sidebar-section.collapsed > *:not(.section-title) { display: none; }
 @media (prefers-reduced-motion: reduce) { .section-title::after { transition: none; } }
+
+/* v32 — Open Canvas board surface */
+.board-surface {
+  position: absolute; inset: 0; transform-origin: 0 0;
+  pointer-events: none;            /* children re-enable pointer events */
+}
+.board-surface .board-card,
+.board-surface .board-text { pointer-events: auto; }
+.board-empty {
+  position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
+  color: var(--text-secondary, #8a8a92); font-size: 14px; pointer-events: none;
+}
+.board-toolbar {
+  position: absolute; top: 12px; left: 12px; z-index: 20; display: none;
+  gap: 6px; align-items: center;
+  background: var(--bg-elevated, #15151a); border: 1px solid var(--border-color, #2a2a32);
+  border-radius: 8px; padding: 6px;
+}
+.board-toolbar button {
+  background: transparent; color: var(--text-primary, #e6e6ec); border: none;
+  padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+.board-toolbar button:hover { background: var(--border-color, #2a2a32); }
+.board-zoom-label { color: var(--text-secondary, #8a8a92); font-size: 12px; padding: 0 4px; }
+
+/* v32 — board camera panning cursor + compositor hint */
+.canvas-viewport.board-panning { cursor: grab; }
+.canvas-viewport.board-panning:active { cursor: grabbing; }
+.board-surface { will-change: transform; }
+
+/* v32 — board cards (pages laid out on the canvas) */
+.board-card {
+  position: absolute; background: var(--bg-elevated, #15151a);
+  border: 1px solid var(--border-color, #2a2a32); border-radius: 10px;
+  overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.board-card-img { width: 100%; height: calc(100% - 22px); object-fit: contain; background: #000; display: block; }
+.board-card-label { height: 22px; font-size: 11px; color: var(--text-secondary, #8a8a92);
+  display: flex; align-items: center; padding: 0 8px; border-top: 1px solid var(--border-color, #2a2a32); }
+.board-card.selected { outline: 2px solid var(--accent-primary, #4f7cff); outline-offset: 2px; }
+
+/* v32 — board card resize handle (sole selection) */
+.board-resize {
+  position: absolute; right: 4px; bottom: 4px; width: 12px; height: 12px;
+  background: var(--accent-primary, #4f7cff); border: 2px solid #fff; border-radius: 50%;
+  cursor: nwse-resize; z-index: 5;
+}
+
+/* v32 — "Back to board" return pill (editor -> board after editing a card) */
+.board-return-pill {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 30;
+  background: var(--accent-primary, #4f7cff); color: #fff; border: none;
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* v32 Task 6 — marquee rubber-band selection box (lives inside the
+   camera-transformed surface, so its px are board coordinates) */
+.board-marquee {
+  position: absolute; border: 1px solid var(--accent-primary, #4f7cff);
+  background: rgba(79,124,255,0.12); pointer-events: none;
+}
+
+/* v32 Task 7 — board text nodes + SVG connector overlay */
+.board-text { position: absolute; pointer-events: auto; cursor: move; white-space: pre-wrap;
+  font-family: Geist, system-ui, sans-serif; line-height: 1.2; }
+.board-text.selected { outline: 1px dashed var(--accent-primary, #4f7cff); outline-offset: 2px; }
+.board-connectors { position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: visible; pointer-events: none; }

@@ -387,8 +387,12 @@ export function fitBoard() {
   const pad = 80;
   const zoom = clampZoom(Math.min((vp.width - pad * 2) / b.w, (vp.height - pad * 2) / b.h));
   state.board.camera.zoom = zoom;
-  state.board.camera.x = (vp.width - b.w * zoom) / 2 - b.x * zoom + pad;
-  state.board.camera.y = (vp.height - b.h * zoom) / 2 - b.y * zoom + pad;
+  // Center the content: since `zoom` already fits it inside (vp - 2*pad),
+  // centering gives exactly `pad` on the constraining axis and >= pad on the
+  // other. Do NOT add `+ pad` here — that over-corrects and pins the trailing
+  // edge to ~0 padding.
+  state.board.camera.x = (vp.width - b.w * zoom) / 2 - b.x * zoom;
+  state.board.camera.y = (vp.height - b.h * zoom) / 2 - b.y * zoom;
   applyCamera();
 }
 export function resetBoard() { state.board.camera = { x: 0, y: 0, zoom: 1 }; applyCamera(); }
@@ -498,8 +502,7 @@ export function indexOfPage(id) {
 In `src/features/board.js`, add a helper that seeds `state.board.objects` from the current pages if the board is empty. Add near the top (after imports):
 
 ```js
-import { pageCount, getPageMeta, indexOfPage } from './pages.js';
-import { onDocumentChange } from './pages.js';
+import { getPageMeta, indexOfPage, onDocumentChange } from './pages.js';
 ```
 
 Add the seeder + a default-grid layout:
@@ -629,16 +632,10 @@ In `bindBoard()`, subscribe to document changes (debounced, like the filmstrip d
       const liveIds = new Set(getPageMeta().map(m => m.id));
       // Remove cards whose page was deleted.
       state.board.objects = state.board.objects.filter(o => o.kind !== 'card' || liveIds.has(o.pageId));
-      // Add a card for any new page that lacks one.
-      const have = new Set(state.board.objects.filter(o => o.kind === 'card').map(o => o.pageId));
-      let row = 0, col = 0;
-      for (const p of getPageMeta()) {
-        if (have.has(p.id)) continue;
-        const ar = p.w && p.h ? p.h / p.w : 0.625;
-        state.board.objects.push({ id: nextId(), kind: 'card', pageId: p.id,
-          x: 60 + col * 304, y: 60 + row * (280 * ar + 52), w: 280, h: Math.round(280 * ar), z: state.board.objects.length });
-        col = (col + 1) % 4; if (col === 0) row++;
-      }
+      // Add a card for any new page that lacks one. ensureCards() skips pages
+      // that already have a card (advancing the grid cursor) and places new
+      // cards at the next free cell, instead of stacking them on (60,60).
+      ensureCards();
       renderBoard();
     }, 200);
   });
@@ -678,6 +675,12 @@ git commit -m "feat(v32): render pages as board cards with sync" -m "Co-Authored
 ---
 
 ## Task 4: Card selection, move, resize, raise/lower
+
+> **As-built (post-review, commits `41e67d5` + `813e371`):** this task shipped with four deviations from the snippets below, all forced by code review — later tasks must build on the *as-built* shape, not the snippets:
+> - `spaceDown` is a **module-scope** `let` (board.js ~line 19), not a `bindBoard()` closure. `onCardMouseDown` and the empty-surface mousedown handler each `if (spaceDown) return;` as their first guard so Space pans over cards (no select/drag, no `stopPropagation`).
+> - Resize-handle reconciliation lives in **`updateSelectionChrome()`** (adds to the sole selection, removes otherwise), NOT inline in `renderBoard()`. `renderBoard()` still calls `updateSelectionChrome()` at its end. So a plain click (no re-render) syncs the handle.
+> - `.board-resize` CSS is `right:4px; bottom:4px; z-index:5;` (fully inside the card) — NOT `right:-5px; bottom:-5px` (which `overflow:hidden` + `border-radius` clipped to a sliver).
+> - `hitTopBoardRef` is exported from `board-tools.js` for Task 6 but NOT imported into `board.js` yet; `isTypingTarget` is not imported into `board-tools.js`.
 
 **Files:**
 - Modify: `src/features/board.js` (`onCardMouseDown`, marquee on empty, `resolveBoardRef` usage)

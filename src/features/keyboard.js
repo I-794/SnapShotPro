@@ -29,6 +29,8 @@ export function bindKeyboard() {
     if (state.ui.paletteOpen) return;
 
     if (e.key === 'Escape') {
+      // v32 — Esc exits board mode (the toolbar promises it).
+      if (state.mode === 'board' && typeof window.__exitBoardMode === 'function') { window.__exitBoardMode(); return; }
       if (el.shortcutsOverlay && el.shortcutsOverlay.style.display === 'flex') { showShortcuts(false); return; }
       if (state.ui.stickerDrawerOpen) { closeStickerDrawer(); return; }
       if (state.tool !== 'select') { setTool('select'); clearSelection(); render(); return; }
@@ -63,15 +65,19 @@ export function bindKeyboard() {
         if (e.key === '[') { e.preventDefault(); timelineSetIn(); return; }
         if (e.key === ']') { e.preventDefault(); timelineSetOut(); return; }
       }
-      if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); return; }
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        // Nudge the selected element: 1px, or 10px with Shift. One history entry
-        // per key press (e.repeat skips the save while a key is held).
-        const step = e.shiftKey ? 10 : 1;
-        const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
-        const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
-        if (nudgeSelected(dx, dy, !e.repeat)) e.preventDefault();
-        return;
+      // v32 — these bespoke canvas handlers own Delete/Backspace and arrow-nudge
+      // for the SINGLE-canvas editor. In board mode the board's own window-level
+      // handler owns Delete (acting on boardSelection); skip here so Delete
+      // doesn't also run deleteSelected() on a stale canvasSelection.
+      if (state.mode === 'single') {
+        if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); return; }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          const step = e.shiftKey ? 10 : 1;
+          const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+          const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+          if (nudgeSelected(dx, dy, !e.repeat)) e.preventDefault();
+          return;
+        }
       }
     }
   });
