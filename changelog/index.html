@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v31 Merge Studio: turn one design into hundreds with {{placeholders}} and a CSV, on top of v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v32 Open Canvas: lay every page on an infinite, pan-and-zoom board of cards you can arrange, connect, group, and export as one image, on top of v31 Merge Studio (CSV to N designs), v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v31 Merge Studio: mark a design with placeholders, upload a CSV, and export one on-brand image per row as a ZIP. On top of v30 Studio Intelligence and the full trail back to a single HTML file.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v32 Open Canvas: an infinite board of cards for your whole project, plus v31 Merge Studio (CSV to N on-brand designs) and the full trail back to a single HTML file.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -698,6 +698,52 @@
         .mg-card.c3 { left: 40%; transform: rotate(6deg); background: linear-gradient(150deg, #f59e0b, #b45309); }
         @media (max-width: 860px) { .mg-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v32 — Open Canvas spotlight. Its own motif: an infinite board depicted
+           as a dark canvas with a faint dot grid, screenshot cards laid out as
+           tiles, a dashed cobalt group bounding box, a connector arrow, and
+           monospace coordinate ticks. Echoes the actual board UI (dashed group
+           bbox, card grid, mono coords). Distinct from v16 glass, v17 spectrum,
+           v18 variations, v19 assets, and v31 merge. */
+        .spotlight-canvas {
+            background:
+                radial-gradient(50% 80% at 12% 8%, rgba(35,72,255,0.20), transparent 56%),
+                radial-gradient(46% 78% at 92% 96%, rgba(124,131,255,0.14), transparent 54%),
+                #070912;
+        }
+        .spotlight-canvas::after { display: none; }
+        .spotlight-canvas .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); }
+        .spotlight-canvas .spot-feat-ico { background: linear-gradient(135deg, rgba(35,72,255,0.34), rgba(124,131,255,0.26)); }
+        .spotlight-canvas .btn-primary { background: #fff; color: #11131c; }
+        .spotlight-canvas .btn-primary:hover { background: #f0f0ee; }
+        /* The board, depicted: a dot-grid canvas with cards, a dashed group bbox,
+           a connector, and coordinate ticks. */
+        .oc-stage {
+            position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 18px;
+            overflow: hidden; background: #0b0d16;
+            background-image: radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px);
+            background-size: 22px 22px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 24px 54px rgba(4,7,18,0.5);
+        }
+        .oc-coords { position: absolute; inset: 0; pointer-events: none; font-family: var(--font-mono); font-size: 9.5px; color: rgba(255,255,255,0.30); }
+        .oc-coords span { position: absolute; }
+        .oc-coords .x0 { left: 8px; top: 8px; }
+        .oc-coords .x1 { right: 8px; top: 8px; }
+        .oc-coords .x2 { left: 8px; bottom: 8px; }
+        .oc-coords .x3 { right: 8px; bottom: 8px; }
+        .oc-card { position: absolute; border-radius: 10px; overflow: hidden; background: #15161f; border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 10px 22px rgba(4,7,18,0.46); }
+        .oc-card .shot { display: block; width: 100%; aspect-ratio: 16 / 10; background: linear-gradient(135deg, #2a2d3d, #15161f); }
+        .oc-card .lab { height: 16px; display: flex; align-items: center; padding: 0 7px; font-family: var(--font-mono); font-size: 8.5px; color: rgba(255,255,255,0.55); border-top: 1px solid rgba(255,255,255,0.08); }
+        .oc-card.a { left: 12%; top: 15%; width: 33%; transform: rotate(-2.5deg); }
+        .oc-card.b { left: 52%; top: 11%; width: 30%; transform: rotate(1.5deg); }
+        .oc-card.c { left: 16%; top: 54%; width: 28%; transform: rotate(2deg); }
+        .oc-card.d { left: 54%; top: 50%; width: 32%; transform: rotate(-1.5deg); }
+        /* Dashed cobalt group bbox around cards c + d, echoing the board's group. */
+        .oc-group { position: absolute; left: 12%; top: 46%; width: 76%; height: 46%; border: 1.5px dashed rgba(35,72,255,0.85); border-radius: 8px; pointer-events: none; }
+        /* Connector arrow from card a to card b. */
+        .oc-arrow { position: absolute; left: 44%; top: 24%; width: 9%; height: 0; border-top: 2px solid rgba(124,131,255,0.92); }
+        .oc-arrow::after { content: ''; position: absolute; right: -1px; top: -5px; border: 5px solid transparent; border-left-color: rgba(124,131,255,0.92); }
+        @media (max-width: 860px) { .oc-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -777,45 +823,41 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-merge reveal">
+        <div class="spotlight spotlight-canvas reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v31 · July 2026</div>
-                <h2>Merge Studio.</h2>
-                <p class="spot-lede">Design once, then ship a thousand. Mark your design with placeholders like <code>{{name}}</code>, upload a spreadsheet, and Merge Studio renders one on-brand image per row. Text, colors, and even the screenshot swap automatically, all bundled into a ZIP.</p>
+                <div class="spot-ver">v32 · July 2026</div>
+                <h2>Open Canvas.</h2>
+                <p class="spot-lede">Your whole project on one infinite board. Every page becomes a card you can pan, zoom, arrange, connect, and group. Double-click a card to edit it in the studio, then export the entire board as a single image.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6M4 12h6M4 17h6"/><path d="M14 5v14"/><path d="M17 8l3 4-3 4"/></svg></span>
-                        <div><strong>Placeholders that travel with your design</strong><span>Type tokens straight into your headline, watermark, browser title, or brand colors. They save with the project, so the template is there next time.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+                        <div><strong>An infinite canvas of cards</strong><span>Every page is a movable card on a pan-and-zoom board. Drag to arrange, resize, and layer them, then double-click any card to drop into the full editor and back.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M9 4v16"/></svg></span>
-                        <div><strong>A CSV becomes a folder of designs</strong><span>Preview any row live on the canvas, then export the whole sheet at once. Each PNG is named from your data and bundled into one ZIP.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h12"/><path d="M12 6l6 6-6 6"/><path d="M5 5v14"/></svg></span>
+                        <div><strong>Connect, group, and annotate</strong><span>Draw arrows between cards to show the flow, marquee a set and group it under one dashed frame, and drop text labels anywhere. The board is the canvas; the screenshots are the content.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 15 4-4 4 4 3-3 5 5"/><circle cx="8.5" cy="9.5" r="1.5"/></svg></span>
-                        <div><strong>Swap the screenshot too</strong><span>An <code>image</code> column gives every row its own capture. URLs load safely through the proxy, so exports stay sharp and untainted.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/><path d="M12 16v4"/></svg></span>
+                        <div><strong>Export the whole board</strong><span>One command composites every card at full resolution, plus your text and arrows, into a single PNG that looks exactly like the board on screen. The layout saves with your project.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
                     <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                    <a href="/merge/" class="btn btn-ghost btn-lg">How Merge Studio works</a>
+                    <a href="/editor/" class="btn btn-ghost btn-lg">Try the board (Cmd-K)</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="mg-stage" aria-hidden="true">
-                    <div class="mg-csv">
-                        <div class="mg-r h"><span>name</span><span>role</span><span>image</span></div>
-                        <div class="mg-r"><span>Ada Lovelace</span><span>Engineer</span><span>ada.png</span></div>
-                        <div class="mg-r"><span>Grace Hopper</span><span>Admiral</span><span>grace.png</span></div>
-                        <div class="mg-r"><span>Alan Turing</span><span>Founder</span><span>alan.png</span></div>
-                    </div>
-                    <div class="mg-fan">
-                        <div class="mg-card c1"><b>Ada Lovelace</b><span>Engineer</span></div>
-                        <div class="mg-card c2"><b>Grace Hopper</b><span>Admiral</span></div>
-                        <div class="mg-card c3"><b>Alan Turing</b><span>Founder</span></div>
-                    </div>
+                <div class="oc-stage" aria-hidden="true">
+                    <div class="oc-coords"><span class="x0">0,0</span><span class="x1">1024,0</span><span class="x2">0,768</span><span class="x3">1024,768</span></div>
+                    <div class="oc-card a"><span class="shot"></span><span class="lab">Page</span></div>
+                    <div class="oc-card b"><span class="shot"></span><span class="lab">Page</span></div>
+                    <div class="oc-card c"><span class="shot"></span><span class="lab">Page</span></div>
+                    <div class="oc-card d"><span class="shot"></span><span class="lab">Page</span></div>
+                    <div class="oc-group"></div>
+                    <div class="oc-arrow"></div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -828,6 +870,17 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v32.0</span><span class="entry-date">July 2026</span></div>
+                <div>
+                    <h2>Open Canvas</h2>
+                    <ul class="changes">
+                        <li><b>An infinite board for your whole project.</b> Every page is now a card on a freeform, pan-and-zoom canvas. Drag cards to arrange them, resize and layer them, and double-click any card to edit that page in the full studio and jump straight back. The board is a new view alongside Single, Set, and Batch - toggle it from the command palette (Cmd-K).</li>
+                        <li><b>Connect, group, and label.</b> Draw arrows between cards to map a flow, marquee a set of cards and group them under one dashed frame, and drop text labels anywhere on the board. Move a group and its children move with it. The board holds your screenshots, not the pixels behind them.</li>
+                        <li><b>Export the board as one image.</b> A single command re-renders every card at full resolution and composites them with your text and arrows into one PNG that matches the board on screen. The layout saves with your project, so the board reopens exactly as you left it.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v31.0</span><span class="entry-date">July 2026</span></div>
                 <div>
                     <h2>Merge Studio</h2>
