@@ -159,6 +159,85 @@ export const TOOLS = [
     description: 'ALWAYS call this as your final action each turn: propose 2-4 short next-step prompts the user might want (e.g. "Make it bolder", "Try dark mode").',
     input_schema: { type: 'object', properties: { chips: { type: 'array', items: { type: 'string' } } }, required: ['chips'] },
     async run(args) { pendingChips = (args.chips || []).slice(0, 4).map(String); return 'ok'; }
+  },
+  {
+    name: 'add_page_from_url',
+    description: 'Seed the board from a web page: scrape the page at the URL and drop its images as cards. Returns how many cards were added. Use when the user wants to pull images from a link.',
+    input_schema: { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] },
+    async run(args) {
+      const { enterBoardMode } = await import('./board.js');
+      const { seedFromUrlCore } = await import('./seed.js');
+      if (state.mode !== 'board') enterBoardMode();
+      const r = await seedFromUrlCore(args.url);
+      if (r.error) return `Could not seed from that URL: ${r.error}`;
+      return `Seeded ${r.added} card${r.added === 1 ? '' : 's'} from the page.`;
+    }
+  },
+  {
+    name: 'add_page',
+    description: 'Add a new blank page (a new card on the board), or duplicate the current one. Use when the user wants more cards.',
+    input_schema: { type: 'object', properties: { duplicate: { type: 'boolean', description: 'true to duplicate the active page instead of adding a blank one' } } },
+    async run(args) {
+      const { enterBoardMode } = await import('./board.js');
+      const { addPage } = await import('./pages.js');
+      if (state.mode !== 'board') enterBoardMode();
+      addPage({ duplicate: !!args.duplicate });
+      return args.duplicate ? 'Duplicated the active page as a new card.' : 'Added a new blank card.';
+    }
+  },
+  {
+    name: 'arrange_cards',
+    description: 'Re-arrange cards on the board into a tidy layout: grid (4-col), row (single horizontal row), hero (one big card plus the rest stacked), or bento (asymmetric). By default arranges ALL cards; pass ids (page ids) to arrange a subset.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        layout: { type: 'string', description: 'grid|row|hero|bento' },
+        ids: { type: 'array', items: { type: 'string' }, description: 'optional page ids to arrange; omit for all' }
+      },
+      required: ['layout']
+    },
+    async run(args) {
+      const { enterBoardMode, arrangeCards } = await import('./board.js');
+      if (state.mode !== 'board') enterBoardMode();
+      const layout = ['grid', 'row', 'hero', 'bento'].includes(args.layout) ? args.layout : 'grid';
+      arrangeCards(layout, Array.isArray(args.ids) ? args.ids : undefined);
+      return `Re-arranged the cards into a ${layout} layout.`;
+    }
+  },
+  {
+    name: 'group_cards',
+    description: 'Group a set of cards under one dashed bounding box so they move together. Pass the page ids of the cards to group (at least 2). Returns the new group id.',
+    input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } }, required: ['ids'] },
+    async run(args) {
+      const { enterBoardMode, groupCards } = await import('./board.js');
+      if (state.mode !== 'board') enterBoardMode();
+      const ids = Array.isArray(args.ids) ? args.ids : [];
+      const gid = groupCards(ids);
+      if (!gid) return 'Need at least 2 card ids to group.';
+      return `Grouped ${ids.length} cards (group ${gid}).`;
+    }
+  },
+  {
+    name: 'ungroup',
+    description: 'Remove a group (the cards stay on the board, just no longer grouped). Pass the group object id.',
+    input_schema: { type: 'object', properties: { id: { type: 'number' } }, required: ['id'] },
+    async run(args) {
+      const { enterBoardMode, ungroupCards } = await import('./board.js');
+      if (state.mode !== 'board') enterBoardMode();
+      const ok = ungroupCards(args.id);
+      return ok ? 'Ungrouped.' : 'No group with that id.';
+    }
+  },
+  {
+    name: 'export_board',
+    description: 'Export the whole board as a single composite PNG (every card re-rendered at full resolution, plus text and arrows). Use when the user wants to save or share the board.',
+    input_schema: { type: 'object', properties: {} },
+    async run(args) {
+      const { enterBoardMode, exportBoard } = await import('./board.js');
+      if (state.mode !== 'board') enterBoardMode();
+      try { await exportBoard(); return 'Exported the board as board.png.'; }
+      catch (e) { return `Export failed: ${e?.message || e}`; }
+    }
   }
 ];
 
