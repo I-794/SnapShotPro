@@ -1,0 +1,32 @@
+# v32 — keep the explicit `vercel --prod` upload lean. The GitHub auto-deploy
+# builds fresh in Vercel's cloud and ignores these automatically, but a local
+# CLI deploy uploads the working directory, so we must exclude the large /
+# local-only files explicitly. (claude.exe is 236 MB and alone exceeds Vercel's
+# 100 MB per-file limit.)
+
+# Local build output (Vercel builds its own from source):
+dist
+
+# Local-only binaries / junk:
+claude.exe
+*.exe
+
+# Vercel link metadata (per-machine):
+.vercel
+
+# Legacy reference copy (not part of the live build):
+SnapShot-Pro-main
+
+# Deps (installed fresh by Vercel):
+node_modules
+
+# Local env:
+.env
+.env.local
+.env.*
+
+# Logs:
+*.log
+
+# OS/editor cruft:
+.DS_Store
