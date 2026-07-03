@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '32.0';
+const CURRENT_VERSION = '31.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🪟 Open Canvas",
+  heading: "🗂 Merge Studio",
   items: [
-    { title: 'An infinite board',
-      desc: 'Every page is a card on a pan-and-zoom canvas. Arrange, resize, and layer them freely.' },
-    { title: 'Connect, group, label',
-      desc: 'Draw arrows between cards, marquee a set into a group, and drop text labels anywhere.' },
-    { title: 'Edit and return',
-      desc: 'Double-click a card to edit that page in the studio, then jump back to the board.' },
-    { title: 'Export the board',
-      desc: 'One command composites every card, plus your text and arrows, into a single PNG.' }
+    { title: 'Placeholders',
+      desc: 'Type {{tokens}} into your text, watermark, browser title, or brand colors. They save with your project as a reusable template.' },
+    { title: 'CSV → N designs',
+      desc: 'Upload a spreadsheet and export one on-brand image per row, each named from your data and bundled into a single ZIP.' },
+    { title: 'Per-row screenshots',
+      desc: 'An image column swaps the screenshot itself for every row, loaded safely through the proxy so exports stay sharp.' },
+    { title: 'Live row preview',
+      desc: 'Step through rows on the real canvas before you export. Your template restores untouched afterward.' }
   ]
 };
 
