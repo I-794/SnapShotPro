@@ -248,6 +248,68 @@ function groupSelected() {
   renderBoard();
 }
 
+// v32 — board helpers shared by the toolbar and the conversational agent. Each
+// mutates state.board and re-renders.
+
+// Group an explicit set of object ids (cards/text) under one group. Returns the
+// group id, or null if fewer than 2 ids.
+export function groupCards(ids) {
+  const set = (Array.isArray(ids) ? ids : []).filter(Boolean);
+  if (set.length < 2) return null;
+  const g = { id: nextId(), kind: 'group', children: set.slice(), x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
+  state.board.objects.push(g);
+  renderBoard();
+  return g.id;
+}
+
+// Remove the group object with this id (children stay). Returns true if removed.
+export function ungroupCards(id) {
+  const i = state.board.objects.findIndex(o => o.id === id && o.kind === 'group');
+  if (i < 0) return false;
+  state.board.objects.splice(i, 1);
+  renderBoard();
+  return true;
+}
+
+// Re-lay out cards into a taste-curated arrangement. layout is one of
+// 'grid'|'row'|'hero'|'bento'. If ids is omitted, lay out ALL cards. Non-card
+// objects (text/arrows/groups) are left in place.
+export function arrangeCards(layout, ids) {
+  const cards = state.board.objects.filter(o => o.kind === 'card' && (!ids || ids.includes(o.pageId)));
+  if (!cards.length) return;
+  const colW = 280, gap = 24;
+  const place = (o, x, y, w, h) => { o.x = x; o.y = y; o.w = w; o.h = h; };
+  if (layout === 'row') {
+    let x = 60;
+    for (const o of cards) { const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar); place(o, x, 60, w, h); x += w + gap; }
+  } else if (layout === 'hero') {
+    const [hero, ...rest] = cards;
+    if (hero) { const ar = hero.h / hero.w || 0.625; const w = colW * 1.6, h = Math.round(w * ar); place(hero, 60, 60, w, h); }
+    let y = 60;
+    for (const o of rest) { const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar); place(o, 60 + colW * 1.6 + gap, y, w, h); y += h + gap; }
+  } else if (layout === 'bento') {
+    const big = cards[0];
+    let bigBottom = 60;
+    if (big) { const ar = big.h / big.w || 0.625; const w = colW * 2 + gap, h = Math.round(w * ar); place(big, 60, 60, w, h); bigBottom = 60 + h + gap; }
+    const rest = cards.slice(1);
+    let x = 60 + colW * 2 + gap * 2, y = 60;
+    for (const o of rest) {
+      const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar);
+      if (y + h > bigBottom) { y = 60; x = 60; } // wrap to a new row under the big card
+      place(o, x, y, w, h); y += h + gap;
+    }
+  } else {
+    // 'grid' (default): 4-column grid.
+    let row = 0, col = 0; const cols = 4;
+    for (const o of cards) {
+      const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar);
+      place(o, 60 + col * (colW + gap), 60 + row * (h + gap + 28), w, h);
+      col = (col + 1) % cols; if (col === 0) row++;
+    }
+  }
+  renderBoard();
+}
+
 // v32 Task 7 — reusable drag-move of the whole selection via the uniform
 // resolveBoardRef(...).moveBy handle, so cards, text, AND groups all drag (a
 // group's moveBy translates its children). Extracted from onCardMouseDown.
