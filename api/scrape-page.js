@@ -60,16 +60,25 @@ export default async function handler(req, res) {
       images.push({ url: a, w: null, h: null, alt: alt || '' });
     };
 
-    // Open Graph image(s) — primary signal. og:image can repeat; grab all.
-    const og = text.match(/<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/ig) || [];
-    for (const m of og) {
-      const c = (m.match(/content=["']([^"']+)["']/i) || [])[1];
-      if (c) push(c, 'Open Graph image');
+    // Open Graph image(s) — primary signal. Match whole <meta> tags and check
+    // property/content independently so content-first tags (some CMSes) work too.
+    const metas = text.match(/<meta[^>]*>/ig) || [];
+    for (const tag of metas) {
+      if (/property=["']og:image(?::secure_url)?["']/i.test(tag)) {
+        const c = (tag.match(/content=["']([^"']+)["']/i) || [])[1];
+        if (c) push(c, 'Open Graph image');
+      }
     }
 
-    // Apple-touch-icon (app icon).
-    const ati = text.match(/<link[^>]+rel=["']apple-touch-icon[^"']*["'][^>]+href=["']([^"']+)["']/i);
-    if (ati) push(ati[1], 'App icon');
+    // Apple-touch-icon + favicon (order-independent): match whole <link> tags.
+    const links = text.match(/<link[^>]*>/ig) || [];
+    for (const tag of links) {
+      const rel = (tag.match(/rel=["']([^"']+)["']/i) || [])[1] || '';
+      const href = (tag.match(/href=["']([^"']+)["']/i) || [])[1];
+      if (!href) continue;
+      if (/apple-touch-icon/i.test(rel)) push(href, 'App icon');
+      else if (/(^|\s)icon(\s|$)/i.test(rel) || /shortcut\s+icon/i.test(rel)) push(href, 'Favicon');
+    }
 
     // Hero <img> and <picture><source srcset>. srcset first entry only.
     const imgs = text.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/ig) || [];
@@ -83,10 +92,6 @@ export default async function handler(req, res) {
       const s = (m.match(/srcset=["']([^"'\s]+)/i) || [])[1];
       if (s) push(s, '');
     }
-
-    // Favicon fallback.
-    const fav = text.match(/<link[^>]+rel=["'](?:shortcut )?icon["'][^>]+href=["']([^"']+)["']/i);
-    if (fav) push(fav[1], 'Favicon');
 
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.status(200).json({
