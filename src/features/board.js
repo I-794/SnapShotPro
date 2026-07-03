@@ -466,7 +466,7 @@ function onResizeStart(e, node) {
   window.addEventListener('mouseup', onUp);
 }
 function onCardDoubleClick(e, node) {
-  const pageId = Number(node.dataset.pageId);
+  const pageId = node.dataset.pageId;   // a uid() UUID string — do NOT Number()-coerce
   const idx = indexOfPage(pageId);
   if (idx < 0) return;
   switchTo(idx);

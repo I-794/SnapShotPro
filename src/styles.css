@@ -1688,7 +1688,7 @@ kbd {
 }
 .board-toolbar {
   position: absolute; top: 12px; left: 12px; z-index: 20; display: none;
-  gap: 6px; align-items: center;
+  gap: 6px; align-items: center; flex-wrap: wrap;
   background: var(--bg-elevated, #15151a); border: 1px solid var(--border-color, #2a2a32);
   border-radius: 8px; padding: 6px;
 }
