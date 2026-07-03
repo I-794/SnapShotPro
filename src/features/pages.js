@@ -13,7 +13,7 @@ import { state } from '../state/state.js';
 import { render, renderInto } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { onHistoryChange } from '../state/history.js';
-import { serializeFull } from '../state/serialize.js';
+import { serializeFull, imageToDataUrl } from '../state/serialize.js';
 import { applyPayload, applyDesignToState, makeThumb, uid } from './document.js';
 
 const DOC_VERSION = 14;
@@ -134,6 +134,24 @@ export function addPage({ duplicate = false } = {}) {
   if (state.brand && state.brand.enforce && state.brand.enabled) {
     import('./brand-brain.js').then(m => m.applyBrand());
   }
+}
+
+// v32 — Seed: add a page that carries a given decoded <img>, inheriting the
+// current look. Builds the payload + thumb off the live editor (no flicker, no
+// re-render of the active page), pushes to pages, and emits change so the board
+// sync drops a card. Returns the new page id. The new page is NOT made active.
+export function addPageWithImage(img) {
+  if (!img || !img.width || !img.height) return null;
+  const dataUrl = imageToDataUrl(img, 2000, 'image/jpeg', 0.9);
+  const thumb = imageToDataUrl(img, 320, 'image/jpeg', 0.6) || dataUrl;
+  // Inherit the current design, but size the canvas to the image's aspect.
+  const cur = serializeFull();
+  const design = { ...cur.design, canvas: { width: img.width, height: img.height } };
+  const payload = { schemaVersion: cur.schemaVersion, design, image: dataUrl, svgCode: null };
+  const page = { id: uid(), payload, thumb };
+  pages.push(page);
+  emitChange();
+  return page.id;
 }
 
 export function deletePage(index) {
