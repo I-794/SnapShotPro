@@ -254,9 +254,18 @@ function groupSelected() {
 // Group an explicit set of object ids (cards/text) under one group. Returns the
 // group id, or null if fewer than 2 ids.
 export function groupCards(ids) {
-  const set = (Array.isArray(ids) ? ids : []).filter(Boolean);
-  if (set.length < 2) return null;
-  const g = { id: nextId(), kind: 'group', children: set.slice(), x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
+  // `ids` are PAGE ids (the ids surfaced to the agent/user). The board's group
+  // logic keys children by board OBJECT id (a card's own id from nextId()), so
+  // resolve page ids -> object ids here. Cards that aren't found are dropped.
+  const pageIds = (Array.isArray(ids) ? ids : []).filter(Boolean);
+  if (pageIds.length < 2) return null;
+  const objIds = [];
+  for (const pid of pageIds) {
+    const card = state.board.objects.find(o => o.kind === 'card' && o.pageId === pid);
+    if (card) objIds.push(card.id);
+  }
+  if (objIds.length < 2) return null;
+  const g = { id: nextId(), kind: 'group', children: objIds, x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
   state.board.objects.push(g);
   renderBoard();
   return g.id;
