@@ -109,23 +109,27 @@ export function ensureTourDefaults(design) {
   return design;
 }
 
+// v32 — cap an <img> to maxEdge on the long edge and encode to a dataURL. Returns
+// null if the canvas is tainted (cross-origin source) or the image is empty.
+export function imageToDataUrl(img, maxEdge, mime = 'image/jpeg', quality = 0.9) {
+  if (!img || !img.width || !img.height) return null;
+  try {
+    let w = img.width, h = img.height;
+    const longEdge = Math.max(w, h);
+    if (longEdge > maxEdge) { const s = maxEdge / longEdge; w = Math.round(w * s); h = Math.round(h * s); }
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    return c.toDataURL(mime, quality);
+  } catch (e) { return null; }
+}
+
 // Re-encode the loaded screenshot to a bounded dataURL so it travels with the
 // project. Capped at 2000px on the long edge + JPEG to keep localStorage/jsonb
 // payloads sane. Returns null if there's no image or the canvas is tainted
 // (cross-origin source) — the project still saves, just without baked artwork.
 export function getImageDataURL() {
-  const img = state.image;
-  if (!img || !img.width || !img.height) return null;
-  try {
-    const MAX = 2000;
-    let w = img.width, h = img.height;
-    const longEdge = Math.max(w, h);
-    if (longEdge > MAX) { const s = MAX / longEdge; w = Math.round(w * s); h = Math.round(h * s); }
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    c.getContext('2d').drawImage(img, 0, 0, w, h);
-    return c.toDataURL('image/jpeg', 0.9);
-  } catch (e) { return null; }
+  return imageToDataUrl(state.image, 2000, 'image/jpeg', 0.9);
 }
 
 export function serializeFull() {

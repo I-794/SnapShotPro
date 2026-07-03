@@ -142,6 +142,12 @@ function ensureSurface() {
     _returnPill.addEventListener('click', returnToBoard);
     viewport.appendChild(_returnPill);
   }
+
+  // v32 Task 4 — expose the freshly built toolbar so seed.js can append its
+  // "Add from URL" bar. Handshake works in either init order: if bindSeed ran
+  // first it left window.__seedAttach; if not, seed.js reads window.__boardToolbar.
+  window.__boardToolbar = toolbar;
+  if (typeof window.__seedAttach === 'function') window.__seedAttach(toolbar);
 }
 
 function applyCamera() {
@@ -239,6 +245,78 @@ function groupSelected() {
   const g = { id: nextId(), kind: 'group', children: childIds, x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
   state.board.objects.push(g);
   selectBoardOnly({ kind: 'boardObject', id: g.id });
+  renderBoard();
+}
+
+// v32 — board helpers shared by the toolbar and the conversational agent. Each
+// mutates state.board and re-renders.
+
+// Group an explicit set of cards by their PAGE ids. Returns the group id, or
+// null if fewer than 2 cards resolve. (Internally resolves page ids -> board
+// object ids, since the group logic keys children by object id.)
+export function groupCards(ids) {
+  // `ids` are PAGE ids (the ids surfaced to the agent/user). The board's group
+  // logic keys children by board OBJECT id (a card's own id from nextId()), so
+  // resolve page ids -> object ids here. Cards that aren't found are dropped.
+  const pageIds = (Array.isArray(ids) ? ids : []).filter(Boolean);
+  if (pageIds.length < 2) return null;
+  const objIds = [];
+  for (const pid of pageIds) {
+    const card = state.board.objects.find(o => o.kind === 'card' && o.pageId === pid);
+    if (card) objIds.push(card.id);
+  }
+  if (objIds.length < 2) return null;
+  const g = { id: nextId(), kind: 'group', children: objIds, x: 0, y: 0, w: 0, h: 0, z: state.board.objects.length };
+  state.board.objects.push(g);
+  renderBoard();
+  return g.id;
+}
+
+// Remove the group object with this id (children stay). Returns true if removed.
+export function ungroupCards(id) {
+  const i = state.board.objects.findIndex(o => o.id === id && o.kind === 'group');
+  if (i < 0) return false;
+  state.board.objects.splice(i, 1);
+  renderBoard();
+  return true;
+}
+
+// Re-lay out cards into a taste-curated arrangement. layout is one of
+// 'grid'|'row'|'hero'|'bento'. If ids is omitted, lay out ALL cards. Non-card
+// objects (text/arrows/groups) are left in place.
+export function arrangeCards(layout, ids) {
+  const cards = state.board.objects.filter(o => o.kind === 'card' && (!ids || ids.includes(o.pageId)));
+  if (!cards.length) return;
+  const colW = 280, gap = 24;
+  const place = (o, x, y, w, h) => { o.x = x; o.y = y; o.w = w; o.h = h; };
+  if (layout === 'row') {
+    let x = 60;
+    for (const o of cards) { const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar); place(o, x, 60, w, h); x += w + gap; }
+  } else if (layout === 'hero') {
+    const [hero, ...rest] = cards;
+    if (hero) { const ar = hero.h / hero.w || 0.625; const w = colW * 1.6, h = Math.round(w * ar); place(hero, 60, 60, w, h); }
+    let y = 60;
+    for (const o of rest) { const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar); place(o, 60 + colW * 1.6 + gap, y, w, h); y += h + gap; }
+  } else if (layout === 'bento') {
+    const big = cards[0];
+    let bigBottom = 60;
+    if (big) { const ar = big.h / big.w || 0.625; const w = colW * 2 + gap, h = Math.round(w * ar); place(big, 60, 60, w, h); bigBottom = 60 + h + gap; }
+    const rest = cards.slice(1);
+    let x = 60 + colW * 2 + gap * 2, y = 60;
+    for (const o of rest) {
+      const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar);
+      if (y + h > bigBottom) { y = 60; x = 60; } // wrap to a new row under the big card
+      place(o, x, y, w, h); y += h + gap;
+    }
+  } else {
+    // 'grid' (default): 4-column grid.
+    let row = 0, col = 0; const cols = 4;
+    for (const o of cards) {
+      const ar = o.h / o.w || 0.625; const w = colW, h = Math.round(w * ar);
+      place(o, 60 + col * (colW + gap), 60 + row * (h + gap + 28), w, h);
+      col = (col + 1) % cols; if (col === 0) row++;
+    }
+  }
   renderBoard();
 }
 
@@ -460,7 +538,7 @@ function onResizeStart(e, node) {
   window.addEventListener('mouseup', onUp);
 }
 function onCardDoubleClick(e, node) {
-  const pageId = Number(node.dataset.pageId);
+  const pageId = node.dataset.pageId;   // a uid() UUID string — do NOT Number()-coerce
   const idx = indexOfPage(pageId);
   if (idx < 0) return;
   switchTo(idx);
