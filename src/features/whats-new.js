@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '31.0';
+const CURRENT_VERSION = '32.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🗂 Merge Studio",
+  heading: "🪟 Open Canvas",
   items: [
-    { title: 'Placeholders',
-      desc: 'Type {{tokens}} into your text, watermark, browser title, or brand colors. They save with your project as a reusable template.' },
-    { title: 'CSV → N designs',
-      desc: 'Upload a spreadsheet and export one on-brand image per row, each named from your data and bundled into a single ZIP.' },
-    { title: 'Per-row screenshots',
-      desc: 'An image column swaps the screenshot itself for every row, loaded safely through the proxy so exports stay sharp.' },
-    { title: 'Live row preview',
-      desc: 'Step through rows on the real canvas before you export. Your template restores untouched afterward.' }
+    { title: 'An infinite board',
+      desc: 'Every page is a card on a pan-and-zoom canvas. Arrange, resize, connect, and group them, then export the whole board as one image.' },
+    { title: 'Seed from a URL',
+      desc: 'Paste a page link and SnapShotPro drops its images onto the board as cards. Paste a link, get a set.' },
+    { title: 'Drive it by chat',
+      desc: 'The Design Agent can arrange, group, add, and export cards for you. Ask it to lay out your board.' },
+    { title: 'Saves with your project',
+      desc: 'The board layout travels with the project and reopens exactly as you left it.' }
   ]
 };
 
