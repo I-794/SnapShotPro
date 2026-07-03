@@ -142,6 +142,12 @@ function ensureSurface() {
     _returnPill.addEventListener('click', returnToBoard);
     viewport.appendChild(_returnPill);
   }
+
+  // v32 Task 4 — expose the freshly built toolbar so seed.js can append its
+  // "Add from URL" bar. Handshake works in either init order: if bindSeed ran
+  // first it left window.__seedAttach; if not, seed.js reads window.__boardToolbar.
+  window.__boardToolbar = toolbar;
+  if (typeof window.__seedAttach === 'function') window.__seedAttach(toolbar);
 }
 
 function applyCamera() {
