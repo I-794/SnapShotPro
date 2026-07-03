@@ -1,3 +1,5 @@
+import { lookup } from 'dns/promises';
+
 // v30 model policy: gpt-5.5 for all non-image OpenAI calls (vision/text/enhance).
 // Overridable per-route via OPENAI_VISION_MODEL / OPENAI_ENHANCE_MODEL env vars.
 export const DEFAULT_VISION_MODEL = 'gpt-5.5';
@@ -85,4 +87,88 @@ export function clampNumber(value, min, max, fallback) {
 export function handleApiError(res, error) {
   const status = error instanceof ApiError ? error.status : 500;
   res.status(status).json({ error: error.message || String(error) });
+}
+
+// v32 — SSRF guard, shared by the fetch-url media proxy and scrape-page.
+// Copied verbatim from api/fetch-url.js; do not relax the private-IP ranges.
+export const MAX_REDIRECTS = 5;
+
+export function isPrivateIp(ip) {
+  if (!ip || typeof ip !== 'string') return true;
+  let addr = ip.trim().toLowerCase();
+  const pct = addr.indexOf('%');
+  if (pct >= 0) addr = addr.slice(0, pct);
+
+  const mapped = addr.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (mapped) addr = mapped[1];
+
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(addr)) {
+    const parts = addr.split('.').map(Number);
+    if (parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true;
+    const [a, b] = parts;
+    if (a === 0 || a === 127 || a === 10) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true;
+    if (a >= 224) return true;
+    return false;
+  }
+
+  if (addr === '::' || addr === '::1') return true;
+  if (addr.startsWith('fe8') || addr.startsWith('fe9') ||
+      addr.startsWith('fea') || addr.startsWith('feb')) return true;
+  if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
+  if (addr.startsWith('ff')) return true;
+  return false;
+}
+
+export async function assertPublicHost(host) {
+  if (!host) throw new ApiError(400, 'Invalid host');
+  const literal = host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host;
+  if (/^[0-9.]+$/.test(literal) || literal.includes(':')) {
+    if (isPrivateIp(literal)) throw new ApiError(422, 'Host not allowed');
+    return;
+  }
+
+  let records;
+  try {
+    records = await lookup(host, { all: true });
+  } catch (_) {
+    throw new ApiError(422, 'Host could not be resolved');
+  }
+  if (!records || !records.length) throw new ApiError(422, 'Host could not be resolved');
+  for (const rec of records) {
+    if (isPrivateIp(rec.address)) throw new ApiError(422, 'Host not allowed');
+  }
+}
+
+export function assertHttpUrl(url) {
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new ApiError(400, 'Only http(s) URLs are allowed');
+  }
+}
+
+export async function fetchPublic(startUrl, { maxRedirects = MAX_REDIRECTS, userAgent = 'Mozilla/5.0 SnapShotPro/11' } = {}) {
+  let current = startUrl;
+  for (let redirects = 0; redirects <= maxRedirects; redirects += 1) {
+    assertHttpUrl(current);
+    await assertPublicHost(current.hostname);
+
+    const upstream = await fetch(current.toString(), {
+      headers: { 'User-Agent': userAgent },
+      redirect: 'manual'
+    });
+
+    if (upstream.status >= 300 && upstream.status < 400) {
+      const location = upstream.headers.get('location');
+      if (!location) throw new ApiError(502, 'Redirect missing location');
+      current = new URL(location, current);
+      continue;
+    }
+
+    return upstream;
+  }
+
+  throw new ApiError(508, 'Too many redirects');
 }
