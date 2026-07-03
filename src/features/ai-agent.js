@@ -9,6 +9,7 @@ import { showNotification } from '../ui/notification.js';
 import { runAgentTurn } from './ai-cloud.js';
 import { TOOLS, runTool, consumeChips } from './agent-tools.js';
 import { loadChat, saveChat, loadMemory } from './agent-memory.js';
+import { getPageMeta } from './pages.js';
 
 const MAX_ITERS = 8;
 let messages = [];          // neutral history
@@ -19,13 +20,20 @@ function systemPrompt() {
   const mem = loadMemory();
   const memBlock = mem.length ? `\nThings you remember about this user:\n- ${mem.join('\n- ')}` : '';
   const c = state.canvas;
-  return [
+  const lines = [
     'You are the SnapShotPro Design Agent. You design and refine the PRESENTATION of a screenshot by calling tools.',
     'Prefer apply_design for background/frame/layout/shadow/filter/color changes. Use generate_background for AI imagery, isolate_subject for product-shot composites, set_palette for color schemes, set_text for headlines, set_filters for tone, look_at_canvas when unsure about visual quality.',
     'Be tasteful and on-brand. Keep replies short. After acting, ALWAYS call suggest_next with 2-4 short follow-up prompts.',
     `Canvas is ${c.width}x${c.height}. Do not edit the screenshot content beyond isolate/background.`,
     memBlock
-  ].join('\n');
+  ];
+  if (state.mode === 'board') {
+    const meta = getPageMeta();
+    const list = meta.slice(0, 12).map((m, i) => `card ${i + 1}: pageId ${m.id}`).join('; ');
+    const more = meta.length > 12 ? ` (and ${meta.length - 12} more)` : '';
+    lines.push(`\nThe user is on the Open Canvas board, viewing ${meta.length} card${meta.length === 1 ? '' : 's'} (each card is a page). Card page ids: ${list}${more}. You can drive the board: add_page_from_url (seed cards from a link), add_page (add/duplicate a card), arrange_cards (layout grid|row|hero|bento; pass page ids or omit for all), group_cards (pass ≥2 page ids; returns the group id), ungroup (pass the group id), export_board (export the whole board as one PNG).`);
+  }
+  return lines.join('\n');
 }
 
 function el(id) { return document.getElementById(id); }
