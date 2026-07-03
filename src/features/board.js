@@ -251,8 +251,9 @@ function groupSelected() {
 // v32 — board helpers shared by the toolbar and the conversational agent. Each
 // mutates state.board and re-renders.
 
-// Group an explicit set of object ids (cards/text) under one group. Returns the
-// group id, or null if fewer than 2 ids.
+// Group an explicit set of cards by their PAGE ids. Returns the group id, or
+// null if fewer than 2 cards resolve. (Internally resolves page ids -> board
+// object ids, since the group logic keys children by object id.)
 export function groupCards(ids) {
   // `ids` are PAGE ids (the ids surfaced to the agent/user). The board's group
   // logic keys children by board OBJECT id (a card's own id from nextId()), so
