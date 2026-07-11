@@ -30,6 +30,49 @@ Design settings:
 
 The site should feel trustworthy, capable, and creative. It should not read as a niche developer tool, an experimental agency portfolio, or a generic SaaS template.
 
+### 2.1 Applied design skills
+
+The implementation and review must apply all three design guides together:
+
+- `design-taste-frontend` - audit-first preservation, anti-template discipline, real imagery, controlled page archetypes, motivated motion, and strict preflight review.
+- `frontend-design` - subject-specific art direction, deliberate color/type/layout choices, a single justified aesthetic risk, and critique before and after building.
+- `ui-ux-pro-max` - accessibility-first interaction rules, 44px minimum touch targets, semantic theme tokens, responsive and performance checks, and independent light/dark validation.
+
+The local `ui-ux-pro-max` design-system search was run with the approved `7 / 4 / 4` dials. Its generic dark-glass, pink-accent, Inter, and cinematic-route-transition recommendations conflict with the user-approved brief and are rejected. Its product-proof pattern and measurable UX requirements are retained. User-approved brand and design decisions override database defaults.
+
+### 2.2 Compact visual plan
+
+Color roles:
+
+- Canvas Ice - cool off-white page background.
+- Paper - white raised and reading surfaces.
+- Ink - near-black primary text.
+- Utility Gray - accessible secondary text and rules.
+- SnapShot Cobalt - existing brand action, link, focus, and selection color.
+- Night Canvas and Night Surface - off-black and charcoal dark-mode foundations.
+
+Type roles:
+
+- Geist Display - restrained large headlines and category statements.
+- Geist - body, navigation, controls, and labels.
+- JetBrains Mono - code, shortcuts, dimensions, and genuine technical metadata only.
+
+Layout concept:
+
+- A bright editorial shell frames real product work using full-width bands, asymmetric media, disciplined gutters, and dark product stages where the editor needs contrast.
+- Pages use spacing and rules before cards; repeated selectable objects are the exception.
+
+### 2.3 Signature element: Output Ribbon
+
+The one deliberate aesthetic risk is a full-bleed Output Ribbon on the homepage. It uses authentic SnapShotPro exports in several meaningful aspect ratios to show one source capture becoming polished launch, documentation, store, and social assets.
+
+- The ribbon is product evidence, not a decorative marquee.
+- It appears once on the site and does not loop continuously.
+- Desktop may use one controlled horizontal composition with varied crop sizes.
+- Mobile becomes a vertical or user-controlled scroll-snap sequence with visible controls and no gesture-only dependency.
+- It provides the visual bridge from the hero into the workflow section and leaves a hint of subsequent content in the first viewport.
+- Supporting pages use ordinary product-shot figures rather than repeating the signature.
+
 ## 3. Goals and success criteria
 
 ### 3.1 Primary goal
@@ -189,8 +232,9 @@ Routes: homepage and gallery.
 
 Structure:
 
-- Product-led hero with one primary action and at most one secondary action.
-- Authentic product image or exported result visible in the first viewport.
+- Full-bleed product-proof hero with readable text over a deliberately quiet region, not a split text/media card composition.
+- One primary action and at most one secondary action.
+- Authentic product imagery visible in the first viewport, with the Output Ribbon providing the homepage signature.
 - Varied full-width editorial bands.
 - Real proof immediately after the hero.
 - No repetitive three-card feature row.
@@ -259,13 +303,14 @@ The page remains one coherent theme at a time. Sections may use small tonal vari
 
 ### 8.2 Typography
 
-- Preserve Geist as the display and body family.
+- Preserve Geist as a deliberate two-role system: Geist Display behavior for headlines and Geist for body/UI text.
 - Restrict JetBrains Mono to code, shortcuts, version data where genuinely needed, and technical metadata.
 - Self-host production WOFF2 font assets under `public/fonts/` with `font-display: swap`.
 - Use weight, scale, whitespace, and color for hierarchy.
 - Avoid routine highlighted words, gradient text, excessive uppercase mono eyebrows, and negative tracking.
 - Keep body measure near 65 characters with comfortable line height.
 - Use balanced or pretty text wrapping where supported.
+- Keep visible text at 16px or larger on mobile except short metadata that remains legible and nonessential.
 
 ### 8.3 Shape and material rules
 
@@ -377,12 +422,14 @@ Do not use scroll listeners or React-style state for continuous pointer and scro
 - Use logical heading order and semantic sections.
 - Implement visible `:focus-visible` treatment across both appearances.
 - Ensure keyboard, pointer, and touch access for navigation and menus.
+- Provide at least 44px by 44px interactive hit areas on touch layouts and at least 8px between adjacent touch targets.
 - Expose menu expansion, current page, current appearance, and gallery filter state programmatically.
 - Gallery filters use `aria-pressed` or the appropriate single-selection pattern.
 - Preserve native FAQ disclosure semantics.
 - Meet WCAG AA contrast for body text, controls, metadata, placeholders, focus indicators, and both theme modes.
 - Provide stable touch targets on mobile.
 - Motion communicates hierarchy, feedback, or state change and respects `prefers-reduced-motion`.
+- Keep micro-interactions between 150ms and 300ms, animate transform and opacity, and avoid blocking input during transitions.
 - Marketing content remains understandable with animation and optional JavaScript disabled.
 - Reserve image dimensions and font behavior to keep CLS below 0.1.
 - Target LCP below 2.5 seconds and INP below 200ms on representative pages.
@@ -447,16 +494,19 @@ Test representative routes from every archetype at minimum:
 
 - Desktop: 1440 x 900.
 - Laptop/tablet: 1024 x 768.
-- Mobile: 390 x 844 and 360 x 740.
+- Mobile: 390 x 844, 375 x 812, and 360 x 740.
+- Landscape: representative phone and tablet widths.
 
 For each representative route:
 
 - Verify first-viewport hierarchy and CTA visibility.
 - Verify full, condensed, and mobile navigation.
 - Verify keyboard focus order, menu behavior, skip link, and current-route state.
+- Verify browser zoom and text scaling to 200 percent without loss of content or function.
 - Verify Light, Dark, and System appearances, including persistence and no visible flash.
 - Verify reduced-motion behavior.
 - Verify image framing, stable dimensions, text wrapping, and absence of horizontal overflow.
+- Verify every touch target and adjacent-target gap at mobile widths.
 - Verify hover, active, selected, loading, empty, and error states that exist on the route.
 
 After the archetype checks, capture and inspect at least one full-page screenshot in both appearances for every public route. Run contrast and performance checks on the homepage and one representative page from each archetype.
@@ -484,6 +534,7 @@ The redesign is complete when:
 - Creators and product teams receive equal recognition.
 - The homepage communicates the category and outcome within the first viewport.
 - Authentic local product imagery replaces generic placeholders.
+- The homepage uses the single approved Output Ribbon signature, and no other route repeats it.
 - Light, Dark, and System appearances work across all public pages.
 - Navigation is complete and accessible at desktop, tablet, and mobile sizes.
 - Shared primitives replace repeated page-local patterns without flattening page archetypes.
