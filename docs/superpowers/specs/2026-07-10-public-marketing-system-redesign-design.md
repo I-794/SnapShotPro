@@ -1,6 +1,6 @@
 # SnapShotPro public marketing system redesign
 
-**Status:** Approved in design review; awaiting written-spec review.
+**Status:** Approved for implementation.
 **Date:** 2026-07-10
 **Scope:** Entire public marketing site. The editor is excluded from visual and functional changes.
 
