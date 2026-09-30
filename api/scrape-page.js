@@ -14,12 +14,12 @@ function abs(u, base) {
   try { return new URL(u, base).toString(); } catch (_) { return null; }
 }
 
-// Only image-looking URLs (skip trackers/scripts by extension).
+// Only image-looking http(s) URLs (skip trackers/scripts by extension). v32.1 —
+// .ico and inline data: URIs are never useful cards (favicons, 1px spacers).
 function looksLikeImage(u) {
-  if (!u) return false;
+  if (!u || !/^https?:/i.test(u)) return false;
   const path = u.split('?')[0].split('#')[0].toLowerCase();
-  return /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)(\b|$)/.test(path) ||
-    u.startsWith('data:image/');
+  return /\.(png|jpe?g|gif|webp|avif|svg|bmp)(\b|$)/.test(path);
 }
 
 export default async function handler(req, res) {
@@ -53,11 +53,12 @@ export default async function handler(req, res) {
     const seen = new Set();
     const images = [];
 
-    const push = (url, alt) => {
+    const icons = [];   // favicons: only used when the page has nothing better
+    const push = (url, alt, list = images) => {
       const a = abs(url, base);
       if (!a || seen.has(a) || !looksLikeImage(a)) return;
       seen.add(a);
-      images.push({ url: a, w: null, h: null, alt: alt || '' });
+      list.push({ url: a, w: null, h: null, alt: alt || '' });
     };
 
     // Open Graph image(s) — primary signal. Match whole <meta> tags and check
@@ -76,8 +77,8 @@ export default async function handler(req, res) {
       const rel = (tag.match(/rel=["']([^"']+)["']/i) || [])[1] || '';
       const href = (tag.match(/href=["']([^"']+)["']/i) || [])[1];
       if (!href) continue;
-      if (/apple-touch-icon/i.test(rel)) push(href, 'App icon');
-      else if (/(^|\s)icon(\s|$)/i.test(rel) || /shortcut\s+icon/i.test(rel)) push(href, 'Favicon');
+      if (/apple-touch-icon/i.test(rel)) push(href, 'App icon', icons);
+      else if (/(^|\s)icon(\s|$)/i.test(rel) || /shortcut\s+icon/i.test(rel)) push(href, 'Favicon', icons);
     }
 
     // Hero <img> and <picture><source srcset>. srcset first entry only.
@@ -96,7 +97,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.status(200).json({
       title: title.replace(/\s+/g, ' ').trim().slice(0, 200),
-      images: images.slice(0, MAX_IMAGES)
+      images: (images.length ? images : icons).slice(0, MAX_IMAGES)
     });
   } catch (e) {
     handleApiError(res, e);

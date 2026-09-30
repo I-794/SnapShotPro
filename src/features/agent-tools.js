@@ -235,8 +235,11 @@ export const TOOLS = [
     async run(args) {
       const { enterBoardMode, exportBoard } = await import('./board.js');
       if (state.mode !== 'board') enterBoardMode();
-      try { await exportBoard(); return 'Exported the board as board.png.'; }
-      catch (e) { return `Export failed: ${e?.message || e}`; }
+      try {
+        const r = await exportBoard();
+        if (r && r.ok) return `Exported the board as board.png (${r.width}×${r.height}).`;
+        return `Export failed: ${(r && r.error) || 'unknown error'}`;
+      } catch (e) { return `Export failed: ${e?.message || e}`; }
     }
   }
 ];

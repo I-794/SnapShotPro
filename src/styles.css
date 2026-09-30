@@ -1759,3 +1759,47 @@ kbd {
   padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;
 }
 .board-seed-go:hover { filter: brightness(1.08); }
+.board-seed-go:disabled, .board-seed-input:disabled { opacity: 0.6; cursor: progress; }
+
+/* v32.1 — board polish: touch, toolbar states, empty state, inline text edit */
+/* #drop-zone centers the viewport (align-items:center), so its height normally
+   comes from the canvas inside it. The board hides that canvas, which collapsed
+   the viewport to 0px (or to the canvas size) and clipped the cards — stretch it. */
+.canvas-viewport.board-mode { align-self: stretch; touch-action: none; }
+/* On the board every page is already a card, so the filmstrip is hidden. */
+.canvas-container:has(> .canvas-viewport.board-mode) > .page-filmstrip { display: none !important; }
+.board-surface { user-select: none; -webkit-user-select: none; }
+/* the card <img> must not start a native image drag (it cancels the pointer drag) */
+.board-card-img { pointer-events: none; -webkit-user-drag: none; }
+.board-toolbar button:disabled { opacity: 0.4; cursor: default; background: transparent; }
+.board-toolbar button.active { background: var(--accent-primary, #4f7cff); color: #fff; }
+.board-toolbar button:focus-visible,
+.board-toolbar select:focus-visible { outline: 2px solid var(--accent-primary, #4f7cff); outline-offset: 1px; }
+.board-arrange {
+  background: transparent; color: var(--text-primary, #e6e6ec); font-size: 12px; font-family: inherit;
+  border: 1px solid var(--border-color, #2a2a32); border-radius: 6px; padding: 3px 6px; cursor: pointer;
+}
+.board-arrange option { background: var(--bg-elevated, #15151a); }
+.board-hint { color: var(--accent-primary, #4f7cff); font-size: 12px; }
+.board-hint:empty { display: none; }
+.board-empty {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 15;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  max-width: min(420px, calc(100% - 32px)); padding: 24px;
+  background: var(--bg-elevated, #15151a); border: 1px dashed var(--border-color, #2a2a32);
+  border-radius: 12px; color: var(--text-secondary, #8a8a92); font-size: 13px; pointer-events: auto;
+}
+.board-empty-title { color: var(--text-primary, #e6e6ec); font-size: 16px; font-weight: 600; }
+.board-empty-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+.board-empty-actions button {
+  border: 1px solid var(--border-color, #2a2a32); background: transparent; color: var(--text-primary, #e6e6ec);
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.board-empty-actions .board-empty-upload { background: var(--accent-primary, #4f7cff); border-color: transparent; color: #fff; }
+.board-empty-hint { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+.board-text.editing { cursor: text; user-select: text; -webkit-user-select: text;
+  outline: 2px solid var(--accent-primary, #4f7cff); outline-offset: 2px; }
+@media (pointer: coarse) {
+  .board-resize { width: 24px; height: 24px; right: 2px; bottom: 2px; }   /* card has overflow:hidden */
+  .board-toolbar button { padding: 8px 10px; }
+}

@@ -66,7 +66,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight' || id === 'toggleBoard' || id === 'boardAddText' || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
+      id === 'toggle-spotlight' || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
 
@@ -82,8 +82,8 @@ export function registerCommands() {
     { id: 'campaign-generate', label: 'Generate Campaign',     icon: '📦', group: groupFor('campaign-generate'),
       run: () => import('./campaign-generator.js').then(m => m.generateCampaign({ name: 'Campaign', includeAppStore: true })),
       when: () => !!state.image },
-    { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
-    { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
+    { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => (state.mode === 'board' ? window.__boardUndo?.() : undo(render)) },
+    { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => (state.mode === 'board' ? window.__boardRedo?.() : redo(render)) },
     { id: 'duplicate-selection', label: 'Duplicate selection', icon: '⧉', run: () => { if (duplicateSelection()) render(); }, when: () => state.canvasSelection.length > 0 },
     { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
@@ -100,6 +100,32 @@ export function registerCommands() {
     { id: 'exportBoard', label: 'Board: export PNG', icon: 'download', group: 'File',
       run: () => import('./board.js').then(m => m.exportBoard()),
       when: () => state.mode === 'board' },
+    // v32.1 — board layout commands (previously reachable only via the agent).
+    { id: 'boardFit', label: 'Board: fit to screen', icon: '⌧', group: 'View', keys: '0',
+      run: () => import('./board.js').then(m => m.fitBoard()),
+      when: () => state.mode === 'board' },
+    { id: 'boardResetZoom', label: 'Board: zoom to 100%', icon: '🔍', group: 'View', keys: '1',
+      run: () => import('./board.js').then(m => m.resetBoard()),
+      when: () => state.mode === 'board' },
+    { id: 'boardGroup', label: 'Board: group selected', icon: '▣', group: 'View', keys: 'mod+g',
+      run: () => import('./board.js').then(m => m.groupSelected()),
+      when: () => state.mode === 'board' && state.boardSelection.length > 1 },
+    { id: 'boardUngroup', label: 'Board: ungroup', icon: '▢', group: 'View', keys: 'mod+shift+g',
+      run: () => import('./board.js').then(m => m.ungroupSelected()),
+      when: () => state.mode === 'board' && state.boardSelection.some(r => state.board.objects.some(o => o.id === r.id && o.kind === 'group')) },
+    ...['grid', 'row', 'hero', 'bento'].map(layout => ({
+      id: `boardArrange-${layout}`, label: `Board: arrange as ${layout}`, icon: '▦', group: 'View',
+      run: () => import('./board.js').then(m => { m.arrangeCards(layout); m.fitBoard(); }),
+      when: () => state.mode === 'board'
+    })),
+    { id: 'boardUpload', label: 'Board: upload images as cards', icon: '📁', group: 'View',
+      run: () => {
+        if (state.mode !== 'board') enterBoardMode();
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+        inp.addEventListener('change', () => import('./board.js').then(m => m.addFilesAsCards(inp.files)));
+        inp.click();
+      } },
     { id: 'seedFromUrl', label: 'Board: add from URL', icon: 'link', group: 'View',
       run: () => {
         if (state.mode !== 'board') enterBoardMode();

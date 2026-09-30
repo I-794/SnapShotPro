@@ -57,6 +57,7 @@ import { bindCampaigns } from './features/campaigns.js';
 import { bindPages } from './features/pages.js';
 import { bindBoard } from './features/board.js';
 import { bindSeed } from './features/seed.js';
+import { bindA11y } from './ui/a11y.js';
 import { bindTours } from './features/tours.js';
 import { bindGallery } from './features/gallery.js';
 import { bindCrop } from './features/crop.js';
@@ -157,6 +158,7 @@ function init() {
   bindPages();
   bindBoard();     // v32 — Open Canvas board surface
   bindSeed();       // v32 — Seed: URL -> board cards
+  bindA11y();       // v32.1 — button names + modal dialog focus handling
   bindTours();
   bindProjects();
   bindCampaigns();

@@ -48,7 +48,9 @@ function showUploadUI() {
 // render + sync the sidebar controls. Toggles the upload zone for blank pages.
 export function applyPayload(payload) {
   applyDesignToState(payload).then(() => {
-    if (state.image) showCanvasUI(); else showUploadUI();
+    // v32.1 — on the board, the single-canvas UI stays hidden (a page switch or
+    // delete from the board must not un-hide #canvas-wrapper over the cards).
+    if (state.mode !== 'board') { if (state.image) showCanvasUI(); else showUploadUI(); }
     render();
     if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
     // v24 — if this design is a code snippet, re-rasterize crisply from its
@@ -60,8 +62,17 @@ export function applyPayload(payload) {
   });
 }
 
+// v32.1 — show the canvas or the upload zone to match the live page (used when
+// leaving the board, where applyPayload deliberately left them hidden).
+export function syncCanvasUI() {
+  if (state.image) showCanvasUI(); else showUploadUI();
+}
+
 // Downscale the live preview canvas to a small JPEG thumbnail (page/project cards).
 export function makeThumb() {
+  // v32.1 — on the board the preview canvas isn't redrawn (render() routes to
+  // renderBoard), so it holds a stale frame; callers keep the existing thumb.
+  if (state.mode === 'board') return null;
   const src = el.previewCanvas;
   if (!src || !src.width) return null;
   try {

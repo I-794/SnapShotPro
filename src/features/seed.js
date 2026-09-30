@@ -4,12 +4,18 @@
 // /api/fetch-url) and drops each as a page via pages.addPageWithImage. The board's
 // onDocumentChange sync then lays a card per new page. Degrades gracefully when
 // the API is unreachable (Vite dev doesn't serve /api) — shows a notification.
+// v32.1 — progress + busy state on the bar, tiny images (icons/trackers) are
+// skipped, skipped images are reported, and a lone blank page is replaced.
 
+import { state } from '../state/state.js';
 import { showNotification } from '../ui/notification.js';
 import { loadImageEl } from './url-load.js';
-import { addPageWithImage } from './pages.js';
+import { addPageWithImage, pageCount, getPageMeta } from './pages.js';
+
+const MIN_SIDE = 64;   // smaller than this is an icon/tracker, not a card
 
 let bar = null;     // .board-seed input row
+let busy = false;
 
 function ensureBar(toolbar) {
   if (bar || !toolbar) return;
@@ -25,46 +31,74 @@ function ensureBar(toolbar) {
   toolbar.appendChild(bar);
 }
 
+function setBusy(on, label) {
+  if (!bar) return;
+  const input = bar.querySelector('.board-seed-input');
+  const btn = bar.querySelector('.board-seed-go');
+  input.disabled = on;
+  btn.disabled = on;
+  btn.textContent = on ? (label || 'Loading…') : 'Add';
+}
+
 function url2host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return u; } }
 
-// v32 — core Seed flow with no UI side effects. Returns {added, ids, error?}.
+// v32 — core Seed flow with no UI side effects. Returns {added, skipped, ids, error?}.
 // Used by the UI seedFromUrl (notifications) and the agent's add_page_from_url tool.
-export async function seedFromUrlCore(rawUrl) {
+// onProgress(done, total) is optional.
+export async function seedFromUrlCore(rawUrl, onProgress) {
   const url = (rawUrl || '').trim();
-  if (!url) return { added: 0, ids: [] };
+  if (!url) return { added: 0, skipped: 0, ids: [] };
   let manifest;
   try {
     const res = await fetch(`/api/scrape-page?url=${encodeURIComponent(url)}`);
     if (!res.ok) {
       let msg = `Scrape failed (${res.status})`;
       try { const j = await res.json(); if (j && j.error) msg = j.error; } catch (_) {}
-      return { added: 0, ids: [], error: msg };
+      return { added: 0, skipped: 0, ids: [], error: msg };
     }
     manifest = await res.json();
   } catch (e) {
-    return { added: 0, ids: [], error: 'Could not reach the scraper.' };
+    return { added: 0, skipped: 0, ids: [], error: 'Could not reach the scraper.' };
   }
   const imgs = (manifest && manifest.images) || [];
+  // A doc that is one blank page is just a placeholder; replace it once real cards land.
+  const loneBlank = pageCount() === 1 && !state.image ? getPageMeta()[0].id : null;
   const ids = [];
+  let skipped = 0;
   for (let i = 0; i < imgs.length; i++) {
+    if (onProgress) onProgress(i + 1, imgs.length);
     try {
       const img = await loadImageEl(imgs[i].url);
+      if (img.width < MIN_SIDE || img.height < MIN_SIDE) { skipped++; continue; }
       const id = addPageWithImage(img);
-      if (id) ids.push(id);
-    } catch (e) { /* skip one bad image */ }
+      if (id) ids.push(id); else skipped++;
+    } catch (e) { skipped++; /* skip one bad image */ }
     await new Promise(r => setTimeout(r, 0));
   }
-  return { added: ids.length, ids };
+  if (ids.length && loneBlank) {
+    const { dropPage } = await import('./board.js');
+    dropPage(loneBlank);
+  }
+  return { added: ids.length, skipped, ids };
 }
 
 export async function seedFromUrl(rawUrl) {
   const url = (rawUrl || '').trim();
-  if (!url) return;
-  showNotification('Scraping page…', 'success');
-  const r = await seedFromUrlCore(url);
-  if (r.error) { showNotification(r.error, 'error'); return; }
-  if (!r.added) { showNotification('No images loaded from that page.', 'error'); return; }
-  showNotification(`Added ${r.added} card${r.added === 1 ? '' : 's'} from ${url2host(url)}.`, 'success');
+  if (!url || busy) return;
+  busy = true;
+  setBusy(true, 'Scraping…');
+  try {
+    const r = await seedFromUrlCore(url, (d, n) => setBusy(true, `Loading ${d}/${n}…`));
+    if (r.error) { showNotification(r.error, 'error'); return; }
+    if (!r.added) { showNotification('No usable images found on that page.', 'error'); return; }
+    const skipped = r.skipped ? ` (skipped ${r.skipped} small or broken image${r.skipped === 1 ? '' : 's'})` : '';
+    showNotification(`Added ${r.added} card${r.added === 1 ? '' : 's'} from ${url2host(url)}${skipped}.`, 'success');
+    const input = bar && bar.querySelector('.board-seed-input');
+    if (input) input.value = '';
+  } finally {
+    busy = false;
+    setBusy(false);
+  }
 }
 
 export function bindSeed() {
