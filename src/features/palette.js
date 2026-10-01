@@ -9,9 +9,9 @@ import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
 import { setTool } from './canvas-tools.js';
-import { selectAll, duplicateSelection } from './selection.js';
-import { listExportPresets, applyExportPreset } from './export-presets.js';
-import { toggleLayersPanel } from './layers.js';
+import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
+import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
+import { toggleLayersPanel, renderLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
 import { stickers } from '../state/presets.js';
 import { addSticker } from './stickers.js';
@@ -62,7 +62,9 @@ function groupFor(id) {
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
       id.startsWith('tour-') || id === 'code-studio' || id.startsWith('merge-')) return 'File';
-  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects') return 'Edit';
+  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects' ||
+      id.startsWith('distribute-') || id.startsWith('match-') || id === 'hide-selection' ||
+      id === 'lock-selection' || id === 'unlock-all') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
@@ -213,6 +215,15 @@ export function registerCommands() {
     { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
     { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
     { id: 'brand-brain-apply', label: 'Apply Brand',          icon: '🎨', run: () => import('./brand-brain.js').then(m => m.applyBrand()), when: () => !!state.brand?.enabled },
+    // v33 — Aperture QoL
+    { id: 'export-quick',       label: 'Quick export (repeat last preset)', icon: '⚡', run: quickExport, when: () => !!state.image },
+    { id: 'distribute-h',       label: 'Distribute horizontally', icon: '⇹', run: () => { saveStateToHistory(); if (groupDistribute('h')) render(); else showStatus('Select 3+ objects'); }, when: () => state.canvasSelection.length >= 3 },
+    { id: 'distribute-v',       label: 'Distribute vertically',   icon: '⇳', run: () => { saveStateToHistory(); if (groupDistribute('v')) render(); else showStatus('Select 3+ objects'); }, when: () => state.canvasSelection.length >= 3 },
+    { id: 'match-width',        label: 'Match width (largest)',   icon: '⇔', run: () => { saveStateToHistory(); if (groupMatchSize('w')) render(); }, when: () => state.canvasSelection.length >= 2 },
+    { id: 'match-height',       label: 'Match height (largest)',  icon: '⇕', run: () => { saveStateToHistory(); if (groupMatchSize('h')) render(); }, when: () => state.canvasSelection.length >= 2 },
+    { id: 'hide-selection',     label: 'Hide selected',           icon: '⊘', run: () => { if (setSelectionFlag('hide')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'lock-selection',     label: 'Lock selected',           icon: '🔒', run: () => { if (setSelectionFlag('lock')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'unlock-all',         label: 'Unlock & show all objects', icon: '🔓', run: () => { const n = unlockAll(); if (n) { render(); renderLayersPanel(); } showStatus(n ? `Unlocked ${n}` : 'Nothing locked or hidden'); } },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 
@@ -246,6 +257,7 @@ export function registerCommands() {
     'redo':           'mod+shift+z',
     'duplicate-selection': 'mod+d',
     'select-all-objects':  'mod+a',
+    'export-quick':        'mod+shift+s',
   };
   commands.forEach((c) => {
     c.group = groupFor(c.id);

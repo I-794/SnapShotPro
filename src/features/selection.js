@@ -32,12 +32,18 @@ export function isRefSelected(ref) {
   return state.canvasSelection.some((r) => refsEqual(r, ref));
 }
 
+// v33 — hidden or locked objects (Layers panel eye/lock) can't be picked on the
+// canvas: hit tests, marquee, and Select all all skip them.
+export function isPickable(obj) {
+  return !!obj && obj.visible !== false && !obj.locked;
+}
+
 // Enumerate every currently selectable object on the canvas, top-most last.
 export function objectRefs() {
   const refs = [];
-  (state.annotations || []).forEach((a) => refs.push({ kind: 'annotation', id: a.id }));
-  (state.redactions || []).forEach((r) => refs.push({ kind: 'redaction', id: r.id }));
-  (state.extraImages || []).forEach((e) => refs.push({ kind: 'extraImage', id: e.id }));
+  (state.annotations || []).forEach((a) => { if (isPickable(a)) refs.push({ kind: 'annotation', id: a.id }); });
+  (state.redactions || []).forEach((r) => { if (isPickable(r)) refs.push({ kind: 'redaction', id: r.id }); });
+  (state.extraImages || []).forEach((e) => { if (isPickable(e)) refs.push({ kind: 'extraImage', id: e.id }); });
   if (state.textOverlay.enabled && state.textOverlay.content) refs.push({ kind: 'text' });
   return refs;
 }
@@ -79,6 +85,18 @@ export function resolveRef(ref) {
           fill: ann.fill, fillColor: ann.fillColor, fillOpacity: ann.fillOpacity,
         };
       },
+      // v33 — scale to w x h around the box's top-left. Fixed-size badges
+      // (number, sticker) and zero-size axes are left alone.
+      resize(w, h) {
+        if (ann.type === 'number' || ann.type === 'sticker') return;
+        const bb = annotationBBox(ann);
+        const sx = bb.w > 0 && w != null ? w / bb.w : 1;
+        const sy = bb.h > 0 && h != null ? h / bb.h : 1;
+        const fx = (v) => bb.x + (v - bb.x) * sx, fy = (v) => bb.y + (v - bb.y) * sy;
+        if (Array.isArray(ann.points)) ann.points.forEach((p) => { p.x = fx(p.x); p.y = fy(p.y); });
+        ann.x1 = fx(ann.x1); ann.x2 = fx(ann.x2); ann.y1 = fy(ann.y1); ann.y2 = fy(ann.y2);
+      },
+      target: ann,
       setStyle(s) {
         if (s.color != null) ann.color = s.color;
         if (s.strokeWidth != null) ann.strokeWidth = s.strokeWidth;
@@ -96,6 +114,8 @@ export function resolveRef(ref) {
     return {
       box: { x: r.x, y: r.y, w: r.w, h: r.h },
       moveBy(dx, dy) { r.x += dx; r.y += dy; },
+      resize(w, h) { if (w != null) r.w = w; if (h != null) r.h = h; },
+      target: r,
       clone() {
         const copy = JSON.parse(JSON.stringify(r));
         copy.id = newId();
@@ -118,6 +138,12 @@ export function resolveRef(ref) {
     return {
       box: { x: cw * ei.xFrac - w / 2, y: ch * ei.yFrac - h / 2, w, h },
       moveBy(dx, dy) { ei.xFrac += dx / cw; ei.yFrac += dy / ch; },
+      // Images keep their aspect ratio, so matching one dimension scales both.
+      resize(nw, nh) {
+        if (nw != null) ei.scaleFrac = nw / img.width;
+        else if (nh != null) ei.scaleFrac = nh / img.height;
+      },
+      target: ei,
       clone() {
         const id = 'extra_' + newId();
         imageRegistry[id] = img;           // share the same decoded image
@@ -148,6 +174,8 @@ export function resolveRef(ref) {
       // Text is a singleton overlay: it can't be duplicated or deleted from the
       // canvas (it's owned by the Text sidebar section), so these are no-ops.
       clone() { return null; },
+      resize() {},
+      target: null,
       remove() {},
       raiseToFront() {},
       sendToBack() {},
@@ -184,6 +212,33 @@ export function toggleRef(ref) {
 
 export function selectAll() {
   setSelection(objectRefs());
+}
+
+// v33 — drop refs whose object was just hidden or locked (text has no lock).
+export function pruneSelection() {
+  const live = objectRefs();
+  setSelection(state.canvasSelection.filter((r) => r.kind === 'text' || live.some((l) => refsEqual(l, r))));
+}
+
+// v33 — hide or lock every selected object (one history entry). Text is the
+// sidebar-owned singleton, so it's skipped.
+export function setSelectionFlag(flag) {
+  const targets = state.canvasSelection.map(resolveRef).filter((h) => h && h.target).map((h) => h.target);
+  if (!targets.length) return false;
+  saveStateToHistory();
+  targets.forEach((o) => { if (flag === 'hide') o.visible = false; else o.locked = true; });
+  clearSelection();
+  return true;
+}
+
+// v33 — unlock + unhide everything on the canvas. Returns how many changed.
+export function unlockAll() {
+  const all = [...(state.annotations || []), ...(state.redactions || []), ...(state.extraImages || [])];
+  const hit = all.filter((o) => o.locked || o.visible === false);
+  if (!hit.length) return 0;
+  saveStateToHistory();
+  hit.forEach((o) => { o.locked = false; o.visible = true; });
+  return hit.length;
 }
 
 // Mirror a lone selection into the legacy single-select fields so the existing
@@ -255,4 +310,34 @@ export function groupAlign(how) {
     case 'bottom':  dy = canvas.height - b.h - b.y; break;
   }
   state.canvasSelection.forEach((ref) => { const h = resolveRef(ref); if (h) h.moveBy(dx, dy); });
+}
+
+// v33 — spread 3+ selected objects so the gaps between them are equal. The
+// outermost two stay put. axis: 'h' | 'v'. Returns false if fewer than 3.
+export function groupDistribute(axis) {
+  const items = state.canvasSelection.map(resolveRef).filter(Boolean);
+  if (items.length < 3) return false;
+  const pos = axis === 'h' ? 'x' : 'y', size = axis === 'h' ? 'w' : 'h';
+  items.sort((a, b) => a.box[pos] - b.box[pos]);
+  const first = items[0], last = items[items.length - 1];
+  const span = (last.box[pos] + last.box[size]) - first.box[pos];
+  const total = items.reduce((sum, it) => sum + it.box[size], 0);
+  const gap = (span - total) / (items.length - 1);
+  let cursor = first.box[pos] + first.box[size] + gap;
+  for (let i = 1; i < items.length - 1; i++) {
+    const d = cursor - items[i].box[pos];
+    if (axis === 'h') items[i].moveBy(d, 0); else items[i].moveBy(0, d);
+    cursor += items[i].box[size] + gap;
+  }
+  return true;
+}
+
+// v33 — make every selected object as wide (dim 'w') or tall (dim 'h') as the
+// largest one. Returns false if fewer than 2 resizable objects.
+export function groupMatchSize(dim) {
+  const items = state.canvasSelection.map(resolveRef).filter((h) => h && h.target);
+  if (items.length < 2) return false;
+  const target = Math.max(...items.map((h) => h.box[dim]));
+  items.forEach((h) => { if (dim === 'w') h.resize(target, null); else h.resize(null, target); });
+  return true;
 }

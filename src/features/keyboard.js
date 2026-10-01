@@ -10,6 +10,7 @@ import { clearSelection, selectAll, duplicateSelection } from './selection.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { timelineActive, timelineStepFrame, timelineSetIn, timelineSetOut } from './timeline.js';
 import { matchEvent } from './shortcuts.js';
+import { quickExport } from './export-presets.js';
 
 function showShortcuts(show) {
   if (!el.shortcutsOverlay) return;
@@ -52,6 +53,7 @@ export function bindKeyboard() {
           case 'redo':       window.__boardRedo?.(); return;
           case 'select-all': window.__boardSelectAll?.(); return;
           case 'export':     window.__boardExport?.(); return;
+          case 'quick-export': window.__boardExport?.(); return;
           case 'duplicate':  return;
         }
       }
@@ -59,6 +61,7 @@ export function bindKeyboard() {
         case 'undo':   undo(render); return;
         case 'redo':   redo(render); return;
         case 'export': exportImage(); return;
+        case 'quick-export': quickExport(); return;
         case 'copy':   copyToClipboard(); return;
         case 'help':   showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return;
         case 'duplicate':  if (duplicateSelection()) render(); return;

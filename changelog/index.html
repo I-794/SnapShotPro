@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v32 Open Canvas: lay every page on an infinite, pan-and-zoom board of cards you can arrange, connect, group, seed from a URL, drive by chat, and export as one image, on top of v31 Merge Studio (CSV to N designs), v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v33 Aperture (eyedropper, recent colors, distribute, undo from the toast, quick export) and v32 Open Canvas: lay every page on an infinite, pan-and-zoom board of cards you can arrange, connect, group, seed from a URL, drive by chat, and export as one image, on top of v31 Merge Studio (CSV to N designs), v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v32 Open Canvas: an infinite board of cards for your whole project, seed it from a URL, drive it by chat, and export it as one image. Plus v31 Merge Studio (CSV to N on-brand designs) and the full trail back to a single HTML file.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v33 Aperture (quality of life) and v32 Open Canvas: an infinite board of cards for your whole project, seed it from a URL, drive it by chat, and export it as one image. Plus v31 Merge Studio (CSV to N on-brand designs) and the full trail back to a single HTML file.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -762,6 +762,7 @@
         .entry.latest .ver { background: var(--accent); color: var(--on-accent); border-color: transparent; }
         .entry-date { font-size: 12.5px; font-weight: 500; color: var(--ink-3); }
         .entry h2 { font-size: clamp(20px, 2.6vw, 27px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; line-height: 1.15; }
+        .entry-note { color: color-mix(in srgb, var(--ink-2) 60%, var(--ink-3)); font-size: 14.5px; line-height: 1.55; max-width: 62ch; margin: -6px 0 14px; text-wrap: pretty; }
         .changes { list-style: none; display: flex; flex-direction: column; gap: 11px; }
         .changes li { position: relative; padding-left: 22px; color: var(--ink-2); font-size: 15.5px; line-height: 1.55; }
         .changes li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
@@ -822,7 +823,7 @@
         <div class="spotlight spotlight-canvas reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
-                <span class="spot-tag"><span class="dot"></span>Latest release</span>
+                <span class="spot-tag"><span class="dot"></span>Latest flagship</span>
                 <div class="spot-ver">v32 · July 2026</div>
                 <h2>Open Canvas.</h2>
                 <p class="spot-lede">Your whole project on one infinite board. Every page is a card you can pan, zoom, arrange, connect, and group. Seed it from a URL, drive it by chat, and export the whole board as a single image.</p>
@@ -866,6 +867,20 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v33.0</span><span class="entry-date">October 2026</span></div>
+                <div>
+                    <h2>Aperture</h2>
+                    <p class="entry-note">Starting with v33, each release gets a photography codename, in A to Z order. This one is about the small things you do a hundred times a day.</p>
+                    <ul class="changes">
+                        <li><b>Pick colors from anywhere.</b> Every color picker now has an eyedropper that samples any pixel on your screen, including your own canvas (Chrome and Edge). Under each picker, your brand colors and the last 8 colors you used are one click away.</li>
+                        <li><b>Space things evenly.</b> Select three or more objects and Distribute spreads them with equal gaps. Match size makes a selection as wide or as tall as its largest item. Both live in the right-click menu and Cmd-K.</li>
+                        <li><b>Lock and hide that actually hold.</b> Locked or hidden layers can no longer be clicked, dragged, or caught by a marquee or Select all. Hide or lock straight from the right-click menu, and bring everything back with Unlock &amp; show all.</li>
+                        <li><b>Undo right from the toast.</b> Deleting objects, a page, or a board card shows an Undo button for a few seconds. Deleted pages come back with their latest edits, and board cards return to the same spot.</li>
+                        <li><b>Quick export and a tidier stage.</b> Cmd/Ctrl+Shift+S re-exports with the last preset you used, and the preset menu remembers it. Page thumbnails now sit under the canvas instead of squeezing it from the side, and the zoom controls no longer cover the board's Export button.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v32.1</span><span class="entry-date">September 2026</span></div>
                 <div>
                     <h2>Open Canvas, polished</h2>

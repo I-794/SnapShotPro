@@ -14,7 +14,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { screenToBoard, clampZoom } from './board-tools.js';
 import { resolveBoardRef, clearBoardSelection, selectBoardOnly, toggleBoardRef, hitTopBoardRef, groupBounds } from './board-tools.js';
-import { pageCount, getPageMeta, indexOfPage, onDocumentChange, notifyDocumentChange, switchTo, syncActivePage, deletePage, addPageWithImage } from './pages.js';
+import { pageCount, getPageMeta, indexOfPage, onDocumentChange, notifyDocumentChange, switchTo, syncActivePage, deletePage, addPageWithImage, clearPageTrash, hasPageTrash, restoreDeletedPages } from './pages.js';
 import { syncCanvasUI } from './document.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { showNotification } from '../ui/notification.js';
@@ -763,7 +763,7 @@ export function dropPage(pageId) {
   const i = indexOfPage(pageId);
   if (i < 0 || pageCount() <= 1) return;
   state.board.objects = state.board.objects.filter(o => !(o.kind === 'card' && o.pageId === pageId));
-  deletePage(i);
+  deletePage(i, { recordTrash: false });
   rebaseline();
   renderBoard();
   // The board just went from empty to real cards: frame them once the
@@ -927,6 +927,9 @@ function updatePinch() {
 // object now (instant) AND delete the underlying page; the onDocumentChange sync
 // would drop the card too, but resolving+removing first avoids the 200ms wait.
 function deleteBoardSelection() {
+  const count = state.boardSelection.length;
+  const before = snapBoard();
+  clearPageTrash();
   for (const ref of [...state.boardSelection]) {
     const o = state.board.objects.find(x => x.id === ref.id);
     if (!o) continue;
@@ -952,6 +955,16 @@ function deleteBoardSelection() {
   state.boardSelection = [];
   commitBoard();
   renderBoard();
+  // v33 — Undo toast: bring the pages back first, then the board layout (cards
+  // only restore when their page exists). Skipped if the board was edited since.
+  if (snapBoard() === before && !hasPageTrash()) return;   // nothing was deletable
+  const depth = undoStack.length;
+  showNotification(count === 1 ? 'Deleted' : `Deleted ${count} items`, 'success', { action: { label: 'Undo', run: () => {
+    restoreDeletedPages();
+    if (undoStack.length === depth) undoBoard();
+    rebaseline();
+    renderBoard();
+  } } });
 }
 
 // ── v32.1 — inline text editing ─────────────────────────────────────────────

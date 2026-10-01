@@ -17,6 +17,7 @@ import { bindCanvasTools, setTool } from './features/canvas-tools.js';
 import { bindContextMenu } from './features/context-menu.js';
 import { bindAssetLibrary } from './features/asset-library.js';
 import { bindExportPresets } from './features/export-presets.js';
+import { bindColorTools } from './features/color-tools.js';
 import { bindMergeStudio } from './features/merge-studio.js';
 import { bindLayersEvents, renderLayersPanel } from './features/layers.js';
 import { bindHistoryTimeline, renderHistoryTimeline } from './features/history-timeline.js';
@@ -121,6 +122,7 @@ function init() {
   bindContextMenu();    // v28 — right-click canvas object menu
   bindAssetLibrary();   // v28 — reusable asset library (Import group)
   bindExportPresets();  // v28 — export presets (Export group)
+  bindColorTools();     // v33 — eyedropper + brand/recent swatches on color pickers
   bindMergeStudio();    // v31 — Merge Studio (data-driven batch: CSV → N designs)
   bindLayersEvents();
   bindHistoryTimeline();

@@ -8,6 +8,7 @@ export const SHORTCUTS = [
   { id: 'palette',  keys: 'mod+k',       label: 'Command palette',               group: 'General',  displayOnly: true },
   { id: 'help',     keys: '?',           label: 'Toggle shortcuts help',          group: 'General',  match: (e) => e.key === '?' },
   { id: 'export',   keys: 'mod+s',       label: 'Export image',                   group: 'File',     match: (e, mod) => mod && k(e) === 's' && !e.shiftKey },
+  { id: 'quick-export', keys: 'mod+shift+s', label: 'Quick export (last preset)', group: 'File', match: (e, mod) => mod && e.shiftKey && k(e) === 's' },
   { id: 'copy',     keys: 'mod+shift+c', label: 'Copy to clipboard',              group: 'File',     match: (e, mod) => mod && e.shiftKey && k(e) === 'c' },
   { id: 'undo',     keys: 'mod+z',       label: 'Undo',                           group: 'Edit',     match: (e, mod) => mod && k(e) === 'z' && !e.shiftKey },
   { id: 'redo',     keys: 'mod+shift+z', label: 'Redo',                           group: 'Edit',     match: (e, mod) => mod && (k(e) === 'y' || (k(e) === 'z' && e.shiftKey)) },

@@ -1,6 +1,7 @@
 import { state, imageRegistry } from '../state/state.js';
 import { el } from '../ui/elements.js';
-import { saveStateToHistory } from '../state/history.js';
+import { saveStateToHistory, undo, history } from '../state/history.js';
+import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
 import { drawArrow, drawStroke, annotationBBox, drawShape, SHAPE_TYPES } from '../render/annotations.js';
 import { hitTestExtraImageAtPoint } from './extra-images.js';
@@ -46,6 +47,7 @@ export function hitTestAnnotations(x, y) {
   if (!state.annotations) return -1;
   for (let i = state.annotations.length - 1; i >= 0; i--) {
     const ann = state.annotations[i];
+    if (ann.visible === false || ann.locked) continue;   // v33 — hidden/locked aren't pickable
     const bb = annotationBBox(ann);
     const pad = 10;
     if (x >= bb.x - pad && x <= bb.x + bb.w + pad &&
@@ -76,6 +78,7 @@ export function hitTestRedactions(x, y) {
   if (!state.redactions) return -1;
   for (let i = state.redactions.length - 1; i >= 0; i--) {
     const r = state.redactions[i];
+    if (r.visible === false || r.locked) continue;
     if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return i;
   }
   return -1;
@@ -100,12 +103,23 @@ export function hitTopRef(x, y) {
 // fall back to the legacy single-select fields kept in sync by selection.js.
 export function deleteSelected() {
   if (state.canvasSelection.length) {
+    // Text is the sidebar-owned singleton and can't be deleted from the canvas.
+    const handles = state.canvasSelection.filter((r) => r.kind !== 'text').map(resolveRef).filter(Boolean);
+    if (!handles.length) return;
     saveStateToHistory();
+    const entry = history.past[history.past.length - 1];
     // Resolve handles up front; each remove() recomputes its live index so the
     // batch stays correct as the underlying arrays shrink.
-    state.canvasSelection.map(resolveRef).filter(Boolean).forEach((h) => h.remove());
+    handles.forEach((h) => h.remove());
     clearSelection();
     render();
+    // v33 — one-click Undo (same as Cmd+Z; the deletion is one history entry).
+    showNotification(handles.length === 1 ? 'Deleted' : `Deleted ${handles.length} items`, 'success',
+      { action: { label: 'Undo', run: () => {
+        // Only if nothing else was done since; otherwise Undo would revert that instead.
+        if (history.past[history.past.length - 1] === entry) undo(render);
+        else showNotification('Use Cmd/Ctrl+Z to step back through later edits', 'error');
+      } } });
   }
 }
 
