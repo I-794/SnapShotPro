@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '32.1';
+const CURRENT_VERSION = '33.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🪟 Open Canvas, polished",
+  heading: "📷 v33 · Aperture",
   items: [
-    { title: 'Your board edits stick',
-      desc: 'Moves, resizes, text, arrows, and groups now autosave, and Cmd/Ctrl+Z undoes them on the board.' },
-    { title: 'Touch and trackpad',
-      desc: 'Drag cards with a finger, pinch to zoom, two-finger scroll to pan, double-tap a card to open it.' },
-    { title: 'Sharper board exports',
-      desc: 'The board PNG now renders at up to 3x, with progress on the Export button.' },
-    { title: 'Faster to drive',
-      desc: 'New board shortcuts (press ? to see them), inline text editing, Arrange and Ungroup in the toolbar, and upload straight onto an empty board.' }
+    { title: 'Pick colors from anywhere',
+      desc: 'Every color picker has an eyedropper, plus your brand colors and last 8 colors one click away.' },
+    { title: 'Space things evenly',
+      desc: 'Right-click 3+ objects to Distribute them, or Match size to the largest. Hide and Lock are there too.' },
+    { title: 'Undo from the toast',
+      desc: 'Deleting objects, pages, or board cards shows an Undo button. Deleted pages come back with their edits.' },
+    { title: 'Quick export',
+      desc: 'Cmd/Ctrl+Shift+S re-exports with the last preset you used. Page thumbnails now sit under the canvas.' }
   ]
 };
 

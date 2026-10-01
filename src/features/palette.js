@@ -11,7 +11,7 @@ import { setScene } from './scene-select.js';
 import { setTool } from './canvas-tools.js';
 import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
 import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
-import { toggleLayersPanel } from './layers.js';
+import { toggleLayersPanel, renderLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
 import { stickers } from '../state/presets.js';
 import { addSticker } from './stickers.js';
@@ -221,9 +221,9 @@ export function registerCommands() {
     { id: 'distribute-v',       label: 'Distribute vertically',   icon: '⇳', run: () => { saveStateToHistory(); if (groupDistribute('v')) render(); else showStatus('Select 3+ objects'); }, when: () => state.canvasSelection.length >= 3 },
     { id: 'match-width',        label: 'Match width (largest)',   icon: '⇔', run: () => { saveStateToHistory(); if (groupMatchSize('w')) render(); }, when: () => state.canvasSelection.length >= 2 },
     { id: 'match-height',       label: 'Match height (largest)',  icon: '⇕', run: () => { saveStateToHistory(); if (groupMatchSize('h')) render(); }, when: () => state.canvasSelection.length >= 2 },
-    { id: 'hide-selection',     label: 'Hide selected',           icon: '⊘', run: () => { if (setSelectionFlag('hide')) render(); }, when: () => state.canvasSelection.length > 0 },
-    { id: 'lock-selection',     label: 'Lock selected',           icon: '🔒', run: () => { if (setSelectionFlag('lock')) render(); }, when: () => state.canvasSelection.length > 0 },
-    { id: 'unlock-all',         label: 'Unlock & show all objects', icon: '🔓', run: () => { const n = unlockAll(); if (n) render(); showStatus(n ? `Unlocked ${n}` : 'Nothing locked or hidden'); } },
+    { id: 'hide-selection',     label: 'Hide selected',           icon: '⊘', run: () => { if (setSelectionFlag('hide')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'lock-selection',     label: 'Lock selected',           icon: '🔒', run: () => { if (setSelectionFlag('lock')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'unlock-all',         label: 'Unlock & show all objects', icon: '🔓', run: () => { const n = unlockAll(); if (n) { render(); renderLayersPanel(); } showStatus(n ? `Unlocked ${n}` : 'Nothing locked or hidden'); } },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 

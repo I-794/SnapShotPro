@@ -125,6 +125,7 @@ export function applyDocument(doc) {
   state.board = d.board || { objects: [], camera: { x: 0, y: 0, zoom: 1 } };
   if (!state.board.camera) state.board.camera = { x: 0, y: 0, zoom: 1 };
   state.boardSelection = [];
+  trash = [];   // v33 — never restore another document's pages
   applyPayload(pages[active].payload);
   renderFilmstrip();
 }
