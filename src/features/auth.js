@@ -25,9 +25,6 @@ function clearLocalConfig() {
 function getConfig() {
   const local = loadLocalConfig();
   if (local && local.url && local.anonKey) return local;
-  const envUrl = import.meta.env.VITE_SUPABASE_URL;
-  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  if (envUrl && envKey) return { url: envUrl, anonKey: envKey, source: 'env' };
   return null;
 }
 

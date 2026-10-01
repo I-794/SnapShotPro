@@ -87,16 +87,12 @@ return `501` and the editor falls back to the existing browser-key flow.
 
 ### Supabase (for accounts + cloud project sync)
 
-Create a free Supabase project at https://supabase.com/, then in the Vercel project → Settings → Environment Variables, add:
+Supabase is bring-your-own: no Supabase keys are stored in this repo or read from
+environment variables. Each user creates a free project at https://supabase.com/ and
+pastes its Project URL + anon public key into the editor's cloud setup dialog; they are
+saved only in that user's browser (`localStorage`).
 
-| Name | Value |
-|------|-------|
-| `VITE_SUPABASE_URL` | from Supabase project Settings → API |
-| `VITE_SUPABASE_ANON_KEY` | from Supabase project Settings → API (the **anon public** key, safe to ship to browsers) |
-
-Both must start with `VITE_` so Vite exposes them to the client bundle.
-
-Then in your Supabase project, create the schema (SQL Editor → New Query):
+In your Supabase project, create the schema (SQL Editor → New Query):
 
 ```sql
 create table if not exists public.templates (
