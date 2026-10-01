@@ -160,5 +160,5 @@ Current `SCHEMA_VERSION` is 19 (the per-design payload; unchanged by v32). The b
 
 ## Things that look like project rules but aren't
 
-- `SKILL.md` and `Taste.md` at the repo root are **vendored copies of generic frontend design skills** (`design-taste-frontend`, `redesign-existing-projects`). They describe React/Tailwind/Next conventions and do **not** apply to this codebase (vanilla JS, no framework). Do not treat them as repo conventions.
+- `.claude/skills/taste-skill` (new marketing pages) and `.claude/skills/redesign-skill` (polishing existing pages) are generic design skills (see `.claude/skills/ATTRIBUTION.md`). Use them deliberately for marketing pages, expressed as vanilla HTML/CSS; their React/Tailwind suggestions and rules are not conventions for the editor code.
 - `SnapShot-Pro-main/` is a legacy pre-Vite single-file version of the app, kept for reference. The live app is everything under `src/` + `editor/`. Do not edit the legacy copy.
