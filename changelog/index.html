@@ -740,6 +740,58 @@
         .oc-arrow::after { content: ''; position: absolute; right: -1px; top: -5px; border: 5px solid transparent; border-left-color: rgba(124,131,255,0.92); }
         @media (max-width: 860px) { .oc-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v33 — Aperture spotlight. Its own motif: a lens-warm amber light over a
+           dot-grid stage showing the release's everyday tools in one scene: three
+           objects spread with equal gaps (Distribute), a locked object faded back,
+           a color picker with eyedropper + brand/recent swatches, and a
+           "Deleted / Undo" toast. Echoes the real editor UI. Distinct from v28's
+           marquee + context menu and v32's board of cards. */
+        .spotlight-aperture {
+            background:
+                radial-gradient(54% 84% at 8% 4%, rgba(232,166,79,0.22), transparent 56%),
+                radial-gradient(48% 80% at 96% 98%, rgba(232,166,79,0.10), transparent 54%),
+                #0a0907;
+        }
+        .spotlight-aperture::after { display: none; }
+        .spotlight-aperture .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04)); }
+        .spotlight-aperture .spot-feat-ico { background: rgba(232,166,79,0.20); }
+        .spotlight-aperture .spot-feat-ico svg { color: #f3c88c; }
+        .spotlight-aperture .btn-primary { background: #fff; color: #14110c; box-shadow: 0 10px 28px rgba(232,166,79,0.26); }
+        .spotlight-aperture .btn-primary:hover { background: #f0f0ee; }
+        .ap-stage {
+            position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden;
+            background: #100e0b;
+            background-image: radial-gradient(rgba(255,255,255,0.09) 1px, transparent 1px);
+            background-size: 22px 22px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07), 0 24px 54px rgba(8,6,3,0.55);
+        }
+        .ap-obj { position: absolute; top: 24%; height: 24%; border-radius: 10px; background: linear-gradient(150deg, #3a3631, #221f1b); box-shadow: 0 10px 22px rgba(0,0,0,0.45); outline: 1.5px solid rgba(232,166,79,0.9); outline-offset: 3px; }
+        .ap-obj.o1 { left: 9%;  width: 20%; }
+        .ap-obj.o2 { left: 39%; width: 14%; }
+        .ap-obj.o3 { left: 63%; width: 26%; }
+        .ap-gap { position: absolute; top: 36%; height: 0; border-top: 1.5px solid #e8a64f; }
+        .ap-gap::before, .ap-gap::after { content: ''; position: absolute; top: -5px; width: 1.5px; height: 9px; background: #e8a64f; }
+        .ap-gap::before { left: 0; } .ap-gap::after { right: 0; }
+        .ap-gap.g1 { left: calc(29% + 6px); width: calc(10% - 12px); }
+        .ap-gap.g2 { left: calc(53% + 6px); width: calc(10% - 12px); }
+        .ap-eq { position: absolute; top: calc(36% - 26px); transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #14110c; background: #e8a64f; border-radius: 5px; padding: 1px 5px; }
+        .ap-eq.e1 { left: 34%; } .ap-eq.e2 { left: 58%; }
+        .ap-locked { position: absolute; right: 9%; top: 58%; width: 30%; height: 17%; border-radius: 10px; background: linear-gradient(150deg, #2b2824, #1a1815); opacity: 0.5; }
+        .ap-lock { position: absolute; right: calc(9% + 8px); top: calc(58% + 8px); width: 24px; height: 24px; border-radius: 7px; background: rgba(20,17,12,0.92); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; }
+        .ap-lock svg { width: 13px; height: 13px; color: #f3c88c; }
+        .ap-picker { position: absolute; left: 7%; bottom: 8%; width: 52%; padding: 11px; border-radius: 12px; background: rgba(24,21,17,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 14px 32px rgba(0,0,0,0.5); }
+        .ap-row { display: flex; gap: 7px; align-items: center; }
+        .ap-prev { width: 26px; height: 26px; border-radius: 7px; background: #e8a64f; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); flex-shrink: 0; }
+        .ap-hex { flex: 1; height: 26px; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); font-family: var(--font-mono); font-size: 10.5px; color: rgba(255,255,255,0.8); display: flex; align-items: center; padding: 0 8px; }
+        .ap-drop { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(232,166,79,0.75); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .ap-drop svg { width: 13px; height: 13px; color: #f3c88c; }
+        .ap-sw { display: flex; gap: 5px; align-items: center; margin-top: 9px; }
+        .ap-sw i { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+        .ap-sw .sep { width: 1px; height: 11px; background: rgba(255,255,255,0.18); margin: 0 2px; }
+        .ap-toast { position: absolute; right: 6%; top: 6%; display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 12px; border-radius: 10px; background: rgba(24,21,17,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 12px 28px rgba(0,0,0,0.5); font-size: 11.5px; color: rgba(255,255,255,0.86); }
+        .ap-toast b { font-weight: 600; font-size: 11px; color: #f3c88c; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 3px 8px; }
+        @media (max-width: 860px) { .ap-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -820,41 +872,52 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-canvas reveal">
+        <div class="spotlight spotlight-aperture reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
-                <span class="spot-tag"><span class="dot"></span>Latest flagship</span>
-                <div class="spot-ver">v32 · July 2026</div>
-                <h2>Open Canvas.</h2>
-                <p class="spot-lede">Your whole project on one infinite board. Every page is a card you can pan, zoom, arrange, connect, and group. Seed it from a URL, drive it by chat, and export the whole board as a single image.</p>
+                <span class="spot-tag"><span class="dot"></span>Latest release</span>
+                <div class="spot-ver">v33 · October 2026</div>
+                <h2>Aperture.</h2>
+                <p class="spot-lede">The small things you do a hundred times a day, made faster. Pick any color on screen, space objects evenly, and undo a delete right from the toast.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-                        <div><strong>An infinite canvas of cards</strong><span>Every page is a movable card on a pan-and-zoom board. Drag to arrange, resize, and layer them, then double-click any card to drop into the full editor and back.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6"/><path d="M17 7 7.5 16.5 4 20l3.5-3.5"/><path d="m11 6 7 7"/></svg></span>
+                        <div><strong>Colors from anywhere</strong><span>An eyedropper on every color picker, with your brand colors and last 8 colors one click away.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
-                        <div><strong>Seed it from a link</strong><span>Paste a page URL and SnapShotPro drops its images onto the board as cards, loaded safely through the proxy. Paste a link, get a set.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="4" height="10" rx="1"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="17" y="7" width="4" height="10" rx="1"/></svg></span>
+                        <div><strong>Even spacing, real locks</strong><span>Distribute and Match size for any selection. Locked and hidden layers now stay out of your way.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></span>
-                        <div><strong>Drive it by chat</strong><span>The Design Agent can arrange your cards into a grid, group them, add more, and export the board. Ask it to lay out the whole thing.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>
+                        <div><strong>Undo from the toast</strong><span>Deleted objects, pages, and board cards come back in one click. Cmd/Ctrl+Shift+S repeats your last export.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
                     <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                    <a href="/editor/" class="btn btn-ghost btn-lg">Try the board (Cmd-K)</a>
+                    <a href="#history" class="btn btn-ghost btn-lg">Read the notes</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="oc-stage" aria-hidden="true">
-                    <div class="oc-coords"><span class="x0">0,0</span><span class="x1">1024,0</span><span class="x2">0,768</span><span class="x3">1024,768</span></div>
-                    <div class="oc-card a"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card b"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card c"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card d"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-group"></div>
-                    <div class="oc-arrow"></div>
+                <div class="ap-stage" aria-hidden="true">
+                    <div class="ap-obj o1"></div>
+                    <div class="ap-obj o2"></div>
+                    <div class="ap-obj o3"></div>
+                    <div class="ap-gap g1"></div><div class="ap-gap g2"></div>
+                    <span class="ap-eq e1">=</span><span class="ap-eq e2">=</span>
+                    <div class="ap-locked"></div>
+                    <div class="ap-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+                    <div class="ap-toast">Page deleted <b>Undo</b></div>
+                    <div class="ap-picker">
+                        <div class="ap-row">
+                            <span class="ap-prev"></span>
+                            <span class="ap-hex">#E8A64F</span>
+                            <span class="ap-drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6"/><path d="M17 7 7.5 16.5 4 20l3.5-3.5"/><path d="m11 6 7 7"/></svg></span>
+                        </div>
+                        <div class="ap-sw">
+                            <i style="background:#1d2a3a"></i><i style="background:#e8a64f"></i><span class="sep"></span><i style="background:#e05a4f"></i><i style="background:#5aa0e0"></i><i style="background:#4fbf8f"></i><i style="background:#f1efe9"></i><i style="background:#3a3631"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- SWAP-END -->
