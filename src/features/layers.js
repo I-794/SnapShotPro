@@ -5,6 +5,7 @@ import { render } from '../render/render.js';
 import { escapeHTML } from '../utils/dom.js';
 import { BLEND_MODES } from '../render/blend.js';
 import { EASING_OPTIONS } from '../render/easing.js';
+import { pruneSelection } from './selection.js';
 import { animationPresetIds, trackForTarget, addAnimationTrack, removeAnimationTrack } from './animation.js';
 
 function buildLayerList() {
@@ -230,6 +231,7 @@ function toggleLayerVisibility(id) {
   else if (f.kind === 'text') state.textOverlay.enabled = !state.textOverlay.enabled;
   else if (f.kind === 'watermark') state.watermark.enabled = !state.watermark.enabled;
   else f.ref.visible = f.ref.visible === false ? true : false;
+  pruneSelection();
   render(); renderLayersPanel();
 }
 
@@ -237,7 +239,8 @@ function toggleLayerLock(id) {
   const f = findLayerRef(id);
   if (!f || !f.ref) return;
   f.ref.locked = !f.ref.locked;
-  renderLayersPanel();
+  pruneSelection();
+  render(); renderLayersPanel();
 }
 
 function beginRenameLayer(id) {

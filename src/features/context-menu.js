@@ -14,8 +14,11 @@ import { getCanvasCoords } from '../utils/geometry.js';
 import {
   resolveRef, isRefSelected, selectOnly, selectAll, clearSelection,
   groupAlign, duplicateSelection,
+  groupDistribute, groupMatchSize, setSelectionFlag, unlockAll,
 } from './selection.js';
 import { hitTopRef, deleteSelected } from './canvas-tools.js';
+import { renderLayersPanel } from './layers.js';
+import { showNotification } from '../ui/notification.js';
 
 let menuEl = null;
 // Module-level "style clipboard" — copied from an annotation, pasted onto others.
@@ -65,6 +68,41 @@ function align(how) {
   closeMenu();
 }
 
+// v33 — distribute / match size / hide / lock.
+function distribute(axis) {
+  saveStateToHistory();
+  groupDistribute(axis);
+  render();
+  closeMenu();
+}
+
+function matchSize(dim) {
+  saveStateToHistory();
+  groupMatchSize(dim);
+  render();
+  closeMenu();
+}
+
+function flag(which) {
+  if (setSelectionFlag(which)) {
+    render(); renderLayersPanel();
+    showNotification(which === 'hide' ? 'Hidden. Show it again from Layers or "Unlock & show all".' : 'Locked. Unlock from Layers or "Unlock & show all".', 'success');
+  }
+  closeMenu();
+}
+
+function unlockEverything() {
+  const n = unlockAll();
+  if (n) { render(); renderLayersPanel(); }
+  showNotification(n ? `Unlocked ${n} object${n === 1 ? '' : 's'}` : 'Nothing is hidden or locked', 'success');
+  closeMenu();
+}
+
+function hasHiddenOrLocked() {
+  return [...(state.annotations || []), ...(state.redactions || []), ...(state.extraImages || [])]
+    .some((o) => o.locked || o.visible === false);
+}
+
 function alignItems() {
   return [
     { label: 'Left',     run: () => align('left') },
@@ -82,6 +120,7 @@ function buildItems() {
   if (n === 0) {
     const items = [{ label: 'Select all', icon: '▦', run: () => { selectAll(); render(); closeMenu(); } }];
     if (styleClipboard) items.push({ label: 'Paste style', icon: '🖌', disabled: true });
+    if (hasHiddenOrLocked()) items.push({ label: 'Unlock & show all', icon: '🔓', run: unlockEverything });
     return items;
   }
   const dupable = state.canvasSelection.some((r) => r.kind !== 'text');
@@ -98,6 +137,23 @@ function buildItems() {
   }
   items.push({ sep: true });
   items.push({ label: 'Align', icon: '⊞', submenu: alignItems() });
+  if (n >= 3) {
+    items.push({ label: 'Distribute', icon: '⇹', submenu: [
+      { label: 'Horizontally', run: () => distribute('h') },
+      { label: 'Vertically',   run: () => distribute('v') },
+    ] });
+  }
+  if (state.canvasSelection.filter((r) => r.kind !== 'text').length >= 2) {
+    items.push({ label: 'Match size', icon: '⇔', submenu: [
+      { label: 'Width (largest)',  run: () => matchSize('w') },
+      { label: 'Height (largest)', run: () => matchSize('h') },
+    ] });
+  }
+  if (state.canvasSelection.some((r) => r.kind !== 'text')) {
+    items.push({ sep: true });
+    items.push({ label: 'Hide', icon: '⊘', run: () => flag('hide') });
+    items.push({ label: 'Lock', icon: '🔒', run: () => flag('lock') });
+  }
   return items;
 }
 

@@ -175,15 +175,51 @@ export function addPageWithImage(img) {
   return page.id;
 }
 
-export function deletePage(index) {
+// v33 — the last user deletion's pages, restorable from the "Undo" toast.
+// Pages live outside history.snapshot() (document op), so this is their undo.
+let trash = [];   // [{ rec, index, wasActive }] in deletion order
+export function clearPageTrash() { trash = []; }
+export function hasPageTrash() { return trash.length > 0; }
+
+export function restoreDeletedPages() {
+  if (!trash.length) return 0;
+  syncActive();
+  let activeRec = pages[active];
+  for (let i = trash.length - 1; i >= 0; i--) {
+    const { rec, index, wasActive } = trash[i];
+    pages.splice(Math.min(index, pages.length), 0, rec);
+    if (wasActive) activeRec = rec;
+  }
+  const n = trash.length;
+  trash = [];
+  active = Math.max(0, pages.indexOf(activeRec));
+  applyPayload(pages[active].payload);
+  renderFilmstrip();
+  emitChange();
+  return n;
+}
+
+export function deletePage(index, { recordTrash = true } = {}) {
   if (pages.length <= 1) { showNotification('A document needs at least one page.', 'error'); return; }
   if (index < 0 || index >= pages.length) return;
+  if (index === active) syncActive();   // keep the latest edits for Undo
+  if (recordTrash) trash.push({ rec: pages[index], index, wasActive: index === active });
   pages.splice(index, 1);
   if (active >= pages.length) active = pages.length - 1;
   else if (index < active) active -= 1;
   applyPayload(pages[active].payload);
   renderFilmstrip();
   emitChange();
+}
+
+// v33 — user-facing delete: one page, with an "Undo" toast.
+function deleteWithUndo(index) {
+  const before = pages.length;
+  clearPageTrash();
+  deletePage(index);
+  if (pages.length < before) {
+    showNotification('Page deleted', 'success', { action: { label: 'Undo', run: () => { if (restoreDeletedPages()) showNotification('Page restored', 'success'); } } });
+  }
 }
 
 export function movePage(from, to) {
@@ -340,7 +376,7 @@ export function renderFilmstrip() {
     });
   });
   strip.querySelectorAll('[data-del]').forEach(b =>
-    b.addEventListener('click', (e) => { e.stopPropagation(); deletePage(parseInt(b.dataset.del, 10)); }));
+    b.addEventListener('click', (e) => { e.stopPropagation(); deleteWithUndo(parseInt(b.dataset.del, 10)); }));
   const addTile = document.getElementById('page-add-tile');
   if (addTile) addTile.addEventListener('click', () => addPage());
 }

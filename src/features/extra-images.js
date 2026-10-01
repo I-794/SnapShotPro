@@ -95,6 +95,7 @@ export function hitTestExtraImageAtPoint(x, y, canvas) {
   const ch = canvas.height;
   for (let i = state.extraImages.length - 1; i >= 0; i--) {
     const ei = state.extraImages[i];
+    if (ei.visible === false || ei.locked) continue;   // v33 — hidden/locked aren't pickable
     const img = imageRegistry[ei.id];
     if (!img) continue;
     const iw = img.width * ei.scaleFrac;
