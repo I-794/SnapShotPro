@@ -1,0 +1,197 @@
+/* SnapShotPro design tokens. Generated from tokens.json; do not hand-edit.
+   Dark is the default theme. Set data-theme="light" on <html> for light. */
+
+:root,
+[data-theme="dark"] {
+    color-scheme: dark;
+    --brand-cobalt: #2348ff;
+    --brand-violet: #7a5cff;
+    --brand-navy: #121829;
+    --brand-paper: #f1f1ee;
+    --brand-record: #ff3b30;
+    --surface-canvas: #080b14;
+    --surface-base: #0e1220;
+    --surface-control: #161c2e;
+    --surface-raised: #1c2338;
+    --surface-hover: #252d45;
+    --surface-glass: rgba(14, 18, 32, 0.72);
+    --surface-scrim: rgba(4, 6, 12, 0.6);
+    --surface-tooltip: #252d45;
+    --surface-inverse: #eef1f8;
+    --text: #eef1f8;
+    --text-muted: #aab2c8;
+    --text-subtle: #8f98b4;
+    --text-disabled: #4f5774;
+    --text-on-tooltip: #eef1f8;
+    --text-inverse: #15161a;
+    --accent: #5470ff;
+    --accent-hover: #6d86ff;
+    --accent-text: #6d86ff;
+    --accent-solid: #2348ff;
+    --accent-solid-hover: #3d5cff;
+    --accent-solid-pressed: #1a37d6;
+    --on-accent: #ffffff;
+    --accent-soft: rgba(84, 112, 255, 0.14);
+    --accent-soft-hover: rgba(84, 112, 255, 0.22);
+    --accent-line: rgba(84, 112, 255, 0.45);
+    --focus-ring: #6d86ff;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --border-control: #6b7493;
+    --glass-highlight: rgba(255, 255, 255, 0.08);
+    --canvas-dot: rgba(255, 255, 255, 0.045);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.14);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.14);
+    --error: #f87171;
+    --error-soft: rgba(248, 113, 113, 0.14);
+    --info: #38bdf8;
+    --info-soft: rgba(56, 189, 248, 0.14);
+    --aurora-cobalt: rgba(79, 124, 255, 0.28);
+    --aurora-violet: rgba(122, 92, 255, 0.24);
+    --aurora-deep: rgba(35, 72, 255, 0.20);
+    --glass-card: rgba(255, 255, 255, 0.06);
+    --glass-card-hover: rgba(255, 255, 255, 0.09);
+    --glass-line: rgba(255, 255, 255, 0.12);
+    --glass-line-hover: rgba(255, 255, 255, 0.28);
+    --mk-text: #eef1f8;
+    --mk-text-muted: #aab2c8;
+    --mk-text-subtle: #8f98b4;
+    --mk-accent: #7d95ff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 40px rgba(0, 0, 0, 0.55);
+    --shadow-accent-sm: 0 1px 3px rgba(35, 72, 255, 0.35);
+    --shadow-accent: 0 10px 30px rgba(35, 72, 255, 0.45);
+    --shadow-glass-card: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 24px 60px rgba(4, 8, 24, 0.55);
+    --shadow-product: 0 2px 6px rgba(0, 0, 0, 0.4), 0 50px 100px -30px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] {
+    color-scheme: light;
+    --surface-canvas: #f1f1ee;
+    --surface-base: #fbfbf9;
+    --surface-control: #ecece8;
+    --surface-raised: #ffffff;
+    --surface-hover: #e4e4df;
+    --surface-glass: rgba(255, 255, 255, 0.78);
+    --surface-scrim: rgba(21, 22, 26, 0.32);
+    --surface-tooltip: #15161a;
+    --surface-inverse: #15161a;
+    --text: #15161a;
+    --text-muted: #55565e;
+    --text-subtle: #63656f;
+    --text-disabled: #a3a4ab;
+    --text-on-tooltip: #f4f4f1;
+    --text-inverse: #eef1f8;
+    --accent: #2348ff;
+    --accent-hover: #1a37d6;
+    --accent-text: #2348ff;
+    --accent-solid-hover: #1a37d6;
+    --accent-solid-pressed: #1630b8;
+    --accent-soft: rgba(35, 72, 255, 0.08);
+    --accent-soft-hover: rgba(35, 72, 255, 0.14);
+    --accent-line: rgba(35, 72, 255, 0.35);
+    --focus-ring: #2348ff;
+    --border-subtle: rgba(21, 22, 26, 0.07);
+    --border: rgba(21, 22, 26, 0.10);
+    --border-strong: rgba(21, 22, 26, 0.16);
+    --border-control: #85868d;
+    --glass-highlight: rgba(255, 255, 255, 0.9);
+    --canvas-dot: rgba(0, 0, 0, 0.05);
+    --success: #03684a;
+    --success-soft: rgba(3, 104, 74, 0.10);
+    --warning: #a14a07;
+    --warning-soft: rgba(161, 74, 7, 0.10);
+    --error: #b91c1c;
+    --error-soft: rgba(185, 28, 28, 0.10);
+    --info: #0369a1;
+    --info-soft: rgba(3, 105, 161, 0.10);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 40px rgba(0, 0, 0, 0.1);
+    --shadow-accent-sm: 0 1px 3px rgba(35, 72, 255, 0.25);
+}
+
+:root {
+    --font-sans: Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+    --space-0-5: 2px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-24: 96px;
+    --space-30: 120px;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-card-sm: 12px;
+    --radius-card: 22px;
+    --radius-pill: 999px;
+    --size-control-sm: 28px;
+    --size-control: 32px;
+    --size-control-lg: 40px;
+    --size-header: 52px;
+    --size-rail: 64px;
+    --size-sidebar: 360px;
+    --size-icon-sm: 16px;
+    --size-icon-md: 20px;
+    --size-icon-lg: 24px;
+    --size-canvas-grid: 22px;
+    --blur-glass: blur(24px) saturate(160%);
+    --blur-card: blur(22px) saturate(150%);
+    --blur-nav: blur(18px) saturate(160%);
+    --blur-scrim: blur(8px);
+    --duration-fast: 150ms;
+    --duration-smooth: 250ms;
+    --duration-spring: 400ms;
+    --duration-reveal: 700ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --z-canvas-chrome: 100;
+    --z-header: 1000;
+    --z-whats-new: 1500;
+    --z-toast: 2000;
+    --z-modal: 3000;
+    --z-palette: 3200;
+    --z-tooltip: 4000;
+}
+
+.ed-title { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.ed-body { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.ed-body-strong { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 500; letter-spacing: -0.005em; }
+.ed-small { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 500; }
+.ed-caption { font-family: var(--font-sans); font-size: 11px; line-height: 16px; font-weight: 400; }
+.ed-overline { font-family: var(--font-sans); font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.ed-micro { font-family: var(--font-sans); font-size: 10px; line-height: 12px; font-weight: 500; letter-spacing: 0.01em; }
+.ed-value { font-family: var(--font-mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.ed-kbd { font-family: var(--font-mono); font-size: 11px; line-height: 14px; font-weight: 500; }
+.ed-code { font-family: var(--font-mono); font-size: 12px; line-height: 18px; font-weight: 400; }
+.ed-version { font-family: var(--font-mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.02em; }
+.mk-display { font-family: var(--font-sans); font-size: 84px; line-height: 82px; font-weight: 700; letter-spacing: -0.035em; }
+.mk-h1 { font-family: var(--font-sans); font-size: 62px; line-height: 64px; font-weight: 700; letter-spacing: -0.035em; }
+.mk-h2 { font-family: var(--font-sans); font-size: 42px; line-height: 44px; font-weight: 700; letter-spacing: -0.03em; }
+.mk-h3 { font-family: var(--font-sans); font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.02em; }
+.mk-lede { font-family: var(--font-sans); font-size: 19px; line-height: 30px; font-weight: 400; }
+.mk-body { font-family: var(--font-sans); font-size: 16px; line-height: 26px; font-weight: 400; }
+.mk-small { font-family: var(--font-sans); font-size: 14px; line-height: 22px; font-weight: 500; }
+.mk-button { font-family: var(--font-sans); font-size: 15px; line-height: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.mk-price { font-family: var(--font-sans); font-size: 48px; line-height: 48px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.mk-eyebrow { font-family: var(--font-mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+.mk-code { font-family: var(--font-mono); font-size: 13px; line-height: 20px; font-weight: 400; }
+
+@media (prefers-reduced-motion: reduce) {
+    :root { --duration-spring: 150ms; --ease-spring: cubic-bezier(0.22, 1, 0.36, 1); --duration-reveal: 0ms; }
+}
