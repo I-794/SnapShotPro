@@ -160,5 +160,5 @@ Current `SCHEMA_VERSION` is 19 (the per-design payload; unchanged by v32). The b
 
 ## Things that look like project rules but aren't
 
-- `.claude/skills/redesign-skill` is a generic design skill (the only one kept; see `.claude/skills/ATTRIBUTION.md`). Use it deliberately for marketing-page polish; its rules are not conventions for the editor code.
+- `.claude/skills/taste-skill` (new marketing pages) and `.claude/skills/redesign-skill` (polishing existing pages) are generic design skills (see `.claude/skills/ATTRIBUTION.md`). Use them deliberately for marketing pages, expressed as vanilla HTML/CSS; their React/Tailwind suggestions and rules are not conventions for the editor code.
 - `SnapShot-Pro-main/` is a legacy pre-Vite single-file version of the app, kept for reference. The live app is everything under `src/` + `editor/`. Do not edit the legacy copy.
