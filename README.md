@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-4f7cff.svg">
+  <img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-4f7cff.svg">
   <img alt="No signup" src="https://img.shields.io/badge/no%20signup-free%20forever-4f7cff">
   <img alt="PWA" src="https://img.shields.io/badge/PWA-installable%2C%20offline-5a3cff">
   <img alt="Runs in the browser" src="https://img.shields.io/badge/runs-in%20your%20browser-2348ff">
@@ -84,4 +84,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/I-794/SnapShotPr
 
 ## License
 
-[MIT](LICENSE) © Charlie L.
+Copyright (C) 2026 Charlie Lichterman
+
+SnapShotPro is licensed under the GNU Affero General Public License v3.0.
+See [LICENSE](LICENSE) for details.
