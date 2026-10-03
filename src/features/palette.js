@@ -8,7 +8,7 @@ import { exportImage, copyToClipboard, exportAsHTML } from './export.js';
 import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
-import { setTool } from './canvas-tools.js';
+import { setTool, clearAllAnnotations, clearAllRedactions } from './canvas-tools.js';
 import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
 import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
 import { toggleLayersPanel, renderLayersPanel } from './layers.js';
@@ -170,8 +170,8 @@ export function registerCommands() {
     { id: 'tool-highlighter', label: 'Tool: Highlighter',     icon: '🖍', run: () => setTool('highlighter') },
     { id: 'tool-number',      label: 'Tool: Number',          icon: '①',  run: () => setTool('number') },
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
-    { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },
-    { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: () => { saveStateToHistory(); state.redactions = []; render(); showStatus('Redactions cleared'); } },
+    { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: clearAllAnnotations },
+    { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: clearAllRedactions },
     { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
     { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },
     { id: 'style-watercolor', label: 'Style: Watercolor',    icon: '🎨', run: () => document.querySelector('[data-style-preset="watercolor"]')?.click() },
