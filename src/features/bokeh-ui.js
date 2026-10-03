@@ -7,7 +7,7 @@ import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { cutSubject } from './bg-remove.js';
-import { setBokehMaskListener, aspectSig } from '../render/bokeh.js';
+import { setBokehMaskListener, aspectSig, bindMaskOwner, maskFits } from '../render/bokeh.js';
 
 const MASK_EDGE = 768;   // mask long edge; it is softened anyway, so this stays small
 
@@ -28,7 +28,7 @@ function makeMaskDataUrl(cut) {
 function statusText() {
   const b = state.bokeh;
   if (!b || !b.maskDataUrl) return 'The first run downloads a ~40MB model, then it is cached.';
-  if (state.image && b.maskSig && b.maskSig !== aspectSig(state.image)) return 'The image changed. Detect the subject again.';
+  if (state.image && !maskFits(state.image)) return 'The image changed. Detect the subject again.';
   return 'Subject found.';
 }
 
@@ -51,15 +51,18 @@ export async function detectSubject() {
   if (state.video && state.video.loaded) { showNotification('Bokeh works on still images, not video clips.', 'error'); return; }
   if (el.bokehDetectBtn) el.bokehDetectBtn.disabled = true;
   try {
+    const img = state.image;
     const cut = await cutSubject({ progressId: 'bokeh-progress' });
     if (!cut) { showNotification('Another background task is running. Try again in a moment.', 'error'); return; }
+    if (state.image !== img) { showNotification('The image changed during detection. Try again.', 'error'); return; }
     saveStateToHistory();
     state.bokeh = {
       ...state.bokeh,
       maskDataUrl: makeMaskDataUrl(cut),
-      maskSig: aspectSig(state.image),
+      maskSig: aspectSig(img),
       enabled: true,
     };
+    bindMaskOwner(img);
     render();
     showNotification('Subject found. Background blur is on.', 'success');
   } catch (e) {

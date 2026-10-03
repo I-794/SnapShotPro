@@ -25,6 +25,31 @@ export function aspectSig(img) {
   return (img.width / img.height).toFixed(3);
 }
 
+// The exact image object the current mask belongs to. Runtime-only: after a
+// project or page load the first image rendered with that mask claims it (the
+// preview always renders the page's own image first).
+let owner = { src: null, img: null };
+
+export function bindMaskOwner(img) {
+  owner = { src: state.bokeh ? state.bokeh.maskDataUrl : null, img };
+}
+
+// A page/project load decodes a fresh image object, possibly with the same mask
+// string as before (switching back to a page, a duplicated page). Release the
+// claim so that page's own image can take it.
+export function releaseMaskOwner() {
+  owner = { src: null, img: null };
+}
+
+// Does the saved mask belong to this exact source image?
+export function maskFits(img) {
+  const b = state.bokeh;
+  if (!b || !b.maskDataUrl || !img || !img.width || !img.height) return false;
+  if (b.maskSig && b.maskSig !== aspectSig(img)) return false;
+  if (owner.src !== b.maskDataUrl) owner = { src: b.maskDataUrl, img };
+  return owner.img === img;
+}
+
 function maskImage(src) {
   if (maskCache.src !== src) {
     maskCache.src = src;

@@ -10,6 +10,7 @@ import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { render } from '../render/render.js';
 import { normalizeProject } from '../state/serialize.js';
+import { releaseMaskOwner } from '../render/bokeh.js';
 
 // Assign a page payload's design + image into global state WITHOUT touching the
 // DOM or re-rendering. Returns a promise that resolves once the image (if any)
@@ -18,6 +19,8 @@ export function applyDesignToState(payload) {
   const norm = normalizeProject(payload);
   Object.assign(state, norm.design);
   state.svgCode = norm.svgCode || null;
+  // v34 — this page's own image (decoded below) claims its Bokeh mask afresh.
+  releaseMaskOwner();
   return new Promise((resolve) => {
     if (norm.image) {
       const img = new Image();

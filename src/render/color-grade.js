@@ -16,7 +16,7 @@ import { showNotification } from '../ui/notification.js';
 import {
   luminance, rgbToLab, labToRgb, buildGradientRamp, nearestSwatch, paletteLabStats
 } from '../utils/color.js';
-import { applyBokeh, bokehActive } from './bokeh.js';
+import { applyBokeh, bokehActive, maskFits } from './bokeh.js';
 
 let idCounter = 0;
 const cache = { sig: null, canvas: null };
@@ -207,6 +207,7 @@ function imageId(img) {
 export function getGradedImage(srcImage) {
   const graded = gradeImage(srcImage);
   if (!graded || !graded.width || !bokehActive()) return graded;
+  if (!maskFits(srcImage)) return graded;   // mask belongs to another image
   const baseKey = graded === srcImage ? 'src:' + imageId(srcImage) : 'grade:' + cache.sig;
   return applyBokeh(graded, baseKey);
 }
