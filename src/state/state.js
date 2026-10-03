@@ -64,7 +64,8 @@ export const state = {
   deviceFrame: { type: null, color: 'dark', glare: true, url: 'https://example.com', title: 'Screenshot' },
   annotations: [],
   redactions: [],
-  spotlight: { enabled: false, x: 0.2, y: 0.2, w: 0.6, h: 0.6, opacity: 0.65 },
+  // v34 — Spotlight 2.0: any number of focus regions (fractions of the canvas).
+  spotlight: { enabled: false, opacity: 0.65, blur: 0, feather: 0, tint: '#000000', shape: 'rect', regions: [] },
   annotationColor: '#ff3b30',
   annotationStrokeWidth: 4,
   // v16.0 — vector shape tools. Fill applies to the closeable shapes

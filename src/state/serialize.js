@@ -7,6 +7,7 @@
 // the single source of truth for "what travels with a saved/shared design".
 
 import { state } from './state.js';
+import { upgradeSpotlight } from '../render/spotlight-geom.js';
 
 export const SERIALIZED_FIELDS = [
   'imageTransform', 'imageFilters', 'imageLayer', 'textOverlay', 'watermark', 'gradient',
@@ -76,7 +77,7 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 19;
+export const SCHEMA_VERSION = 20;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
@@ -195,6 +196,13 @@ export function ensureBrandDefaults(design) {
   return design;
 }
 
+// v34 — schema 20 migration: v1's single spotlight rect becomes regions[0] of
+// Spotlight 2.0 (blur/feather/tint default to the v1 look). Mutates + returns.
+export function migrateSpotlightV20(design) {
+  if (design && 'spotlight' in design) design.spotlight = upgradeSpotlight(design.spotlight);
+  return design;
+}
+
 // Accept both the v12 envelope ({schemaVersion, design, image, svgCode}) and
 // the legacy flat payload written by the old cloud-sync saveProject() (raw
 // design fields, no image), returning a normalized v12 envelope either way.
@@ -202,14 +210,15 @@ export function normalizeProject(payload) {
   if (!payload || typeof payload !== 'object') {
     return { schemaVersion: SCHEMA_VERSION, design: {}, image: null, svgCode: null };
   }
+  const migrate = (d) => migrateSpotlightV20(ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(d)))));
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,
-      design: ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload.design)))),
+      design: migrate(payload.design),
       image: payload.image || null,
       svgCode: payload.svgCode || null
     };
   }
   // Legacy flat design payload (pre-v12): the whole object is the design.
-  return { schemaVersion: 11, design: ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(payload)))), image: null, svgCode: payload.svgCode || null };
+  return { schemaVersion: 11, design: migrate(payload), image: null, svgCode: payload.svgCode || null };
 }

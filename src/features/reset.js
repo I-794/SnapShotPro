@@ -3,6 +3,7 @@ import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
+import { spotlightDefaults } from '../render/spotlight-geom.js';
 
 export function resetToDefaults() {
   saveStateToHistory();
@@ -25,7 +26,7 @@ export function resetToDefaults() {
   state.deviceFrame = { type: null, color: 'dark', url: 'https://example.com', title: 'Screenshot' };
   state.annotations = [];
   state.redactions = [];
-  state.spotlight = { enabled: false, x: 0.2, y: 0.2, w: 0.6, h: 0.6, opacity: 0.65 };
+  state.spotlight = spotlightDefaults();
   state.annotationColor = '#ff3b30';
   state.annotationStrokeWidth = 4;
   state.tool = 'select';
