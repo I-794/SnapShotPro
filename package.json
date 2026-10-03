@@ -14,6 +14,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:og": "node scripts/build-og.mjs",
+    "build:shots": "node scripts/build-site-shots.mjs",
     "test": "node scripts/regression-tests.mjs",
     "lint": "eslint .",
     "knip": "knip",

@@ -6,6 +6,14 @@
 > - Cache headers, TTFB, and compression come from `vite preview`, not Vercel. Findings that depend on them say **verify on production**.
 > - Several findings were spot-checked against the source (`src/styles.css:432-442`, `src/features/templates.js:51-57`, `src/features/reset.js`, `public/site.css:146-147`).
 
+## Fixes applied in v33.2
+
+- **Slider/color-picker undo:** fixed in `src/state/history.js` (snapshot at the gesture's first `input`, used by the save on `change`).
+- **Reset / Clear All:** now show an Undo toast; Reset keeps `imageRegistry` so undo restores extra images.
+- **picsum placeholders:** replaced on the homepage and gallery with real editor output (`public/shots/`, made by `scripts/build-site-shots.mjs`). Other marketing pages still use picsum.
+- **SW precache:** 83 entries / 5.3 MB down to 69 / 1.6 MB.
+- Found while doing the above: **Spotlight erased the highlighted area** (exported as transparent). Fixed in `src/render/spotlight.js`.
+
 ## Fixes applied (2026-10-03)
 
 Fixed on this branch and checked in a headless browser (30/30 checks pass, including an axe re-run):
