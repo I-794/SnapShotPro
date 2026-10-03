@@ -10,9 +10,10 @@ let busy = false;
 let heartbeatId = null;
 let heartbeatStart = 0;
 let lastProgressLabel = '';
+let progressId = 'bg-remove-progress';   // v34 — Bokeh shows progress in its own section
 
 function setProgress(pct, label, indeterminate = false) {
-  const wrap = document.getElementById('bg-remove-progress');
+  const wrap = document.getElementById(progressId);
   if (!wrap) return;
   if (pct === null) { wrap.style.display = 'none'; wrap.classList.remove('indeterminate'); return; }
   wrap.style.display = 'flex';
@@ -30,7 +31,7 @@ function startHeartbeat(initialLabel) {
   setProgress(0, initialLabel, true);
   heartbeatId = setInterval(() => {
     const secs = Math.round((Date.now() - heartbeatStart) / 1000);
-    const wrap = document.getElementById('bg-remove-progress');
+    const wrap = document.getElementById(progressId);
     if (!wrap) return;
     const lab = wrap.querySelector('.ai-progress-label');
     if (lab) lab.textContent = `${lastProgressLabel} (${secs}s)`;
@@ -84,11 +85,12 @@ function progressLabel(key, current, total) {
 // v19 — core subject cut, reusable by AI Assets. Runs @imgly removal on
 // state.image and returns the cut Image. Does NOT mutate state (caller decides
 // what to do with the result). Returns null if no image / already busy.
-export async function cutSubject() {
+export async function cutSubject(opts = {}) {
   if (busy) return null;
   if (!state.image) return null;
   busy = true;
   try {
+    progressId = opts.progressId || 'bg-remove-progress';
     startHeartbeat(modelLoaded ? 'Preparing your image…' : 'Loading AI model (first run downloads ~40MB)…');
     await new Promise(r => setTimeout(r, 30));
 

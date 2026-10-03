@@ -4,6 +4,7 @@ import { saveStateToHistory } from '../state/history.js';
 import { showNotification } from '../ui/notification.js';
 import { render } from '../render/render.js';
 import { spotlightDefaults } from '../render/spotlight-geom.js';
+import { bokehDefaults } from '../render/bokeh-core.js';
 
 export function resetToDefaults() {
   saveStateToHistory();
@@ -27,6 +28,7 @@ export function resetToDefaults() {
   state.annotations = [];
   state.redactions = [];
   state.spotlight = spotlightDefaults();
+  state.bokeh = bokehDefaults();
   state.annotationColor = '#ff3b30';
   state.annotationStrokeWidth = 4;
   state.tool = 'select';

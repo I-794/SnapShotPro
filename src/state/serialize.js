@@ -8,6 +8,7 @@
 
 import { state } from './state.js';
 import { upgradeSpotlight } from '../render/spotlight-geom.js';
+import { bokehDefaults } from '../render/bokeh-core.js';
 
 export const SERIALIZED_FIELDS = [
   'imageTransform', 'imageFilters', 'imageLayer', 'textOverlay', 'watermark', 'gradient',
@@ -96,7 +97,9 @@ export const PROJECT_FIELDS = [
   'tour',
   // v30 — Brand Brain system (carries logo dataUrl; full-fidelity project field
   // only, deliberately not in the lean SERIALIZED_FIELDS, mirroring `logo`).
-  'brand'
+  'brand',
+  // v34 — Subject Bokeh (carries a mask dataURL, so project-only like `brand`).
+  'bokeh'
 ];
 
 // v25 — guarantee every applied design carries a `tour` block. Because
@@ -196,6 +199,13 @@ export function ensureBrandDefaults(design) {
   return design;
 }
 
+// v34 — guarantee every applied design carries a `bokeh` block, so a page that
+// predates v34 never inherits the previous page's mask via Object.assign.
+export function ensureBokehDefaults(design) {
+  if (design && !design.bokeh) design.bokeh = bokehDefaults();
+  return design;
+}
+
 // v34 — schema 20 migration: v1's single spotlight rect becomes regions[0] of
 // Spotlight 2.0 (blur/feather/tint default to the v1 look). Mutates + returns.
 export function migrateSpotlightV20(design) {
@@ -210,7 +220,7 @@ export function normalizeProject(payload) {
   if (!payload || typeof payload !== 'object') {
     return { schemaVersion: SCHEMA_VERSION, design: {}, image: null, svgCode: null };
   }
-  const migrate = (d) => migrateSpotlightV20(ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(d)))));
+  const migrate = (d) => ensureBokehDefaults(migrateSpotlightV20(ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(d))))));
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,

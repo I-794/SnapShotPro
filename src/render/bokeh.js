@@ -16,7 +16,7 @@ export function setBokehMaskListener(fn) { onMaskReady = fn; }
 
 export function bokehActive() {
   const b = state.bokeh;
-  return !!(b && b.enabled && b.maskDataUrl);
+  return !!(b && b.enabled && b.maskDataUrl) && !(state.video && state.video.loaded);
 }
 
 // Aspect-ratio signature: survives the JPEG re-encode a saved project gets, and
