@@ -10,20 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '33.1';
+const CURRENT_VERSION = '33.2';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "📷 v33.1 · Aperture, polished",
+  heading: "📷 v33.2 · Aperture, tidied",
   items: [
-    { title: 'Undo and Redo are back',
-      desc: 'The header buttons light up after every change, sliders follow along, and loading a template can be undone.' },
-    { title: 'No invisible click-blockers',
-      desc: 'A hidden notification no longer eats clicks on the top-right toolbar.' },
-    { title: 'Keyboard and screen reader friendly',
-      desc: 'Every control is named, presets and scenes work with Tab + Enter, and Esc closes dialogs.' }
+    { title: 'Undo after a slider drag',
+      desc: 'The first Undo after moving a slider or picking a color now puts the old value back.' },
+    { title: 'Undo Reset and Clear All',
+      desc: 'Both show an Undo button in the notification, and undoing a Reset brings extra images back.' },
+    { title: 'Spotlight exports correctly',
+      desc: 'The highlighted area no longer comes out see-through in exported images.' }
   ]
 };
 
