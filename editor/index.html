@@ -1002,8 +1002,13 @@
             <h3 class="section-title">Spotlight Effect</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Spotlight</span><label class="switch"><input type="checkbox" id="spotlight-enabled"><span class="slider"></span></label></div>
             <div id="spotlight-controls" style="display:none;margin-top:16px;">
-                <p class="info-text" style="margin-bottom:12px;">Use the ◎ Spotlight tool above the canvas to drag a region.</p>
-                <div class="control-group"><label class="control-label">Dim Opacity</label><div class="range-group"><input type="range" class="range-input" id="spotlight-opacity" min="10" max="95" value="65"><span class="range-value" id="spotlight-opacity-value">65%</span></div></div>
+                <p class="info-text" style="margin-bottom:12px;">Drag with the ◎ Spotlight tool to add a focus area. Hold Shift for a circle. <span id="spotlight-count"></span></p>
+                <div class="control-group"><label class="control-label">Shape</label><select class="control-input" id="spotlight-shape"><option value="rect">Box</option><option value="ellipse">Circle</option><option value="rounded">Rounded</option></select></div>
+                <div class="control-group"><label class="control-label">Dim Opacity</label><div class="range-group"><input type="range" class="range-input" id="spotlight-opacity" min="0" max="95" value="65"><span class="range-value" id="spotlight-opacity-value">65%</span></div></div>
+                <div class="control-group"><label class="control-label">Blur</label><div class="range-group"><input type="range" class="range-input" id="spotlight-blur" min="0" max="40" value="0"><span class="range-value" id="spotlight-blur-value">0px</span></div></div>
+                <div class="control-group"><label class="control-label">Soft Edge</label><div class="range-group"><input type="range" class="range-input" id="spotlight-feather" min="0" max="60" value="0"><span class="range-value" id="spotlight-feather-value">0px</span></div></div>
+                <div class="control-group"><label class="control-label">Dim Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="spotlight-tint" value="#000000"></div><input type="text" class="control-input" id="spotlight-tint-text" value="#000000" style="flex:1;"></div></div>
+                <button class="btn btn-secondary" style="width:100%;" id="spotlight-clear-btn">Clear Focus Areas</button>
             </div>
         </div>
 

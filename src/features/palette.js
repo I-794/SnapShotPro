@@ -68,7 +68,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight' || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
+      id === 'toggle-spotlight' || id.startsWith('spotlight-') || id.startsWith('bokeh-') || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
 
@@ -173,6 +173,8 @@ export function registerCommands() {
     { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },
     { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: () => { saveStateToHistory(); state.redactions = []; render(); showStatus('Redactions cleared'); } },
     { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
+    { id: 'spotlight-add-region', label: 'Spotlight: Add focus area',   icon: '◎', run: () => setTool('spotlight') },
+    { id: 'spotlight-clear',      label: 'Spotlight: Clear focus areas', icon: '🗑', run: () => { saveStateToHistory(); state.spotlight.regions = []; render(); window.__updateUIFromState?.(); showStatus('Focus areas cleared'); } },
     { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },
     { id: 'style-watercolor', label: 'Style: Watercolor',    icon: '🎨', run: () => document.querySelector('[data-style-preset="watercolor"]')?.click() },
     { id: 'style-sketch',     label: 'Style: Sketch',        icon: '✏️', run: () => document.querySelector('[data-style-preset="sketch"]')?.click() },
