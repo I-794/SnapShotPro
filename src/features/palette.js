@@ -9,7 +9,8 @@ import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
 import { setTool } from './canvas-tools.js';
-import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
+import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll, pruneSelection } from './selection.js';
+import { upgradeSpotlight } from '../render/spotlight-geom.js';
 import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
 import { toggleLayersPanel, renderLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
@@ -172,9 +173,18 @@ export function registerCommands() {
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
     { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },
     { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: () => { saveStateToHistory(); state.redactions = []; render(); showStatus('Redactions cleared'); } },
-    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
+    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => {
+      saveStateToHistory();
+      state.spotlight = upgradeSpotlight(state.spotlight);
+      state.spotlight.enabled = !state.spotlight.enabled;
+      // Same as the sidebar: turning it on with no focus areas adds a centered one.
+      if (state.spotlight.enabled && !state.spotlight.regions.length) {
+        state.spotlight.regions.push({ id: Date.now(), x: 0.2, y: 0.2, w: 0.6, h: 0.6, shape: state.spotlight.shape });
+      }
+      pruneSelection(); render(); window.__updateUIFromState?.();
+    } },
     { id: 'spotlight-add-region', label: 'Spotlight: Add focus area',   icon: '◎', run: () => setTool('spotlight') },
-    { id: 'spotlight-clear',      label: 'Spotlight: Clear focus areas', icon: '🗑', run: () => { saveStateToHistory(); state.spotlight.regions = []; render(); window.__updateUIFromState?.(); showStatus('Focus areas cleared'); } },
+    { id: 'spotlight-clear',      label: 'Spotlight: Clear focus areas', icon: '🗑', run: () => { saveStateToHistory(); state.spotlight.regions = []; pruneSelection(); render(); window.__updateUIFromState?.(); showStatus('Focus areas cleared'); } },
     { id: 'bokeh-detect', label: 'Bokeh: Detect subject', icon: '◉', run: () => import('./bokeh-ui.js').then((m) => m.detectSubject()), when: () => !!state.image },
     { id: 'bokeh-toggle', label: 'Bokeh: Toggle background blur', icon: '◉', run: () => { if (!state.bokeh?.maskDataUrl) { showStatus('Detect the subject first'); return; } saveStateToHistory(); state.bokeh.enabled = !state.bokeh.enabled; render(); window.__updateUIFromState?.(); } },
     { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },

@@ -31,8 +31,8 @@ export function buildKernel(radius, shape = 'circle') {
 }
 
 // Blur `src` (RGBA, w x h) with a disc/hex kernel. Edges clamp. Returns a new
-// array; alpha is averaged plainly. A radius under 0.5 (or not a number)
-// returns an unchanged copy.
+// array; color is alpha-weighted, and the alpha channel itself is a plain
+// average. A radius under 0.5 (or not a number) returns an unchanged copy.
 export function lensBlur(src, w, h, radius, shape = 'circle', highlights = 0) {
   if (!Number.isFinite(radius) || radius < 0.5) return new Uint8ClampedArray(src);
   const n = w * h;

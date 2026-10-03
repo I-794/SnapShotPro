@@ -127,9 +127,12 @@ function buildItems() {
   const items = [];
   if (dupable) items.push({ label: n > 1 ? `Duplicate ${n} items` : 'Duplicate', icon: '⧉', keys: 'Ctrl/⌘ D', run: duplicate });
   items.push({ label: n > 1 ? `Delete ${n} items` : 'Delete', icon: '🗑', keys: 'Del', run: () => { deleteSelected(); closeMenu(); } });
-  items.push({ sep: true });
-  items.push({ label: 'Bring to front', icon: '⤒', run: () => reorder('front') });
-  items.push({ label: 'Send to back', icon: '⤓', run: () => reorder('back') });
+  // v34 — focus areas have no stacking order.
+  if (!state.canvasSelection.every((r) => r.kind === 'spotlight')) {
+    items.push({ sep: true });
+    items.push({ label: 'Bring to front', icon: '⤒', run: () => reorder('front') });
+    items.push({ label: 'Send to back', icon: '⤓', run: () => reorder('back') });
+  }
   if (hasAnnotationSelected()) {
     items.push({ sep: true });
     items.push({ label: 'Copy style', icon: '🎨', run: copyStyle });

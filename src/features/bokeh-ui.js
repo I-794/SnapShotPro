@@ -3,11 +3,11 @@
 // turns Bokeh on; the blur itself is render/bokeh.js.
 import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
-import { saveStateToHistory } from '../state/history.js';
+import { saveStateToHistory, onHistoryChange } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { cutSubject } from './bg-remove.js';
-import { setBokehMaskListener, aspectSig, bindMaskOwner, maskFits } from '../render/bokeh.js';
+import { setBokehMaskListener, aspectSig, bindMaskOwner, maskMatches } from '../render/bokeh.js';
 
 const MASK_EDGE = 768;   // mask long edge; it is softened anyway, so this stays small
 
@@ -28,7 +28,7 @@ function makeMaskDataUrl(cut) {
 function statusText() {
   const b = state.bokeh;
   if (!b || !b.maskDataUrl) return 'The first run downloads a ~40MB model, then it is cached.';
-  if (state.image && !maskFits(state.image)) return 'The image changed. Detect the subject again.';
+  if (state.image && !maskMatches(state.image)) return 'The image changed. Detect the subject again.';
   return 'Subject found.';
 }
 
@@ -102,5 +102,8 @@ export function bindBokeh() {
     state.bokeh.shape = e.target.value;
     render();
   });
+  // Undo/redo restore state without touching the sidebar. History also emits on
+  // every save, which runs before the caller's mutation, so sync after it.
+  onHistoryChange(() => queueMicrotask(() => { refreshBokehUI(); window.__refreshSpotlightUI?.(); }));
   refreshBokehUI();
 }

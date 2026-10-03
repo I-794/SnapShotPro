@@ -203,8 +203,12 @@ function selectedTarget() {
 export function nudgeSelected(dx, dy, save) {
   // v28 — nudge the whole multi-selection together.
   if (state.canvasSelection.length > 1 || state.canvasSelection[0]?.kind === 'spotlight') {
+    // Resolve first: refs left dangling (e.g. regions just cleared) move nothing,
+    // so they must not push an empty history entry.
+    const handles = state.canvasSelection.map(resolveRef).filter(Boolean);
+    if (!handles.length) return false;
     if (save) saveStateToHistory();
-    state.canvasSelection.forEach((ref) => { const h = resolveRef(ref); if (h) h.moveBy(dx, dy); });
+    handles.forEach((h) => h.moveBy(dx, dy));
     render();
     return true;
   }

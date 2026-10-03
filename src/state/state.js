@@ -2,6 +2,9 @@
 // Other modules import this and mutate it directly (kept simple — no observer pattern).
 // Call render() from render/render.js after mutating to redraw.
 
+import { spotlightDefaults } from '../render/spotlight-geom.js';   // v34 (DOM-free, no imports)
+import { bokehDefaults } from '../render/bokeh-core.js';           // v34 (DOM-free, no imports)
+
 export const state = {
   image: null,
   svgCode: null,
@@ -65,10 +68,10 @@ export const state = {
   annotations: [],
   redactions: [],
   // v34 — Spotlight 2.0: any number of focus regions (fractions of the canvas).
-  spotlight: { enabled: false, opacity: 0.65, blur: 0, feather: 0, tint: '#000000', shape: 'rect', regions: [] },
+  spotlight: spotlightDefaults(),
   // v34 — Subject Bokeh. maskDataUrl is a white-on-transparent subject mask
   // (from cutSubject); maskSig is the image's aspect ratio when it was made.
-  bokeh: { enabled: false, amount: 12, highlights: 0.4, shape: 'circle', maskDataUrl: null, maskSig: null },
+  bokeh: bokehDefaults(),
   annotationColor: '#ff3b30',
   annotationStrokeWidth: 4,
   // v16.0 — vector shape tools. Fill applies to the closeable shapes

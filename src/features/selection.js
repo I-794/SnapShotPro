@@ -163,7 +163,8 @@ export function resolveRef(ref) {
   }
 
   if (ref.kind === 'spotlight') {
-    const list = (state.spotlight && Array.isArray(state.spotlight.regions)) ? state.spotlight.regions : [];
+    if (!state.spotlight || !state.spotlight.enabled) return null;
+    const list = Array.isArray(state.spotlight.regions) ? state.spotlight.regions : [];
     const r = list.find((x) => x.id === ref.id);
     if (!r) return null;
     const at = () => list.indexOf(r);

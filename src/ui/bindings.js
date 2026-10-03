@@ -190,6 +190,22 @@ function updateWatermarkControls() {
   if (el.watermarkControls) el.watermarkControls.style.display = state.watermark.enabled ? 'block' : 'none';
 }
 
+// v34 — push state.spotlight into the Spotlight section (also run after undo/redo).
+export function refreshSpotlightUI() {
+  if (!el.spotlightEnabled || !state.spotlight) return;
+  const set = (e, val) => { if (e) e.value = val; };
+  const txt = (e, val) => { if (e) e.textContent = val; };
+  const sp = state.spotlight;
+  el.spotlightEnabled.checked = sp.enabled;
+  set(el.spotlightOpacity, Math.round(sp.opacity * 100));
+  txt(el.spotlightOpacityValue, Math.round(sp.opacity * 100) + '%');
+  set(el.spotlightBlur, sp.blur || 0); txt(el.spotlightBlurValue, (sp.blur || 0) + 'px');
+  set(el.spotlightFeather, sp.feather || 0); txt(el.spotlightFeatherValue, (sp.feather || 0) + 'px');
+  set(el.spotlightTint, sp.tint || '#000000'); set(el.spotlightTintText, sp.tint || '#000000');
+  set(el.spotlightShape, sp.shape || 'rect');
+  updateSpotlightControls();
+}
+
 function updateSpotlightControls() {
   if (el.spotlightControls) el.spotlightControls.style.display = state.spotlight.enabled ? 'block' : 'none';
   const n = Array.isArray(state.spotlight.regions) ? state.spotlight.regions.length : 0;
@@ -400,6 +416,7 @@ function bindRedactionSpotlight() {
   if (el.spotlightShape) el.spotlightShape.addEventListener('change', (e) => {
     saveStateToHistory();
     const shape = e.target.value;
+    state.spotlight = upgradeSpotlight(state.spotlight);
     state.spotlight.shape = shape;
     // Reshape the selected focus areas too; new ones use this shape.
     const ids = state.canvasSelection.filter((s) => s.kind === 'spotlight').map((s) => s.id);
@@ -679,17 +696,7 @@ export function updateUIFromState() {
     updateWatermarkControls();
   }
 
-  if (el.spotlightEnabled) {
-    const sp = state.spotlight;
-    el.spotlightEnabled.checked = sp.enabled;
-    set(el.spotlightOpacity, Math.round(sp.opacity * 100));
-    txt(el.spotlightOpacityValue, Math.round(sp.opacity * 100) + '%');
-    set(el.spotlightBlur, sp.blur || 0); txt(el.spotlightBlurValue, (sp.blur || 0) + 'px');
-    set(el.spotlightFeather, sp.feather || 0); txt(el.spotlightFeatherValue, (sp.feather || 0) + 'px');
-    set(el.spotlightTint, sp.tint || '#000000'); set(el.spotlightTintText, sp.tint || '#000000');
-    set(el.spotlightShape, sp.shape || 'rect');
-    updateSpotlightControls();
-  }
+  refreshSpotlightUI();   // v34
   refreshBokehUI();   // v34
 
   if (el.reflectionEnabled) {
@@ -747,4 +754,5 @@ export function bindAllControls() {
 
   // expose for templates/reset
   window.__updateUIFromState = updateUIFromState;
+  window.__refreshSpotlightUI = refreshSpotlightUI;   // v34
 }
