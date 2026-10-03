@@ -361,7 +361,11 @@ export function groupDistribute(axis) {
 // v33 — make every selected object as wide (dim 'w') or tall (dim 'h') as the
 // largest one. Returns false if fewer than 2 resizable objects.
 export function groupMatchSize(dim) {
-  const items = state.canvasSelection.map(resolveRef).filter((h) => h && h.target);
+  // Spotlight regions have target: null (no per-object hide/lock) but still resize; text stays excluded.
+  const items = state.canvasSelection
+    .map((ref) => ({ ref, h: resolveRef(ref) }))
+    .filter(({ ref, h }) => h && (h.target || ref.kind === 'spotlight'))
+    .map(({ h }) => h);
   if (items.length < 2) return false;
   const target = Math.max(...items.map((h) => h.box[dim]));
   items.forEach((h) => { if (dim === 'w') h.resize(target, null); else h.resize(null, target); });

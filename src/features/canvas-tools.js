@@ -88,9 +88,6 @@ export function hitTestRedactions(x, y) {
   return -1;
 }
 
-// v28 — resolve the top-most object under a point into a selection ref, using
-// the same priority the old single-select path used: text → annotation →
-// redaction → extra image.
 // v34 — spotlight regions are hit on their outline band (or resize corner) only.
 export function hitTestSpotlight(x, y) {
   const sp = state.spotlight;
@@ -112,6 +109,9 @@ function spotlightCornerHit(x, y) {
     hitRegionCorner(r, cw, ch, x, y)) || null;
 }
 
+// v28 — resolve the top-most object under a point into a selection ref, using
+// the same priority the old single-select path used: text → annotation →
+// redaction → extra image.
 export function hitTopRef(x, y) {
   const canvas = el.previewCanvas;
   if (hitTestText(x, y)) return { kind: 'text' };
@@ -420,8 +420,9 @@ function canvasMouseMove(e) {
 
   // v28 — group drag: move every selected object by the pointer delta.
   if (groupDrag.active) {
-    if (!groupDrag.saved) { saveStateToHistory(); groupDrag.saved = true; }
     const dx = x - groupDrag.lastX, dy = y - groupDrag.lastY;
+    if (dx === 0 && dy === 0) return; // no movement: no move, no empty undo entry
+    if (!groupDrag.saved) { saveStateToHistory(); groupDrag.saved = true; }
     state.canvasSelection.forEach((ref) => { const h = resolveRef(ref); if (h) h.moveBy(dx, dy); });
     groupDrag.lastX = x; groupDrag.lastY = y;
     render();

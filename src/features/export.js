@@ -14,9 +14,8 @@ export function exportImage() {
     case 'webp': mimeType = 'image/webp'; extension = 'webp'; break;
     default:     mimeType = 'image/png';  extension = 'png';  break;
   }
-  if (state.bgMode === 'transparent' && mimeType === 'image/png') {
-    render(true);
-  }
+  // Re-render without preview-only chrome (selection outlines etc.) before reading the canvas.
+  render(true);
   const blobCallback = (blob) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -24,7 +23,7 @@ export function exportImage() {
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification(`Image exported as ${extension.toUpperCase()}!`, 'success');
-    if (state.bgMode === 'transparent') render();
+    render();
   };
   if (mimeType === 'image/png') el.previewCanvas.toBlob(blobCallback, mimeType);
   else el.previewCanvas.toBlob(blobCallback, mimeType, quality);
@@ -32,7 +31,9 @@ export function exportImage() {
 
 export function copyToClipboard() {
   if (!state.image) { showNotification('Please load an image first!', 'error'); return; }
+  render(true);
   el.previewCanvas.toBlob((blob) => {
+    render();
     const item = new ClipboardItem({ 'image/png': blob });
     navigator.clipboard.write([item])
       .then(() => showNotification('Image copied to clipboard!', 'success'))
