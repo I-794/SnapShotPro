@@ -81,6 +81,9 @@ function snapshot() {
 
 function restore(snap) {
   Object.assign(state, snap);
+  // Sidebar controls mirror state; without this, sliders kept showing the
+  // undone value. window hook avoids an import cycle with ui/bindings.js.
+  if (typeof window !== 'undefined' && typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
 }
 
 export function saveStateToHistory() {

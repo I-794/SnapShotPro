@@ -6,6 +6,20 @@
 > - Cache headers, TTFB, and compression come from `vite preview`, not Vercel. Findings that depend on them say **verify on production**.
 > - Several findings were spot-checked against the source (`src/styles.css:432-442`, `src/features/templates.js:51-57`, `src/features/reset.js`, `public/site.css:146-147`).
 
+## Fixes applied (2026-10-03)
+
+Fixed on this branch and checked in a headless browser (30/30 checks pass, including an axe re-run):
+
+- **Invisible toast blocking clicks:** fixed. Hidden toasts get `pointer-events: none; visibility: hidden` (`src/styles.css`), and `#notification` now has `role="status" aria-live="polite"`.
+- **Unlabeled editor controls (both Critical):** fixed. `src/ui/a11y.js` links each `.control-label` to its control and names toggle switches, color hex boxes and placeholder-only inputs. axe `label` went from 43 to 0 and `select-name` from 13 to 0.
+- **Click-only tiles:** fixed. Background, size and shadow presets, scenes, 3D demos and the upload zone are now focusable buttons that Enter and Space activate.
+- **Escape doesn't close dialogs:** fixed for Welcome and the cloud, auth and versions dialogs.
+- **Load Template not undoable:** fixed (`saveStateToHistory()` before applying).
+- **Marketing pages:** added a phone menu (≤560px), a skip link, a `<main id="main">` landmark on every page (via the partial injector in `vite.config.js`), `aria-current` on the active nav link, underlined in-text links, and fixed contrast (`--ink-3`, the hero `.url`, the editor `--text-tertiary`).
+- **Found while verifying (not in the original audit):** the header **Undo/Redo buttons were permanently disabled**. `renderHistoryTimeline()` returned early because `#history-track` doesn't exist. Also, undo/redo never refreshed the sidebar controls. Both are fixed (`history-timeline.js`, `history.js`).
+
+**Still open:** everything else below, notably the picsum placeholder images and other content/UX items, performance work (fonts, code-splitting, SW precache), Reset/Clear All confirmations, and one more undo bug found while verifying. Sliders and color pickers save their undo step on `change`, *after* the value moved, so the first Undo after a slider drag does nothing. Moving the save to the start of the drag changes when collaboration broadcasts and autosave fire, so it needs its own careful change.
+
 ## Summary
 
 | Category       | Critical | High | Medium | Low | Total |

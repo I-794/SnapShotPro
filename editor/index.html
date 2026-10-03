@@ -596,7 +596,7 @@
             <label class="control-label">Recolor an element</label>
             <div style="display:flex;gap:6px;margin-bottom:10px;">
                 <input type="text" class="control-input" id="medit-recolor-desc" placeholder="e.g. the primary button" style="flex:1;">
-                <input type="color" id="medit-recolor-hex" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
+                <input type="color" id="medit-recolor-hex" aria-label="New color" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
                 <button class="btn btn-secondary" id="medit-recolor">Recolor</button>
             </div>
 
@@ -1422,7 +1422,7 @@
     <div class="present-counter" id="present-counter">1 / 1</div>
 </div>
 
-<div class="notification" id="notification">
+<div class="notification" id="notification" role="status" aria-live="polite" aria-atomic="true">
     <span class="notification-icon">✓</span>
     <span class="notification-text" id="notification-text">Image exported successfully!</span>
 </div>

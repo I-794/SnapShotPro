@@ -10,7 +10,7 @@
     --border-glow: rgba(84, 112, 255, 0.16);
     --text-primary: #ecedf1;
     --text-secondary: #9a9ca8;
-    --text-tertiary: #63656f;
+    --text-tertiary: #8a8d99;   /* ≥4.5:1 on the dark panels (was #63656f, 3.2:1) */
     /* Electric cobalt brand — same family as the landing, tuned brighter for dark UI */
     --accent-primary: #5470ff;
     --accent-secondary: #7d92ff;
@@ -436,10 +436,12 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
     border: 1px solid var(--glass-border); border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     display: flex; align-items: center; gap: 10px; z-index: 2000;
-    transform: translateX(400px); opacity: 0;
+    transform: translateX(calc(100% + 40px)); opacity: 0;
+    /* Hidden toasts must not swallow clicks on the toolbar beneath them. */
+    pointer-events: none; visibility: hidden;
     transition: all var(--transition-smooth);
 }
-.notification.show { transform: translateX(0); opacity: 1; }
+.notification.show { transform: translateX(0); opacity: 1; pointer-events: auto; visibility: visible; }
 .notification.success { border-color: rgba(52, 211, 153, 0.3); box-shadow: var(--shadow-lg), 0 0 20px rgba(52, 211, 153, 0.08); }
 .notification.error { border-color: rgba(248, 113, 113, 0.3); box-shadow: var(--shadow-lg), 0 0 20px rgba(248, 113, 113, 0.08); }
 .notification-icon { font-size: 18px; }

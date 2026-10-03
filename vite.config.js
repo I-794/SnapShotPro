@@ -18,10 +18,13 @@ function htmlPartials() {
       order: 'pre',
       handler(html) {
         const version = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')).version;
+        // Everything between the nav and footer becomes the <main id="main">
+        // landmark (target of the nav's skip link), unless the page has its own.
+        const wrapMain = !/<main[\s>]/.test(html) && html.includes('<!--PARTIAL:nav-->') && html.includes('<!--PARTIAL:footer-->');
         return html
           .split('<!--PARTIAL:mark-->').join(read('mark.html'))
-          .split('<!--PARTIAL:nav-->').join(read('nav.html'))
-          .split('<!--PARTIAL:footer-->').join(read('footer.html').split('{{VERSION}}').join(version));
+          .split('<!--PARTIAL:nav-->').join(read('nav.html') + (wrapMain ? '\n<main id="main">' : ''))
+          .split('<!--PARTIAL:footer-->').join((wrapMain ? '</main>\n' : '') + read('footer.html').split('{{VERSION}}').join(version));
       }
     }
   };
