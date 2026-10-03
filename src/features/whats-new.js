@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '33.0';
+const CURRENT_VERSION = '34.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "📷 v33 · Aperture",
+  heading: "📷 v34 · Bokeh",
   items: [
-    { title: 'Pick colors from anywhere',
-      desc: 'Every color picker has an eyedropper, plus your brand colors and last 8 colors one click away.' },
-    { title: 'Space things evenly',
-      desc: 'Right-click 3+ objects to Distribute them, or Match size to the largest. Hide and Lock are there too.' },
-    { title: 'Undo from the toast',
-      desc: 'Deleting objects, pages, or board cards shows an Undo button. Deleted pages come back with their edits.' },
-    { title: 'Quick export',
-      desc: 'Cmd/Ctrl+Shift+S re-exports with the last preset you used. Page thumbnails now sit under the canvas.' }
+    { title: 'Spotlight, rebuilt',
+      desc: 'Add several focus areas, pick box, circle, or rounded, and blur everything else.' },
+    { title: 'Real background blur',
+      desc: 'Bokeh (Adjust tab) finds your subject and softens the background like a camera lens.' },
+    { title: 'Bokeh highlights',
+      desc: 'Bright spots bloom into soft circles. Turn it up or down with one slider.' },
+    { title: 'Works everywhere',
+      desc: 'Both effects bake into every export, and Bokeh works in every mockup too.' }
   ]
 };
 
