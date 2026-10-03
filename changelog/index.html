@@ -792,11 +792,11 @@
         .ap-toast b { font-weight: 600; font-size: 11px; color: #f3c88c; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 3px 8px; }
         @media (max-width: 860px) { .ap-stage { max-width: 460px; margin: 0 auto; } }
 
-        /* v34 — Bokeh spotlight. Its own motif: an out-of-focus field of soft
-           rose and warm-white light discs behind a screenshot card whose one
-           focus area stays crisp while the rest is dimmed and blurred, plus a
-           small control chip echoing the sidebar. Distinct from v33's amber
-           dot-grid of tools. */
+        /* v34 — Bokeh spotlight. The stage is a real Subject Bokeh render made by
+           the app itself (public/v34-bokeh-example.jpg): a phone stays sharp
+           while string lights behind it bloom into soft discs. A small
+           Spotlight card (one crisp focus area, the rest dimmed and blurred)
+           floats over the corner, plus a chip echoing the Bokeh sidebar. */
         .spotlight-bokeh {
             background:
                 radial-gradient(52% 80% at 92% 6%, rgba(228,138,158,0.20), transparent 56%),
@@ -814,34 +814,26 @@
             background: #120d0e;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07), 0 24px 54px rgba(8,4,5,0.55);
         }
-        .bk-orb { position: absolute; aspect-ratio: 1 / 1; border-radius: 50%; background: radial-gradient(circle, rgba(255,228,234,0.85), rgba(228,138,158,0.5) 46%, rgba(228,138,158,0) 72%); }
-        .bk-orb.b1 { width: 26%; left: -4%; top: 4%;  opacity: 0.55; }
-        .bk-orb.b2 { width: 14%; left: 30%; top: -3%; opacity: 0.40; }
-        .bk-orb.b3 { width: 20%; right: 2%; top: 6%;  opacity: 0.50; }
-        .bk-orb.b4 { width: 11%; right: 26%; top: 80%; opacity: 0.45; }
-        .bk-orb.b5 { width: 30%; left: 6%; bottom: -10%; opacity: 0.35; }
-        .bk-orb.b6 { width: 9%;  right: 6%; bottom: 14%; opacity: 0.60; }
-        .bk-orb.b7 { width: 16%; left: 44%; bottom: -4%; opacity: 0.30; }
-        .bk-card { position: absolute; left: 14%; top: 20%; width: 72%; height: 54%; border-radius: 12px; overflow: hidden; background: #241c1e; box-shadow: 0 18px 40px rgba(0,0,0,0.5); }
+        .bk-stage::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07); pointer-events: none; }
+        .bk-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+        .bk-card { position: absolute; right: 5%; top: 5%; width: 40%; height: 29%; border-radius: 10px; overflow: hidden; background: #241c1e; border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 16px 36px rgba(0,0,0,0.55); }
         .bk-layer { position: absolute; inset: 0; }
-        .bk-layer.soft { filter: blur(5px); }
+        .bk-layer.soft { filter: blur(3px); }
         .bk-layer.soft::after { content: ''; position: absolute; inset: 0; background: rgba(10,6,7,0.55); }
-        .bk-layer.sharp { clip-path: inset(29% 5% 41% 37% round 10px); }
-        .bk-tile { position: absolute; border-radius: 8px; background: linear-gradient(150deg, #4a3d41, #2c2326); }
+        .bk-layer.sharp { clip-path: inset(29% 5% 41% 37% round 7px); }
+        .bk-tile { position: absolute; border-radius: 5px; background: linear-gradient(150deg, #4a3d41, #2c2326); }
         .bk-tile.t1 { left: 6%; top: 8%; width: 88%; height: 13%; }
         .bk-tile.t2 { left: 6%; top: 29%; width: 27%; height: 63%; }
         .bk-tile.t3 { left: 40%; top: 32%; width: 52%; height: 24%; background: linear-gradient(150deg, #e48a9e, #a9566a); }
         .bk-tile.t4 { left: 40%; top: 64%; width: 52%; height: 28%; }
-        .bk-ring { position: absolute; left: 37%; top: 29%; width: 58%; height: 30%; border: 1.5px dashed rgba(242,182,195,0.9); border-radius: 10px; }
-        .bk-chip { position: absolute; right: 6%; bottom: 6%; padding: 7px 11px; border-radius: 10px; background: rgba(26,19,21,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 12px 28px rgba(0,0,0,0.5); font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.86); }
+        .bk-ring { position: absolute; left: 37%; top: 29%; width: 58%; height: 30%; border: 1.5px dashed rgba(242,182,195,0.9); border-radius: 7px; }
+        .bk-chip { position: absolute; right: 5%; bottom: 5%; padding: 7px 11px; border-radius: 10px; background: rgba(26,19,21,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 12px 28px rgba(0,0,0,0.5); font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.86); white-space: nowrap; }
         .bk-chip b { color: #f2b6c3; font-weight: 600; }
-        @media (prefers-reduced-motion: no-preference) {
-            .bk-orb { animation: bk-drift 16s ease-in-out infinite alternate; }
-            .bk-orb.b2, .bk-orb.b5 { animation-duration: 21s; animation-delay: -6s; }
-            .bk-orb.b3, .bk-orb.b6 { animation-duration: 18s; animation-delay: -11s; }
-        }
-        @keyframes bk-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(5%, -4%, 0); } }
         @media (max-width: 860px) { .bk-stage { max-width: 460px; margin: 0 auto; } }
+        @media (max-width: 480px) {
+            .bk-card { width: 36%; height: 26%; right: 4%; top: 4%; border-radius: 8px; }
+            .bk-chip { right: 4%; bottom: 4%; padding: 5px 7px; border-radius: 8px; font-size: 9px; }
+        }
 
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
@@ -950,15 +942,14 @@
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="bk-stage" aria-hidden="true">
-                    <div class="bk-orb b1"></div><div class="bk-orb b2"></div><div class="bk-orb b3"></div>
-                    <div class="bk-orb b4"></div><div class="bk-orb b5"></div><div class="bk-orb b6"></div><div class="bk-orb b7"></div>
-                    <div class="bk-card">
+                <div class="bk-stage">
+                    <img class="bk-photo" src="/v34-bokeh-example.jpg" width="1200" height="1200" decoding="async" alt="A phone stays sharp while the city lights behind it melt into soft bokeh circles.">
+                    <div class="bk-card" aria-hidden="true">
                         <div class="bk-layer soft"><div class="bk-tile t1"></div><div class="bk-tile t2"></div><div class="bk-tile t3"></div><div class="bk-tile t4"></div></div>
                         <div class="bk-layer sharp"><div class="bk-tile t1"></div><div class="bk-tile t2"></div><div class="bk-tile t3"></div><div class="bk-tile t4"></div></div>
                         <div class="bk-ring"></div>
                     </div>
-                    <div class="bk-chip">Blur <b>12px</b> · Soft edge <b>8px</b></div>
+                    <div class="bk-chip" aria-hidden="true">Bokeh <b>22</b> · Highlights <b>80%</b></div>
                 </div>
             </div>
             <!-- SWAP-END -->
