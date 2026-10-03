@@ -8,7 +8,10 @@ import { showNotification } from '../ui/notification.js';
 import { lensBlur } from './bokeh-core.js';
 
 const cache = { key: null, maskSrc: null, canvas: null };
-const maskCache = { src: null, img: null };
+// Decoded mask images by dataURL. A few entries, so a multi-page export can hold
+// every page's mask ready instead of swapping a single slot back and forth.
+const MASK_CACHE_MAX = 4;
+const maskCache = new Map();   // src -> { img, ready: Promise }
 let onMaskReady = null;
 let taintWarned = false;
 
@@ -23,6 +26,13 @@ export function bokehActive() {
 // changes when the image is cropped or swapped for a different shape.
 export function aspectSig(img) {
   return (img.width / img.height).toFixed(3);
+}
+
+// The saved signature is rounded to 3 decimals and a saved project downscales
+// large photos (rounding each side), so compare with a relative tolerance.
+function sameAspect(sig, img) {
+  const a = img.width / img.height;
+  return Math.abs(parseFloat(sig) - a) / a < 0.01;
 }
 
 // Which masks belong to which image: each image object carries the set of mask
@@ -55,27 +65,53 @@ export function maskFits(img) {
   const claim = pendingClaim;
   if (img) pendingClaim = false;
   if (!b || !b.maskDataUrl || !img || !img.width || !img.height) return false;
-  if (b.maskSig && b.maskSig !== aspectSig(img)) return false;
+  if (b.maskSig && !sameAspect(b.maskSig, img)) return false;
   if (img.__bokehMasks && img.__bokehMasks.has(b.maskDataUrl)) return true;
   if (claim) { tag(img, b.maskDataUrl); return true; }
   return false;
 }
 
+// Same test as maskFits, but it never claims: for status text and other reads
+// that must not use up the one-shot claim after a load.
+export function maskMatches(img) {
+  const b = state.bokeh;
+  if (!b || !b.maskDataUrl || !img || !img.width || !img.height) return false;
+  if (b.maskSig && !sameAspect(b.maskSig, img)) return false;
+  if (img.__bokehMasks && img.__bokehMasks.has(b.maskDataUrl)) return true;
+  return pendingClaim;
+}
+
+function maskEntry(src) {
+  let e = maskCache.get(src);
+  if (e) { maskCache.delete(src); maskCache.set(src, e); return e; }   // most recent last
+  const img = new Image();
+  const ready = new Promise((resolve) => {
+    img.onload = () => { resolve(); if (onMaskReady) onMaskReady(); };
+    img.onerror = () => resolve();
+  });
+  img.src = src;
+  e = { img, ready };
+  maskCache.set(src, e);
+  while (maskCache.size > MASK_CACHE_MAX) maskCache.delete(maskCache.keys().next().value);
+  return e;
+}
+
 function maskImage(src) {
-  if (maskCache.src !== src) {
-    maskCache.src = src;
-    maskCache.img = new Image();
-    maskCache.img.onload = () => { if (onMaskReady) onMaskReady(); };
-    maskCache.img.src = src;
-  }
-  const img = maskCache.img;
+  const img = maskEntry(src).img;
   return img.complete && img.naturalWidth ? img : null;
+}
+
+// Resolves once this mask is decoded (or failed), so an offscreen render right
+// after a page apply draws its Bokeh instead of skipping it mid-decode.
+export function ensureBokehMask(src) {
+  if (!src) return Promise.resolve();
+  return maskEntry(src).ready;
 }
 
 export function applyBokeh(src, baseKey) {
   if (!bokehActive() || !src || !src.width || !src.height) return src;
   const b = state.bokeh;
-  if (b.maskSig && b.maskSig !== aspectSig(src)) return src;   // stale mask
+  if (b.maskSig && !sameAspect(b.maskSig, src)) return src;    // stale mask
   const mask = maskImage(b.maskDataUrl);
   if (!mask) return src;                                      // still decoding
 

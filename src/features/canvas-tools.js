@@ -400,6 +400,8 @@ function drawMarquee() {
 
 // v28 — commit the marquee: select every object whose box intersects it. A
 // near-zero drag is treated as a click (selection was already cleared on down).
+// v34 — a spotlight focus area is selected only when the marquee fully contains
+// it, so a marquee drawn inside a large area picks the objects, not the area.
 function finalizeMarquee() {
   const rx = Math.min(marquee.x0, marquee.x1), ry = Math.min(marquee.y0, marquee.y1);
   const rw = Math.abs(marquee.x1 - marquee.x0), rh = Math.abs(marquee.y1 - marquee.y0);
@@ -408,6 +410,7 @@ function finalizeMarquee() {
     const h = resolveRef(ref);
     if (!h) return false;
     const b = h.box;
+    if (ref.kind === 'spotlight') return b.x >= rx && b.y >= ry && b.x + b.w <= rx + rw && b.y + b.h <= ry + rh;
     return !(b.x > rx + rw || b.x + b.w < rx || b.y > ry + rh || b.y + b.h < ry);
   });
   setSelection(hits);

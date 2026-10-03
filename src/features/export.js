@@ -14,8 +14,11 @@ export function exportImage() {
     case 'webp': mimeType = 'image/webp'; extension = 'webp'; break;
     default:     mimeType = 'image/png';  extension = 'png';  break;
   }
-  // Re-render without preview-only chrome (selection outlines etc.) before reading the canvas.
-  render(true);
+  // Re-render without preview-only chrome (selection outlines etc.) before reading
+  // the canvas. Not in Set mode: render(true) would skip the Set panel preview,
+  // and that preview draws no selection chrome anyway.
+  const bracket = state.mode !== 'set';
+  if (bracket) render(true);
   const blobCallback = (blob) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -23,7 +26,7 @@ export function exportImage() {
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification(`Image exported as ${extension.toUpperCase()}!`, 'success');
-    render();
+    if (bracket) render();
   };
   if (mimeType === 'image/png') el.previewCanvas.toBlob(blobCallback, mimeType);
   else el.previewCanvas.toBlob(blobCallback, mimeType, quality);
@@ -31,9 +34,10 @@ export function exportImage() {
 
 export function copyToClipboard() {
   if (!state.image) { showNotification('Please load an image first!', 'error'); return; }
-  render(true);
+  const bracket = state.mode !== 'set';   // see exportImage
+  if (bracket) render(true);
   el.previewCanvas.toBlob((blob) => {
-    render();
+    if (bracket) render();
     const item = new ClipboardItem({ 'image/png': blob });
     navigator.clipboard.write([item])
       .then(() => showNotification('Image copied to clipboard!', 'success'))
