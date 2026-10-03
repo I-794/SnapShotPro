@@ -5,7 +5,6 @@
 import { state } from '../state/state.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
-import { showNotification } from '../ui/notification.js';
 import { runAgentTurn } from './ai-cloud.js';
 import { TOOLS, runTool, consumeChips } from './agent-tools.js';
 import { loadChat, saveChat, loadMemory } from './agent-memory.js';
