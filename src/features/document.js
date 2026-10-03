@@ -19,16 +19,18 @@ export function applyDesignToState(payload) {
   const norm = normalizeProject(payload);
   Object.assign(state, norm.design);
   state.svgCode = norm.svgCode || null;
-  // v34 — this page's own image (decoded below) claims its Bokeh mask afresh.
-  releaseMaskOwner();
+  // v34 — once this page's own image is in place, it may claim its Bokeh mask
+  // (releaseMaskOwner opens a one-shot claim; not before the decode, or a render
+  // in between would hand the mask to the previous image).
   return new Promise((resolve) => {
     if (norm.image) {
       const img = new Image();
-      img.onload = () => { state.image = img; resolve(); };
-      img.onerror = () => { state.image = null; resolve(); };
+      img.onload = () => { state.image = img; releaseMaskOwner(); resolve(); };
+      img.onerror = () => { state.image = null; releaseMaskOwner(); resolve(); };
       img.src = norm.image;
     } else {
       state.image = null;
+      releaseMaskOwner();
       resolve();
     }
   });

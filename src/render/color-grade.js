@@ -206,8 +206,10 @@ function imageId(img) {
 // feeds the flat, 2D mockup, 3D screen, and Surface paths.
 export function getGradedImage(srcImage) {
   const graded = gradeImage(srcImage);
-  if (!graded || !graded.width || !bokehActive()) return graded;
-  if (!maskFits(srcImage)) return graded;   // mask belongs to another image
+  if (!graded || !graded.width) return graded;
+  // maskFits first (even with Bokeh off) so the one-shot claim after a page
+  // load goes to that page's own image, not one rendered later.
+  if (!maskFits(srcImage) || !bokehActive()) return graded;   // mask belongs to another image
   const baseKey = graded === srcImage ? 'src:' + imageId(srcImage) : 'grade:' + cache.sig;
   return applyBokeh(graded, baseKey);
 }

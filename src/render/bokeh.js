@@ -25,29 +25,40 @@ export function aspectSig(img) {
   return (img.width / img.height).toFixed(3);
 }
 
-// The exact image object the current mask belongs to. Runtime-only: after a
-// project or page load the first image rendered with that mask claims it (the
-// preview always renders the page's own image first).
-let owner = { src: null, img: null };
+// Which masks belong to which image: each image object carries the set of mask
+// strings detected on (or claimed by) it, so undo/redo back to an earlier mask
+// still finds its image, and no module-level reference keeps an image alive.
+// Runtime-only; never persisted or snapshotted.
+function tag(img, src) {
+  if (!img.__bokehMasks) img.__bokehMasks = new Set();
+  img.__bokehMasks.add(src);
+}
+
+// A page/project load decodes a fresh image object that has no tags yet. Only
+// right after a load (releaseMaskOwner) may the first image checked claim the
+// mask; undo/redo swapping the mask string never opens a claim.
+let pendingClaim = false;
 
 export function bindMaskOwner(img) {
-  owner = { src: state.bokeh ? state.bokeh.maskDataUrl : null, img };
+  pendingClaim = false;
+  if (img && state.bokeh && state.bokeh.maskDataUrl) tag(img, state.bokeh.maskDataUrl);
 }
 
-// A page/project load decodes a fresh image object, possibly with the same mask
-// string as before (switching back to a page, a duplicated page). Release the
-// claim so that page's own image can take it.
 export function releaseMaskOwner() {
-  owner = { src: null, img: null };
+  pendingClaim = true;
 }
 
-// Does the saved mask belong to this exact source image?
+// Does the saved mask belong to this exact source image? The claim after a load
+// is one-shot: the first image checked (the page's own) uses it either way.
 export function maskFits(img) {
   const b = state.bokeh;
+  const claim = pendingClaim;
+  if (img) pendingClaim = false;
   if (!b || !b.maskDataUrl || !img || !img.width || !img.height) return false;
   if (b.maskSig && b.maskSig !== aspectSig(img)) return false;
-  if (owner.src !== b.maskDataUrl) owner = { src: b.maskDataUrl, img };
-  return owner.img === img;
+  if (img.__bokehMasks && img.__bokehMasks.has(b.maskDataUrl)) return true;
+  if (claim) { tag(img, b.maskDataUrl); return true; }
+  return false;
 }
 
 function maskImage(src) {
