@@ -22,9 +22,11 @@ spotlight: {
   blur: 0,                     // px of blur outside the regions (0 = v1 look)
   feather: 0,                  // soft edge, px
   tint: '#000000',             // dim color
-  regions: [{ id, x, y, w, h, shape: 'rect'|'ellipse'|'rounded', radius }]
+  regions: [{ id, x, y, w, h, shape: 'rect'|'ellipse'|'rounded' }]
 }
 ```
+- Implementation note: no per-region radius; `rounded` uses a fixed share of the short side (`ROUNDED_FRAC`).
+- Implementation note: regions use group-drag move and corner resize; they have no per-region hide/lock (the spotlight is shown/hidden as a whole). `groupMatchSize` includes them (their handles have `target: null`). The editing chrome (`drawSpotlightChrome`) is preview-only, drawn in `render()`; `export.js` `exportImage` and `copyToClipboard` now call `render(true)` before reading the preview canvas and `render()` after, so the chrome never reaches the file. `exportAsHTML`, share, and gallery still read the live preview (known follow-up).
 - `migrateSpotlightV20()` in `serialize.js` turns the old single `x,y,w,h` into `regions[0]`. Also update `reset.js` and the `state.js` defaults.
 - **Renderer** (`spotlight.js`): fill the tint over the canvas, then for each region punch a hole with `destination-out` (shape path + `ctx.filter = blur(feather)` for a soft edge). When `blur > 0`, first copy the canvas to an offscreen, blur it with `ctx.filter`, and draw the blurred copy *outside* the regions (clip with an even-odd path), then the tint. This is the same "sample the canvas" approach `drawRedactions` already uses. No change to call sites, so the flat, 2D-mockup, and 3D-texture paths all get it automatically. (Surface path: it currently has no spotlight call; leave that unchanged, as in v33.)
 - **Tool**: the spotlight drag tool *adds* a region instead of replacing it (Shift-drag = ellipse). Regions become a selectable kind in `selection.js` (`kind: 'spotlight'`) so move, resize, delete, duplicate, align, and the context menu all work through `resolveRef`. `isPickable` and the hit tests include them.
@@ -38,6 +40,11 @@ bokeh: { enabled: false, amount: 12, highlights: 0.4, shape: 'circle'|'hexagon',
          maskDataUrl: null, maskSig: null }
 ```
 - **Make mask** button → `cutSubject()` → read the alpha channel into a grayscale mask canvas → store it as `maskDataUrl` (downscaled to a 1024px long edge, PNG) plus `maskSig` = the image signature. If `state.image` changes, the signature no longer matches, so bokeh turns off and the UI says "Re-detect subject".
+- Implementation note: `maskSig` is the image aspect ratio (a pixel hash would break when a saved project re-encodes the image as JPEG); loading a new image clears the mask. The optional `set_bokeh` agent tool was skipped.
+- Implementation note (mask ownership): the mask applies only to the exact image object it was detected on. `render/bokeh.js` tags images (`img.__bokehMasks`, a runtime-only Set of mask dataURLs) via `bindMaskOwner`; `maskFits(img)` is checked at the single seam, `getGradedImage` in `color-grade.js`. After a page/project load, `document.js` `applyDesignToState` calls `releaseMaskOwner()` in the image's `onload`, so the page's own freshly decoded image claims the saved mask once. Undo/redo never transfers a mask to another image. `maskSig` stays as an extra guard.
+- Implementation note (video): bokeh is skipped while a video clip is loaded (`bokehActive()`), loading a video clears the mask, and Detect subject refuses on video.
+- Implementation note (lens blur): `bokeh-core.js` `lensBlur` is an alpha- and highlight-weighted average in linear light rather than a pre-blur brightness boost. Pixels above `BRIGHT` get extra weight via a smoothstep, so they bloom while flat tones keep their value; alpha weighting keeps transparent pixels from darkening edges; a radius under 0.5 or non-finite returns a copy. User-approved change from the plan.
+- Implementation note (verification): real @imgly subject detection could not be exercised in the build environment (model host blocked); everything else was verified with a synthetic mask.
 - **New `src/render/bokeh.js`**: `applyBokeh(srcCanvasOrImage)` → cached result keyed by (image sig + bokeh settings).
   1. Background = the source with a **lens blur**: a disc/hex-kernel blur done at reduced resolution (fast) in an `ImageData` pass. Bright pixels above a threshold get boosted before blurring, so they bloom into round "bokeh balls" (`highlights`).
   2. Composite: blurred background, then the sharp source masked by the feathered subject mask. The mask is blurred slightly so edges don't look cut out.
