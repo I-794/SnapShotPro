@@ -25,7 +25,7 @@ const WHATS_NEW = {
     { title: 'Bokeh highlights',
       desc: 'Bright spots bloom into soft circles. Turn it up or down with one slider.' },
     { title: 'Works everywhere',
-      desc: 'Both effects bake into every export, and Bokeh works in every mockup too.' }
+      desc: 'Both effects bake into your exported images, and Bokeh works in every mockup too.' }
   ]
 };
 
