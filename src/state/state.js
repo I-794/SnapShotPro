@@ -66,6 +66,9 @@ export const state = {
   redactions: [],
   // v34 — Spotlight 2.0: any number of focus regions (fractions of the canvas).
   spotlight: { enabled: false, opacity: 0.65, blur: 0, feather: 0, tint: '#000000', shape: 'rect', regions: [] },
+  // v34 — Subject Bokeh. maskDataUrl is a white-on-transparent subject mask
+  // (from cutSubject); maskSig is the image's aspect ratio when it was made.
+  bokeh: { enabled: false, amount: 12, highlights: 0.4, shape: 'circle', maskDataUrl: null, maskSig: null },
   annotationColor: '#ff3b30',
   annotationStrokeWidth: 4,
   // v16.0 — vector shape tools. Fill applies to the closeable shapes
