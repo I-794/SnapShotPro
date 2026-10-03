@@ -10,22 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '33.0';
+const CURRENT_VERSION = '33.1';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "📷 v33 · Aperture",
+  heading: "📷 v33.1 · Aperture, polished",
   items: [
-    { title: 'Pick colors from anywhere',
-      desc: 'Every color picker has an eyedropper, plus your brand colors and last 8 colors one click away.' },
-    { title: 'Space things evenly',
-      desc: 'Right-click 3+ objects to Distribute them, or Match size to the largest. Hide and Lock are there too.' },
-    { title: 'Undo from the toast',
-      desc: 'Deleting objects, pages, or board cards shows an Undo button. Deleted pages come back with their edits.' },
-    { title: 'Quick export',
-      desc: 'Cmd/Ctrl+Shift+S re-exports with the last preset you used. Page thumbnails now sit under the canvas.' }
+    { title: 'Undo and Redo are back',
+      desc: 'The header buttons light up after every change, sliders follow along, and loading a template can be undone.' },
+    { title: 'No invisible click-blockers',
+      desc: 'A hidden notification no longer eats clicks on the top-right toolbar.' },
+    { title: 'Keyboard and screen reader friendly',
+      desc: 'Every control is named, presets and scenes work with Tab + Enter, and Esc closes dialogs.' }
   ]
 };
 
