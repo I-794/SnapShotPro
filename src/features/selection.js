@@ -17,7 +17,7 @@ import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
 import { annotationBBox } from '../render/annotations.js';
 
-// kinds: 'annotation' | 'redaction' | 'extraImage' | 'text'
+// kinds: 'annotation' | 'redaction' | 'extraImage' | 'text' | 'spotlight' (v34)
 // text is a singleton overlay, so its ref has no id.
 
 function newId() {
@@ -43,6 +43,10 @@ export function objectRefs() {
   const refs = [];
   (state.annotations || []).forEach((a) => { if (isPickable(a)) refs.push({ kind: 'annotation', id: a.id }); });
   (state.redactions || []).forEach((r) => { if (isPickable(r)) refs.push({ kind: 'redaction', id: r.id }); });
+  // v34 — spotlight focus regions (the spotlight is shown/hidden as a whole).
+  if (state.spotlight && state.spotlight.enabled && Array.isArray(state.spotlight.regions)) {
+    state.spotlight.regions.forEach((r) => refs.push({ kind: 'spotlight', id: r.id }));
+  }
   (state.extraImages || []).forEach((e) => { if (isPickable(e)) refs.push({ kind: 'extraImage', id: e.id }); });
   if (state.textOverlay.enabled && state.textOverlay.content) refs.push({ kind: 'text' });
   return refs;
@@ -158,6 +162,28 @@ export function resolveRef(ref) {
     };
   }
 
+  if (ref.kind === 'spotlight') {
+    const list = (state.spotlight && Array.isArray(state.spotlight.regions)) ? state.spotlight.regions : [];
+    const r = list.find((x) => x.id === ref.id);
+    if (!r) return null;
+    const at = () => list.indexOf(r);
+    return {
+      box: { x: r.x * cw, y: r.y * ch, w: r.w * cw, h: r.h * ch },
+      moveBy(dx, dy) { r.x += dx / cw; r.y += dy / ch; },
+      resize(w, h) { if (w != null) r.w = Math.max(4, w) / cw; if (h != null) r.h = Math.max(4, h) / ch; },
+      // The spotlight is hidden/locked as a whole (sidebar + Layers), so a
+      // region has no per-object hide/lock target.
+      target: null,
+      clone() {
+        const copy = { ...r, id: newId(), x: r.x + CLONE_OFFSET / cw, y: r.y + CLONE_OFFSET / ch };
+        list.push(copy);
+        return { kind: 'spotlight', id: copy.id };
+      },
+      remove() { const i = at(); if (i !== -1) list.splice(i, 1); },
+      raiseToFront() {},
+      sendToBack() {},
+    };
+  }
   if (ref.kind === 'text') {
     const t = state.textOverlay;
     if (!t.enabled || !t.content) return null;

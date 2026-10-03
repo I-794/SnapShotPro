@@ -149,7 +149,7 @@ function buildItems() {
       { label: 'Height (largest)', run: () => matchSize('h') },
     ] });
   }
-  if (state.canvasSelection.some((r) => r.kind !== 'text')) {
+  if (state.canvasSelection.some((r) => r.kind !== 'text' && r.kind !== 'spotlight')) {
     items.push({ sep: true });
     items.push({ label: 'Hide', icon: '⊘', run: () => flag('hide') });
     items.push({ label: 'Lock', icon: '🔒', run: () => flag('lock') });
