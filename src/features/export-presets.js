@@ -14,6 +14,7 @@ import { showNotification } from '../ui/notification.js';
 import { clearSelection, setSelection } from './selection.js';
 
 const LS_KEY = 'snapshotpro_export_presets';
+const LAST_KEY = 'snapshotpro_last_export_preset';   // v33 — quick export
 
 const BUILTINS = [
   { id: 'png-1x',  name: 'PNG · 1×',           format: 'png',  quality: 100, scale: 1 },
@@ -73,11 +74,26 @@ function exportScaled(scale, format, quality) {
 export function applyExportPreset(id) {
   const p = read().find((x) => x.id === id);
   if (!p) return;
+  try { localStorage.setItem(LAST_KEY, p.id); } catch (e) {}
+  if (el.exportPresetSelect) el.exportPresetSelect.value = p.id;
   // Keep the editor's export settings + UI in sync with the preset.
   state.exportSettings.format = p.format;
   if (p.quality != null) state.exportSettings.quality = p.quality;
   if (el.exportFormat) el.exportFormat.value = p.format;
   exportScaled(p.scale || 1, p.format, p.quality);
+}
+
+// v33 — the last preset used (falls back to the first one), for one-key re-export.
+export function lastExportPreset() {
+  const list = read();
+  let id = null;
+  try { id = localStorage.getItem(LAST_KEY); } catch (e) {}
+  return list.find((x) => x.id === id) || list[0] || null;
+}
+
+export function quickExport() {
+  const p = lastExportPreset();
+  if (p) applyExportPreset(p.id);
 }
 
 function saveCurrentAsPreset(scale) {
@@ -103,6 +119,8 @@ function renderUi() {
   if (!sel) return;
   const list = read();
   sel.innerHTML = list.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
+  const last = lastExportPreset();
+  if (last) sel.value = last.id;
 }
 
 export function bindExportPresets() {

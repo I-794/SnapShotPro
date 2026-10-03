@@ -14,7 +14,6 @@
 // truth per parameter.
 
 import { state } from '../state/state.js';
-import { render } from '../render/render.js';
 import { saveStateToHistory, onHistoryChange } from '../state/history.js';
 import {
   bindPlayback, pause, togglePlay, seek, stop,

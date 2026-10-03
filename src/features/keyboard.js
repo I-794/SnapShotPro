@@ -10,6 +10,7 @@ import { clearSelection, selectAll, duplicateSelection } from './selection.js';
 import { isTypingTarget } from '../utils/dom.js';
 import { timelineActive, timelineStepFrame, timelineSetIn, timelineSetOut } from './timeline.js';
 import { matchEvent } from './shortcuts.js';
+import { quickExport } from './export-presets.js';
 
 function showShortcuts(show) {
   if (!el.shortcutsOverlay) return;
@@ -29,8 +30,8 @@ export function bindKeyboard() {
     if (state.ui.paletteOpen) return;
 
     if (e.key === 'Escape') {
-      // v32 — Esc exits board mode (the toolbar promises it).
-      if (state.mode === 'board' && typeof window.__exitBoardMode === 'function') { window.__exitBoardMode(); return; }
+      // v32.1 — board Esc cascade: cancel connect → clear selection → exit board.
+      if (state.mode === 'board' && typeof window.__boardEscape === 'function') { window.__boardEscape(); return; }
       if (el.shortcutsOverlay && el.shortcutsOverlay.style.display === 'flex') { showShortcuts(false); return; }
       if (state.ui.stickerDrawerOpen) { closeStickerDrawer(); return; }
       if (state.tool !== 'select') { setTool('select'); clearSelection(); render(); return; }
@@ -45,10 +46,22 @@ export function bindKeyboard() {
     const sc = matchEvent(e);
     if (sc) {
       e.preventDefault();
+      // v32.1 — on the board these act on the board, not the hidden active page.
+      if (state.mode === 'board') {
+        switch (sc) {
+          case 'undo':       window.__boardUndo?.(); return;
+          case 'redo':       window.__boardRedo?.(); return;
+          case 'select-all': window.__boardSelectAll?.(); return;
+          case 'export':     window.__boardExport?.(); return;
+          case 'quick-export': window.__boardExport?.(); return;
+          case 'duplicate':  return;
+        }
+      }
       switch (sc) {
         case 'undo':   undo(render); return;
         case 'redo':   redo(render); return;
         case 'export': exportImage(); return;
+        case 'quick-export': quickExport(); return;
         case 'copy':   copyToClipboard(); return;
         case 'help':   showShortcuts(el.shortcutsOverlay.style.display !== 'flex'); return;
         case 'duplicate':  if (duplicateSelection()) render(); return;

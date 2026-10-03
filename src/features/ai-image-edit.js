@@ -10,7 +10,7 @@ import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { getKey } from './api-keys.js';
-import { imageToDataUrl, dataUrlToBase64, loadImage, canvasToBlob, blobToBase64, nearestGptImageSize } from './ai-shared.js';
+import { imageToDataUrl, loadImage, canvasToBlob, blobToBase64, nearestGptImageSize } from './ai-shared.js';
 
 function setStatus(msg) {
   const s = document.getElementById('ai-edit-status');

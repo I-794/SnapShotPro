@@ -10,22 +10,20 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '32.0';
+const CURRENT_VERSION = '33.2';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "🪟 Open Canvas",
+  heading: "📷 v33.2 · Aperture, tidied",
   items: [
-    { title: 'An infinite board',
-      desc: 'Every page is a card on a pan-and-zoom canvas. Arrange, resize, connect, and group them, then export the whole board as one image.' },
-    { title: 'Seed from a URL',
-      desc: 'Paste a page link and SnapShotPro drops its images onto the board as cards. Paste a link, get a set.' },
-    { title: 'Drive it by chat',
-      desc: 'The Design Agent can arrange, group, add, and export cards for you. Ask it to lay out your board.' },
-    { title: 'Saves with your project',
-      desc: 'The board layout travels with the project and reopens exactly as you left it.' }
+    { title: 'Undo after a slider drag',
+      desc: 'The first Undo after moving a slider or picking a color now puts the old value back.' },
+    { title: 'Undo Reset and Clear All',
+      desc: 'Both show an Undo button in the notification, and undoing a Reset brings extra images back.' },
+    { title: 'Spotlight exports correctly',
+      desc: 'The highlighted area no longer comes out see-through in exported images.' }
   ]
 };
 

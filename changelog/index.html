@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v32 Open Canvas: lay every page on an infinite, pan-and-zoom board of cards you can arrange, connect, group, seed from a URL, drive by chat, and export as one image, on top of v31 Merge Studio (CSV to N designs), v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
+    <meta name="description" content="SnapShotPro changelog. What shipped in each release, up to v33 Aperture (eyedropper, recent colors, distribute, undo from the toast, quick export) and v32 Open Canvas: lay every page on an infinite, pan-and-zoom board of cards you can arrange, connect, group, seed from a URL, drive by chat, and export as one image, on top of v31 Merge Studio (CSV to N designs), v30 Studio Intelligence, the AI Design Agent, AI Assets, Design Variations, color filters and palettes, vector shape tools, motion on stills, the timeline scrubber, layer blend modes, alignment guides, device reflections, richer text effects, multi-page decks, projects, version history, live collaboration, Brand Kit, App Store screenshot sets, generative AI edits, and video.">
     <title>Changelog · SnapShotPro</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="SnapShotPro Changelog">
-    <meta property="og:description" content="Every SnapShotPro release, up to v32 Open Canvas: an infinite board of cards for your whole project, seed it from a URL, drive it by chat, and export it as one image. Plus v31 Merge Studio (CSV to N on-brand designs) and the full trail back to a single HTML file.">
+    <meta property="og:description" content="Every SnapShotPro release, up to v33 Aperture (quality of life) and v32 Open Canvas: an infinite board of cards for your whole project, seed it from a URL, drive it by chat, and export it as one image. Plus v31 Merge Studio (CSV to N on-brand designs) and the full trail back to a single HTML file.">
     <meta property="og:image" content="__OG_BASE__/og.png?v=2">
     <meta name="theme-color" content="#2348ff">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -740,6 +740,58 @@
         .oc-arrow::after { content: ''; position: absolute; right: -1px; top: -5px; border: 5px solid transparent; border-left-color: rgba(124,131,255,0.92); }
         @media (max-width: 860px) { .oc-stage { max-width: 460px; margin: 0 auto; } }
 
+        /* v33 — Aperture spotlight. Its own motif: a lens-warm amber light over a
+           dot-grid stage showing the release's everyday tools in one scene: three
+           objects spread with equal gaps (Distribute), a locked object faded back,
+           a color picker with eyedropper + brand/recent swatches, and a
+           "Deleted / Undo" toast. Echoes the real editor UI. Distinct from v28's
+           marquee + context menu and v32's board of cards. */
+        .spotlight-aperture {
+            background:
+                radial-gradient(54% 84% at 8% 4%, rgba(232,166,79,0.22), transparent 56%),
+                radial-gradient(48% 80% at 96% 98%, rgba(232,166,79,0.10), transparent 54%),
+                #0a0907;
+        }
+        .spotlight-aperture::after { display: none; }
+        .spotlight-aperture .spot-copy { background: linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04)); }
+        .spotlight-aperture .spot-feat-ico { background: rgba(232,166,79,0.20); }
+        .spotlight-aperture .spot-feat-ico svg { color: #f3c88c; }
+        .spotlight-aperture .btn-primary { background: #fff; color: #14110c; box-shadow: 0 10px 28px rgba(232,166,79,0.26); }
+        .spotlight-aperture .btn-primary:hover { background: #f0f0ee; }
+        .ap-stage {
+            position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden;
+            background: #100e0b;
+            background-image: radial-gradient(rgba(255,255,255,0.09) 1px, transparent 1px);
+            background-size: 22px 22px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07), 0 24px 54px rgba(8,6,3,0.55);
+        }
+        .ap-obj { position: absolute; top: 24%; height: 24%; border-radius: 10px; background: linear-gradient(150deg, #3a3631, #221f1b); box-shadow: 0 10px 22px rgba(0,0,0,0.45); outline: 1.5px solid rgba(232,166,79,0.9); outline-offset: 3px; }
+        .ap-obj.o1 { left: 9%;  width: 20%; }
+        .ap-obj.o2 { left: 39%; width: 14%; }
+        .ap-obj.o3 { left: 63%; width: 26%; }
+        .ap-gap { position: absolute; top: 36%; height: 0; border-top: 1.5px solid #e8a64f; }
+        .ap-gap::before, .ap-gap::after { content: ''; position: absolute; top: -5px; width: 1.5px; height: 9px; background: #e8a64f; }
+        .ap-gap::before { left: 0; } .ap-gap::after { right: 0; }
+        .ap-gap.g1 { left: calc(29% + 6px); width: calc(10% - 12px); }
+        .ap-gap.g2 { left: calc(53% + 6px); width: calc(10% - 12px); }
+        .ap-eq { position: absolute; top: calc(36% - 26px); transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #14110c; background: #e8a64f; border-radius: 5px; padding: 1px 5px; }
+        .ap-eq.e1 { left: 34%; } .ap-eq.e2 { left: 58%; }
+        .ap-locked { position: absolute; right: 9%; top: 58%; width: 30%; height: 17%; border-radius: 10px; background: linear-gradient(150deg, #2b2824, #1a1815); opacity: 0.5; }
+        .ap-lock { position: absolute; right: calc(9% + 8px); top: calc(58% + 8px); width: 24px; height: 24px; border-radius: 7px; background: rgba(20,17,12,0.92); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; }
+        .ap-lock svg { width: 13px; height: 13px; color: #f3c88c; }
+        .ap-picker { position: absolute; left: 7%; bottom: 8%; width: 52%; padding: 11px; border-radius: 12px; background: rgba(24,21,17,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 14px 32px rgba(0,0,0,0.5); }
+        .ap-row { display: flex; gap: 7px; align-items: center; }
+        .ap-prev { width: 26px; height: 26px; border-radius: 7px; background: #e8a64f; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); flex-shrink: 0; }
+        .ap-hex { flex: 1; height: 26px; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); font-family: var(--font-mono); font-size: 10.5px; color: rgba(255,255,255,0.8); display: flex; align-items: center; padding: 0 8px; }
+        .ap-drop { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(232,166,79,0.75); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .ap-drop svg { width: 13px; height: 13px; color: #f3c88c; }
+        .ap-sw { display: flex; gap: 5px; align-items: center; margin-top: 9px; }
+        .ap-sw i { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+        .ap-sw .sep { width: 1px; height: 11px; background: rgba(255,255,255,0.18); margin: 0 2px; }
+        .ap-toast { position: absolute; right: 6%; top: 6%; display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 12px; border-radius: 10px; background: rgba(24,21,17,0.94); border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 12px 28px rgba(0,0,0,0.5); font-size: 11.5px; color: rgba(255,255,255,0.86); }
+        .ap-toast b { font-weight: 600; font-size: 11px; color: #f3c88c; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 3px 8px; }
+        @media (max-width: 860px) { .ap-stage { max-width: 460px; margin: 0 auto; } }
+
         /* ── Timeline (full release history) ── */
         /* v16 — each release is a frosted glass card floating over the page
            aurora, so the whole changelog carries the liquid-glass look. */
@@ -762,6 +814,7 @@
         .entry.latest .ver { background: var(--accent); color: var(--on-accent); border-color: transparent; }
         .entry-date { font-size: 12.5px; font-weight: 500; color: var(--ink-3); }
         .entry h2 { font-size: clamp(20px, 2.6vw, 27px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; line-height: 1.15; }
+        .entry-note { color: color-mix(in srgb, var(--ink-2) 60%, var(--ink-3)); font-size: 14.5px; line-height: 1.55; max-width: 62ch; margin: -6px 0 14px; text-wrap: pretty; }
         .changes { list-style: none; display: flex; flex-direction: column; gap: 11px; }
         .changes li { position: relative; padding-left: 22px; color: var(--ink-2); font-size: 15.5px; line-height: 1.55; }
         .changes li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
@@ -819,41 +872,52 @@
      entry. Everything between the two SWAP markers is what changes. -->
 <section style="padding-bottom: clamp(48px, 7vw, 80px);">
     <div class="wrap">
-        <div class="spotlight spotlight-canvas reveal">
+        <div class="spotlight spotlight-aperture reveal">
             <!-- SWAP-START -->
             <div class="spot-copy">
                 <span class="spot-tag"><span class="dot"></span>Latest release</span>
-                <div class="spot-ver">v32 · July 2026</div>
-                <h2>Open Canvas.</h2>
-                <p class="spot-lede">Your whole project on one infinite board. Every page is a card you can pan, zoom, arrange, connect, and group. Seed it from a URL, drive it by chat, and export the whole board as a single image.</p>
+                <div class="spot-ver">v33 · October 2026</div>
+                <h2>Aperture.</h2>
+                <p class="spot-lede">The small things you do a hundred times a day, made faster. Pick any color on screen, space objects evenly, and undo a delete right from the toast.</p>
                 <div class="spot-feats">
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-                        <div><strong>An infinite canvas of cards</strong><span>Every page is a movable card on a pan-and-zoom board. Drag to arrange, resize, and layer them, then double-click any card to drop into the full editor and back.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6"/><path d="M17 7 7.5 16.5 4 20l3.5-3.5"/><path d="m11 6 7 7"/></svg></span>
+                        <div><strong>Colors from anywhere</strong><span>An eyedropper on every color picker, with your brand colors and last 8 colors one click away.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
-                        <div><strong>Seed it from a link</strong><span>Paste a page URL and SnapShotPro drops its images onto the board as cards, loaded safely through the proxy. Paste a link, get a set.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="4" height="10" rx="1"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="17" y="7" width="4" height="10" rx="1"/></svg></span>
+                        <div><strong>Even spacing, real locks</strong><span>Distribute and Match size for any selection. Locked and hidden layers now stay out of your way.</span></div>
                     </div>
                     <div class="spot-feat">
-                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></span>
-                        <div><strong>Drive it by chat</strong><span>The Design Agent can arrange your cards into a grid, group them, add more, and export the board. Ask it to lay out the whole thing.</span></div>
+                        <span class="spot-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>
+                        <div><strong>Undo from the toast</strong><span>Deleted objects, pages, and board cards come back in one click. Cmd/Ctrl+Shift+S repeats your last export.</span></div>
                     </div>
                 </div>
                 <div class="spot-actions">
                     <a href="/editor/" class="btn btn-primary btn-lg">Open the studio <span class="ar">→</span></a>
-                    <a href="/editor/" class="btn btn-ghost btn-lg">Try the board (Cmd-K)</a>
+                    <a href="#history" class="btn btn-ghost btn-lg">Read the notes</a>
                 </div>
             </div>
             <div class="spot-visual">
-                <div class="oc-stage" aria-hidden="true">
-                    <div class="oc-coords"><span class="x0">0,0</span><span class="x1">1024,0</span><span class="x2">0,768</span><span class="x3">1024,768</span></div>
-                    <div class="oc-card a"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card b"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card c"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-card d"><span class="shot"></span><span class="lab">Page</span></div>
-                    <div class="oc-group"></div>
-                    <div class="oc-arrow"></div>
+                <div class="ap-stage" aria-hidden="true">
+                    <div class="ap-obj o1"></div>
+                    <div class="ap-obj o2"></div>
+                    <div class="ap-obj o3"></div>
+                    <div class="ap-gap g1"></div><div class="ap-gap g2"></div>
+                    <span class="ap-eq e1">=</span><span class="ap-eq e2">=</span>
+                    <div class="ap-locked"></div>
+                    <div class="ap-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+                    <div class="ap-toast">Page deleted <b>Undo</b></div>
+                    <div class="ap-picker">
+                        <div class="ap-row">
+                            <span class="ap-prev"></span>
+                            <span class="ap-hex">#E8A64F</span>
+                            <span class="ap-drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6"/><path d="M17 7 7.5 16.5 4 20l3.5-3.5"/><path d="m11 6 7 7"/></svg></span>
+                        </div>
+                        <div class="ap-sw">
+                            <i style="background:#1d2a3a"></i><i style="background:#e8a64f"></i><span class="sep"></span><i style="background:#e05a4f"></i><i style="background:#5aa0e0"></i><i style="background:#4fbf8f"></i><i style="background:#f1efe9"></i><i style="background:#3a3631"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- SWAP-END -->
@@ -866,6 +930,58 @@
         <h2 class="log-head reveal">Every release</h2>
         <ul class="log">
             <li class="entry latest reveal">
+                <div class="entry-meta"><span class="ver">v33.2</span><span class="entry-date">October 2026</span></div>
+                <div>
+                    <h2>Aperture, tidied</h2>
+                    <ul class="changes">
+                        <li><b>Undo after a slider drag works.</b> Dragging a slider or picking a color and then pressing Undo used to do nothing the first time. It now puts the old value back straight away.</li>
+                        <li><b>Reset and Clear All can be undone in one click.</b> Both now show an Undo button in the notification, like deletes do. Undoing a Reset also brings back extra images you'd added.</li>
+                        <li><b>Spotlight exports correctly.</b> The highlighted area used to come out see-through in exported images. It now shows your screenshot at full brightness, the way the preview does.</li>
+                        <li><b>Real examples on the site.</b> The homepage and gallery now show images made in SnapShotPro instead of stock photos, and the homepage loads faster.</li>
+                        <li><b>Lighter first visit.</b> The offline copy downloaded on your first visit drops from about 5.4 MB to 1.6 MB. Heavier tools like 3D mockups and PDF export download the first time you use them.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
+                <div class="entry-meta"><span class="ver">v33.1</span><span class="entry-date">October 2026</span></div>
+                <div>
+                    <h2>Aperture, polished</h2>
+                    <ul class="changes">
+                        <li><b>Undo and Redo buttons work again.</b> The header Undo and Redo buttons had been stuck greyed out; they now light up after every change, and undoing also moves the sidebar sliders back so they match the canvas. Loading a template is now undoable too.</li>
+                        <li><b>No more invisible click-blockers.</b> A notification that had slid away could leave an invisible strip over the top-right toolbar that swallowed clicks (the Layers collapse button, for one). Hidden notifications are now truly out of the way.</li>
+                        <li><b>A studio you can drive with a keyboard or screen reader.</b> Every slider, dropdown, and toggle now announces its name. Background, size, and shadow presets, scenes, 3D demos, and the drop zone can be reached with Tab and picked with Enter or Space. Esc closes the welcome and cloud dialogs, and status messages are read aloud.</li>
+                        <li><b>A real menu on phones.</b> On small screens the site's nav links no longer disappear: tap the menu button to open them. Every page also gains a Skip to content link, the nav marks the page you're on, links inside paragraphs are underlined, and muted text is easier to read.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
+                <div class="entry-meta"><span class="ver">v33.0</span><span class="entry-date">October 2026</span></div>
+                <div>
+                    <h2>Aperture</h2>
+                    <p class="entry-note">Starting with v33, each release gets a photography codename, in A to Z order. This one is about the small things you do a hundred times a day.</p>
+                    <ul class="changes">
+                        <li><b>Pick colors from anywhere.</b> Every color picker now has an eyedropper that samples any pixel on your screen, including your own canvas (Chrome and Edge). Under each picker, your brand colors and the last 8 colors you used are one click away.</li>
+                        <li><b>Space things evenly.</b> Select three or more objects and Distribute spreads them with equal gaps. Match size makes a selection as wide or as tall as its largest item. Both live in the right-click menu and Cmd-K.</li>
+                        <li><b>Lock and hide that actually hold.</b> Locked or hidden layers can no longer be clicked, dragged, or caught by a marquee or Select all. Hide or lock straight from the right-click menu, and bring everything back with Unlock &amp; show all.</li>
+                        <li><b>Undo right from the toast.</b> Deleting objects, a page, or a board card shows an Undo button for a few seconds. Deleted pages come back with their latest edits, and board cards return to the same spot.</li>
+                        <li><b>Quick export and a tidier stage.</b> Cmd/Ctrl+Shift+S re-exports with the last preset you used, and the preset menu remembers it. Page thumbnails now sit under the canvas instead of squeezing it from the side, and the zoom controls no longer cover the board's Export button.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
+                <div class="entry-meta"><span class="ver">v32.1</span><span class="entry-date">September 2026</span></div>
+                <div>
+                    <h2>Open Canvas, polished</h2>
+                    <ul class="changes">
+                        <li><b>Board edits now save and undo.</b> Moving, resizing, connecting, grouping, and labeling cards autosaves with your project, and Cmd/Ctrl+Z / Shift+Cmd/Ctrl+Z undo and redo them on the board instead of silently changing the hidden page behind it. Projects opened under v32.0 whose cards went missing are repaired automatically.</li>
+                        <li><b>Touch, pinch, and trackpads.</b> Drag cards with a finger, pinch with two fingers to zoom around them, drag empty space to pan, and double-tap a card to open it. On a trackpad, pinch zooms smoothly and a two-finger scroll pans. The board now fills the whole stage instead of being clipped to the canvas size.</li>
+                        <li><b>Sharper, honest exports.</b> The board PNG renders at up to 3x (kept within the browser's canvas limit), multi-line labels wrap exactly as on screen, and the Export button shows progress. The Design Agent now reports a failed export instead of claiming success.</li>
+                        <li><b>Faster to drive.</b> Board shortcuts for nudge, select all, group/ungroup, fit, zoom, text, and connect (press <code>?</code> to see them); Esc steps back one level at a time; labels edit inline; Arrange, Ungroup, and Export sit in the toolbar and the command palette; cards are numbered; and an empty board offers Upload and Add-from-URL right where you look.</li>
+                        <li><b>Cleaner seeding and a more accessible studio.</b> Add-from-URL shows progress, skips favicons and tiny images, and tells you what it skipped. Icon-only buttons now have accessible names, and dialogs keep keyboard focus inside and return it when they close.</li>
+                    </ul>
+                </div>
+            </li>
+            <li class="entry reveal">
                 <div class="entry-meta"><span class="ver">v32.0</span><span class="entry-date">July 2026</span></div>
                 <div>
                     <h2>Open Canvas</h2>

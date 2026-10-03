@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShotPro v32.0 · Pro Editor</title>
+    <title>SnapShotPro v33 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,10 +29,9 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShotPro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v32.0</span></span>
+                <span>SnapShotPro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v33 · Aperture</span></span>
             </div>
             <div class="header-actions">
-                <button class="btn btn-secondary" id="sidebar-toggle-btn" aria-label="Menu" title="Menu">☰</button>
                 <span id="auth-pill" style="display:inline-flex;gap:6px;align-items:center;margin-right:4px;"></span>
                 <button class="btn btn-secondary" id="theme-toggle-btn" title="Toggle Theme">🌙</button>
                 <button class="btn btn-secondary" id="shortcuts-btn" title="Keyboard Shortcuts">⌨️</button>
@@ -596,7 +595,7 @@
             <label class="control-label">Recolor an element</label>
             <div style="display:flex;gap:6px;margin-bottom:10px;">
                 <input type="text" class="control-input" id="medit-recolor-desc" placeholder="e.g. the primary button" style="flex:1;">
-                <input type="color" id="medit-recolor-hex" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
+                <input type="color" id="medit-recolor-hex" aria-label="New color" value="#4f46e5" style="width:38px;height:32px;border-radius:6px;border:1px solid var(--border-color);cursor:pointer;padding:2px;">
                 <button class="btn btn-secondary" id="medit-recolor">Recolor</button>
             </div>
 
@@ -1248,7 +1247,7 @@
             <input type="number" id="ann-sides" min="3" max="12" value="6" title="Polygon sides" style="width:46px;padding:4px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
             <input type="number" id="ann-points" min="3" max="12" value="5" title="Star points" style="width:46px;padding:4px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:6px;">
             <button id="ann-delete-btn" class="ann-tool-btn" style="margin-left:4px;">🗑 Delete</button>
-            <button id="ann-clear-btn" class="ann-tool-btn">Clear All</button>
+            <button id="ann-clear-btn" class="ann-tool-btn" title="Remove every annotation (Undo brings them back)">Clear All</button>
         </div>
 
         <div class="canvas-container" id="drop-zone">
@@ -1422,7 +1421,7 @@
     <div class="present-counter" id="present-counter">1 / 1</div>
 </div>
 
-<div class="notification" id="notification">
+<div class="notification" id="notification" role="status" aria-live="polite" aria-atomic="true">
     <span class="notification-icon">✓</span>
     <span class="notification-text" id="notification-text">Image exported successfully!</span>
 </div>

@@ -20,15 +20,14 @@ The following skills were installed from third-party sources.
 - License: MIT (see `LICENSE.taste-skill`)
 - Version: 1.0.0 (commit 01d8504)
 - Installed: 2026-06-17
-- Skills: brandkit, brutalist-skill (industrial-brutalist-ui), gpt-tasteskill (gpt-taste),
-  image-to-code-skill (image-to-code), imagegen-frontend-mobile, imagegen-frontend-web,
-  minimalist-skill (minimalist-ui), output-skill (full-output-enforcement),
-  redesign-skill (redesign-existing-projects), soft-skill (high-end-visual-design),
-  stitch-skill (stitch-design-taste), taste-skill (design-taste-frontend),
-  taste-skill-v1 (design-taste-frontend-v1)
-- Note: these are frontend design-taste skills oriented toward React/Tailwind/component
-  libraries. They are available on-demand but do not auto-apply; this repo is vanilla JS
-  (see CLAUDE.md), so invoke them deliberately when relevant.
+- Skills: brandkit, output-skill (full-output-enforcement),
+  redesign-skill (redesign-existing-projects), taste-skill (design-taste-frontend)
+- Removed 2026-10-01 (overlapping, mostly React/Tailwind-oriented, gave conflicting style
+  rules): brutalist-skill, gpt-tasteskill, image-to-code-skill, imagegen-frontend-mobile,
+  imagegen-frontend-web, minimalist-skill, soft-skill, stitch-skill, taste-skill-v1.
+  Two design skills are kept, for the marketing pages only (not the editor), expressed
+  as vanilla HTML/CSS: `taste-skill` for building new pages (it built /merge/,
+  /studio-intelligence/ and the changelog), `redesign-skill` for polishing existing ones.
 
 These were vendored directly into `.claude/skills/` (rather than installed via the
 Claude Code plugin marketplace) so they are version-controlled and available to all

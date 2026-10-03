@@ -18,10 +18,13 @@ function htmlPartials() {
       order: 'pre',
       handler(html) {
         const version = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')).version;
+        // Everything between the nav and footer becomes the <main id="main">
+        // landmark (target of the nav's skip link), unless the page has its own.
+        const wrapMain = !/<main[\s>]/.test(html) && html.includes('<!--PARTIAL:nav-->') && html.includes('<!--PARTIAL:footer-->');
         return html
           .split('<!--PARTIAL:mark-->').join(read('mark.html'))
-          .split('<!--PARTIAL:nav-->').join(read('nav.html'))
-          .split('<!--PARTIAL:footer-->').join(read('footer.html').split('{{VERSION}}').join(version));
+          .split('<!--PARTIAL:nav-->').join(read('nav.html') + (wrapMain ? '\n<main id="main">' : ''))
+          .split('<!--PARTIAL:footer-->').join((wrapMain ? '</main>\n' : '') + read('footer.html').split('{{VERSION}}').join(version));
       }
     }
   };
@@ -186,7 +189,16 @@ export default defineConfig({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // v33.2 — the precache downloads in the background on the first visit to
+        // ANY page (homepage included), so it holds only what the editor needs
+        // to boot offline. PNGs (OG cards, marketing art, gallery exports) and the
+        // big lazy chunks (three.js, onnxruntime, jspdf, html2canvas, AI SDKs) are
+        // left out and cached by the runtime rule below the first time they're used.
+        globPatterns: ['**/*.{js,css,html,svg,ico,woff2}'],
+        manifestTransforms: [async (entries) => ({
+          manifest: entries.filter((e) => !(/^assets\/.*\.js$/.test(e.url) && !/^assets\/editor-/.test(e.url) && e.size > 100 * 1024)),
+          warnings: []
+        })],
         // v23 — share-target POST handler layered onto the generated SW, so
         // Workbox keeps owning precache / runtime caching / auto-update.
         importScripts: ['/share-handler.js'],
@@ -197,6 +209,16 @@ export default defineConfig({
             options: {
               cacheName: 'cdn-models',
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 }
+            }
+          },
+          {
+            // Hashed build chunks are immutable, so cache-first is safe: lazy
+            // features keep working offline once they've been opened.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/assets/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'lazy-chunks',
+              expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 60 }
             }
           }
         ]

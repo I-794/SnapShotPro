@@ -10,7 +10,7 @@
 // numbered PNG ZIP, and presents the pages fullscreen.
 
 import { state } from '../state/state.js';
-import { render, renderInto } from '../render/render.js';
+import { renderInto } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { onHistoryChange } from '../state/history.js';
 import { serializeFull, imageToDataUrl } from '../state/serialize.js';
@@ -27,6 +27,9 @@ let active = 0;
 const changeListeners = [];
 export function onDocumentChange(fn) { changeListeners.push(fn); }
 function emitChange() { changeListeners.forEach(fn => { try { fn(); } catch (e) {} }); }
+// v32.1 — board edits live in state.board (document level) without touching the
+// pages array; board.js calls this (debounced) so projects.js autosaves them.
+export function notifyDocumentChange() { emitChange(); }
 
 export function pageCount() { return pages.length; }
 
@@ -58,24 +61,42 @@ export function syncActivePage() {
 // v32 — schema 14 migration: wrap a pre-v32 document (no board) with a default
 // board layout. One page -> one centered card; many pages -> a default grid.
 // `card` objects ref pages[i].id. Camera reset to origin/100%.
+// v32.1 — card ids are numeric (matching board.js nextId()), and the aspect
+// comes from canvas.width/height. The first v32 build read canvas.w/h (always
+// undefined -> NaN geometry, saved as null) and used uid() strings, so boards it
+// migrated are repaired on load: any card with non-finite geometry is re-laid
+// into the default grid. Ids are left alone (arrows/groups reference them;
+// board.js resolves DOM ids by string compare, so string ids still work).
+function pageAspect(p) {
+  const c = p && p.payload && p.payload.design && p.payload.design.canvas;
+  const ar = c && c.width && c.height ? c.height / c.width : 0;
+  return Number.isFinite(ar) && ar > 0 ? ar : 0.5625;
+}
+function gridCard(p, i, id) {
+  const colW = 280, gap = 24, cols = 4;
+  const h = Math.round(colW * pageAspect(p));
+  const col = i % cols, row = Math.floor(i / cols);
+  return { id, kind: 'card', pageId: p.id, x: 60 + col * (colW + gap), y: 60 + row * (h + gap + 28), w: colW, h, z: i };
+}
+let migId = 0;
+function numericId() { return Date.now() * 1000 + (migId++ % 1000); }
+
 export function migrateBoardV14(doc) {
   if (!doc) return doc;
+  const ps = doc.pages || [];
   if (doc.board && Array.isArray(doc.board.objects)) {
     // ensure camera exists
     if (!doc.board.camera) doc.board.camera = { x: 0, y: 0, zoom: 1 };
+    const ok = (n) => typeof n === 'number' && Number.isFinite(n);
+    doc.board.objects.forEach(o => {
+      if (o.kind !== 'card' || (ok(o.x) && ok(o.y) && ok(o.w) && ok(o.h) && o.w > 0 && o.h > 0)) return;
+      const i = Math.max(0, ps.findIndex(p => p.id === o.pageId));
+      const fixed = gridCard(ps[i] || {}, i, o.id);
+      Object.assign(o, { x: fixed.x, y: fixed.y, w: fixed.w, h: fixed.h });
+    });
     return doc;
   }
-  const ps = doc.pages || [];
-  const colW = 280, gap = 24, cols = 4;
-  const objects = [];
-  let row = 0, col = 0;
-  for (const p of ps) {
-    const c = (p.payload && p.payload.design && p.payload.design.canvas) || { width: 1280, height: 720 };
-    const ar = c.h / c.w;
-    const w = colW, h = Math.round(colW * ar);
-    objects.push({ id: uid(), kind: 'card', pageId: p.id, x: 60 + col * (colW + gap), y: 60 + row * (h + gap + 28), w, h, z: objects.length });
-    col = (col + 1) % cols; if (col === 0) row++;
-  }
+  const objects = ps.map((p, i) => gridCard(p, i, numericId()));
   doc.board = { objects, camera: { x: 0, y: 0, zoom: 1 } };
   return doc;
 }
@@ -104,6 +125,7 @@ export function applyDocument(doc) {
   state.board = d.board || { objects: [], camera: { x: 0, y: 0, zoom: 1 } };
   if (!state.board.camera) state.board.camera = { x: 0, y: 0, zoom: 1 };
   state.boardSelection = [];
+  trash = [];   // v33 — never restore another document's pages
   applyPayload(pages[active].payload);
   renderFilmstrip();
 }
@@ -154,15 +176,51 @@ export function addPageWithImage(img) {
   return page.id;
 }
 
-export function deletePage(index) {
+// v33 — the last user deletion's pages, restorable from the "Undo" toast.
+// Pages live outside history.snapshot() (document op), so this is their undo.
+let trash = [];   // [{ rec, index, wasActive }] in deletion order
+export function clearPageTrash() { trash = []; }
+export function hasPageTrash() { return trash.length > 0; }
+
+export function restoreDeletedPages() {
+  if (!trash.length) return 0;
+  syncActive();
+  let activeRec = pages[active];
+  for (let i = trash.length - 1; i >= 0; i--) {
+    const { rec, index, wasActive } = trash[i];
+    pages.splice(Math.min(index, pages.length), 0, rec);
+    if (wasActive) activeRec = rec;
+  }
+  const n = trash.length;
+  trash = [];
+  active = Math.max(0, pages.indexOf(activeRec));
+  applyPayload(pages[active].payload);
+  renderFilmstrip();
+  emitChange();
+  return n;
+}
+
+export function deletePage(index, { recordTrash = true } = {}) {
   if (pages.length <= 1) { showNotification('A document needs at least one page.', 'error'); return; }
   if (index < 0 || index >= pages.length) return;
+  if (index === active) syncActive();   // keep the latest edits for Undo
+  if (recordTrash) trash.push({ rec: pages[index], index, wasActive: index === active });
   pages.splice(index, 1);
   if (active >= pages.length) active = pages.length - 1;
   else if (index < active) active -= 1;
   applyPayload(pages[active].payload);
   renderFilmstrip();
   emitChange();
+}
+
+// v33 — user-facing delete: one page, with an "Undo" toast.
+function deleteWithUndo(index) {
+  const before = pages.length;
+  clearPageTrash();
+  deletePage(index);
+  if (pages.length < before) {
+    showNotification('Page deleted', 'success', { action: { label: 'Undo', run: () => { if (restoreDeletedPages()) showNotification('Page restored', 'success'); } } });
+  }
 }
 
 export function movePage(from, to) {
@@ -319,18 +377,42 @@ export function renderFilmstrip() {
     });
   });
   strip.querySelectorAll('[data-del]').forEach(b =>
-    b.addEventListener('click', (e) => { e.stopPropagation(); deletePage(parseInt(b.dataset.del, 10)); }));
+    b.addEventListener('click', (e) => { e.stopPropagation(); deleteWithUndo(parseInt(b.dataset.del, 10)); }));
   const addTile = document.getElementById('page-add-tile');
   if (addTile) addTile.addEventListener('click', () => addPage());
 }
 
+// v32.1 — an edit only changes the active page, so refresh just its thumb and
+// patch that one tile instead of rebuilding every tile + listener. Falls back to
+// a full renderFilmstrip when the strip's shape doesn't match (e.g. first image
+// on a blank doc makes the strip appear).
+function refreshActiveTile() {
+  const strip = document.getElementById('page-filmstrip');
+  if (!strip || !pages[active]) return;
+  const tiles = strip.querySelectorAll('.page-tile[data-idx]');
+  const wantVisible = hasContent();
+  if (tiles.length !== pages.length || (strip.style.display === 'none') === wantVisible) { renderFilmstrip(); return; }
+  const thumb = makeThumb();
+  if (!thumb) return;
+  pages[active].thumb = thumb;
+  const box = tiles[active] && tiles[active].querySelector('.page-tile-thumb');
+  if (!box) { renderFilmstrip(); return; }
+  const img = box.querySelector('img');
+  if (img) img.src = thumb;
+  else box.innerHTML = `<img src="${thumb}" alt="">`;
+}
+
 // ── Bind ─────────────────────────────────────────────────────────────────────
 let stripTimer = null;
+// typeof guard: scripts/regression-tests.mjs imports this module under Node.
+const idle = typeof window !== 'undefined' && window.requestIdleCallback
+  ? (fn) => window.requestIdleCallback(fn, { timeout: 1000 })
+  : (fn) => setTimeout(fn, 0);
 export function bindPages() {
-  // Keep the active thumb + filmstrip fresh as the user edits (debounced).
+  // Keep the active thumb fresh as the user edits (debounced, then on idle).
   onHistoryChange(() => {
     clearTimeout(stripTimer);
-    stripTimer = setTimeout(renderFilmstrip, 600);
+    stripTimer = setTimeout(() => idle(refreshActiveTile), 600);
   });
 
   const dup = document.getElementById('deck-duplicate-btn');

@@ -8,10 +8,10 @@ import { exportImage, copyToClipboard, exportAsHTML } from './export.js';
 import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
-import { setTool } from './canvas-tools.js';
-import { selectAll, duplicateSelection } from './selection.js';
-import { listExportPresets, applyExportPreset } from './export-presets.js';
-import { toggleLayersPanel } from './layers.js';
+import { setTool, clearAllAnnotations, clearAllRedactions } from './canvas-tools.js';
+import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
+import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
+import { toggleLayersPanel, renderLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
 import { stickers } from '../state/presets.js';
 import { addSticker } from './stickers.js';
@@ -62,11 +62,13 @@ function groupFor(id) {
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
       id.startsWith('tour-') || id === 'code-studio' || id.startsWith('merge-')) return 'File';
-  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects') return 'Edit';
+  if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects' ||
+      id.startsWith('distribute-') || id.startsWith('match-') || id === 'hide-selection' ||
+      id === 'lock-selection' || id === 'unlock-all') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight' || id === 'toggleBoard' || id === 'boardAddText' || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
+      id === 'toggle-spotlight' || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
 
@@ -82,8 +84,8 @@ export function registerCommands() {
     { id: 'campaign-generate', label: 'Generate Campaign',     icon: '📦', group: groupFor('campaign-generate'),
       run: () => import('./campaign-generator.js').then(m => m.generateCampaign({ name: 'Campaign', includeAppStore: true })),
       when: () => !!state.image },
-    { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => undo(render) },
-    { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => redo(render) },
+    { id: 'undo',             label: 'Undo',                  icon: '↶',  run: () => (state.mode === 'board' ? window.__boardUndo?.() : undo(render)) },
+    { id: 'redo',             label: 'Redo',                  icon: '↷',  run: () => (state.mode === 'board' ? window.__boardRedo?.() : redo(render)) },
     { id: 'duplicate-selection', label: 'Duplicate selection', icon: '⧉', run: () => { if (duplicateSelection()) render(); }, when: () => state.canvasSelection.length > 0 },
     { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
@@ -100,6 +102,32 @@ export function registerCommands() {
     { id: 'exportBoard', label: 'Board: export PNG', icon: 'download', group: 'File',
       run: () => import('./board.js').then(m => m.exportBoard()),
       when: () => state.mode === 'board' },
+    // v32.1 — board layout commands (previously reachable only via the agent).
+    { id: 'boardFit', label: 'Board: fit to screen', icon: '⌧', group: 'View', keys: '0',
+      run: () => import('./board.js').then(m => m.fitBoard()),
+      when: () => state.mode === 'board' },
+    { id: 'boardResetZoom', label: 'Board: zoom to 100%', icon: '🔍', group: 'View', keys: '1',
+      run: () => import('./board.js').then(m => m.resetBoard()),
+      when: () => state.mode === 'board' },
+    { id: 'boardGroup', label: 'Board: group selected', icon: '▣', group: 'View', keys: 'mod+g',
+      run: () => import('./board.js').then(m => m.groupSelected()),
+      when: () => state.mode === 'board' && state.boardSelection.length > 1 },
+    { id: 'boardUngroup', label: 'Board: ungroup', icon: '▢', group: 'View', keys: 'mod+shift+g',
+      run: () => import('./board.js').then(m => m.ungroupSelected()),
+      when: () => state.mode === 'board' && state.boardSelection.some(r => state.board.objects.some(o => o.id === r.id && o.kind === 'group')) },
+    ...['grid', 'row', 'hero', 'bento'].map(layout => ({
+      id: `boardArrange-${layout}`, label: `Board: arrange as ${layout}`, icon: '▦', group: 'View',
+      run: () => import('./board.js').then(m => { m.arrangeCards(layout); m.fitBoard(); }),
+      when: () => state.mode === 'board'
+    })),
+    { id: 'boardUpload', label: 'Board: upload images as cards', icon: '📁', group: 'View',
+      run: () => {
+        if (state.mode !== 'board') enterBoardMode();
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+        inp.addEventListener('change', () => import('./board.js').then(m => m.addFilesAsCards(inp.files)));
+        inp.click();
+      } },
     { id: 'seedFromUrl', label: 'Board: add from URL', icon: 'link', group: 'View',
       run: () => {
         if (state.mode !== 'board') enterBoardMode();
@@ -142,8 +170,8 @@ export function registerCommands() {
     { id: 'tool-highlighter', label: 'Tool: Highlighter',     icon: '🖍', run: () => setTool('highlighter') },
     { id: 'tool-number',      label: 'Tool: Number',          icon: '①',  run: () => setTool('number') },
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
-    { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: () => { saveStateToHistory(); state.annotations = []; render(); showStatus('Annotations cleared'); } },
-    { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: () => { saveStateToHistory(); state.redactions = []; render(); showStatus('Redactions cleared'); } },
+    { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: clearAllAnnotations },
+    { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: clearAllRedactions },
     { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
     { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },
     { id: 'style-watercolor', label: 'Style: Watercolor',    icon: '🎨', run: () => document.querySelector('[data-style-preset="watercolor"]')?.click() },
@@ -187,6 +215,15 @@ export function registerCommands() {
     { id: 'collab-start',     label: 'Live collaboration: Start/leave session', icon: '👥', run: () => document.getElementById('collab-start-btn')?.click() },
     { id: 'reset-onboarding', label: 'Reset onboarding tour', icon: '🧭', run: () => { resetOnboarding(); showStatus('Onboarding reset'); } },
     { id: 'brand-brain-apply', label: 'Apply Brand',          icon: '🎨', run: () => import('./brand-brain.js').then(m => m.applyBrand()), when: () => !!state.brand?.enabled },
+    // v33 — Aperture QoL
+    { id: 'export-quick',       label: 'Quick export (repeat last preset)', icon: '⚡', run: quickExport, when: () => !!state.image },
+    { id: 'distribute-h',       label: 'Distribute horizontally', icon: '⇹', run: () => { saveStateToHistory(); if (groupDistribute('h')) render(); else showStatus('Select 3+ objects'); }, when: () => state.canvasSelection.length >= 3 },
+    { id: 'distribute-v',       label: 'Distribute vertically',   icon: '⇳', run: () => { saveStateToHistory(); if (groupDistribute('v')) render(); else showStatus('Select 3+ objects'); }, when: () => state.canvasSelection.length >= 3 },
+    { id: 'match-width',        label: 'Match width (largest)',   icon: '⇔', run: () => { saveStateToHistory(); if (groupMatchSize('w')) render(); }, when: () => state.canvasSelection.length >= 2 },
+    { id: 'match-height',       label: 'Match height (largest)',  icon: '⇕', run: () => { saveStateToHistory(); if (groupMatchSize('h')) render(); }, when: () => state.canvasSelection.length >= 2 },
+    { id: 'hide-selection',     label: 'Hide selected',           icon: '⊘', run: () => { if (setSelectionFlag('hide')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'lock-selection',     label: 'Lock selected',           icon: '🔒', run: () => { if (setSelectionFlag('lock')) { render(); renderLayersPanel(); } }, when: () => state.canvasSelection.length > 0 },
+    { id: 'unlock-all',         label: 'Unlock & show all objects', icon: '🔓', run: () => { const n = unlockAll(); if (n) { render(); renderLayersPanel(); } showStatus(n ? `Unlocked ${n}` : 'Nothing locked or hidden'); } },
     { id: 'show-whats-new',   label: "Show what's new",      icon: '🆕', run: () => { if (window.__openWhatsNew) window.__openWhatsNew(); else showStatus('What\'s new is unavailable'); } }
   ];
 
@@ -220,6 +257,7 @@ export function registerCommands() {
     'redo':           'mod+shift+z',
     'duplicate-selection': 'mod+d',
     'select-all-objects':  'mod+a',
+    'export-quick':        'mod+shift+s',
   };
   commands.forEach((c) => {
     c.group = groupFor(c.id);

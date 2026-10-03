@@ -1,7 +1,7 @@
-import { state, imageRegistry } from '../state/state.js';
+import { state } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
-import { showNotification } from '../ui/notification.js';
+import { showUndoToast } from '../ui/notification.js';
 import { render } from '../render/render.js';
 
 export function resetToDefaults() {
@@ -41,11 +41,13 @@ export function resetToDefaults() {
   state.tilt3d = { rx: 0, ry: 0, rz: 0, perspective: 1200 };
   state.scene = { id: '' };
 
-  Object.keys(imageRegistry).forEach(k => delete imageRegistry[k]);
+  // v33.2 — imageRegistry is deliberately left alone: undo restores the
+  // extraImages records, which need their decoded images (keyed by id) to still
+  // be there. Set panels and batch images live in the same registry too.
 
   render();
   if (typeof window.__updateUIFromState === 'function') window.__updateUIFromState();
-  showNotification('Reset to defaults.', 'success');
+  showUndoToast('Reset to defaults', render);
 }
 
 export function bindResetButton() {

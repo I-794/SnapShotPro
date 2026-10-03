@@ -1,6 +1,7 @@
 import { state, imageRegistry } from '../state/state.js';
 import { el } from '../ui/elements.js';
 import { saveStateToHistory } from '../state/history.js';
+import { showUndoToast } from '../ui/notification.js';
 import { render } from '../render/render.js';
 import { drawArrow, drawStroke, annotationBBox, drawShape, SHAPE_TYPES } from '../render/annotations.js';
 import { hitTestExtraImageAtPoint } from './extra-images.js';
@@ -46,6 +47,7 @@ export function hitTestAnnotations(x, y) {
   if (!state.annotations) return -1;
   for (let i = state.annotations.length - 1; i >= 0; i--) {
     const ann = state.annotations[i];
+    if (ann.visible === false || ann.locked) continue;   // v33 — hidden/locked aren't pickable
     const bb = annotationBBox(ann);
     const pad = 10;
     if (x >= bb.x - pad && x <= bb.x + bb.w + pad &&
@@ -76,6 +78,7 @@ export function hitTestRedactions(x, y) {
   if (!state.redactions) return -1;
   for (let i = state.redactions.length - 1; i >= 0; i--) {
     const r = state.redactions[i];
+    if (r.visible === false || r.locked) continue;
     if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return i;
   }
   return -1;
@@ -100,13 +103,40 @@ export function hitTopRef(x, y) {
 // fall back to the legacy single-select fields kept in sync by selection.js.
 export function deleteSelected() {
   if (state.canvasSelection.length) {
+    // Text is the sidebar-owned singleton and can't be deleted from the canvas.
+    const handles = state.canvasSelection.filter((r) => r.kind !== 'text').map(resolveRef).filter(Boolean);
+    if (!handles.length) return;
     saveStateToHistory();
     // Resolve handles up front; each remove() recomputes its live index so the
     // batch stays correct as the underlying arrays shrink.
-    state.canvasSelection.map(resolveRef).filter(Boolean).forEach((h) => h.remove());
+    handles.forEach((h) => h.remove());
     clearSelection();
     render();
+    // v33 — one-click Undo (same as Cmd+Z; the deletion is one history entry).
+    showUndoToast(handles.length === 1 ? 'Deleted' : `Deleted ${handles.length} items`, render);
   }
+}
+
+// v33.2 — Clear All (annotation toolbar, Cmd-K) and Clear All Redactions get
+// the same one-click Undo toast as canvas deletes. No-op when already empty.
+export function clearAllAnnotations() {
+  const n = state.annotations.length;
+  if (!n) return;
+  saveStateToHistory();
+  state.annotations = [];
+  clearSelection();
+  render();
+  showUndoToast(n === 1 ? 'Cleared 1 annotation' : `Cleared ${n} annotations`, render);
+}
+
+export function clearAllRedactions() {
+  const n = state.redactions.length;
+  if (!n) return;
+  saveStateToHistory();
+  state.redactions = [];
+  clearSelection();
+  render();
+  showUndoToast(n === 1 ? 'Cleared 1 redaction' : `Cleared ${n} redactions`, render);
 }
 
 // v14 — resolve the currently "selected" element into a uniform handle: its
@@ -637,12 +667,7 @@ export function bindCanvasTools() {
   if (annSides) annSides.addEventListener('change', (e) => { state.polygonSides = Math.max(3, Math.min(12, parseInt(e.target.value) || 6)); });
   if (annPoints) annPoints.addEventListener('change', (e) => { state.starPoints = Math.max(3, Math.min(12, parseInt(e.target.value) || 5)); });
   if (annDeleteBtn) annDeleteBtn.addEventListener('click', deleteSelected);
-  if (annClearBtn) annClearBtn.addEventListener('click', () => {
-    saveStateToHistory();
-    state.annotations = [];
-    clearSelection();
-    render();
-  });
+  if (annClearBtn) annClearBtn.addEventListener('click', clearAllAnnotations);
 
   // v14 — align the selected element to the canvas.
   document.querySelectorAll('.align-canvas-btn[data-align-canvas]').forEach(btn => {

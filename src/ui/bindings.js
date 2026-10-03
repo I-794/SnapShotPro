@@ -13,6 +13,7 @@ import { refreshEffectsUI } from '../features/effects-ui.js';
 import { refreshPalettesUI } from '../features/palettes.js';
 import { refreshColorMapUI } from '../features/color-map.js';
 import { refreshMockup3dUI } from '../features/mockup-3d-ui.js';
+import { clearAllRedactions } from '../features/canvas-tools.js';
 
 // Helper: link a slider+display to a state value with optional onChange (for history).
 function linkSlider(input, display, getStr, setVal, opts = {}) {
@@ -372,11 +373,7 @@ function bindShadow() {
 function bindRedactionSpotlight() {
   if (el.redactType) el.redactType.addEventListener('change', (e) => { state.redactType = e.target.value; });
   linkSlider(el.redactIntensity, el.redactIntensityValue, v => String(v), v => state.redactIntensity = v);
-  if (el.clearRedactionsBtn) el.clearRedactionsBtn.addEventListener('click', () => {
-    saveStateToHistory();
-    state.redactions = [];
-    render();
-  });
+  if (el.clearRedactionsBtn) el.clearRedactionsBtn.addEventListener('click', clearAllRedactions);
   if (el.spotlightEnabled) el.spotlightEnabled.addEventListener('change', (e) => {
     saveStateToHistory();
     state.spotlight.enabled = e.target.checked;
