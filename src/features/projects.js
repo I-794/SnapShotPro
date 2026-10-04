@@ -111,15 +111,20 @@ function writeStore(store) {
     lastWrite = persistIdb();
     return lastWrite;
   }
+  // localStorage fallback: the write is synchronous; lastWrite/lastFailure are
+  // still set so the status line and Save version report the real outcome.
+  let ok = true;
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
-    return true;
   } catch (e) {
     // Quota exceeded — prune the oldest auto-versions across all projects and retry once.
     pruneAutoVersions(store);
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); return true; }
-    catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); return false; }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+    catch (e2) { ok = false; showNotification(STORAGE_FULL_MSG, 'error', { duration: 8000 }); }
   }
+  lastFailure = ok ? null : 'quota';
+  lastWrite = Promise.resolve(ok);
+  return ok;
 }
 
 function isQuotaError(e) {
@@ -680,7 +685,8 @@ async function pullCloud() {
 // IndexedDB: the write is async, so show "Saving…" now; persistIdb sets "Saved"
 // or "Not saved" once it settles. localStorage: synchronous, as before v34.
 function reportWrite(res, ts) {
-  if (res && typeof res.then === 'function') setStatusText('Saving…');
+  if (backend === 'idb' && res && typeof res.then === 'function') setStatusText('Saving…');
+  else if (res === false || (backend !== 'idb' && lastFailure)) setStatusText('Not saved');
   else setSavedStatus(ts);
 }
 function setStatusText(t) {
@@ -787,8 +793,7 @@ export function bindProjects() {
     const saved = saveActive({ versionLabel: label.trim() || 'Manual save' });
     renderPanel();
     if (!saved) { showNotification('Could not save this version. Try again.', 'error'); return; }
-    if (backend !== 'idb') { showNotification('Version saved.', 'success'); return; }
-    // IndexedDB: confirm only once the write has committed.
+    // Confirm only once the write has landed (localStorage resolves at once).
     return lastWrite.then(ok => {
       if (ok) showNotification('Version saved.', 'success');
       else if (lastFailure === 'quota') showNotification(STORAGE_FULL_MSG, 'error', { duration: 8000 });
