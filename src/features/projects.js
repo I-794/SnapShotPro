@@ -23,7 +23,7 @@ import { onHistoryChange } from '../state/history.js';
 import { makeThumb, uid } from './document.js';
 import { serializeDocument, applyDocument, onDocumentChange, pageCount } from './pages.js';
 import { getClient, getUser, onAuthChange } from './auth.js';
-import { idbAvailable, idbGet, idbSet } from '../state/project-db.js';
+import { idbAvailable, idbGet, idbSet, idbUpdate, idbReset } from '../state/project-db.js';
 
 const STORE_KEY = 'snapshotpro_projects_v12';
 const ACTIVE_KEY = 'snapshotpro_active_project';
@@ -40,6 +40,11 @@ let creating = false;   // guard so the debounce can't double-create "Untitled"
 // (the pre-v34 localStorage path, used when IndexedDB is unavailable). Until
 // initStore() settles, `ready` is false and every writer waits on `readyP`, so
 // a save requested at startup can never write an empty cache over real data.
+//
+// Isolation rule: the cache and the live editor never share objects. Every
+// payload goes into the cache as its own copy (cloneDoc) and every stored
+// payload goes into the editor as a copy (applyDocument(cloneDoc(...))), so an
+// edit can never reach back into a saved project or version.
 let backend = 'idb';
 let cache = {};
 let ready = false;
@@ -47,6 +52,19 @@ let resolveReady;
 const readyP = new Promise(r => { resolveReady = r; });
 let writeChain = Promise.resolve();  // serialized IndexedDB writes
 let writeQueued = false;             // a queued write will pick up the latest cache
+let writesPending = 0;               // queued + in-flight IndexedDB writes
+let reloadAfterWrite = false;        // another tab saved while we were writing
+const deletedIds = new Set();        // deleted here, not yet written (see persistIdb)
+const IDB_USED_KEY = 'snapshotpro_projects_idb';
+const channel = (typeof BroadcastChannel === 'function')
+  ? (() => { try { return new BroadcastChannel('snapshotpro-projects'); } catch (e) { return null; } })()
+  : null;
+
+function cloneDoc(x) {
+  if (x == null) return x;
+  try { return structuredClone(x); }
+  catch (e) { return JSON.parse(JSON.stringify(x)); }
+}
 
 function whenReady(fn) {
   if (ready) return fn();
@@ -74,44 +92,126 @@ function writeStore(store) {
     catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); return false; }
   }
 }
+
+function isQuotaError(e) {
+  return !!e && (e.name === 'QuotaExceededError' || e.code === 22);
+}
+
+// One committed write of the cache. Two tabs share one IndexedDB store, and each
+// tab's cache can be stale, so the write is a per-project merge done inside one
+// readwrite transaction (idbUpdate): a project that is in IndexedDB but not in
+// this tab's cache was saved by another tab and is kept (and adopted into the
+// cache) unless this tab deleted it. A project in both is written from this
+// tab's cache (last writer per project wins).
+let adopted = false;   // the last write pulled in another tab's projects
+function writeCacheOnce(store, deleted) {
+  return idbUpdate(STORE_KEY, current => {
+    if (current && typeof current === 'object') {
+      for (const id of Object.keys(current)) {
+        if (!(id in store) && !deleted.has(id)) { store[id] = current[id]; adopted = true; }
+      }
+    }
+    return store;
+  });
+}
+
 // Coalesce rapid writes (only the latest cache is written) and chain them on one
 // promise so an older write can never land after a newer one.
 function persistIdb() {
   if (writeQueued) return writeChain;
   writeQueued = true;
+  writesPending++;
   writeChain = writeChain.then(async () => {
     writeQueued = false;
     const store = cache;
-    try { await idbSet(STORE_KEY, store); }
+    const deleted = new Set(deletedIds);
+    let ok = false;
+    try { await writeCacheOnce(store, deleted); ok = true; }
     catch (e) {
-      // Quota exceeded (or similar) — prune the oldest auto-versions and retry once.
-      pruneAutoVersions(store);
-      try { await idbSet(STORE_KEY, store); }
-      catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+      if (isQuotaError(e)) {
+        // Out of space: prune the oldest auto-versions and retry once.
+        pruneAutoVersions(store);
+        try { await writeCacheOnce(store, deleted); ok = true; }
+        catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+      } else {
+        // Transient (closed connection, aborted transaction): reopen and retry once.
+        // Never prune versions for a non-quota error.
+        idbReset();
+        try { await writeCacheOnce(store, deleted); ok = true; }
+        catch (e2) {
+          if (isQuotaError(e2)) {
+            pruneAutoVersions(store);
+            try { await writeCacheOnce(store, deleted); ok = true; }
+            catch (e3) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+          } else {
+            showNotification('Could not save the project right now. Your work is still open; try again.', 'error');
+          }
+        }
+      }
     }
+    if (ok) {
+      deleted.forEach(id => deletedIds.delete(id));
+      if (channel) { try { channel.postMessage({ type: 'saved', at: Date.now() }); } catch (e) { /* closed */ } }
+      if (adopted) { adopted = false; renderPanel(); }
+    }
+  }).catch(() => { /* never break the chain */ }).finally(() => {
+    writesPending--;
+    if (writesPending === 0 && reloadAfterWrite) { reloadAfterWrite = false; reloadFromIdb(); }
   });
   return writeChain;
 }
 
-// Open IndexedDB, migrate a pre-v34 localStorage store once, then mark ready.
-// Falls back to the localStorage backend on any IndexedDB failure.
-async function initStore() {
-  try {
-    let stored = await idbGet(STORE_KEY);
-    if (stored == null) {
-      let legacy = null;
-      try { legacy = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { legacy = null; }
-      if (legacy && typeof legacy === 'object') {
-        await idbSet(STORE_KEY, legacy);
-        // Only after the IndexedDB write resolved: free the localStorage space.
-        try { localStorage.removeItem(STORE_KEY); } catch (e) { /* harmless leftover */ }
-        stored = legacy;
-      }
+// Another tab committed a write: re-read the store so this tab's cache (and its
+// next write) is current. Deferred while a local write is queued or in flight.
+function reloadFromIdb() {
+  if (backend !== 'idb' || !ready) return;
+  if (writesPending > 0) { reloadAfterWrite = true; return; }
+  idbGet(STORE_KEY).then(stored => {
+    if (writesPending > 0) { reloadAfterWrite = true; return; }   // a write started meanwhile
+    cache = (stored && typeof stored === 'object') ? stored : {};
+    deletedIds.forEach(id => { delete cache[id]; });
+    renderPanel();
+  }, () => { /* keep the cache we have; the next write merges anyway */ });
+}
+
+async function loadIdbStore() {
+  let stored = await idbGet(STORE_KEY);
+  if (stored == null) {
+    let legacy = null;
+    try { legacy = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { legacy = null; }
+    if (legacy && typeof legacy === 'object') {
+      await idbSet(STORE_KEY, legacy);
+      // Only after the IndexedDB write resolved: free the localStorage space.
+      try { localStorage.removeItem(STORE_KEY); } catch (e) { /* harmless leftover */ }
+      stored = legacy;
     }
+  }
+  return stored;
+}
+
+// Open IndexedDB, migrate a pre-v34 localStorage store once, then mark ready.
+// Falls back to the localStorage backend on any IndexedDB failure. If this
+// browser has used IndexedDB for projects before (IDB_USED_KEY), a failure is
+// retried once, and if it still fails the user is told, since their saved
+// projects are in IndexedDB and edits now go to localStorage only.
+async function initStore() {
+  let usedBefore = false;
+  try { usedBefore = localStorage.getItem(IDB_USED_KEY) === '1'; } catch (e) { /* ignore */ }
+  let stored, ok = false;
+  try { stored = await loadIdbStore(); ok = true; }
+  catch (e) {
+    if (usedBefore) {
+      idbReset();
+      try { stored = await loadIdbStore(); ok = true; } catch (e2) { /* fall through */ }
+    }
+  }
+  if (ok) {
     cache = (stored && typeof stored === 'object') ? stored : {};
     backend = 'idb';
-  } catch (e) {
+    try { localStorage.setItem(IDB_USED_KEY, '1'); } catch (e) { /* ignore */ }
+  } else {
     backend = 'ls';
+    if (usedBefore) showNotification('Saved projects could not be loaded right now. Reload the page to try again.', 'error');
   }
   ready = true;
   resolveReady();
@@ -137,7 +237,7 @@ function newProject(name) {
   store[id] = {
     id,
     name: name || untitledName(store),
-    payload: serializeDocument(),
+    payload: cloneDoc(serializeDocument()),   // own copy, never shared with the editor
     thumbnail: makeThumb(),
     createdAt: now,
     updatedAt: now,
@@ -166,7 +266,7 @@ function saveActive({ versionLabel } = {}) {
   let p = store[activeId];
   if (!p) return null;
 
-  p.payload = serializeDocument();
+  p.payload = cloneDoc(serializeDocument());   // own copy, never shared with the editor
   p.thumbnail = makeThumb();
   p.updatedAt = Date.now();
 
@@ -177,7 +277,7 @@ function saveActive({ versionLabel } = {}) {
     p.versions.unshift({
       id: uid(),
       label: named ? versionLabel : null,
-      payload: p.payload,
+      payload: cloneDoc(p.payload),   // independent of the project's current payload
       thumbnail: p.thumbnail,
       createdAt: Date.now(),
       auto: !named
@@ -196,10 +296,9 @@ function saveActive({ versionLabel } = {}) {
   return p;
 }
 
-function scheduleAutosave() {
-  if (!state.image) return;        // nothing meaningful to save yet
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => whenReady(() => {
+function runAutosave() {
+  saveTimer = null;
+  whenReady(() => {
     if (!activeId) {
       if (creating) return;
       creating = true;
@@ -209,7 +308,21 @@ function scheduleAutosave() {
       saveActive();
     }
     renderPanel();
-  }), AUTOSAVE_DELAY);
+  });
+}
+
+function scheduleAutosave() {
+  if (!state.image) return;        // nothing meaningful to save yet
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(runAutosave, AUTOSAVE_DELAY);
+}
+
+// v34: the page is being hidden (tab switch, app switch on a phone, close):
+// run a pending debounced autosave now instead of losing it.
+function flushPendingSave() {
+  if (!saveTimer) return;
+  clearTimeout(saveTimer);
+  runAutosave();
 }
 
 // Immediate save triggered by document-level changes (page add / switch /
@@ -235,7 +348,7 @@ function openProject(id) {
   if (!p) return;
   activeId = id;
   localStorage.setItem(ACTIVE_KEY, id);
-  applyDocument(p.payload);
+  applyDocument(cloneDoc(p.payload));   // the editor gets a copy; edits never touch the store
   setSavedStatus(p.updatedAt);
   renderPanel();
   showNotification(`Opened "${p.name}".`, 'success');
@@ -249,14 +362,14 @@ function restoreVersion(versionId) {
   if (!v) return;
   // Snapshot the pre-restore state first so the restore itself is recoverable.
   p.versions.unshift({
-    id: uid(), label: 'Before restore', payload: serializeDocument(),
+    id: uid(), label: 'Before restore', payload: cloneDoc(serializeDocument()),
     thumbnail: makeThumb(), createdAt: Date.now(), auto: false
   });
-  p.payload = v.payload;
+  p.payload = cloneDoc(v.payload);   // the project and the version stay independent
   p.updatedAt = Date.now();
   writeStore(store);
   pushProjectToCloud(p);
-  applyDocument(v.payload);
+  applyDocument(cloneDoc(v.payload));
   closeVersionsModal();
   renderPanel();
   showNotification('Version restored.', 'success');
@@ -271,14 +384,14 @@ function forkVersion(versionId) {
   const id = uid();
   const now = Date.now();
   store[id] = {
-    id, name: `${p.name} (copy)`, payload: v.payload, thumbnail: v.thumbnail,
+    id, name: `${p.name} (copy)`, payload: cloneDoc(v.payload), thumbnail: v.thumbnail,
     createdAt: now, updatedAt: now, versions: []
   };
   activeId = id;
   localStorage.setItem(ACTIVE_KEY, id);
   writeStore(store);
   pushProjectToCloud(store[id]);
-  applyDocument(v.payload);
+  applyDocument(cloneDoc(v.payload));
   closeVersionsModal();
   renderPanel();
   showNotification(`Forked into "${store[id].name}".`, 'success');
@@ -305,7 +418,7 @@ function duplicateProject(id) {
   const nid = uid();
   const now = Date.now();
   store[nid] = {
-    id: nid, name: `${p.name} (copy)`, payload: p.payload, thumbnail: p.thumbnail,
+    id: nid, name: `${p.name} (copy)`, payload: cloneDoc(p.payload), thumbnail: p.thumbnail,
     createdAt: now, updatedAt: now, versions: []
   };
   writeStore(store);
@@ -320,6 +433,7 @@ function deleteProject(id) {
   if (!p) return;
   if (!confirm(`Delete "${p.name}"? This can't be undone.`)) return;
   delete store[id];
+  deletedIds.add(id);   // so the merge in persistIdb does not bring it back from IndexedDB
   writeStore(store);
   if (activeId === id) { activeId = null; localStorage.removeItem(ACTIVE_KEY); }
   deleteProjectFromCloud(id);
@@ -501,6 +615,15 @@ export function bindProjects() {
 
   // Pull cloud projects whenever a user signs in.
   onAuthChange(u => { if (u) pullCloud(); });
+
+  // v34: flush a pending autosave when the page is hidden or unloaded.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPendingSave();
+  });
+  window.addEventListener('pagehide', flushPendingSave);
+
+  // v34: another tab saved projects; re-read so this tab's list and writes are current.
+  if (channel) channel.onmessage = (e) => { if (e.data && e.data.type === 'saved') reloadFromIdb(); };
 
   const finish = () => {
     const active = getActive();
