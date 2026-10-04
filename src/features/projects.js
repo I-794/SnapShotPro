@@ -23,7 +23,7 @@ import { onHistoryChange } from '../state/history.js';
 import { makeThumb, uid } from './document.js';
 import { serializeDocument, applyDocument, onDocumentChange, pageCount } from './pages.js';
 import { getClient, getUser, onAuthChange } from './auth.js';
-import { idbAvailable, idbGet, idbSet, idbUpdate, idbReset } from '../state/project-db.js';
+import { idbAvailable, idbGet, idbUpdate, idbReset } from '../state/project-db.js';
 
 const STORE_KEY = 'snapshotpro_projects_v12';
 const ACTIVE_KEY = 'snapshotpro_active_project';
@@ -236,18 +236,33 @@ function reloadFromIdb() {
   }, () => { /* keep the cache we have; the next write merges anyway */ });
 }
 
-async function loadIdbStore() {
-  let stored = await idbGet(STORE_KEY);
-  if (stored == null) {
-    let legacy = null;
-    try { legacy = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { legacy = null; }
-    if (legacy && typeof legacy === 'object') {
-      await idbSet(STORE_KEY, legacy);
-      // Only after the IndexedDB write resolved: free the localStorage space.
-      try { localStorage.removeItem(STORE_KEY); } catch (e) { /* harmless leftover */ }
-      stored = legacy;
-    }
+// Projects in localStorage (a pre-v34 store, or work saved while IndexedDB
+// failed to load) are merged into IndexedDB: ids IndexedDB lacks are added; for
+// an id in both the newer updatedAt wins and the version lists are unioned
+// (mergeVersions), so no named version is lost. An empty IndexedDB just takes
+// the localStorage store (the first-time migration). One readwrite transaction.
+function mergeLocalStore(current, local) {
+  if (!current || typeof current !== 'object') return local;
+  for (const id of Object.keys(local)) {
+    const theirs = local[id];
+    if (!theirs || typeof theirs !== 'object') continue;
+    const mine = current[id];
+    if (!mine) { current[id] = theirs; continue; }
+    const winner = (theirs.updatedAt || 0) > (mine.updatedAt || 0) ? theirs : mine;
+    mergeVersions(winner, winner === mine ? theirs : mine);
+    current[id] = winner;
   }
+  return current;
+}
+
+async function loadIdbStore() {
+  let local = null;
+  try { local = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { local = null; }
+  if (!local || typeof local !== 'object' || Array.isArray(local)) return idbGet(STORE_KEY);
+  const stored = await idbUpdate(STORE_KEY, current => mergeLocalStore(current, local));
+  // Only after the IndexedDB write resolved: free the localStorage space. If the
+  // write failed, the error propagates and localStorage stays untouched.
+  try { localStorage.removeItem(STORE_KEY); } catch (e) { /* merged again next load */ }
   return stored;
 }
 
