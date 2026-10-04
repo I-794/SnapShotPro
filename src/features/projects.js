@@ -1,8 +1,13 @@
 // v12 — Projects & Version History.
 //
 // Turns the editor from a single ephemeral canvas into a project workspace:
-//  • Local-first store (localStorage) so "never lose a design" works offline
-//    and without a Supabase account; cloud sync layers on when signed in.
+//  • Local-first store so "never lose a design" works offline and without a
+//    Supabase account; cloud sync layers on when signed in. v34: projects live
+//    in IndexedDB (src/state/project-db.js) because a large photo plus its
+//    versions overflows phone localStorage; the whole store is kept in memory
+//    (`cache`) so call sites stay synchronous. A one-time migration moves an
+//    existing localStorage store into IndexedDB, and when IndexedDB is
+//    unavailable the old localStorage path is used unchanged.
 //  • Debounced autosave of the active project after every committed edit.
 //  • Version snapshots — automatic (time-spaced) + named — with a timeline
 //    modal to restore or fork a version into a new project.
@@ -18,6 +23,7 @@ import { onHistoryChange } from '../state/history.js';
 import { makeThumb, uid } from './document.js';
 import { serializeDocument, applyDocument, onDocumentChange, pageCount } from './pages.js';
 import { getClient, getUser, onAuthChange } from './auth.js';
+import { idbAvailable, idbGet, idbSet } from '../state/project-db.js';
 
 const STORE_KEY = 'snapshotpro_projects_v12';
 const ACTIVE_KEY = 'snapshotpro_active_project';
@@ -30,11 +36,34 @@ let saveTimer = null;
 let creating = false;   // guard so the debounce can't double-create "Untitled"
 
 // ── Local store ────────────────────────────────────────────────────────────
+// v34: backend is 'idb' (in-memory `cache`, persisted to IndexedDB) or 'ls'
+// (the pre-v34 localStorage path, used when IndexedDB is unavailable). Until
+// initStore() settles, `ready` is false and every writer waits on `readyP`, so
+// a save requested at startup can never write an empty cache over real data.
+let backend = 'idb';
+let cache = {};
+let ready = false;
+let resolveReady;
+const readyP = new Promise(r => { resolveReady = r; });
+let writeChain = Promise.resolve();  // serialized IndexedDB writes
+let writeQueued = false;             // a queued write will pick up the latest cache
+
+function whenReady(fn) {
+  if (ready) return fn();
+  return readyP.then(fn);
+}
+
 function loadStore() {
+  if (backend === 'idb') return cache;
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
   catch (e) { return {}; }
 }
 function writeStore(store) {
+  if (backend === 'idb') {
+    cache = store;
+    persistIdb();
+    return true;   // the write itself is async; callers only use this as a soft signal
+  }
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
     return true;
@@ -45,6 +74,49 @@ function writeStore(store) {
     catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); return false; }
   }
 }
+// Coalesce rapid writes (only the latest cache is written) and chain them on one
+// promise so an older write can never land after a newer one.
+function persistIdb() {
+  if (writeQueued) return writeChain;
+  writeQueued = true;
+  writeChain = writeChain.then(async () => {
+    writeQueued = false;
+    const store = cache;
+    try { await idbSet(STORE_KEY, store); }
+    catch (e) {
+      // Quota exceeded (or similar) — prune the oldest auto-versions and retry once.
+      pruneAutoVersions(store);
+      try { await idbSet(STORE_KEY, store); }
+      catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+    }
+  });
+  return writeChain;
+}
+
+// Open IndexedDB, migrate a pre-v34 localStorage store once, then mark ready.
+// Falls back to the localStorage backend on any IndexedDB failure.
+async function initStore() {
+  try {
+    let stored = await idbGet(STORE_KEY);
+    if (stored == null) {
+      let legacy = null;
+      try { legacy = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { legacy = null; }
+      if (legacy && typeof legacy === 'object') {
+        await idbSet(STORE_KEY, legacy);
+        // Only after the IndexedDB write resolved: free the localStorage space.
+        try { localStorage.removeItem(STORE_KEY); } catch (e) { /* harmless leftover */ }
+        stored = legacy;
+      }
+    }
+    cache = (stored && typeof stored === 'object') ? stored : {};
+    backend = 'idb';
+  } catch (e) {
+    backend = 'ls';
+  }
+  ready = true;
+  resolveReady();
+}
+
 function pruneAutoVersions(store) {
   Object.values(store).forEach(p => {
     if (p.versions) p.versions = p.versions.filter(v => !v.auto).slice(0, 5)
@@ -127,7 +199,7 @@ function saveActive({ versionLabel } = {}) {
 function scheduleAutosave() {
   if (!state.image) return;        // nothing meaningful to save yet
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
+  saveTimer = setTimeout(() => whenReady(() => {
     if (!activeId) {
       if (creating) return;
       creating = true;
@@ -137,21 +209,24 @@ function scheduleAutosave() {
       saveActive();
     }
     renderPanel();
-  }, AUTOSAVE_DELAY);
+  }), AUTOSAVE_DELAY);
 }
 
 // Immediate save triggered by document-level changes (page add / switch /
 // delete / reorder) which don't go through the history stack. Creates a project
 // on demand so multi-page work is never lost.
+// v34: deferred until the project store has loaded (see initStore).
 export function saveDocumentNow() {
-  if (!state.image && pageCount() <= 1) return;
-  if (!activeId) {
-    if (creating) return;
-    creating = true; newProject(); creating = false;
-  } else {
-    saveActive();
-  }
-  renderPanel();
+  whenReady(() => {
+    if (!state.image && pageCount() <= 1) return;
+    if (!activeId) {
+      if (creating) return;
+      creating = true; newProject(); creating = false;
+    } else {
+      saveActive();
+    }
+    renderPanel();
+  });
 }
 
 // ── Applying a project / version to the editor ───────────────────────────────
@@ -284,6 +359,7 @@ async function deleteProjectFromCloud(id) {
 }
 async function pullCloud() {
   try {
+    await readyP;
     const user = getUser(); const c = await getClient();
     if (!user || !c) return;
     const { data: projs } = await c.from('projects')
@@ -400,14 +476,14 @@ export function bindProjects() {
   const newBtn = document.getElementById('projects-new-btn');
   const saveVerBtn = document.getElementById('projects-save-version-btn');
   const historyBtn = document.getElementById('projects-history-btn');
-  if (newBtn) newBtn.addEventListener('click', () => {
+  if (newBtn) newBtn.addEventListener('click', () => whenReady(() => {
     const name = prompt('New project name:', 'Untitled');
     if (name == null) return;
     newProject(name.trim() || undefined);
     renderPanel();
     showNotification('New project created.', 'success');
-  });
-  if (saveVerBtn) saveVerBtn.addEventListener('click', () => {
+  }));
+  if (saveVerBtn) saveVerBtn.addEventListener('click', () => whenReady(() => {
     if (!state.image) { showNotification('Load an image first.', 'error'); return; }
     if (!activeId) newProject();
     const label = prompt('Name this version (optional):', '');
@@ -415,8 +491,8 @@ export function bindProjects() {
     saveActive({ versionLabel: label.trim() || 'Manual save' });
     renderPanel();
     showNotification('Version saved.', 'success');
-  });
-  if (historyBtn) historyBtn.addEventListener('click', openVersionsModal);
+  }));
+  if (historyBtn) historyBtn.addEventListener('click', () => whenReady(openVersionsModal));
 
   const closeBtn = document.getElementById('versions-modal-close');
   const overlay = document.getElementById('versions-modal');
@@ -426,7 +502,20 @@ export function bindProjects() {
   // Pull cloud projects whenever a user signs in.
   onAuthChange(u => { if (u) pullCloud(); });
 
-  const active = getActive();
-  if (active) setSavedStatus(active.updatedAt);
-  renderPanel();
+  const finish = () => {
+    const active = getActive();
+    if (active) setSavedStatus(active.updatedAt);
+    renderPanel();
+  };
+  if (!idbAvailable()) {
+    // No IndexedDB at all: the pre-v34 localStorage path, synchronously as before.
+    backend = 'ls';
+    ready = true;
+    resolveReady();
+    finish();
+    return;
+  }
+  // Non-blocking: the rest of the app starts while the store loads. Saves
+  // requested meanwhile wait on readyP and run once the real store is in memory.
+  initStore().then(finish, finish);
 }
