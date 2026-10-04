@@ -74,7 +74,13 @@ function run(mode, fn) {
     try { req = fn(tx.objectStore(STORE), fail); }   // put() can throw (e.g. DataCloneError)
     catch (e) { fail(e); }
     tx.oncomplete = () => resolve(req ? req.result : undefined);
-    tx.onerror = () => reject(failed || tx.error || new Error('IndexedDB request failed'));
+    // A failed request (e.g. QuotaExceededError on put in WebKit/Firefox) fires
+    // its error here first, while tx.error is still null: take the request's error.
+    tx.onerror = (ev) => {
+      let reqErr = null;
+      try { reqErr = ev && ev.target && ev.target.error; } catch (x) { /* not readable */ }
+      reject(failed || reqErr || tx.error || new Error('IndexedDB transaction failed'));
+    };
     tx.onabort = () => reject(failed || tx.error || new Error('IndexedDB transaction aborted'));
   }));
 }

@@ -30,6 +30,7 @@ const ACTIVE_KEY = 'snapshotpro_active_project';
 const AUTOSAVE_DELAY = 1500;            // ms after the last edit before we save
 const AUTO_VERSION_INTERVAL = 3 * 60_000; // min spacing between auto-snapshots
 const MAX_AUTO_VERSIONS = 15;           // named versions are never pruned
+const PRUNE_KEEP_AUTO = 3;              // auto versions kept per project when storage is full
 
 let activeId = null;
 let saveTimer = null;
@@ -45,6 +46,9 @@ let creating = false;   // guard so the debounce can't double-create "Untitled"
 // payload goes into the cache as its own copy (cloneDoc) and every stored
 // payload goes into the editor as a copy (applyDocument(cloneDoc(...))), so an
 // edit can never reach back into a saved project or version.
+// Stored payloads are immutable once written (they are only ever replaced), so
+// a project's payload and its newest version may share one object; the editor
+// only ever receives structuredClone copies.
 let backend = 'idb';
 let cache = {};
 let ready = false;
@@ -55,6 +59,14 @@ let writeQueued = false;             // a queued write will pick up the latest c
 let writesPending = 0;               // queued + in-flight IndexedDB writes
 let reloadAfterWrite = false;        // another tab saved while we were writing
 const deletedIds = new Set();        // deleted here, not yet written (see persistIdb)
+// Projects this tab changed and has not yet committed, id -> change counter. Only
+// these may overwrite IndexedDB in the merge; everything else defers to it.
+const dirtyIds = new Map();
+let dirtySeq = 0;
+function markDirty(id) { if (id) dirtyIds.set(id, ++dirtySeq); }
+// A change to an existing project: bump updatedAt, never backwards (a clock step
+// back must not make this tab's newest save look older than its previous one).
+function touch(p) { p.updatedAt = Math.max(Date.now(), (p.updatedAt || 0) + 1); markDirty(p.id); }
 const IDB_USED_KEY = 'snapshotpro_projects_idb';
 const channel = (typeof BroadcastChannel === 'function')
   ? (() => { try { return new BroadcastChannel('snapshotpro-projects'); } catch (e) { return null; } })()
@@ -97,20 +109,43 @@ function isQuotaError(e) {
   return !!e && (e.name === 'QuotaExceededError' || e.code === 22);
 }
 
-// One committed write of the cache. Two tabs share one IndexedDB store, and each
-// tab's cache can be stale, so the write is a per-project merge done inside one
-// readwrite transaction (idbUpdate): a project that is in IndexedDB but not in
-// this tab's cache was saved by another tab and is kept (and adopted into the
-// cache) unless this tab deleted it. A project in both is written from this
-// tab's cache (last writer per project wins).
+// Two tabs share one IndexedDB store and each tab's cache can be stale, so the
+// cache is reconciled per project against what IndexedDB holds (`current`):
+//  - deleted in this tab (LIVE deletedIds): never brought back;
+//  - in both: this tab's copy wins only if this tab changed it (dirtyIds) and it
+//    is not older than the stored one; otherwise the stored copy wins and
+//    replaces this tab's stale copy;
+//  - only in IndexedDB: another tab saved it, adopt it;
+//  - only in this tab: keep it if this tab changed it (a new project); else
+//    another tab deleted it, drop it.
+// Mutates `store` in place; returns true if anything from IndexedDB came in.
+function reconcile(store, current) {
+  if (!current || typeof current !== 'object') return false;   // nothing stored (or cleared): keep ours
+  let changed = false;
+  for (const id of Object.keys(current)) {
+    if (deletedIds.has(id)) continue;
+    const mine = store[id], theirs = current[id];
+    const keepMine = mine && dirtyIds.has(id) && !(theirs && theirs.updatedAt > mine.updatedAt);
+    if (!keepMine && mine !== theirs) { store[id] = theirs; changed = true; }
+  }
+  for (const id of Object.keys(store)) {
+    if (deletedIds.has(id) || (!(id in current) && !dirtyIds.has(id))) { delete store[id]; changed = true; }
+  }
+  return changed;
+}
+
+// One committed write of the cache: reconcile with IndexedDB and put, inside
+// one readwrite transaction (idbUpdate), so no other tab can write in between.
+// `captured` receives the dirty/deleted marks this write covered; they are
+// cleared only after it commits, and only if not changed again meanwhile.
 let adopted = false;   // the last write pulled in another tab's projects
-function writeCacheOnce(store, deleted) {
+function writeCacheOnce(captured, prune = false) {
   return idbUpdate(STORE_KEY, current => {
-    if (current && typeof current === 'object') {
-      for (const id of Object.keys(current)) {
-        if (!(id in store) && !deleted.has(id)) { store[id] = current[id]; adopted = true; }
-      }
-    }
+    const store = cache;
+    if (reconcile(store, current)) adopted = true;
+    if (prune) pruneAutoVersions(store);   // after the merge, so the put really shrinks
+    captured.dirty = new Map(dirtyIds);
+    captured.deleted = new Set(deletedIds);
     return store;
   });
 }
@@ -123,25 +158,22 @@ function persistIdb() {
   writesPending++;
   writeChain = writeChain.then(async () => {
     writeQueued = false;
-    const store = cache;
-    const deleted = new Set(deletedIds);
+    const captured = { dirty: new Map(), deleted: new Set() };
     let ok = false;
-    try { await writeCacheOnce(store, deleted); ok = true; }
+    try { await writeCacheOnce(captured); ok = true; }
     catch (e) {
       if (isQuotaError(e)) {
         // Out of space: prune the oldest auto-versions and retry once.
-        pruneAutoVersions(store);
-        try { await writeCacheOnce(store, deleted); ok = true; }
+        try { await writeCacheOnce(captured, true); ok = true; }
         catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); }
       } else {
         // Transient (closed connection, aborted transaction): reopen and retry once.
         // Never prune versions for a non-quota error.
         idbReset();
-        try { await writeCacheOnce(store, deleted); ok = true; }
+        try { await writeCacheOnce(captured); ok = true; }
         catch (e2) {
           if (isQuotaError(e2)) {
-            pruneAutoVersions(store);
-            try { await writeCacheOnce(store, deleted); ok = true; }
+            try { await writeCacheOnce(captured, true); ok = true; }
             catch (e3) { showNotification('Storage full — older versions were trimmed.', 'error'); }
           } else {
             showNotification('Could not save the project right now. Your work is still open; try again.', 'error');
@@ -150,7 +182,8 @@ function persistIdb() {
       }
     }
     if (ok) {
-      deleted.forEach(id => deletedIds.delete(id));
+      captured.deleted.forEach(id => deletedIds.delete(id));
+      captured.dirty.forEach((seq, id) => { if (dirtyIds.get(id) === seq) dirtyIds.delete(id); });
       if (channel) { try { channel.postMessage({ type: 'saved', at: Date.now() }); } catch (e) { /* closed */ } }
       if (adopted) { adopted = false; renderPanel(); }
     }
@@ -168,8 +201,9 @@ function reloadFromIdb() {
   if (writesPending > 0) { reloadAfterWrite = true; return; }
   idbGet(STORE_KEY).then(stored => {
     if (writesPending > 0) { reloadAfterWrite = true; return; }   // a write started meanwhile
-    cache = (stored && typeof stored === 'object') ? stored : {};
-    deletedIds.forEach(id => { delete cache[id]; });
+    // Same rules as a write: keeps this tab's uncommitted changes (e.g. after a
+    // failed write) and its deletes; everything else comes from IndexedDB.
+    reconcile(cache, stored);   // nothing stored at all (cleared): keep what we have
     renderPanel();
   }, () => { /* keep the cache we have; the next write merges anyway */ });
 }
@@ -217,11 +251,27 @@ async function initStore() {
   resolveReady();
 }
 
+// Storage full: keep every named version, trim auto versions to the newest few.
 function pruneAutoVersions(store) {
   Object.values(store).forEach(p => {
-    if (p.versions) p.versions = p.versions.filter(v => !v.auto).slice(0, 5)
-      .concat((p.versions.filter(v => v.auto)).slice(0, 3));
+    if (!p.versions) return;
+    const autoKeep = new Set(p.versions.filter(v => v.auto).slice(0, PRUNE_KEEP_AUTO));
+    p.versions = p.versions.filter(v => !v.auto || autoKeep.has(v));
   });
+}
+
+// localStorage can throw (quota, private mode); the active id is a convenience.
+function setActiveKey(id) {
+  try { if (id) localStorage.setItem(ACTIVE_KEY, id); else localStorage.removeItem(ACTIVE_KEY); }
+  catch (e) { /* the in-memory activeId still works for this session */ }
+}
+
+// Create a project from the current document unless one is being created.
+function createFromDocument() {
+  if (creating) return null;
+  creating = true;
+  try { return newProject(); }
+  finally { creating = false; }
 }
 
 function getActive() {
@@ -243,8 +293,9 @@ function newProject(name) {
     updatedAt: now,
     versions: []
   };
+  markDirty(id);
   activeId = id;
-  localStorage.setItem(ACTIVE_KEY, id);
+  setActiveKey(id);
   writeStore(store);
   pushProjectToCloud(store[id]);
   // v30 — Brand Brain enforcement: a new project starts on-brand.
@@ -262,13 +313,23 @@ function untitledName(store) {
 // Persist the current editor state into the active project. Auto-snapshots a
 // version if enough time has passed since the last one.
 function saveActive({ versionLabel } = {}) {
-  const store = loadStore();
+  let store = loadStore();
   let p = store[activeId];
-  if (!p) return null;
+  if (!p) {
+    // Deleted in another tab (or its creation never landed): never stop saving silently.
+    if (!activeId) return null;
+    const created = createFromDocument();
+    if (!created) return null;
+    showNotification('This project was removed elsewhere, so your work was saved as a new project.', 'info');
+    if (versionLabel == null) { setSavedStatus(created.updatedAt); return created; }
+    store = loadStore();   // newProject wrote it (the ls backend parses a fresh object)
+    p = store[activeId];
+    if (!p) return created;
+  }
 
   p.payload = cloneDoc(serializeDocument());   // own copy, never shared with the editor
   p.thumbnail = makeThumb();
-  p.updatedAt = Date.now();
+  touch(p);
 
   const named = versionLabel != null;
   const last = p.versions[0];
@@ -277,7 +338,7 @@ function saveActive({ versionLabel } = {}) {
     p.versions.unshift({
       id: uid(),
       label: named ? versionLabel : null,
-      payload: cloneDoc(p.payload),   // independent of the project's current payload
+      payload: p.payload,   // shared with the project: stored payloads are never mutated
       thumbnail: p.thumbnail,
       createdAt: Date.now(),
       auto: !named
@@ -299,14 +360,8 @@ function saveActive({ versionLabel } = {}) {
 function runAutosave() {
   saveTimer = null;
   whenReady(() => {
-    if (!activeId) {
-      if (creating) return;
-      creating = true;
-      newProject();
-      creating = false;
-    } else {
-      saveActive();
-    }
+    if (!activeId) createFromDocument();
+    else saveActive();
     renderPanel();
   });
 }
@@ -332,12 +387,8 @@ function flushPendingSave() {
 export function saveDocumentNow() {
   whenReady(() => {
     if (!state.image && pageCount() <= 1) return;
-    if (!activeId) {
-      if (creating) return;
-      creating = true; newProject(); creating = false;
-    } else {
-      saveActive();
-    }
+    if (!activeId) createFromDocument();
+    else saveActive();
     renderPanel();
   });
 }
@@ -347,7 +398,7 @@ function openProject(id) {
   const p = loadStore()[id];
   if (!p) return;
   activeId = id;
-  localStorage.setItem(ACTIVE_KEY, id);
+  setActiveKey(id);
   applyDocument(cloneDoc(p.payload));   // the editor gets a copy; edits never touch the store
   setSavedStatus(p.updatedAt);
   renderPanel();
@@ -365,8 +416,8 @@ function restoreVersion(versionId) {
     id: uid(), label: 'Before restore', payload: cloneDoc(serializeDocument()),
     thumbnail: makeThumb(), createdAt: Date.now(), auto: false
   });
-  p.payload = cloneDoc(v.payload);   // the project and the version stay independent
-  p.updatedAt = Date.now();
+  p.payload = v.payload;   // shared: stored payloads are never mutated
+  touch(p);
   writeStore(store);
   pushProjectToCloud(p);
   applyDocument(cloneDoc(v.payload));
@@ -387,8 +438,9 @@ function forkVersion(versionId) {
     id, name: `${p.name} (copy)`, payload: cloneDoc(v.payload), thumbnail: v.thumbnail,
     createdAt: now, updatedAt: now, versions: []
   };
+  markDirty(id);
   activeId = id;
-  localStorage.setItem(ACTIVE_KEY, id);
+  setActiveKey(id);
   writeStore(store);
   pushProjectToCloud(store[id]);
   applyDocument(cloneDoc(v.payload));
@@ -405,7 +457,7 @@ function renameProject(id) {
   const name = prompt('Rename project:', p.name);
   if (name == null) return;
   p.name = name.trim() || p.name;
-  p.updatedAt = Date.now();
+  touch(p);
   writeStore(store);
   pushProjectToCloud(p);
   renderPanel();
@@ -421,6 +473,7 @@ function duplicateProject(id) {
     id: nid, name: `${p.name} (copy)`, payload: cloneDoc(p.payload), thumbnail: p.thumbnail,
     createdAt: now, updatedAt: now, versions: []
   };
+  markDirty(nid);
   writeStore(store);
   pushProjectToCloud(store[nid]);
   renderPanel();
@@ -434,8 +487,9 @@ function deleteProject(id) {
   if (!confirm(`Delete "${p.name}"? This can't be undone.`)) return;
   delete store[id];
   deletedIds.add(id);   // so the merge in persistIdb does not bring it back from IndexedDB
+  dirtyIds.delete(id);
   writeStore(store);
-  if (activeId === id) { activeId = null; localStorage.removeItem(ACTIVE_KEY); }
+  if (activeId === id) { activeId = null; setActiveKey(null); }
   deleteProjectFromCloud(id);
   renderPanel();
   showNotification('Project deleted.', 'success');
@@ -495,6 +549,7 @@ async function pullCloud() {
             createdAt: new Date(v.created_at).getTime(), auto: !v.label
           })).sort((a, b) => b.createdAt - a.createdAt)
         };
+        markDirty(row.id);
         if (!local) added++;
       }
     });
@@ -581,7 +636,7 @@ function closeVersionsModal() {
 
 // ── Bind ─────────────────────────────────────────────────────────────────────
 export function bindProjects() {
-  activeId = localStorage.getItem(ACTIVE_KEY) || null;
+  try { activeId = localStorage.getItem(ACTIVE_KEY) || null; } catch (e) { activeId = null; }
 
   // Autosave after every committed edit, and after page-level document changes.
   onHistoryChange(scheduleAutosave);
