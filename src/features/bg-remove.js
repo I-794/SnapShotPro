@@ -2,6 +2,7 @@ import { state } from '../state/state.js';
 import { saveStateToHistory } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
+import { isStaleBuildError, showStaleBuildNotice } from '../ui/stale-build.js';
 
 const MAX_EDGE = 2048;
 
@@ -141,6 +142,7 @@ async function removeBackground() {
     showNotification('Background removed.', 'success');
   } catch (e) {
     console.error('[bg-remove] failed:', e);
+    if (isStaleBuildError(e)) { showStaleBuildNotice(); return; }
     const msg = e?.message || String(e);
     showNotification('Background removal failed: ' + msg, 'error');
   }

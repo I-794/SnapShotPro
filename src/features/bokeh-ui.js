@@ -6,6 +6,7 @@ import { el } from '../ui/elements.js';
 import { saveStateToHistory, onHistoryChange } from '../state/history.js';
 import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
+import { isStaleBuildError, showStaleBuildNotice } from '../ui/stale-build.js';
 import { cutSubject } from './bg-remove.js';
 import { setBokehMaskListener, aspectSig, bindMaskOwner, maskMatches } from '../render/bokeh.js';
 
@@ -67,7 +68,8 @@ export async function detectSubject() {
     showNotification('Subject found. Background blur is on.', 'success');
   } catch (e) {
     console.error('[bokeh] detect failed:', e);
-    showNotification('Subject detection failed: ' + (e?.message || String(e)), 'error');
+    if (isStaleBuildError(e)) showStaleBuildNotice();
+    else showNotification('Subject detection failed: ' + (e?.message || String(e)), 'error');
   } finally {
     if (el.bokehDetectBtn) el.bokehDetectBtn.disabled = false;
     refreshBokehUI();
