@@ -68,6 +68,7 @@ function markDirty(id) { if (id) dirtyIds.set(id, ++dirtySeq); }
 // back must not make this tab's newest save look older than its previous one).
 function touch(p) { p.updatedAt = Math.max(Date.now(), (p.updatedAt || 0) + 1); markDirty(p.id); }
 const IDB_USED_KEY = 'snapshotpro_projects_idb';
+let idbLoadFailed = false;   // saved projects are in IndexedDB but could not be read this session
 const channel = (typeof BroadcastChannel === 'function')
   ? (() => { try { return new BroadcastChannel('snapshotpro-projects'); } catch (e) { return null; } })()
   : null;
@@ -127,11 +128,29 @@ function reconcile(store, current) {
     const mine = store[id], theirs = current[id];
     const keepMine = mine && dirtyIds.has(id) && !(theirs && theirs.updatedAt > mine.updatedAt);
     if (!keepMine && mine !== theirs) { store[id] = theirs; changed = true; }
+    // Ours wins, but another tab may have saved versions of the same project.
+    else if (keepMine && theirs && mine !== theirs && mergeVersions(mine, theirs)) changed = true;
   }
   for (const id of Object.keys(store)) {
     if (deletedIds.has(id) || (!(id in current) && !dirtyIds.has(id))) { delete store[id]; changed = true; }
   }
   return changed;
+}
+
+// Union of both version lists by id (ours wins on a collision): every named
+// version kept, auto versions capped at MAX_AUTO_VERSIONS, newest first.
+// Versions are never deleted one by one, so nothing has to stay removed.
+// Payloads are shared, not cloned (stored payloads are immutable).
+// Returns true if the other tab contributed a version.
+function mergeVersions(mine, theirs) {
+  const ours = Array.isArray(mine.versions) ? mine.versions : [];
+  const seen = new Set(ours.map(v => v.id));
+  const extra = (Array.isArray(theirs.versions) ? theirs.versions : []).filter(v => v && !seen.has(v.id));
+  if (!extra.length) return false;
+  const all = [...ours, ...extra].sort((a, b) => b.createdAt - a.createdAt);
+  const autoV = all.filter(v => v.auto).slice(0, MAX_AUTO_VERSIONS);
+  mine.versions = [...all.filter(v => !v.auto), ...autoV].sort((a, b) => b.createdAt - a.createdAt);
+  return true;
 }
 
 // One committed write of the cache: reconcile with IndexedDB and put, inside
@@ -245,7 +264,10 @@ async function initStore() {
     try { localStorage.setItem(IDB_USED_KEY, '1'); } catch (e) { /* ignore */ }
   } else {
     backend = 'ls';
-    if (usedBefore) showNotification('Saved projects could not be loaded right now. Reload the page to try again.', 'error');
+    if (usedBefore) {
+      idbLoadFailed = true;
+      showNotification('Saved projects could not be loaded right now. Reload the page to try again.', 'error', { duration: 8000 });
+    }
   }
   ready = true;
   resolveReady();
@@ -318,6 +340,9 @@ function saveActive({ versionLabel } = {}) {
   if (!p) {
     // Deleted in another tab (or its creation never landed): never stop saving silently.
     if (!activeId) return null;
+    // Storage fallback after IndexedDB failed to load: the active project is in
+    // IndexedDB, not removed. The load-failed notice already told the user.
+    if (backend === 'ls' && idbLoadFailed) return null;
     const created = createFromDocument();
     if (!created) return null;
     showNotification('This project was removed elsewhere, so your work was saved as a new project.', 'info');
