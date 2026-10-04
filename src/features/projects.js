@@ -68,7 +68,9 @@ function markDirty(id) { if (id) dirtyIds.set(id, ++dirtySeq); }
 // back must not make this tab's newest save look older than its previous one).
 function touch(p) { p.updatedAt = Math.max(Date.now(), (p.updatedAt || 0) + 1); markDirty(p.id); }
 const IDB_USED_KEY = 'snapshotpro_projects_idb';
-let idbLoadFailed = false;   // saved projects are in IndexedDB but could not be read this session
+// IndexedDB was used before but failed to load: ACTIVE_KEY keeps pointing at the
+// IndexedDB project so a later healthy load reopens it.
+let keepActiveKey = false;
 const channel = (typeof BroadcastChannel === 'function')
   ? (() => { try { return new BroadcastChannel('snapshotpro-projects'); } catch (e) { return null; } })()
   : null;
@@ -127,7 +129,14 @@ function reconcile(store, current) {
     if (deletedIds.has(id)) continue;
     const mine = store[id], theirs = current[id];
     const keepMine = mine && dirtyIds.has(id) && !(theirs && theirs.updatedAt > mine.updatedAt);
-    if (!keepMine && mine !== theirs) { store[id] = theirs; changed = true; }
+    if (!keepMine && mine !== theirs) {
+      // The stored copy is newer, but this tab may hold versions it has not
+      // committed yet (e.g. a named one): carry them over (stored wins on id).
+      // `theirs` is a fresh object from the IndexedDB read; the project stays
+      // dirty, so the merged list is written by this or the next write.
+      if (mine && theirs && dirtyIds.has(id)) mergeVersions(theirs, mine);
+      store[id] = theirs; changed = true;
+    }
     // Ours wins, but another tab may have saved versions of the same project.
     else if (keepMine && theirs && mine !== theirs && mergeVersions(mine, theirs)) changed = true;
   }
@@ -265,8 +274,12 @@ async function initStore() {
   } else {
     backend = 'ls';
     if (usedBefore) {
-      idbLoadFailed = true;
-      showNotification('Saved projects could not be loaded right now. Reload the page to try again.', 'error', { duration: 8000 });
+      // The active project is in IndexedDB, not removed: forget it for this
+      // session only (ACTIVE_KEY stays, so a later healthy load reopens it), and
+      // new work is saved as its own localStorage project by the normal path.
+      activeId = null;
+      keepActiveKey = true;
+      showNotification('Saved projects could not be loaded right now. New work is saved as a separate project; reload later to see your other projects.', 'error', { duration: 8000 });
     }
   }
   ready = true;
@@ -284,6 +297,7 @@ function pruneAutoVersions(store) {
 
 // localStorage can throw (quota, private mode); the active id is a convenience.
 function setActiveKey(id) {
+  if (keepActiveKey) return;
   try { if (id) localStorage.setItem(ACTIVE_KEY, id); else localStorage.removeItem(ACTIVE_KEY); }
   catch (e) { /* the in-memory activeId still works for this session */ }
 }
@@ -340,9 +354,6 @@ function saveActive({ versionLabel } = {}) {
   if (!p) {
     // Deleted in another tab (or its creation never landed): never stop saving silently.
     if (!activeId) return null;
-    // Storage fallback after IndexedDB failed to load: the active project is in
-    // IndexedDB, not removed. The load-failed notice already told the user.
-    if (backend === 'ls' && idbLoadFailed) return null;
     const created = createFromDocument();
     if (!created) return null;
     showNotification('This project was removed elsewhere, so your work was saved as a new project.', 'info');
@@ -682,9 +693,10 @@ export function bindProjects() {
     if (!activeId) newProject();
     const label = prompt('Name this version (optional):', '');
     if (label == null) return;
-    saveActive({ versionLabel: label.trim() || 'Manual save' });
+    const saved = saveActive({ versionLabel: label.trim() || 'Manual save' });
     renderPanel();
-    showNotification('Version saved.', 'success');
+    if (saved) showNotification('Version saved.', 'success');
+    else showNotification('Could not save this version. Try again.', 'error');
   }));
   if (historyBtn) historyBtn.addEventListener('click', () => whenReady(openVersionsModal));
 
