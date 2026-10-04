@@ -1,7 +1,4 @@
 import { state } from '../state/state.js';
-import { el } from '../ui/elements.js';
-import { saveStateToHistory } from '../state/history.js';
-import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { getKey } from './api-keys.js';
 

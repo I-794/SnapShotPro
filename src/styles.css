@@ -10,7 +10,7 @@
     --border-glow: rgba(84, 112, 255, 0.16);
     --text-primary: #ecedf1;
     --text-secondary: #9a9ca8;
-    --text-tertiary: #63656f;
+    --text-tertiary: #8a8d99;   /* ≥4.5:1 on the dark panels (was #63656f, 3.2:1) */
     /* Electric cobalt brand — same family as the landing, tuned brighter for dark UI */
     --accent-primary: #5470ff;
     --accent-secondary: #7d92ff;
@@ -436,10 +436,12 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
     border: 1px solid var(--glass-border); border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     display: flex; align-items: center; gap: 10px; z-index: 2000;
-    transform: translateX(400px); opacity: 0;
+    transform: translateX(calc(100% + 40px)); opacity: 0;
+    /* Hidden toasts must not swallow clicks on the toolbar beneath them. */
+    pointer-events: none; visibility: hidden;
     transition: all var(--transition-smooth);
 }
-.notification.show { transform: translateX(0); opacity: 1; }
+.notification.show { transform: translateX(0); opacity: 1; pointer-events: auto; visibility: visible; }
 .notification.success { border-color: rgba(52, 211, 153, 0.3); box-shadow: var(--shadow-lg), 0 0 20px rgba(52, 211, 153, 0.08); }
 .notification.error { border-color: rgba(248, 113, 113, 0.3); box-shadow: var(--shadow-lg), 0 0 20px rgba(248, 113, 113, 0.08); }
 .notification-icon { font-size: 18px; }
@@ -1381,14 +1383,6 @@ kbd {
 }
 .canvas-viewport { touch-action: none; }
 
-#sidebar-toggle-btn { display: none; }
-.sidebar-backdrop {
-    position: fixed; inset: 52px 0 0 0; background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    z-index: 1050; opacity: 0; pointer-events: none; transition: opacity var(--transition-smooth);
-}
-.sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
-
 .header { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
 .history-timeline { padding-bottom: env(safe-area-inset-bottom); }
 
@@ -1412,7 +1406,6 @@ kbd {
     .main-content { margin-right: 0; padding: 8px 12px 48px; }
     .layers-panel { display: none; }
     #preview-canvas { max-height: calc(100vh - 180px); }
-    #sidebar-toggle-btn { display: inline-flex; }
     .header { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
     .logo { font-size: 15px; gap: 8px; }
     /* v23 — compact, canvas-first header. The desktop action row does not fit a
@@ -1507,10 +1500,6 @@ kbd {
         content: ''; position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
         width: 40px; height: 5px; border-radius: 3px; background: var(--border-color);
     }
-
-    /* Superseded affordances. */
-    #sidebar-toggle-btn { display: none; }
-    .sidebar-backdrop { display: none; }
 
     /* Canvas claims the space above the peeked sheet + dock. dvh avoids the iOS
        URL-bar collapse clipping the canvas (the old 100vh math did). */
