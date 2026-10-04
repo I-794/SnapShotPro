@@ -10,20 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '33.2';
+const CURRENT_VERSION = '34.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "📷 v33.2 · Aperture, tidied",
+  heading: "📷 v34 · Bokeh",
   items: [
-    { title: 'Undo after a slider drag',
-      desc: 'The first Undo after moving a slider or picking a color now puts the old value back.' },
-    { title: 'Undo Reset and Clear All',
-      desc: 'Both show an Undo button in the notification, and undoing a Reset brings extra images back.' },
-    { title: 'Spotlight exports correctly',
-      desc: 'The highlighted area no longer comes out see-through in exported images.' }
+    { title: 'Spotlight, rebuilt',
+      desc: 'Add several focus areas, pick box, circle, or rounded, and blur everything else.' },
+    { title: 'Real background blur',
+      desc: 'Bokeh (Adjust tab) finds your subject and softens the background like a camera lens.' },
+    { title: 'Bokeh highlights',
+      desc: 'Bright spots bloom into soft circles. Turn it up or down with one slider.' },
+    { title: 'Works everywhere',
+      desc: 'Both effects bake into your exported images, and Bokeh works in every mockup too.' }
   ]
 };
 

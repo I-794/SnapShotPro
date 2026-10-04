@@ -9,7 +9,8 @@ import { resetTilt, applyTiltPreset } from './tilt.js';
 import { applyMeshPreset } from './mesh-pad.js';
 import { setScene } from './scene-select.js';
 import { setTool, clearAllAnnotations, clearAllRedactions } from './canvas-tools.js';
-import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll } from './selection.js';
+import { selectAll, duplicateSelection, groupDistribute, groupMatchSize, setSelectionFlag, unlockAll, pruneSelection } from './selection.js';
+import { upgradeSpotlight } from '../render/spotlight-geom.js';
 import { listExportPresets, applyExportPreset, quickExport } from './export-presets.js';
 import { toggleLayersPanel, renderLayersPanel } from './layers.js';
 import { openStickerDrawer } from './stickers.js';
@@ -68,7 +69,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id === 'toggle-spotlight' || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
+      id === 'toggle-spotlight' || id.startsWith('spotlight-') || id.startsWith('bokeh-') || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
 
@@ -172,7 +173,20 @@ export function registerCommands() {
     { id: 'tool-redact',      label: 'Tool: Redact',          icon: '▓',  run: () => setTool('redact') },
     { id: 'clear-annotations', label: 'Clear all annotations', icon: '🗑', run: clearAllAnnotations },
     { id: 'clear-redactions',  label: 'Clear all redactions',  icon: '🗑', run: clearAllRedactions },
-    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => { saveStateToHistory(); state.spotlight.enabled = !state.spotlight.enabled; render(); } },
+    { id: 'toggle-spotlight',  label: 'Toggle Spotlight',     icon: '◎',  run: () => {
+      saveStateToHistory();
+      state.spotlight = upgradeSpotlight(state.spotlight);
+      state.spotlight.enabled = !state.spotlight.enabled;
+      // Same as the sidebar: turning it on with no focus areas adds a centered one.
+      if (state.spotlight.enabled && !state.spotlight.regions.length) {
+        state.spotlight.regions.push({ id: Date.now(), x: 0.2, y: 0.2, w: 0.6, h: 0.6, shape: state.spotlight.shape });
+      }
+      pruneSelection(); render(); window.__updateUIFromState?.();
+    } },
+    { id: 'spotlight-add-region', label: 'Spotlight: Add focus area',   icon: '◎', run: () => setTool('spotlight') },
+    { id: 'spotlight-clear',      label: 'Spotlight: Clear focus areas', icon: '🗑', run: () => { saveStateToHistory(); state.spotlight.regions = []; pruneSelection(); render(); window.__updateUIFromState?.(); showStatus('Focus areas cleared'); } },
+    { id: 'bokeh-detect', label: 'Bokeh: Detect subject', icon: '◉', run: () => import('./bokeh-ui.js').then((m) => m.detectSubject()), when: () => !!state.image },
+    { id: 'bokeh-toggle', label: 'Bokeh: Toggle background blur', icon: '◉', run: () => { if (!state.bokeh?.maskDataUrl) { showStatus('Detect the subject first'); return; } saveStateToHistory(); state.bokeh.enabled = !state.bokeh.enabled; render(); window.__updateUIFromState?.(); } },
     { id: 'ai-enhance',       label: 'AI Auto-Enhance',      icon: '✨', run: () => document.getElementById('ai-enhance-btn')?.click() },
     { id: 'style-watercolor', label: 'Style: Watercolor',    icon: '🎨', run: () => document.querySelector('[data-style-preset="watercolor"]')?.click() },
     { id: 'style-sketch',     label: 'Style: Sketch',        icon: '✏️', run: () => document.querySelector('[data-style-preset="sketch"]')?.click() },

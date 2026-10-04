@@ -75,7 +75,9 @@ function snapshot() {
     // v27 — Surface Studio (physical & print mockup) settings are undoable.
     surface: state.surface,
     // v30 — Brand Brain system is undoable (Apply / Extract are one undo step).
-    brand: state.brand
+    brand: state.brand,
+    // v34 — Subject Bokeh (Detect subject / sliders are undoable).
+    bokeh: state.bokeh
   }));
 }
 

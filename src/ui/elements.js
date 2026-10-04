@@ -74,6 +74,12 @@ const IDS = [
 
   // Spotlight
   'spotlight-enabled', 'spotlight-controls', 'spotlight-opacity', 'spotlight-opacity-value',
+  // v34 — Spotlight 2.0
+  'spotlight-shape', 'spotlight-blur', 'spotlight-blur-value', 'spotlight-feather', 'spotlight-feather-value',
+  'spotlight-tint', 'spotlight-tint-text', 'spotlight-clear-btn', 'spotlight-count',
+  // v34 — Subject Bokeh
+  'bokeh-detect-btn', 'bokeh-status', 'bokeh-enabled', 'bokeh-controls',
+  'bokeh-amount', 'bokeh-amount-value', 'bokeh-highlights', 'bokeh-highlights-value', 'bokeh-shape',
 
   // v16.1 — Studio Effects: liquid glass + film grain
   'glass-enabled', 'glass-controls', 'glass-blur', 'glass-blur-value',
