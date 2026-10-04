@@ -5,9 +5,13 @@
 //    Supabase account; cloud sync layers on when signed in. v34: projects live
 //    in IndexedDB (src/state/project-db.js) because a large photo plus its
 //    versions overflows phone localStorage; the whole store is kept in memory
-//    (`cache`) so call sites stay synchronous. A one-time migration moves an
-//    existing localStorage store into IndexedDB, and when IndexedDB is
-//    unavailable the old localStorage path is used unchanged.
+//    (`cache`) so call sites stay synchronous. On every healthy load, any
+//    project store found in localStorage (pre-v34, or saved while IndexedDB
+//    failed to load) is merged into IndexedDB and then removed. When IndexedDB
+//    is unavailable, or does not load within OPEN_TIMEOUT, the old localStorage
+//    path is used; `snapshotpro_projects_idb` records that IndexedDB was used
+//    before, so a later failure retries once and tells the user.
+//  • The status line says "Saved" only after the write has committed.
 //  • Debounced autosave of the active project after every committed edit.
 //  • Version snapshots — automatic (time-spaced) + named — with a timeline
 //    modal to restore or fork a version into a new project.
@@ -31,6 +35,9 @@ const AUTOSAVE_DELAY = 1500;            // ms after the last edit before we save
 const AUTO_VERSION_INTERVAL = 3 * 60_000; // min spacing between auto-snapshots
 const MAX_AUTO_VERSIONS = 15;           // named versions are never pruned
 const PRUNE_KEEP_AUTO = 3;              // auto versions kept per project when storage is full
+const OPEN_TIMEOUT = 8000;              // ms before a hung IndexedDB load counts as failed
+const RETRY_DELAY = 5000;               // ms before the single retry of a failed write
+const STORAGE_FULL_MSG = 'Storage full. This change was not saved. Delete old projects or versions to free space.';
 
 let activeId = null;
 let saveTimer = null;
@@ -58,6 +65,10 @@ let writeChain = Promise.resolve();  // serialized IndexedDB writes
 let writeQueued = false;             // a queued write will pick up the latest cache
 let writesPending = 0;               // queued + in-flight IndexedDB writes
 let reloadAfterWrite = false;        // another tab saved while we were writing
+let queuedWrite = null;              // promise of the queued write (resolves true once committed)
+let lastWrite = Promise.resolve(true); // the write covering the latest writeStore call
+let writeSeq = 0;                    // bumped whenever a new write is queued
+let lastFailure = null;              // 'quota' | 'retrying' | 'error' for the last failed write
 const deletedIds = new Set();        // deleted here, not yet written (see persistIdb)
 // Projects this tab changed and has not yet committed, id -> change counter. Only
 // these may overwrite IndexedDB in the merge; everything else defers to it.
@@ -91,11 +102,14 @@ function loadStore() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
   catch (e) { return {}; }
 }
+// IndexedDB backend: returns a promise that resolves true once the write has
+// committed, false if it failed (also kept in `lastWrite`). localStorage
+// backend: returns true/false synchronously, as before v34.
 function writeStore(store) {
   if (backend === 'idb') {
     cache = store;
-    persistIdb();
-    return true;   // the write itself is async; callers only use this as a soft signal
+    lastWrite = persistIdb();
+    return lastWrite;
   }
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
@@ -179,21 +193,25 @@ function writeCacheOnce(captured, prune = false) {
 }
 
 // Coalesce rapid writes (only the latest cache is written) and chain them on one
-// promise so an older write can never land after a newer one.
-function persistIdb() {
-  if (writeQueued) return writeChain;
+// promise so an older write can never land after a newer one. Resolves true once
+// the write committed, false if it failed. The status line follows the outcome.
+// A non-quota failure (after the immediate reopen-and-retry) gets one more try
+// RETRY_DELAY later, unless a newer write was queued meanwhile.
+function persistIdb(isRetry = false) {
+  if (writeQueued) return queuedWrite;
   writeQueued = true;
   writesPending++;
+  const mySeq = ++writeSeq;
   writeChain = writeChain.then(async () => {
     writeQueued = false;
     const captured = { dirty: new Map(), deleted: new Set() };
-    let ok = false;
+    let ok = false, failure = null;
     try { await writeCacheOnce(captured); ok = true; }
     catch (e) {
       if (isQuotaError(e)) {
         // Out of space: prune the oldest auto-versions and retry once.
         try { await writeCacheOnce(captured, true); ok = true; }
-        catch (e2) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+        catch (e2) { failure = 'quota'; }
       } else {
         // Transient (closed connection, aborted transaction): reopen and retry once.
         // Never prune versions for a non-quota error.
@@ -202,23 +220,41 @@ function persistIdb() {
         catch (e2) {
           if (isQuotaError(e2)) {
             try { await writeCacheOnce(captured, true); ok = true; }
-            catch (e3) { showNotification('Storage full — older versions were trimmed.', 'error'); }
+            catch (e3) { failure = 'quota'; }
           } else {
-            showNotification('Could not save the project right now. Your work is still open; try again.', 'error');
+            failure = 'error';
           }
         }
       }
     }
     if (ok) {
+      lastFailure = null;
       captured.deleted.forEach(id => deletedIds.delete(id));
       captured.dirty.forEach((seq, id) => { if (dirtyIds.get(id) === seq) dirtyIds.delete(id); });
       if (channel) { try { channel.postMessage({ type: 'saved', at: Date.now() }); } catch (e) { /* closed */ } }
       if (adopted) { adopted = false; renderPanel(); }
+      // A newer write is queued: stay on "Saving" until it lands.
+      if (!writeQueued) { const a = getActive(); if (a) setSavedStatus(a.updatedAt); }
+      return true;
     }
-  }).catch(() => { /* never break the chain */ }).finally(() => {
+    setStatusText('Not saved');
+    if (failure === 'quota') {
+      lastFailure = 'quota';
+      showNotification(STORAGE_FULL_MSG, 'error', { duration: 8000 });
+    } else if (!isRetry && !writeQueued) {
+      lastFailure = 'retrying';
+      setTimeout(() => { if (writeSeq === mySeq && !writeQueued) persistIdb(true); }, RETRY_DELAY);
+      showNotification('Could not save the project right now. Retrying in a few seconds.', 'error');
+    } else {
+      lastFailure = 'error';
+      showNotification('Could not save the project right now. Your work is still open; try again.', 'error');
+    }
+    return false;
+  }).catch(() => false /* never break the chain */).finally(() => {
     writesPending--;
     if (writesPending === 0 && reloadAfterWrite) { reloadAfterWrite = false; reloadFromIdb(); }
   });
+  queuedWrite = writeChain;
   return writeChain;
 }
 
@@ -255,33 +291,62 @@ function mergeLocalStore(current, local) {
   return current;
 }
 
-async function loadIdbStore() {
+// `abandoned()` turns true once initStore gave up (timeout): from then on this
+// load must not write IndexedDB or touch localStorage, since the session already
+// runs on the localStorage backend.
+async function loadIdbStore(abandoned) {
   let local = null;
   try { local = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { local = null; }
   if (!local || typeof local !== 'object' || Array.isArray(local)) return idbGet(STORE_KEY);
-  const stored = await idbUpdate(STORE_KEY, current => mergeLocalStore(current, local));
-  // Only after the IndexedDB write resolved: free the localStorage space. If the
-  // write failed, the error propagates and localStorage stays untouched.
+  let stored;
+  try {
+    stored = await idbUpdate(STORE_KEY, current => {
+      if (abandoned()) throw new Error('IndexedDB load timed out');   // aborts the transaction
+      return mergeLocalStore(current, local);
+    });
+  } catch (e) {
+    if (abandoned()) throw e;
+    // The merge write failed (e.g. quota) but IndexedDB may still be readable:
+    // use what it holds and leave the localStorage store for the next load to
+    // merge. If the read fails too, this is a load failure as before.
+    return idbGet(STORE_KEY);
+  }
+  if (abandoned()) throw new Error('IndexedDB load timed out');   // merged again next load
+  // Only after the IndexedDB write resolved: free the localStorage space.
   try { localStorage.removeItem(STORE_KEY); } catch (e) { /* merged again next load */ }
   return stored;
 }
 
-// Open IndexedDB, migrate a pre-v34 localStorage store once, then mark ready.
-// Falls back to the localStorage backend on any IndexedDB failure. If this
-// browser has used IndexedDB for projects before (IDB_USED_KEY), a failure is
-// retried once, and if it still fails the user is told, since their saved
-// projects are in IndexedDB and edits now go to localStorage only.
+// Open IndexedDB, merge any localStorage project store into it, then mark
+// ready. Falls back to the localStorage backend on any IndexedDB failure, or if
+// the load has not settled within OPEN_TIMEOUT (a late result is ignored). If
+// this browser has used IndexedDB for projects before (IDB_USED_KEY), a failure
+// is retried once (within the same time budget), and if it still fails the
+// user is told, since their saved projects are in IndexedDB and edits now go to
+// localStorage only.
 async function initStore() {
   let usedBefore = false;
   try { usedBefore = localStorage.getItem(IDB_USED_KEY) === '1'; } catch (e) { /* ignore */ }
-  let stored, ok = false;
-  try { stored = await loadIdbStore(); ok = true; }
-  catch (e) {
-    if (usedBefore) {
+  let timedOut = false;
+  const abandoned = () => timedOut;
+  const attempt = async () => {
+    try { return { ok: true, stored: await loadIdbStore(abandoned) }; }
+    catch (e) {
+      if (!usedBefore || timedOut) return { ok: false };
       idbReset();
-      try { stored = await loadIdbStore(); ok = true; } catch (e2) { /* fall through */ }
+      try { return { ok: true, stored: await loadIdbStore(abandoned) }; }
+      catch (e2) { return { ok: false }; }
     }
-  }
+  };
+  let timer;
+  const deadline = new Promise(res => {
+    timer = setTimeout(() => { timedOut = true; res({ ok: false, timeout: true }); }, OPEN_TIMEOUT);
+  });
+  const result = await Promise.race([attempt(), deadline]);
+  clearTimeout(timer);
+  // Timed out: drop the hung open; a late connection is closed when it arrives.
+  if (result.timeout) idbReset();
+  const ok = result.ok, stored = result.stored;
   if (ok) {
     cache = (stored && typeof stored === 'object') ? stored : {};
     backend = 'idb';
@@ -372,7 +437,7 @@ function saveActive({ versionLabel } = {}) {
     const created = createFromDocument();
     if (!created) return null;
     showNotification('This project was removed elsewhere, so your work was saved as a new project.', 'info');
-    if (versionLabel == null) { setSavedStatus(created.updatedAt); return created; }
+    if (versionLabel == null) { reportWrite(lastWrite, created.updatedAt); return created; }
     store = loadStore();   // newProject wrote it (the ls backend parses a fresh object)
     p = store[activeId];
     if (!p) return created;
@@ -402,9 +467,9 @@ function saveActive({ versionLabel } = {}) {
     pushVersionToCloud(p.id, justAdded);
   }
 
-  writeStore(store);
+  const res = writeStore(store);
   pushProjectToCloud(p);
-  setSavedStatus(p.updatedAt);
+  reportWrite(res, p.updatedAt);
   return p;
 }
 
@@ -451,7 +516,8 @@ function openProject(id) {
   activeId = id;
   setActiveKey(id);
   applyDocument(cloneDoc(p.payload));   // the editor gets a copy; edits never touch the store
-  setSavedStatus(p.updatedAt);
+  if (backend === 'idb' && dirtyIds.has(id)) setStatusText(writesPending ? 'Saving…' : 'Not saved');
+  else setSavedStatus(p.updatedAt);
   renderPanel();
   showNotification(`Opened "${p.name}".`, 'success');
 }
@@ -611,6 +677,16 @@ async function pullCloud() {
 }
 
 // ── UI: sidebar panel ────────────────────────────────────────────────────────
+// IndexedDB: the write is async, so show "Saving…" now; persistIdb sets "Saved"
+// or "Not saved" once it settles. localStorage: synchronous, as before v34.
+function reportWrite(res, ts) {
+  if (res && typeof res.then === 'function') setStatusText('Saving…');
+  else setSavedStatus(ts);
+}
+function setStatusText(t) {
+  const s = document.getElementById('projects-status');
+  if (s) s.textContent = t;
+}
 function setSavedStatus(ts) {
   const s = document.getElementById('projects-status');
   if (s) s.textContent = ts ? `Saved · ${new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
@@ -710,8 +786,15 @@ export function bindProjects() {
     if (label == null) return;
     const saved = saveActive({ versionLabel: label.trim() || 'Manual save' });
     renderPanel();
-    if (saved) showNotification('Version saved.', 'success');
-    else showNotification('Could not save this version. Try again.', 'error');
+    if (!saved) { showNotification('Could not save this version. Try again.', 'error'); return; }
+    if (backend !== 'idb') { showNotification('Version saved.', 'success'); return; }
+    // IndexedDB: confirm only once the write has committed.
+    return lastWrite.then(ok => {
+      if (ok) showNotification('Version saved.', 'success');
+      else if (lastFailure === 'quota') showNotification(STORAGE_FULL_MSG, 'error', { duration: 8000 });
+      else if (lastFailure === 'retrying') showNotification('Version not saved yet. Retrying in a few seconds.', 'error');
+      else showNotification('Could not save this version. Try again.', 'error');
+    });
   }));
   if (historyBtn) historyBtn.addEventListener('click', () => whenReady(openVersionsModal));
 
