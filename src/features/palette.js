@@ -34,6 +34,7 @@ import { seedFromUrl } from './seed.js';
 import { openGalleryBrowse } from './gallery.js';
 import { exportVideoMp4, exportVideoGif } from './video-export.js';
 import { resetOnboarding } from './welcome.js';
+import { canInstallApp, installApp } from './install-app.js';
 import { formatKeys } from './shortcuts.js';
 import { getFrequencyBoost, getRecent, recordUse } from './command-usage.js';
 
@@ -91,6 +92,7 @@ export function registerCommands() {
     { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
     { id: 'theme-light',      label: 'Theme: Light',          icon: '☀️', run: () => applyTheme('light') },
+    { id: 'install-app',      label: 'Install SnapShotPro as an app', icon: '⬇', run: installApp, when: canInstallApp },
     { id: 'zoom-in',          label: 'Zoom in',               icon: '🔍', run: () => setZoom(state.view.zoom * 1.2) },
     { id: 'zoom-out',         label: 'Zoom out',              icon: '🔍', run: () => setZoom(state.view.zoom / 1.2) },
     { id: 'zoom-fit',         label: 'Fit to screen',         icon: '⌧',  run: fitZoom },

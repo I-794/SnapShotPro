@@ -87,6 +87,7 @@ import { bindShareTarget } from './features/share-target.js';
 import { bindExtReceiver } from './features/ext-receiver.js';
 import { bindWelcome } from './features/welcome.js';
 import { bindWhatsNew } from './features/whats-new.js';
+import { bindInstallApp } from './features/install-app.js';
 
 function bindHeader() {
   el.themeToggleBtn.addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
@@ -192,6 +193,7 @@ function init() {
   bindMobileStudio();   // v23 — phone bottom dock + sheet (after studio-nav wires setGroup)
   bindWelcome();
   bindWhatsNew();
+  bindInstallApp();   // v34.1 — header "Install app" button (PWA)
 
   setInitialActivePresets();
   renderMeshPad();

@@ -12,7 +12,7 @@ const IDS = [
   'code-chrome', 'code-window-title', 'code-font', 'code-font-size', 'code-font-size-value',
   'code-pad', 'code-pad-value', 'code-tab-size', 'code-line-numbers', 'code-wrap', 'code-apply-btn',
   'export-btn', 'reset-btn', 'undo-btn', 'redo-btn', 'drop-zone',
-  'notification', 'notification-text', 'theme-toggle-btn',
+  'notification', 'notification-text', 'theme-toggle-btn', 'install-app-btn',
   'shortcuts-btn', 'shortcuts-overlay', 'shortcuts-grid', 'close-shortcuts-btn', 'annotation-toolbar',
 
   // Image editing

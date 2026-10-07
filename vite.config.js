@@ -172,7 +172,10 @@ export default defineConfig({
         theme_color: '#1a1a2e',
         background_color: '#1a1a2e',
         display: 'standalone',
-        start_url: '/',
+        // v34.1 — open the installed app on the editor; `id` keeps the original
+        // identity so existing installs aren't treated as a different app.
+        id: '/',
+        start_url: '/editor/',
         icons: [
           { src: 'pwa-192.svg', sizes: '192x192', type: 'image/svg+xml' },
           { src: 'pwa-512.svg', sizes: '512x512', type: 'image/svg+xml' },
