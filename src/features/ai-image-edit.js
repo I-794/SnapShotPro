@@ -11,6 +11,7 @@ import { render } from '../render/render.js';
 import { showNotification } from '../ui/notification.js';
 import { getKey } from './api-keys.js';
 import { imageToDataUrl, loadImage, canvasToBlob, blobToBase64, nearestGptImageSize } from './ai-shared.js';
+import { revealSection } from './studio-nav.js';
 
 function setStatus(msg) {
   const s = document.getElementById('ai-edit-status');
@@ -19,7 +20,7 @@ function setStatus(msg) {
 
 function needKeyHint() {
   const details = document.getElementById('api-keys-details');
-  if (details) { details.open = true; details.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  if (details) { revealSection(details); details.open = true; details.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
 
 // ---- backend calls (proxy → BYOK fallback) --------------------------------

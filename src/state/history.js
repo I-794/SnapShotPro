@@ -77,7 +77,9 @@ function snapshot() {
     // v30 — Brand Brain system is undoable (Apply / Extract are one undo step).
     brand: state.brand,
     // v34 — Subject Bokeh (Detect subject / sliders are undoable).
-    bokeh: state.bokeh
+    bokeh: state.bokeh,
+    // v35 — Before / After Compare (carries the Before dataURL).
+    compare: state.compare
   }));
 }
 

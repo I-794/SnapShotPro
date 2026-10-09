@@ -15,6 +15,7 @@ import { refreshColorMapUI } from '../features/color-map.js';
 import { refreshMockup3dUI } from '../features/mockup-3d-ui.js';
 import { upgradeSpotlight } from '../render/spotlight-geom.js';
 import { refreshBokehUI } from '../features/bokeh-ui.js';
+import { refreshCompareUI } from '../features/compare-ui.js';
 import { setSelection } from '../features/selection.js';
 import { clearAllRedactions } from '../features/canvas-tools.js';
 
@@ -695,6 +696,7 @@ export function updateUIFromState() {
 
   refreshSpotlightUI();   // v34
   refreshBokehUI();   // v34
+  refreshCompareUI(); // v35
 
   if (el.reflectionEnabled) {
     el.reflectionEnabled.checked = state.reflection.enabled;

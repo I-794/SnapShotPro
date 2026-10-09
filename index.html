@@ -30,11 +30,15 @@
     <style>
         /* Landing-specific pieces only; the design system lives in /site.css. */
         .hero { position: relative; overflow: hidden; }
-        .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; min-height: calc(100dvh - 66px); padding: clamp(36px, 6vw, 72px) 0 clamp(48px, 7vw, 88px); }
+        /* padding-block, not padding: .wrap on the same element owns the side gutters. */
+        .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; min-height: calc(100dvh - 66px); padding-block: clamp(36px, 6vw, 72px) clamp(48px, 7vw, 88px); }
         .hero-eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 26px; padding: 7px 15px 7px 8px; border-radius: var(--r-pill); background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), 0 0 12px var(--accent); }
         .hero-eyebrow span { font-size: 13px; font-weight: 500; color: var(--ink-2); }
-        .hero h1 { font-size: clamp(44px, 6.6vw, 84px); font-weight: 700; line-height: 0.98; letter-spacing: -0.035em; margin-bottom: 24px; color: var(--ink); }
+        a.hero-eyebrow { transition: border-color .2s; } a.hero-eyebrow:hover { border-color: var(--glass-hi); }
+        .hero-eyebrow b { color: var(--ink); font-weight: 600; }
+        /* Sized so "Screenshots that" stays on one line in the hero column. */
+        .hero h1 { font-size: clamp(42px, 4.7vw, 60px); font-weight: 700; line-height: 0.98; letter-spacing: -0.035em; margin-bottom: 24px; color: var(--ink); }
         .hero-sub { font-size: clamp(16.5px, 1.5vw, 19px); color: var(--ink-2); max-width: 32ch; line-height: 1.55; margin-bottom: 34px; }
         .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; }
 
@@ -47,7 +51,8 @@
         .browser-shot { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; background: #0b0e1a; }
         .float-chip { position: absolute; z-index: 2; background: rgba(14,18,32,0.66); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border-radius: 13px; padding: 10px 14px; box-shadow: var(--shadow-lift); border: 1px solid var(--glass-line); display: flex; align-items: center; gap: 9px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
         .float-chip svg { width: 16px; height: 16px; color: var(--accent); }
-        .float-chip.one { bottom: 11%; left: -4%; } .float-chip.two { top: 14%; right: -3%; }
+        /* Inside the card: .showpiece clips overflow, so negative offsets cut the chips off. */
+        .float-chip.one { bottom: 6%; left: 5%; } .float-chip.two { top: 6%; right: 5%; }
 
         .fc-copy .eyebrow { margin-bottom: 12px; }
         .fc-copy h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 16px; color: var(--ink); }
@@ -86,6 +91,7 @@
 
         @media (max-width: 900px) {
             .hero-inner { grid-template-columns: 1fr; min-height: 0; gap: 44px; padding-top: 44px; padding-bottom: 64px; }
+            .hero h1 { font-size: clamp(42px, 8vw, 64px); }
             .hero-sub { max-width: 44ch; }
             .showpiece { aspect-ratio: 4 / 3; max-width: 540px; }
             .tri-grid { grid-template-columns: 1fr; }
@@ -94,10 +100,10 @@
             .steps { grid-template-columns: 1fr; }
         }
         @media (max-width: 560px) {
-            .hero h1 { font-size: clamp(40px, 12vw, 56px); }
+            .hero h1 { font-size: clamp(36px, 10.2vw, 56px); }
             .gallery { grid-template-columns: 1fr; }
             .use-grid { grid-template-columns: 1fr; }
-            .float-chip.one { left: 2%; } .float-chip.two { right: 2%; }
+            .float-chip { display: none; }   /* they covered the screenshot on phones */
         }
     </style>
 </head>
@@ -109,7 +115,7 @@
 <header class="hero">
     <div class="wrap hero-inner">
         <div class="hero-copy">
-            <div class="hero-eyebrow"><span class="dot"></span><span>Free screenshot studio, runs in your browser</span></div>
+            <a class="hero-eyebrow" href="/changelog/"><span class="dot"></span><span><b>New in v35:</b> Before / After compare →</span></a>
             <h1>Screenshots that<br>carry <span class="grad-text">weight</span>.</h1>
             <p class="hero-sub">Backgrounds, device frames, App Store sets, generative AI edits, even video. All in your browser, no account.</p>
             <div class="hero-actions">
@@ -260,7 +266,7 @@
         <div class="steps">
             <div class="step reveal"><div class="num">01</div><h3>Drop in a screenshot</h3><p>Paste, drag, or upload. Add several images and arrange them with auto-layout.</p></div>
             <div class="step reveal"><div class="num">02</div><h3>Style it your way</h3><p>Pick a background, frame, and finish. Annotate, tilt, and enhance until it reads clearly.</p></div>
-            <div class="step reveal"><div class="num">03</div><h3>Export anywhere</h3><p>Copy, download at any store size, export an MP4, or share a link in a click.</p></div>
+            <div class="step reveal"><div class="num">03</div><h3>Download or share</h3><p>Copy, download at any store size, export an MP4, or share a link in a click.</p></div>
         </div>
     </div>
 </section>

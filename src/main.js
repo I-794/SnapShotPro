@@ -43,6 +43,7 @@ import { bindBrandKit } from './features/brand-kit.js';
 import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindBokeh } from './features/bokeh-ui.js';
+import { bindCompare } from './features/compare-ui.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
 import { bindProducer } from './features/producer.js';
@@ -83,6 +84,8 @@ import { bindKeyboard } from './features/keyboard.js';
 import { bindAllControls, updateUIFromState } from './ui/bindings.js';
 import { bindMobileStudio } from './ui/mobile-studio.js';
 import { bindStudioNav } from './features/studio-nav.js';
+import { bindUiMode } from './features/ui-mode.js';
+import { bindFloatingToolbar } from './features/floating-toolbar.js';
 import { bindShareTarget } from './features/share-target.js';
 import { bindExtReceiver } from './features/ext-receiver.js';
 import { bindWelcome } from './features/welcome.js';
@@ -123,6 +126,7 @@ function init() {
   bindExtraImagesEvents();
   bindCanvasTools();
   bindContextMenu();    // v28 — right-click canvas object menu
+  bindFloatingToolbar(); // v35 — toolbar that floats above the canvas selection
   bindAssetLibrary();   // v28 — reusable asset library (Import group)
   bindExportPresets();  // v28 — export presets (Export group)
   bindColorTools();     // v33 — eyedropper + brand/recent swatches on color pickers
@@ -150,6 +154,7 @@ function init() {
   bindBrandBrain();
   bindBgRemove();
   bindBokeh();          // v34 — Subject Bokeh (Adjust group)
+  bindCompare();        // v35 — Before / After Compare (after canvas tools: its hover cursor wins)
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
   bindProducer();      // v30 — Producer autopilot (separate surface)
@@ -190,6 +195,7 @@ function init() {
   bindAllControls();
   bindKeyboard();
   bindStudioNav();
+  bindUiMode();         // v35 — Simple / Pro sidebar (before welcome/what's-new write their flags)
   bindMobileStudio();   // v23 — phone bottom dock + sheet (after studio-nav wires setGroup)
   bindWelcome();
   bindWhatsNew();

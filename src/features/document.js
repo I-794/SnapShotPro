@@ -11,6 +11,7 @@ import { el } from '../ui/elements.js';
 import { render } from '../render/render.js';
 import { normalizeProject } from '../state/serialize.js';
 import { releaseMaskOwner, ensureBokehMask } from '../render/bokeh.js';
+import { ensureCompareImage } from '../render/compare.js';
 
 // Assign a page payload's design + image into global state WITHOUT touching the
 // DOM or re-rendering. Returns a promise that resolves once the image (if any)
@@ -23,7 +24,11 @@ export function applyDesignToState(payload) {
   // (releaseMaskOwner opens a one-shot claim; not before the decode, or a render
   // in between would hand the mask to the previous image). The page's mask is
   // decoded before resolving, so an offscreen render right after draws Bokeh.
-  const maskReady = ensureBokehMask(norm.design && norm.design.bokeh && norm.design.bokeh.maskDataUrl);
+  const maskReady = Promise.all([
+    ensureBokehMask(norm.design && norm.design.bokeh && norm.design.bokeh.maskDataUrl),
+    // v35 — and its Before image, so an offscreen render draws the comparison.
+    ensureCompareImage(norm.design && norm.design.compare && norm.design.compare.beforeSrc),
+  ]);
   return new Promise((resolve) => {
     const done = () => { maskReady.then(() => resolve()); };
     if (norm.image) {
