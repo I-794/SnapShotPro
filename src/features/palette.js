@@ -37,6 +37,8 @@ import { resetOnboarding } from './welcome.js';
 import { canInstallApp, installApp } from './install-app.js';
 import { formatKeys } from './shortcuts.js';
 import { getFrequencyBoost, getRecent, recordUse } from './command-usage.js';
+import { getUiMode, setUiMode } from './ui-mode.js';
+import { toggleFloatingToolbar, isFloatingToolbarEnabled } from './floating-toolbar.js';
 
 let commands = [];
 
@@ -70,6 +72,7 @@ function groupFor(id) {
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
+      id.startsWith('ui-') || id === 'toggle-float-toolbar' ||
       id === 'toggle-spotlight' || id.startsWith('spotlight-') || id.startsWith('bokeh-') || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
@@ -92,6 +95,13 @@ export function registerCommands() {
     { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
     { id: 'theme-light',      label: 'Theme: Light',          icon: '☀️', run: () => applyTheme('light') },
+    // v35 — Simple / Pro sidebar + floating selection toolbar.
+    { id: 'ui-simple', label: 'Simple mode: show only the essential tools', icon: '◐',
+      run: () => setUiMode('simple', { announce: true }), when: () => getUiMode() !== 'simple' },
+    { id: 'ui-pro',    label: 'Pro mode: show every tool', icon: '◑',
+      run: () => setUiMode('pro', { announce: true }), when: () => getUiMode() !== 'pro' },
+    { id: 'toggle-float-toolbar', label: 'Floating selection toolbar: on / off', icon: '▭',
+      run: toggleFloatingToolbar, when: () => state.mode === 'single' || !isFloatingToolbarEnabled() },
     { id: 'install-app',      label: 'Install SnapShotPro as an app', icon: '⬇', run: installApp, when: canInstallApp },
     { id: 'zoom-in',          label: 'Zoom in',               icon: '🔍', run: () => setZoom(state.view.zoom * 1.2) },
     { id: 'zoom-out',         label: 'Zoom out',              icon: '🔍', run: () => setZoom(state.view.zoom / 1.2) },

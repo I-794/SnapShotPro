@@ -225,6 +225,12 @@ function openMenu(clientX, clientY) {
   }, 0);
 }
 
+// v35 — the floating toolbar's "More" button opens the same menu for the
+// current selection.
+export function openContextMenuAt(clientX, clientY) {
+  openMenu(clientX, clientY);
+}
+
 function closeMenu() {
   document.removeEventListener('pointerdown', onDocDown, true);
   window.removeEventListener('blur', closeMenu);

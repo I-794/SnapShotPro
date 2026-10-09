@@ -33,6 +33,10 @@
             </div>
             <div class="header-actions">
                 <span id="auth-pill" style="display:inline-flex;gap:6px;align-items:center;margin-right:4px;"></span>
+                <div class="ui-mode-toggle" id="ui-mode-toggle" role="group" aria-label="Interface mode">
+                    <button type="button" data-mode="simple" title="Simple mode: just the essential tools">Simple</button>
+                    <button type="button" data-mode="pro" title="Pro mode: every tool">Pro</button>
+                </div>
                 <button class="btn btn-secondary" id="install-app-btn" title="Install SnapShotPro as an app" style="display:none;">⬇ <span class="btn-text">Install app</span></button>
                 <button class="btn btn-secondary" id="theme-toggle-btn" title="Toggle Theme">🌙</button>
                 <button class="btn btn-secondary" id="shortcuts-btn" title="Keyboard Shortcuts">⌨️</button>
@@ -56,7 +60,7 @@
     </nav>
 
     <div class="sidebar">
-        <div class="sidebar-section" data-group="import">
+        <div class="sidebar-section" data-group="import" data-simple>
             <h3 class="section-title">Image Upload</h3>
             <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <button class="btn btn-primary" style="flex:1;" id="upload-btn"><span>📁</span> Choose Image</button>
@@ -153,7 +157,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="adjust">
+        <div class="sidebar-section" data-group="adjust" data-simple>
             <h3 class="section-title">Image Editing</h3>
             <label class="control-label">Transform</label>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px;">
@@ -213,7 +217,7 @@
             <button class="btn btn-secondary" id="vary-shuffle" style="width:100%;margin-top:10px;display:none;">🔀 Shuffle again</button>
         </div>
 
-        <div class="sidebar-section" data-group="markup">
+        <div class="sidebar-section" data-group="markup" data-simple>
             <h3 class="section-title">Text &amp; Annotations</h3>
             <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" id="add-text-btn">+ Add Text</button>
             <div id="text-controls" style="display:none;">
@@ -394,7 +398,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="background">
+        <div class="sidebar-section" data-group="background" data-simple>
             <h3 class="section-title">Background</h3>
             <div class="tab-row">
                 <button class="tab-btn active" data-bg="gradient">Gradient</button>
@@ -476,7 +480,7 @@
         </div>
 
         <!-- v20 — AI Design Agent copilot -->
-        <div class="sidebar-section" data-group="ai">
+        <div class="sidebar-section" data-group="ai" data-simple>
             <h3 class="section-title">Design Agent</h3>
             <p class="info-text" style="margin-bottom:8px;">Describe what you want, then refine by chatting. The agent designs, generates, and remembers your style.</p>
             <div id="agent-log" class="agent-log"></div>
@@ -747,7 +751,7 @@
             <p class="info-text" id="brand-info" style="margin-top:8px;">No brand kits saved</p>
         </div>
 
-        <div class="sidebar-section" data-group="adjust">
+        <div class="sidebar-section" data-group="adjust" data-simple>
             <h3 class="section-title">Image Settings</h3>
             <div class="control-group"><label class="control-label">Padding</label><div class="range-group"><input type="range" class="range-input" id="padding" min="0" max="200" value="60"><span class="range-value" id="padding-value">60px</span></div></div>
             <div class="control-group"><label class="control-label">Scale</label><div class="range-group"><input type="range" class="range-input" id="scale" min="50" max="150" value="100"><span class="range-value" id="scale-value">100%</span></div></div>
@@ -775,7 +779,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="background">
+        <div class="sidebar-section" data-group="background" data-simple>
             <h3 class="section-title">Mockup Scenes</h3>
             <div class="scenes-grid" id="scenes-grid">
                 <div class="scene-tile active" data-scene=""><div class="scene-thumb">⊘</div>None</div>
@@ -819,7 +823,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="frame">
+        <div class="sidebar-section" data-group="frame" data-simple>
             <h3 class="section-title">Device &amp; Window Frame</h3>
             <div class="control-group"><label class="control-label">Frame Type</label><select class="control-input" id="device-frame-type"><option value="">None</option><optgroup label="Devices"><option value="iphone16pro">iPhone 16 Pro</option><option value="ipadpro">iPad Pro</option><option value="macbookpro">MacBook Pro</option><option value="watch">Apple Watch</option><option value="studiodisplay">Studio Display</option><option value="pixel">Pixel (Android)</option></optgroup><optgroup label="Windows"><option value="macos">macOS Window</option><option value="windows">Windows Window</option><option value="winlaptop">Windows Laptop</option></optgroup><optgroup label="Browsers"><option value="chrome">Chrome Browser</option><option value="safari">Safari Browser</option><option value="firefox">Firefox Browser</option></optgroup></select></div>
             <div id="device-frame-controls" style="display:none;">
@@ -853,7 +857,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="frame">
+        <div class="sidebar-section" data-group="frame" data-simple>
             <h3 class="section-title">✨ Mockup Presets</h3>
             <div class="scenes-grid">
                 <div class="scene-tile" data-mockup-preset="appstore"><div class="scene-thumb">📱</div>App Store</div>
@@ -979,7 +983,7 @@
             <p class="info-text" id="merge-progress" style="margin-top:8px;"></p>
         </div>
 
-        <div class="sidebar-section" data-group="frame">
+        <div class="sidebar-section" data-group="frame" data-simple>
             <h3 class="section-title">Shadow Settings</h3>
             <div class="shadow-preset-grid">
                 <div class="shadow-preset-btn active" data-shadow="soft">Soft</div>
@@ -1007,7 +1011,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="markup">
+        <div class="sidebar-section" data-group="markup" data-simple>
             <h3 class="section-title">Privacy Tools</h3>
             <p class="info-text" style="margin-bottom:12px;">Use the ▓ Redact tool in the toolbar above the canvas to draw boxes.</p>
             <div class="control-group"><label class="control-label">Redaction Style</label><select class="control-input" id="redact-type"><option value="pixelate">Pixelate</option><option value="blur">Blur</option></select></div>
@@ -1052,7 +1056,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="frame">
+        <div class="sidebar-section" data-group="frame" data-simple>
             <h3 class="section-title">Canvas Settings</h3>
             <div class="control-group"><label class="control-label">Canvas Width</label><input type="number" class="control-input" id="canvas-width" value="1200" min="400" max="4000" step="100"></div>
             <div class="control-group"><label class="control-label">Canvas Height</label><input type="number" class="control-input" id="canvas-height" value="675" min="400" max="4000" step="100"></div>
@@ -1069,7 +1073,7 @@
             <p class="info-text">Export quality: PNG (Lossless)</p>
         </div>
 
-        <div class="sidebar-section" data-group="markup">
+        <div class="sidebar-section" data-group="markup" data-simple>
             <h3 class="section-title">Watermark</h3>
             <div class="toggle-switch"><span class="toggle-label">Enable Watermark</span><label class="switch"><input type="checkbox" id="watermark-enabled"><span class="slider"></span></label></div>
             <div id="watermark-controls" style="display:none;margin-top:16px;">
@@ -1120,7 +1124,7 @@
             </div>
         </div>
 
-        <div class="sidebar-section" data-group="export">
+        <div class="sidebar-section" data-group="export" data-simple>
             <h3 class="section-title">Export Settings</h3>
             <div class="control-group"><label class="control-label">Export Format</label><select class="control-input" id="export-format"><option value="png">PNG (Lossless)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="gif">GIF (Animated)</option></select></div>
             <div id="quality-controls" style="display:none;">
@@ -1146,7 +1150,7 @@
             <button class="btn btn-secondary" style="width:100%;margin-top:8px;" id="export-html-btn">🌐 Export as HTML Card</button>
         </div>
 
-        <div class="sidebar-section" data-group="export">
+        <div class="sidebar-section" data-group="export" data-simple>
             <h3 class="section-title">Share</h3>
             <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="share-btn">&#128279; Share Image</button>
             <p class="info-text" style="margin-bottom:8px;">Upload to Supabase Storage and get a shareable link. Requires cloud setup.</p>
@@ -1175,7 +1179,7 @@
             <p class="info-text" id="collab-status" style="min-height:14px;margin-top:6px;"></p>
         </div>
 
-        <div class="sidebar-section" data-group="project">
+        <div class="sidebar-section" data-group="project" data-simple>
             <h3 class="section-title">📁 Projects</h3>
             <p class="info-text" style="margin-bottom:8px;">Your work autosaves to a project and is versioned automatically. Sign in to sync across devices.</p>
             <div class="project-current">
@@ -1230,7 +1234,7 @@
             <div id="gallery-list"></div>
         </div>
 
-        <div class="sidebar-section" data-group="project">
+        <div class="sidebar-section" data-group="project" data-simple>
             <h3 class="section-title">Templates</h3>
             <div class="control-group"><label class="control-label">Template Name</label><input type="text" class="control-input" id="template-name" placeholder="My Template"></div>
             <div style="display:flex;gap:8px;margin-bottom:12px;">
