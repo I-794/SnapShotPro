@@ -169,6 +169,20 @@ Current `SCHEMA_VERSION` is 21 (v35 Before / After Compare). The board is docume
 
 ## Backlog (unbuilt; next flagship slot is open)
 
+### Planned: v36 Darkroom (batch develop) — not started
+
+Chosen as the v36 flagship (codename Darkroom). Goal: style a whole "roll" of screenshots in one pass, the way a darkroom develops a roll of film the same way.
+
+- **Build on what exists, don't duplicate it.** `src/features/batch-export.js` `exportBatch()` already renders the current design over every image in `state.batch.images` (decoded in `imageRegistry`) into a ZIP via `downloadZip`. Darkroom is the upgrade of that path into a first-class workflow, not a second batch system.
+- **Contact sheet.** A grid of every shot on the roll, each rendered with the current design (offscreen `renderInto` thumbnails, like `pages.js` thumbs). Drop a whole folder or many files; reorder; remove.
+- **Per-shot overrides.** Shared design for the roll, plus small per-shot changes (crop, focal point, caption/text, Before image for Compare, annotations) stored as a diff on top of the shared design. Selecting a shot previews it on the main canvas; edits there either apply to the roll or to that shot only.
+- **Smart fit for mixed sizes.** Phone, tablet, and desktop screenshots on one roll: pick a frame per aspect ratio automatically (e.g. phone -> iPhone mockup, wide -> browser frame) so one design works for all of them.
+- **Develop (export).** Reuse `export-presets.js` (format, quality, 1x/2x/3x) and `renderAtSize` for multiple output sizes per shot; name files from a pattern (`{n}-{name}-{size}`); progress + cancel; ZIP via `downloadZip`. Optionally one PDF contact sheet.
+- **Save the roll with the project.** New state key (e.g. `darkroom`: shot ids, order, per-shot overrides, naming pattern) -> add to `history.js` `snapshot()`, `PROJECT_FIELDS` (shots carry dataURLs, so not lean `SERIALIZED_FIELDS`), bump `SCHEMA_VERSION` 21 -> 22 with an `ensureDarkroomDefaults()` migration, and update the State registry table. Watch project size: cap/encode shots with `imageToDataUrl` like Compare's Before image.
+- **Where it lives.** Sidebar section in the Export group (Pro only, no `data-simple`), plus Cmd-K commands (`darkroom-add`, `darkroom-develop`). Consider whether the existing batch UI is replaced by it.
+- **Alternatives considered for v36:** pro color tools (curves, levels, shareable film looks); AI light-to-dark-mode screenshot converter (pairs with Compare, needs the AI backend). Either can be a later release.
+
+
 - **New creative outputs:** Tour branching + hosted `/tour/:id` URLs (deferred v25 stretch); AI Storyboard / multi-panel generator.
 - **New mockup classes:** print-ready PDF export (bleed / crop marks / CMYK); billboard/large-format and more apparel bases (deferred v27 stretches).
 - **Automation & scale:** public REST API + CLI (headless generation).
