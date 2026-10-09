@@ -38,6 +38,7 @@ import { canInstallApp, installApp } from './install-app.js';
 import { formatKeys } from './shortcuts.js';
 import { getFrequencyBoost, getRecent, recordUse } from './command-usage.js';
 import { getUiMode, setUiMode } from './ui-mode.js';
+import { pickBeforeImage, useCurrentAsBefore, swapBeforeAfter, toggleCompare } from './compare-ui.js';
 import { toggleFloatingToolbar, isFloatingToolbarEnabled } from './floating-toolbar.js';
 
 let commands = [];
@@ -65,14 +66,14 @@ function groupFor(id) {
       id === 'screen-record' || id === 'auto-zoom-toggle') return 'Motion';
   if (id.startsWith('export') || id === 'copy-clipboard' || id === 'load-url' ||
       id.startsWith('share') || id === 'generate-qr' || id.startsWith('mode-') ||
-      id.startsWith('tour-') || id === 'code-studio' || id.startsWith('merge-')) return 'File';
+      id.startsWith('tour-') || id === 'code-studio' || id.startsWith('merge-') || id === 'compare-export-html') return 'File';
   if (id === 'undo' || id === 'redo' || id === 'duplicate-selection' || id === 'select-all-objects' ||
       id.startsWith('distribute-') || id.startsWith('match-') || id === 'hide-selection' ||
       id === 'lock-selection' || id === 'unlock-all') return 'Edit';
   if (id.startsWith('bg-') || id.startsWith('mesh-') || id.startsWith('scene-') ||
       id.startsWith('tilt-') || id === 'reset-tilt' || id.startsWith('style-') ||
       id === 'toggle-layers' || id.startsWith('zoom') || id.startsWith('theme') ||
-      id.startsWith('ui-') || id === 'toggle-float-toolbar' ||
+      id.startsWith('ui-') || id === 'toggle-float-toolbar' || id.startsWith('compare-') ||
       id === 'toggle-spotlight' || id.startsWith('spotlight-') || id.startsWith('bokeh-') || id === 'toggleBoard' || id.startsWith('board') || id === 'seedFromUrl' || id === 'askAgentBoard') return 'View';
   return 'More';
 }
@@ -95,6 +96,13 @@ export function registerCommands() {
     { id: 'select-all-objects',  label: 'Select all objects',  icon: '▦', run: () => { selectAll(); render(); }, when: () => !!state.image },
     { id: 'theme-dark',       label: 'Theme: Dark',           icon: '🌙', run: () => applyTheme('dark') },
     { id: 'theme-light',      label: 'Theme: Light',          icon: '☀️', run: () => applyTheme('light') },
+    // v35 — Before / After Compare.
+    { id: 'compare-add-before', label: 'Before / After: Add Before image', icon: '◧', run: pickBeforeImage },
+    { id: 'compare-use-current', label: 'Before / After: Use current screenshot as Before', icon: '◧', run: useCurrentAsBefore, when: () => !!state.image },
+    { id: 'compare-toggle', label: 'Before / After: Show or hide comparison', icon: '◧', run: toggleCompare, when: () => !!state.compare?.beforeSrc },
+    { id: 'compare-swap', label: 'Before / After: Swap Before and After', icon: '⇄', run: swapBeforeAfter, when: () => !!(state.compare?.beforeSrc && state.image) },
+    { id: 'compare-export-html', label: 'Before / After: Export interactive slider (HTML)', icon: '🌐',
+      run: () => import('./compare-export.js').then((m) => m.exportCompareHTML()), when: () => !!(state.compare?.beforeSrc && state.image) },
     // v35 — Simple / Pro sidebar + floating selection toolbar.
     { id: 'ui-simple', label: 'Simple mode: show only the essential tools', icon: '◐',
       run: () => setUiMode('simple', { announce: true }), when: () => getUiMode() !== 'simple' },

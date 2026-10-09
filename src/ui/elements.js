@@ -81,6 +81,14 @@ const IDS = [
   'bokeh-detect-btn', 'bokeh-status', 'bokeh-enabled', 'bokeh-controls',
   'bokeh-amount', 'bokeh-amount-value', 'bokeh-highlights', 'bokeh-highlights-value', 'bokeh-shape',
 
+  // v35 — Before / After Compare
+  'compare-upload-btn', 'compare-use-current-btn', 'compare-file-input', 'compare-thumb-row', 'compare-thumb',
+  'compare-swap-btn', 'compare-remove-btn', 'compare-status', 'compare-enabled', 'compare-controls',
+  'compare-split', 'compare-split-value', 'compare-orientation', 'compare-fit', 'compare-labels-enabled',
+  'compare-label-fields', 'compare-label-before', 'compare-label-after', 'compare-label-position',
+  'compare-divider-color', 'compare-divider-color-text', 'compare-divider-width', 'compare-divider-width-value',
+  'compare-handle', 'compare-wipe', 'compare-export-html-btn',
+
   // v16.1 — Studio Effects: liquid glass + film grain
   'glass-enabled', 'glass-controls', 'glass-blur', 'glass-blur-value',
   'glass-radius', 'glass-radius-value', 'glass-tint', 'glass-tint-opacity', 'glass-tint-opacity-value', 'glass-rim',

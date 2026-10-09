@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="theme-color" content="#0b0c0f">
-    <title>SnapShotPro v34 · Pro Editor</title>
+    <title>SnapShotPro v35 · Pro Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <circle cx="46" cy="26" r="1.6" fill="#ff3b30"/>
                     </svg>
                 </div>
-                <span>SnapShotPro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v34 · Bokeh</span></span>
+                <span>SnapShotPro <span style="font-size:13px;font-weight:400;color:var(--text-secondary);">v35 · Contrast</span></span>
             </div>
             <div class="header-actions">
                 <span id="auth-pill" style="display:inline-flex;gap:6px;align-items:center;margin-right:4px;"></span>
@@ -128,6 +128,42 @@
         <!-- v28 — Asset Library: a persistent gallery of recently loaded images
              to re-use. Click a thumb to add it as a layer, double-click to set it
              as the main image. -->
+        <div class="sidebar-section" data-group="import" data-simple id="compare-section">
+            <h3 class="section-title">Before / After</h3>
+            <p class="info-text" style="margin-bottom:12px;">Show what changed. Your screenshot is After; add the old one as Before.</p>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <button class="btn btn-primary" style="flex:1;" id="compare-upload-btn">Add Before</button>
+                <button class="btn btn-secondary" style="flex:1;" id="compare-use-current-btn" title="Keep the current screenshot as Before, then load the new one as After">Use current as Before</button>
+            </div>
+            <input type="file" id="compare-file-input" accept="image/*" style="display:none;" aria-label="Before image file">
+            <div class="compare-thumb-row" id="compare-thumb-row" style="display:none;">
+                <img id="compare-thumb" alt="Before image">
+                <span class="compare-thumb-label">Before</span>
+                <button class="btn btn-secondary" id="compare-swap-btn" title="Swap Before and After">⇄ <span>Swap</span></button>
+                <button class="btn btn-secondary" id="compare-remove-btn" title="Remove the Before image">✕</button>
+            </div>
+            <p class="info-text" id="compare-status" style="min-height:14px;margin-bottom:8px;"></p>
+            <div class="toggle-switch"><span class="toggle-label">Show comparison</span><label class="switch"><input type="checkbox" id="compare-enabled"><span class="slider"></span></label></div>
+            <div id="compare-controls" style="display:none;margin-top:16px;">
+                <div class="control-group"><label class="control-label">Divider Position</label><div class="range-group"><input type="range" class="range-input" id="compare-split" min="0" max="100" value="50"><span class="range-value" id="compare-split-value">50%</span></div></div>
+                <div class="control-group"><label class="control-label">Direction</label><select class="control-input" id="compare-orientation"><option value="vertical">Left / right</option><option value="horizontal">Top / bottom</option></select></div>
+                <div class="control-group"><label class="control-label">Before Image Fit</label><select class="control-input" id="compare-fit"><option value="cover">Fill the frame</option><option value="contain">Show the whole image</option></select></div>
+                <div class="toggle-switch"><span class="toggle-label">Labels</span><label class="switch"><input type="checkbox" id="compare-labels-enabled" checked><span class="slider"></span></label></div>
+                <div id="compare-label-fields" style="margin-top:10px;">
+                    <div style="display:flex;gap:8px;" class="control-group">
+                        <input type="text" class="control-input" id="compare-label-before" value="Before" maxlength="40" aria-label="Before label" style="flex:1;min-width:0;">
+                        <input type="text" class="control-input" id="compare-label-after" value="After" maxlength="40" aria-label="After label" style="flex:1;min-width:0;">
+                    </div>
+                    <div class="control-group"><label class="control-label">Label Position</label><select class="control-input" id="compare-label-position"><option value="top">Top</option><option value="bottom">Bottom</option></select></div>
+                </div>
+                <div class="control-group"><label class="control-label">Divider Color</label><div class="color-picker-wrapper"><div class="color-preview"><input type="color" id="compare-divider-color" value="#ffffff"></div><input type="text" class="control-input" id="compare-divider-color-text" value="#ffffff" style="flex:1;"></div></div>
+                <div class="control-group"><label class="control-label">Divider Width</label><div class="range-group"><input type="range" class="range-input" id="compare-divider-width" min="0" max="8" value="3"><span class="range-value" id="compare-divider-width-value">3px</span></div></div>
+                <div class="toggle-switch"><span class="toggle-label">Drag handle</span><label class="switch"><input type="checkbox" id="compare-handle" checked><span class="slider"></span></label></div>
+                <div class="toggle-switch"><span class="toggle-label">Animate a wipe (Motion Studio)</span><label class="switch"><input type="checkbox" id="compare-wipe"><span class="slider"></span></label></div>
+                <button class="btn btn-secondary" style="width:100%;margin-top:12px;" id="compare-export-html-btn">Export interactive slider (HTML)</button>
+            </div>
+        </div>
+
         <div class="sidebar-section" data-group="import">
             <h3 class="section-title">Asset Library</h3>
             <p class="info-text" id="asset-library-empty" style="margin-bottom:8px;">Images you load show up here to drop back in later. Click to add as a layer · double-click for main image.</p>

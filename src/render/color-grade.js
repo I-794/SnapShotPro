@@ -17,6 +17,7 @@ import {
   luminance, rgbToLab, labToRgb, buildGradientRamp, nearestSwatch, paletteLabStats
 } from '../utils/color.js';
 import { applyBokeh, bokehActive, maskFits } from './bokeh.js';
+import { applyCompare } from './compare.js';
 
 let idCounter = 0;
 const cache = { sig: null, canvas: null };
@@ -205,6 +206,12 @@ function imageId(img) {
 // v34 — every caller gets Bokeh on top of the grade for free: this one seam
 // feeds the flat, 2D mockup, 3D screen, and Surface paths.
 export function getGradedImage(srcImage) {
+  // v35 — Before / After Compare wraps the finished After image (grade + Bokeh).
+  const out = gradeAndBlur(srcImage);
+  return srcImage === state.image ? applyCompare(out) : out;
+}
+
+function gradeAndBlur(srcImage) {
   const graded = gradeImage(srcImage);
   if (!graded || !graded.width) return graded;
   // maskFits first (even with Bokeh off) so the one-shot claim after a page

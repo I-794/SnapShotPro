@@ -43,6 +43,7 @@ import { bindBrandKit } from './features/brand-kit.js';
 import { bindBrandBrain } from './features/brand-brain.js';
 import { bindBgRemove } from './features/bg-remove.js';
 import { bindBokeh } from './features/bokeh-ui.js';
+import { bindCompare } from './features/compare-ui.js';
 import { bindAiAssets } from './features/ai-assets.js';
 import { bindAiAgent } from './features/ai-agent.js';
 import { bindProducer } from './features/producer.js';
@@ -153,6 +154,7 @@ function init() {
   bindBrandBrain();
   bindBgRemove();
   bindBokeh();          // v34 — Subject Bokeh (Adjust group)
+  bindCompare();        // v35 — Before / After Compare (after canvas tools: its hover cursor wins)
   bindAiAssets();      // v19 — AI Assets (on-brand background + isolate)
   bindAiAgent();       // v20 — AI Design Agent copilot
   bindProducer();      // v30 — Producer autopilot (separate surface)

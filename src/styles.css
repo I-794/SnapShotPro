@@ -1905,3 +1905,12 @@ kbd {
     .ui-mode-toggle button { padding: 7px 9px; }
     .ftb-label { display: none; }
 }
+
+/* v35 — Before / After Compare: the Before thumbnail row */
+.compare-thumb-row {
+    display: flex; align-items: center; gap: 8px; margin: 4px 0 8px;
+    padding: 6px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-tertiary);
+}
+.compare-thumb-row img { width: 54px; height: 36px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--bg-primary); }
+.compare-thumb-label { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.compare-thumb-row .btn { padding: 6px 10px; font-size: 12px; }

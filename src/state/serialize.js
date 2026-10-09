@@ -9,6 +9,7 @@
 import { state } from './state.js';
 import { upgradeSpotlight } from '../render/spotlight-geom.js';
 import { bokehDefaults } from '../render/bokeh-core.js';
+import { normalizeCompare } from '../render/compare-core.js';
 
 export const SERIALIZED_FIELDS = [
   'imageTransform', 'imageFilters', 'imageLayer', 'textOverlay', 'watermark', 'gradient',
@@ -78,7 +79,7 @@ export function snapshotProject() {
 // restores the artwork — unlike snapshotProject(), which stays deliberately
 // lean for realtime collab/gallery payloads. Bump SCHEMA_VERSION whenever the
 // field set changes so normalizeProject() can migrate older saves.
-export const SCHEMA_VERSION = 20;
+export const SCHEMA_VERSION = 21;
 
 // SERIALIZED_FIELDS + the rest of the design-defining state. Kept separate from
 // SERIALIZED_FIELDS so collab/gallery stay small; projects want full fidelity.
@@ -99,7 +100,9 @@ export const PROJECT_FIELDS = [
   // only, deliberately not in the lean SERIALIZED_FIELDS, mirroring `logo`).
   'brand',
   // v34 — Subject Bokeh (carries a mask dataURL, so project-only like `brand`).
-  'bokeh'
+  'bokeh',
+  // v35 — Before / After Compare (carries the Before dataURL, so project-only).
+  'compare'
 ];
 
 // v25 — guarantee every applied design carries a `tour` block. Because
@@ -206,6 +209,14 @@ export function ensureBokehDefaults(design) {
   return design;
 }
 
+// v35 — schema 21 migration: every applied design carries a valid `compare`
+// block, so a page that predates v35 never inherits the previous page's Before
+// image via Object.assign. Mutates + returns the design.
+export function ensureCompareDefaults(design) {
+  if (design) design.compare = normalizeCompare(design.compare);
+  return design;
+}
+
 // v34 — schema 20 migration: v1's single spotlight rect becomes regions[0] of
 // Spotlight 2.0 (blur/feather/tint default to the v1 look). Mutates + returns.
 export function migrateSpotlightV20(design) {
@@ -220,7 +231,7 @@ export function normalizeProject(payload) {
   if (!payload || typeof payload !== 'object') {
     return { schemaVersion: SCHEMA_VERSION, design: {}, image: null, svgCode: null };
   }
-  const migrate = (d) => ensureBokehDefaults(migrateSpotlightV20(ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(d))))));
+  const migrate = (d) => ensureCompareDefaults(ensureBokehDefaults(migrateSpotlightV20(ensureBrandDefaults(migrateTimelineV18(ensureTourDefaults(sanitizeMotionRuntime(d)))))));
   if (payload.design) {
     return {
       schemaVersion: payload.schemaVersion || SCHEMA_VERSION,

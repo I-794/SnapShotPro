@@ -10,22 +10,22 @@
 // release's highlights — same checklist step as the editor version badge and
 // the changelog page.
 
-const CURRENT_VERSION = '34.0';
+const CURRENT_VERSION = '35.0';
 const LASTSEEN_KEY = 'snapshotpro_lastseen_version';
 const WELCOME_KEY  = 'snapshotpro_welcome_v1';   // set by welcome.js on dismissal
 
 // Latest release only — the newest version’s highlights, not an accumulation.
 const WHATS_NEW = {
-  heading: "📷 v34 · Bokeh",
+  heading: "📷 v35 · Contrast",
   items: [
-    { title: 'Spotlight, rebuilt',
-      desc: 'Add several focus areas, pick box, circle, or rounded, and blur everything else.' },
-    { title: 'Real background blur',
-      desc: 'Bokeh (Adjust tab) finds your subject and softens the background like a camera lens.' },
-    { title: 'Bokeh highlights',
-      desc: 'Bright spots bloom into soft circles. Turn it up or down with one slider.' },
-    { title: 'Works everywhere',
-      desc: 'Both effects bake into your exported images, and Bokeh works in every mockup too.' }
+    { title: 'Before / After',
+      desc: 'Add your old screenshot as Before (Import tab) and drag the divider to show what changed.' },
+    { title: 'Wipe and slider exports',
+      desc: 'Animate a wipe in Motion Studio, or export an interactive slider page you can embed anywhere.' },
+    { title: 'Simple and Pro modes',
+      desc: 'Simple shows just the essential tools. Switch to Pro in the header for everything.' },
+    { title: 'Floating toolbar',
+      desc: 'Select something on the canvas to change its color, size, or order right where it is.' }
   ]
 };
 
