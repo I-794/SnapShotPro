@@ -51,7 +51,8 @@
         .browser-shot { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; background: #0b0e1a; }
         .float-chip { position: absolute; z-index: 2; background: rgba(14,18,32,0.66); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border-radius: 13px; padding: 10px 14px; box-shadow: var(--shadow-lift); border: 1px solid var(--glass-line); display: flex; align-items: center; gap: 9px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
         .float-chip svg { width: 16px; height: 16px; color: var(--accent); }
-        .float-chip.one { bottom: 11%; left: -4%; } .float-chip.two { top: 14%; right: -3%; }
+        /* Inside the card: .showpiece clips overflow, so negative offsets cut the chips off. */
+        .float-chip.one { bottom: 6%; left: 5%; } .float-chip.two { top: 6%; right: 5%; }
 
         .fc-copy .eyebrow { margin-bottom: 12px; }
         .fc-copy h2 { font-size: clamp(26px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; margin-bottom: 16px; color: var(--ink); }
